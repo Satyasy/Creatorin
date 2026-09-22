@@ -39,7 +39,7 @@ function Header() {
     <Brand />
     <button className="mobile-menu" onClick={() => setOpen(!open)} aria-label="Buka navigasi" aria-expanded={open}>{open ? <X /> : <Menu />}</button>
     <nav className={open ? "main-nav is-open" : "main-nav"} aria-label="Navigasi utama">
-      <Link href="/">Beranda</Link><JelajahNav /><a href="#collaboration">Collaboration Room</a><a href="#brief">Brief Proyek</a>
+      <Link href="/">Beranda</Link><JelajahNav /><a href="#collaboration">Collaboration Room</a><Link href="/brief">Brief Proyek</Link>
     </nav>
     <div className="header-actions">
       <Link className="icon-button notification" href="/pesan" aria-label="Pesan"><MessageSquare /><i className="blue-dot" /></Link>
@@ -54,7 +54,7 @@ function Hero() {
     <div className="eyebrow"><span><Sparkles /></span><b>Platform Kolaborasi Kreatif</b><i />Marketplace Jasa Digital & UMKM</div>
     <h1><strong>Temukan</strong> Talenta Kreatif,<br />Wujudkan <em>Ide Digital.</em></h1>
     <p>Temukan creator berbakat untuk kebutuhan digitalmu, atau tampilkan keahlianmu dan dapatkan project yang tepat.</p>
-    <div className="hero-actions"><Link className="button button--dark" href="/jelajah/creator">Jelajahi Creator <ArrowRight /></Link><a className="button button--light" href="#brief">Tawarkan Keahlian</a></div>
+    <div className="hero-actions"><Link className="button button--dark" href="/jelajah/creator">Jelajahi Creator <ArrowRight /></Link><Link className="button button--light" href="/brief">Tawarkan Keahlian</Link></div>
   </div></section>;
 }
 
@@ -262,7 +262,7 @@ export default function App({ initialData }: { initialData?: DiscoverDataProps }
       </>
     )}
   </div></section></main><Footer />
-    {briefVisible && <aside className="brief-toast" id="brief"><div><span><BriefcaseBusiness /></span><p><b>Start a Project Brief</b> &mdash; Tell us what you need and find the right creator.</p></div><div><Link href="/">Get Started</Link><button onClick={() => setBriefVisible(false)} aria-label="Tutup"><X /></button></div></aside>}
+    {briefVisible && <aside className="brief-toast" id="brief"><div><span><BriefcaseBusiness /></span><p><b>Start a Project Brief</b> &mdash; Tell us what you need and find the right creator.</p></div><div><Link href="/brief">Get Started</Link><button onClick={() => setBriefVisible(false)} aria-label="Tutup"><X /></button></div></aside>}
   </div>;
 }
 

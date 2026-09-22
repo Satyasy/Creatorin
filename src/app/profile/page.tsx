@@ -31,7 +31,7 @@ const profileProjects = Array.from({ length: 4 }, (_, id) => ({
 function ProfileHeader() {
   return <header className="profile-header"><div className="profile-header-inner">
     <div className="profile-header-start"><Link className="brand" href="/" aria-label="Kembali ke Creatorin"><img src="/creatorin/logo.svg" alt="" /><span>Creatorin</span></Link><form className="profile-search" onSubmit={(event) => event.preventDefault()}><input aria-label="Cari" placeholder="Cari kreator, keahlian, atau video UGC..." /><button aria-label="Cari"><Search /></button></form></div>
-    <nav className="profile-nav" aria-label="Navigasi utama"><Link href="/">Beranda</Link><JelajahNav /><a href="#collaboration">Collaboration Room</a><a href="#brief">Brief Proyek</a></nav>
+    <nav className="profile-nav" aria-label="Navigasi utama"><Link href="/">Beranda</Link><JelajahNav /><Link href="/">Collaboration Room</Link><Link href="/brief">Brief Proyek</Link></nav>
     <div className="header-actions"><Link className="icon-button notification" href="/pesan" aria-label="Pesan"><MessageSquare /><i className="blue-dot" /></Link><Link className="icon-button notification" href="/notifikasi" aria-label="Notifikasi"><Bell /><i className="pink-dot" /></Link><Link className="profile-button" href="/profile" aria-label="Profil creator"><img src="/creatorin/avatar.png" alt="Qaesyaar Aqeel" /><i /></Link></div>
   </div></header>;
 }
@@ -75,7 +75,7 @@ const reviewItems = [
 function ServicesPanel() {
   return <div className="profile-service-grid">{profileServices.map(([title, category, price, time]) => <article className="profile-service-card" key={title}>
     <div className="profile-service-visual"><ShaderFill className="profile-cover-shader" shader={{ setup: setup, render, manifest, params: { falloff: 1, inverseFalloff: false, ringCount: 20, offset: 0, shape: 1, transform: { x: 50, y: 50, radius: 50, angle: 0 }, color: { r: 1, g: 1, b: 1, a: 1 } } }} /></div>
-    <span className="profile-service-tag">{category}</span><h3>{title}</h3><p>Pengerjaan profesional dengan jaminan kepatuhan brief dan revisi cepat.</p><div className="profile-service-time"><Clock3 /> Estimasi: {time}</div><div className="profile-service-footer"><div><small>HARGA</small><strong>{price}</strong></div><button aria-label="Simpan layanan"><Heart /></button><a href="#brief">Diskusikan</a></div>
+    <span className="profile-service-tag">{category}</span><h3>{title}</h3><p>Pengerjaan profesional dengan jaminan kepatuhan brief dan revisi cepat.</p><div className="profile-service-time"><Clock3 /> Estimasi: {time}</div><div className="profile-service-footer"><div><small>HARGA</small><strong>{price}</strong></div><button aria-label="Simpan layanan"><Heart /></button><Link href="/brief">Diskusikan</Link></div>
   </article>)}</div>;
 }
 function StatisticsPanel() {

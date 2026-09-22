@@ -9,7 +9,7 @@
 .profile-search button { width: 32px; height: 32px; flex: 0 0 32px; display: grid; place-items: center; border: 0; border-radius: 50%; background: #155dfc; color: #fff; cursor: pointer; }
 .profile-search svg { width: 16px; height: 16px; }
 .profile-nav { display: flex; align-items: center; gap: 28px; color: #404040; font-size: 14px; font-weight: 600; }
-.profile-nav a { display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; }
+.profile-nav > a { height: 68px; display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; }
 .profile-nav a:hover, .profile-nav .active, .profile-nav .explore-trigger.active { color: #0d0c22; }
 .profile-nav svg { width: 14px; height: 14px; }
 .profile-nav .explore-menu { height: 68px; }
