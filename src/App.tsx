@@ -41,7 +41,7 @@ function Header() {
       <a href="#top">Beranda</a><a className="active" href="#discover">Jelajah <ChevronDown /></a><a href="#collaboration">Collaboration Room</a><a href="#brief">Brief Proyek</a>
     </nav>
     <div className="header-actions">
-      <button className="icon-button notification" aria-label="Pesan"><MessageSquare /><i className="blue-dot" /></button>
+      <Link className="icon-button notification" href="/pesan" aria-label="Pesan"><MessageSquare /><i className="blue-dot" /></Link>
       <button className="icon-button notification" aria-label="Notifikasi"><Bell /><i className="pink-dot" /></button>
       <Link className="profile-button" href="/profile" aria-label="Buka profil creator"><img src="/creatorin/avatar.png" alt="Qaesyaar Aqeel" /><i /></Link>
     </div>
@@ -83,21 +83,21 @@ function ServiceListingCard({ item }: { item: (typeof marketplaceServices)[numbe
 }
 
 function ProjectCard({ item }: { item: (typeof projects)[number] }) {
-  return <article className="project-card">
+  return <Link className="project-card" href="/proyek/skincare-barrier-restoring-serum" aria-label={`Buka detail proyek ${item.title}`}>
     <ShaderFill className="portfolio-shader" shader={{ setup, render, manifest, params: { falloff: 1, inverseFalloff: false, ringCount: 20, offset: item.id * .03, shape: 1, transform: { x: 50, y: 50, radius: 50, angle: 0 }, color: { r: 1, g: 1, b: 1, a: 1 } } }} />
     <span className="project-play" aria-hidden="true"><Play fill="currentColor" /></span>
     <div className="project-info"><h3>{item.title}</h3><div><span>{item.creator}</span><span>{item.views}</span></div></div>
-  </article>;
+  </Link>;
 }
 
-function CreatorCard({ id, query }: { id: number; query: string }) {
+function CreatorCard({ query }: { query: string }) {
   const [saved, setSaved] = useState(false);
   const visibleServices = services.filter(({ title, category }) => `${title} ${category}`.toLowerCase().includes(query.toLowerCase()));
   return <article className="creator-card">
     <div className="creator-head"><div className="creator-profile"><Link className="avatar-wrap" href="/profile/qaesyaar-aqeel" aria-label="Buka profil Qaesyaar Aqeel"><img src="/creatorin/avatar.png" alt="Qaesyaar Aqeel" /><span><Check /></span></Link><div className="creator-copy">
       <div className="creator-title"><h3><Link href="/profile/qaesyaar-aqeel">Qaesyaar Aqeel</Link></h3><b>PRO+</b><span className="rating"><Star /> 5 <i>(88)</i></span><span><BriefcaseBusiness />88 proyek selesai</span><small>Promoted</small></div>
-      <div className="creator-details"><strong>Mulai Rp200.000/proyek</strong><i>ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¢</i><span><MapPin />Bandung, Jawa Barat</span><i>ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¢</i><span><b>95%</b> Skor Karir</span><i>ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¢</i><span>10 Layanan tersedia</span></div>
-    </div></div><div className="creator-actions"><button className={saved ? "save-button saved" : "save-button"} onClick={() => setSaved(!saved)} aria-label={saved ? "Hapus dari tersimpan" : "Simpan creator"}><Bookmark fill={saved ? "currentColor" : "none"} /></button><a className="contact-button" href={`mailto:hello@creatorin.id?subject=Project untuk creator ${id + 1}`}>Hubungi</a></div></div>
+      <div className="creator-details"><strong>Mulai Rp200.000/proyek</strong><i>&middot;</i><span><MapPin />Bandung, Jawa Barat</span><i>&middot;</i><span><b>95%</b> Skor Karir</span><i>&middot;</i><span>10 Layanan tersedia</span></div>
+    </div></div><div className="creator-actions"><button className={saved ? "save-button saved" : "save-button"} onClick={() => setSaved(!saved)} aria-label={saved ? "Hapus dari tersimpan" : "Simpan creator"}><Bookmark fill={saved ? "currentColor" : "none"} /></button><Link className="contact-button" href="mailto:hello@creatorin.id">Hubungi</Link></div></div>
     <div className="portfolio-grid">{visibleServices.length ? visibleServices.map((item) => <PortfolioCard item={item} key={item.title} />) : <p className="empty-state">Belum ada layanan yang cocok dengan pencarianmu.</p>}</div>
     <div className="skill-list">{skills.map((skill) => <span key={skill}>{skill}</span>)}<small>+2 keahlian lainnya</small></div>
   </article>;
@@ -113,7 +113,7 @@ function Footer() {
   return <footer className="footer"><div className="footer-inner">
     <div className="footer-top"><Brand footer /><div className="social"><span>Social Media</span><a href="#twitter" aria-label="X Twitter"><Twitter /></a><a href="#instagram" aria-label="Instagram"><Instagram /></a><a href="#linkedin" aria-label="LinkedIn"><Linkedin /></a></div></div>
     <div className="footer-body"><div className="about"><h3>Tentang Platform</h3><p>Hubungkan bisnis dengan creator yang tepat untuk membangun karya dan kolaborasi yang berdampak.</p><div className="partners"><img src="/creatorin/partner-1.png" alt="Innovation Room" /><img src="/creatorin/partners.png" alt="Partner Creatorin" /></div></div><div className="footer-columns">{columns.map(([title, ...links]) => <div key={title}><h3>{title}</h3>{links.map((link) => <a href="#top" key={link}>{link}</a>)}</div>)}</div></div>
-    <div className="footer-word" aria-hidden="true">creatorin</div><div className="footer-bottom"><span>Ãƒâ€šÃ‚Â© 2026 Creatorin. All rights reserved.</span><div><a href="#terms">Syarat & Ketentuan</a><a href="#privacy">Kebijakan Privasi</a><a href="#cookies">Cookie Policy</a></div></div>
+    <div className="footer-word" aria-hidden="true">creatorin</div><div className="footer-bottom"><span>&copy; 2026 Creatorin. All rights reserved.</span><div><a href="#terms">Syarat & Ketentuan</a><a href="#privacy">Kebijakan Privasi</a><a href="#cookies">Cookie Policy</a></div></div>
   </div></footer>;
 }
 
@@ -125,11 +125,11 @@ export default function App() {
   const filteredServices = marketplaceServices.filter((item) => Object.values(item).join(" ").toLowerCase().includes(needle));
   const filteredProjects = projects.filter((item) => Object.values(item).join(" ").toLowerCase().includes(needle));
   return <div className="creatorin-app"><Header /><main><Hero /><section className="discover" id="discover"><DiscoverControls query={query} setQuery={setQuery} tab={tab} setTab={setTab} /><div id="discover-results" role="tabpanel">
-    {tab === "Creator" && <div className="creator-list">{Array.from({ length: 6 }, (_, id) => <CreatorCard id={id} query={query} key={id} />)}</div>}
+    {tab === "Creator" && <div className="creator-list">{Array.from({ length: 6 }, (_, id) => <CreatorCard query={query} key={id} />)}</div>}
     {tab === "Layanan" && <div className="service-grid">{filteredServices.length ? filteredServices.map((item) => <ServiceListingCard item={item} key={item.id} />) : <p className="empty-state">Belum ada layanan yang cocok dengan pencarianmu.</p>}</div>}
     {tab === "Proyek" && <div className="project-grid">{filteredProjects.length ? filteredProjects.map((item) => <ProjectCard item={item} key={item.id} />) : <p className="empty-state">Belum ada proyek yang cocok dengan pencarianmu.</p>}</div>}
   </div></section></main><Footer />
-    {briefVisible && <aside className="brief-toast" id="brief"><div><span><BriefcaseBusiness /></span><p><b>Start a Project Brief</b> ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Tell us what you need and find the right creator.</p></div><div><a href="#discover">Get Started</a><button onClick={() => setBriefVisible(false)} aria-label="Tutup"><X /></button></div></aside>}
+    {briefVisible && <aside className="brief-toast" id="brief"><div><span><BriefcaseBusiness /></span><p><b>Start a Project Brief</b> &mdash; Tell us what you need and find the right creator.</p></div><div><a href="#discover">Get Started</a><button onClick={() => setBriefVisible(false)} aria-label="Tutup"><X /></button></div></aside>}
   </div>;
 }
 
