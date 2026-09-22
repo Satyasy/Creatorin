@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { getDb } from "@/lib/db";
-import { profiles, creatorProfiles, businessProfiles, creatorWallets } from "@/lib/db/schema";
+import { profiles, creatorProfiles, businessProfiles, creatorWallets, schoolProfiles } from "@/lib/db/schema";
 
 export async function POST(req: NextRequest) {
   try {
@@ -55,6 +55,12 @@ export async function POST(req: NextRequest) {
           profileId: userId,
           companyName: fullName,
           businessCategory: "UMKM / Bisnis",
+        }).onConflictDoNothing();
+      } else if (role === "school") {
+        await db.insert(schoolProfiles).values({
+          profileId: userId,
+          schoolName: fullName,
+          picName: fullName,
         }).onConflictDoNothing();
       }
     }
