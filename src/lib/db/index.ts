@@ -12,8 +12,12 @@ export function getDb() {
   }
 
   if (!dbInstance) {
-    // Disable prefetch for transaction poolers / serverless
-    const client = postgres(connectionString, { prepare: false });
+    // Disable prefetch for transaction poolers / serverless + enable SSL
+    const client = postgres(connectionString, {
+      prepare: false,
+      ssl: { rejectUnauthorized: false },
+      connect_timeout: 10,
+    });
     dbInstance = drizzle(client, { schema });
   }
 

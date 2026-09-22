@@ -15,6 +15,39 @@ export async function getAuthenticatedUser(req: NextRequest): Promise<AuthUser |
   // 1. Check for testing/development override header
   const devUserId = req.headers.get("x-user-id");
   if (devUserId) {
+    if (devUserId === "33333333-3333-3333-3333-333333333333") {
+      return {
+        id: devUserId,
+        email: "munir@creatorin.id",
+        role: "creator",
+        fullName: "Sobakhul Munir Siroj",
+      };
+    }
+    if (devUserId === "44444444-4444-4444-4444-444444444444") {
+      return {
+        id: devUserId,
+        email: "glowlab@creatorin.id",
+        role: "business",
+        fullName: "GlowLab Skincare Indonesia",
+      };
+    }
+    if (devUserId === "11111111-1111-1111-1111-111111111111") {
+      return {
+        id: devUserId,
+        email: "maya@creatorin.id",
+        role: "creator",
+        fullName: "Maya Angelina",
+      };
+    }
+    if (devUserId === "22222222-2222-2222-2222-222222222222") {
+      return {
+        id: devUserId,
+        email: "qaesyaar@creatorin.id",
+        role: "creator",
+        fullName: "Qaesyaar Aqeel",
+      };
+    }
+
     const db = getDb();
     if (db) {
       try {
