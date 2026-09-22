@@ -34,7 +34,7 @@ export default function ProjectDetailPage() {
   const [commentsOpen, setCommentsOpen] = useState(false);
   const related = Array.from({ length: 8 }, (_, index) => index);
   return <div className="project-detail-page">
-    <div className="project-close"><Link href="/#discover" aria-label="Tutup detail proyek"><X /></Link></div>
+    <div className="project-close"><Link href="/" aria-label="Tutup detail proyek"><X /></Link></div>
     <div className={commentsOpen ? "project-sheet comments-open" : "project-sheet"}>
       <header className="project-detail-header"><div className="project-detail-header-inner">
         <div className="project-author"><span className="project-author-avatar"><img src="/creatorin/maya-angelina.png" alt="" /><i /></span><div><h2>Maya Angelina</h2><div className="project-author-meta"><span className="project-status"><i />Available for work</span><span className="project-follow">Follow</span><span>mayaangelina.creatorin.id</span><span>inquiry@mayaangelina.com</span></div></div></div>
@@ -50,7 +50,7 @@ export default function ProjectDetailPage() {
           <div className="project-copy"><p>Bukannya pegangan tangan romantis, malah diajarin form deadlift yang bener 😭😂 Konten soft-selling pakaian olahraga & suplemen whey protein yang relate banget sama Gen-Z! Engagement rate: 14.8%!</p><p>Proyek ini diproduksi untuk memenuhi standar kampanye performa tinggi bagi UMKM dan brand digital di Indonesia, mengintegrasikan visual storytelling dan conversion heuristics.</p></div>
           <div className="project-tags">{["#AnakGym", "#POV", "#TikTokViral", "#FitnessUGC", "#RelateLucu", "#Royalti"].map((tag) => <span key={tag}>{tag}</span>)}</div>
           <section className="project-creator-card"><img src="/creatorin/maya-angelina.png" alt="" /><h2>Maya Angelina</h2><p>Kreator UGC, sketsa ringan, dan storytelling komersial yang siap dipakai untuk brand.</p><div><Link href="/pesan">Kirim Pesan</Link><Link href="/profile/maya-angelina">Buka Kreator</Link></div></section>
-          <section className="related-projects"><header><h2>Proyek Serupa</h2><Link href="/#discover">Lihat Proyek Lainnya</Link></header><div className="related-grid">{related.map((item) => <article className="related-card" key={item}><img src={item % 2 ? "/creatorin/project-related-2.png" : "/creatorin/project-related-1.png"} alt="" /><span><Play fill="currentColor" size={12} /></span><h3>Retail Promo Miniature Charry 60 Detik</h3><p><small>@mayaangelina.ugc</small><small>602.5K</small></p></article>)}</div></section>
+          <section className="related-projects"><header><h2>Proyek Serupa</h2><Link href="/">Lihat Proyek Lainnya</Link></header><div className="related-grid">{related.map((item) => <article className="related-card" key={item}><img src={item % 2 ? "/creatorin/project-related-2.png" : "/creatorin/project-related-1.png"} alt="" /><span><Play fill="currentColor" size={12} /></span><h3>Retail Promo Miniature Charry 60 Detik</h3><p><small>@mayaangelina.ugc</small><small>602.5K</small></p></article>)}</div></section>
         </main>
         <aside className="project-comments-rail" aria-label="Komentar project" aria-hidden={!commentsOpen}>
           <FloatingActions open={commentsOpen} placement="top" setOpen={setCommentsOpen} />

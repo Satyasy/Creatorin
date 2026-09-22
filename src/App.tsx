@@ -38,11 +38,11 @@ function Header() {
     <Brand />
     <button className="mobile-menu" onClick={() => setOpen(!open)} aria-label="Buka navigasi" aria-expanded={open}>{open ? <X /> : <Menu />}</button>
     <nav className={open ? "main-nav is-open" : "main-nav"} aria-label="Navigasi utama">
-      <a href="#top">Beranda</a><a className="active" href="#discover">Jelajah <ChevronDown /></a><a href="#collaboration">Collaboration Room</a><a href="#brief">Brief Proyek</a>
+      <Link href="/">Beranda</Link><Link className="active" href="/">Jelajah <ChevronDown /></Link><a href="#collaboration">Collaboration Room</a><a href="#brief">Brief Proyek</a>
     </nav>
     <div className="header-actions">
       <Link className="icon-button notification" href="/pesan" aria-label="Pesan"><MessageSquare /><i className="blue-dot" /></Link>
-      <button className="icon-button notification" aria-label="Notifikasi"><Bell /><i className="pink-dot" /></button>
+      <Link className="icon-button notification" href="/notifikasi" aria-label="Notifikasi"><Bell /><i className="pink-dot" /></Link>
       <Link className="profile-button" href="/profile" aria-label="Buka profil creator"><img src="/creatorin/avatar.png" alt="Qaesyaar Aqeel" /><i /></Link>
     </div>
   </div></header>;
@@ -53,7 +53,7 @@ function Hero() {
     <div className="eyebrow"><span><Sparkles /></span><b>Platform Kolaborasi Kreatif</b><i />Marketplace Jasa Digital & UMKM</div>
     <h1><strong>Temukan</strong> Talenta Kreatif,<br />Wujudkan <em>Ide Digital.</em></h1>
     <p>Temukan creator berbakat untuk kebutuhan digitalmu, atau tampilkan keahlianmu dan dapatkan project yang tepat.</p>
-    <div className="hero-actions"><a className="button button--dark" href="#discover">Jelajahi Creator <ArrowRight /></a><a className="button button--light" href="#brief">Tawarkan Keahlian</a></div>
+    <div className="hero-actions"><Link className="button button--dark" href="/">Jelajahi Creator <ArrowRight /></Link><a className="button button--light" href="#brief">Tawarkan Keahlian</a></div>
   </div></section>;
 }
 
@@ -75,10 +75,10 @@ function PortfolioCard({ item }: { item: (typeof services)[number] }) {
 function ServiceListingCard({ item }: { item: (typeof marketplaceServices)[number] }) {
   const [saved, setSaved] = useState(false);
   return <article className="service-card">
-    <div className="service-visual"><ShaderFill className="portfolio-shader" shader={{ setup: waveSetup, render: waveRender, manifest: waveManifest, params: { transform: { x: 50, y: 50, radius: 30, angle: 0 }, amplitude: 15, waveColor: { r: 1, g: 1, b: 1, a: 1 }, offset: item.id * 4, zoom: 1, glowIntensity: 1 } }} /></div>
+    <Link className="service-visual service-visual-link" href="/layanan/full-framer-interactive-website-build" aria-label={`Buka detail layanan ${item.title}`}><ShaderFill className="portfolio-shader" shader={{ setup: waveSetup, render: waveRender, manifest: waveManifest, params: { transform: { x: 50, y: 50, radius: 30, angle: 0 }, amplitude: 15, waveColor: { r: 1, g: 1, b: 1, a: 1 }, offset: item.id * 4, zoom: 1, glowIntensity: 1 } }} /></Link>
     <div className="service-topline"><span>{item.category}</span><Link className="service-creator" href="/profile/sobakhul-munir-siroj"><img src="/creatorin/avatar.png" alt="" />{item.creator}</Link></div>
-    <h3>{item.title}</h3><p>{item.description}</p><div className="service-estimate"><Clock3 />Estimasi: {item.estimate}</div>
-    <div className="service-footer"><div><small>Harga</small><strong>{item.price}</strong></div><div className="service-actions"><button type="button" className={saved ? "saved" : ""} onClick={() => setSaved(!saved)} aria-label={saved ? "Hapus layanan dari tersimpan" : "Simpan layanan"}><Bookmark fill={saved ? "currentColor" : "none"} /></button><a href={`mailto:hello@creatorin.id?subject=${encodeURIComponent(item.title)}`}>Diskusikan</a></div></div>
+    <h3><Link href="/layanan/full-framer-interactive-website-build">{item.title}</Link></h3><p>{item.description}</p><div className="service-estimate"><Clock3 />Estimasi: {item.estimate}</div>
+    <div className="service-footer"><div><small>Harga</small><strong>{item.price}</strong></div><div className="service-actions"><button type="button" className={saved ? "saved" : ""} onClick={() => setSaved(!saved)} aria-label={saved ? "Hapus layanan dari tersimpan" : "Simpan layanan"}><Bookmark fill={saved ? "currentColor" : "none"} /></button><Link href="/layanan/full-framer-interactive-website-build">Detail</Link></div></div>
   </article>;
 }
 
@@ -129,7 +129,7 @@ export default function App() {
     {tab === "Layanan" && <div className="service-grid">{filteredServices.length ? filteredServices.map((item) => <ServiceListingCard item={item} key={item.id} />) : <p className="empty-state">Belum ada layanan yang cocok dengan pencarianmu.</p>}</div>}
     {tab === "Proyek" && <div className="project-grid">{filteredProjects.length ? filteredProjects.map((item) => <ProjectCard item={item} key={item.id} />) : <p className="empty-state">Belum ada proyek yang cocok dengan pencarianmu.</p>}</div>}
   </div></section></main><Footer />
-    {briefVisible && <aside className="brief-toast" id="brief"><div><span><BriefcaseBusiness /></span><p><b>Start a Project Brief</b> &mdash; Tell us what you need and find the right creator.</p></div><div><a href="#discover">Get Started</a><button onClick={() => setBriefVisible(false)} aria-label="Tutup"><X /></button></div></aside>}
+    {briefVisible && <aside className="brief-toast" id="brief"><div><span><BriefcaseBusiness /></span><p><b>Start a Project Brief</b> &mdash; Tell us what you need and find the right creator.</p></div><div><Link href="/">Get Started</Link><button onClick={() => setBriefVisible(false)} aria-label="Tutup"><X /></button></div></aside>}
   </div>;
 }
 

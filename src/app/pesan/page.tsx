@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Bell, CheckCheck, ChevronDown, FileText, MessageSquare, Paperclip, Search, Send } from "lucide-react";
 import "../../App.css";
 import "../../Profile.css";
@@ -29,8 +29,8 @@ type Service = (typeof services)[number];
 function PesanHeader() {
   return <header className="profile-header"><div className="profile-header-inner">
     <div className="profile-header-start"><Link className="brand" href="/" aria-label="Kembali ke Creatorin"><img src="/creatorin/logo.svg" alt="" /><span>Creatorin</span></Link><form className="profile-search" onSubmit={(event) => event.preventDefault()}><input aria-label="Cari" placeholder="Cari kreator, keahlian, atau video UGC..." /><button aria-label="Cari"><Search /></button></form></div>
-    <nav className="profile-nav" aria-label="Navigasi utama"><Link href="/">Beranda</Link><Link className="active" href="/#discover">Jelajah <ChevronDown /></Link><a href="#collaboration">Collaboration Room</a><a href="#brief">Brief Proyek</a></nav>
-    <div className="header-actions"><Link className="icon-button notification" href="/pesan" aria-label="Pesan"><MessageSquare /><i className="blue-dot" /></Link><button className="icon-button notification" aria-label="Notifikasi"><Bell /><i className="pink-dot" /></button><Link className="profile-button" href="/profile" aria-label="Profil creator"><img src="/creatorin/avatar.png" alt="Qaesyaar Aqeel" /><i /></Link></div>
+    <nav className="profile-nav" aria-label="Navigasi utama"><Link href="/">Beranda</Link><Link className="active" href="/">Jelajah <ChevronDown /></Link><a href="#collaboration">Collaboration Room</a><a href="#brief">Brief Proyek</a></nav>
+    <div className="header-actions"><Link className="icon-button notification" href="/pesan" aria-label="Pesan"><MessageSquare /><i className="blue-dot" /></Link><Link className="icon-button notification" href="/notifikasi" aria-label="Notifikasi"><Bell /><i className="pink-dot" /></Link><Link className="profile-button" href="/profile" aria-label="Profil creator"><img src="/creatorin/avatar.png" alt="Qaesyaar Aqeel" /><i /></Link></div>
   </div></header>;
 }
 
@@ -47,12 +47,20 @@ function BubbleMeta({ time }: { time: string }) {
 }
 
 function ChatDetail({ conversation }: { conversation: Conversation }) {
+  const threadRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const thread = threadRef.current;
+    if (!thread) return;
+    thread.scrollTop = thread.scrollHeight;
+  }, [conversation.name]);
+
   return <section className="chat-detail" aria-label={`Percakapan dengan ${conversation.name}`}>
     <header className="chat-header">
       <div className="chat-person"><span className="conversation-avatar"><img src={conversation.avatar} alt="" />{conversation.online && <i />}</span><div><h2>{conversation.name}</h2><p>Online <span>&middot;</span> {conversation.role}</p></div></div>
       <Link href="/profile/sobakhul-munir-siroj">Lihat Profil</Link>
     </header>
-    <div className="chat-thread">
+    <div className="chat-thread" ref={threadRef}>
       <div className="chat-day">Hari ini</div>
       <article className="message-row message-row--out">
         <div className="message-bubble message-bubble--out"><ServiceMini service={services[0]} dark /><p>Halo Mas Munir, kami tertarik dengan layanan Premium Figma SaaS Landing Page untuk brand kami.</p></div><BubbleMeta time="10:30" />

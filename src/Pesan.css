@@ -1,6 +1,6 @@
 .pesan-page { min-height: 100vh; background: #fff; color: #0d0c22; }
 .pesan-shell { height: calc(100vh - 81px); min-height: 620px; display: grid; grid-template-columns: 320px minmax(0, 1fr); overflow: hidden; background: #fff; }
-.pesan-sidebar { min-width: 0; border-right: 1px solid #e5e5e5; background: #fff; }
+.pesan-sidebar { min-width: 0; min-height: 0; border-right: 1px solid #e5e5e5; background: #fff; }
 .pesan-sidebar-top { min-height: 58px; padding: 14px 16px; display: flex; align-items: center; justify-content: space-between; gap: 16px; border-bottom: 1px solid #f5f5f5; }
 .pesan-title { display: flex; align-items: center; gap: 8px; }
 .pesan-title h1 { margin: 0; color: #171717; font-size: 16px; line-height: 24px; letter-spacing: -.7px; }
@@ -11,7 +11,7 @@
 .pesan-search svg { width: 16px; height: 16px; flex: 0 0 16px; }
 .pesan-search input { min-width: 0; width: 100%; border: 0; outline: 0; background: transparent; color: #171717; font-size: 14px; }
 .pesan-search input::placeholder { color: #a1a1a1; }
-.conversation-list { padding: 4px 8px; }
+.conversation-list { min-height: 0; padding: 4px 8px; overflow: auto; }
 .conversation-item { min-width: 0; width: 100%; padding: 10px 12px; display: grid; grid-template-columns: 40px minmax(0, 1fr); gap: 12px; border: 0; border-radius: 8px; background: transparent; color: inherit; text-align: left; cursor: pointer; }
 .conversation-item:hover, .conversation-item.is-active { background: #f8fafc; }
 .conversation-avatar { position: relative; width: 40px; height: 40px; }
@@ -30,8 +30,8 @@
 .pesan-empty-card img { width: 106px; height: 101px; object-fit: contain; }
 .pesan-empty-card h2 { margin: 14px 0 8px; color: #000; font-family: "Space Grotesk", sans-serif; font-size: 36px; line-height: 1; font-weight: 500; letter-spacing: -1.08px; }
 .pesan-empty-card p { margin: 0; color: #a1a1a1; font-size: 14px; line-height: 20px; }
-.pesan-detail-layout { min-width: 0; height: 100%; display: grid; grid-template-columns: minmax(0, 1fr) 330px; overflow: hidden; }
-.chat-detail { min-width: 0; height: 100%; display: grid; grid-template-rows: 60px minmax(0, 1fr) 71px; border-right: 1px solid #e5e5e5; background: #fff; }
+.pesan-detail-layout { min-width: 0; min-height: 0; height: 100%; display: grid; grid-template-columns: minmax(0, 1fr) 330px; overflow: hidden; }
+.chat-detail { min-width: 0; min-height: 0; height: 100%; display: grid; grid-template-rows: 60px minmax(0, 1fr) 71px; border-right: 1px solid #e5e5e5; background: #fff; }
 .chat-header { min-width: 0; padding: 11px 24px; display: flex; align-items: center; justify-content: space-between; gap: 18px; border-bottom: 1px solid #f5f5f5; }
 .chat-person { min-width: 0; display: flex; align-items: center; gap: 12px; }
 .chat-person .conversation-avatar { width: 36px; height: 36px; flex: 0 0 36px; }
@@ -41,7 +41,7 @@
 .chat-person p:first-letter { color: #00a86b; }
 .chat-person p span { color: #d4d4d4; }
 .chat-header > a { padding: 7px 13px; border: 1px solid rgba(229,229,229,.8); border-radius: 8px; color: #404040; font-size: 12px; line-height: 16px; font-weight: 600; white-space: nowrap; }
-.chat-thread { min-width: 0; padding: 24px; overflow: auto; }
+.chat-thread { min-width: 0; min-height: 0; padding: 24px; overflow-y: auto; overscroll-behavior: contain; }
 .chat-day { height: 25px; display: grid; place-items: center; color: #a1a1a1; font-size: 10px; line-height: 15px; }
 .message-row { display: flex; flex-direction: column; align-items: flex-start; gap: 4px; margin-top: 10px; }
 .message-row--out { align-items: flex-end; }
@@ -92,14 +92,15 @@
 .creator-service-actions button:last-child { background: #eff6ff; color: #155dfc; }
 
 @media (max-width: 900px) {
-  .pesan-shell { height: auto; min-height: calc(100vh - 68px); grid-template-columns: 1fr; overflow: visible; }
+  .pesan-shell { height: calc(100vh - 68px); min-height: 0; grid-template-columns: 1fr; overflow: hidden; }
   .pesan-sidebar { border-right: 0; border-bottom: 1px solid #e5e5e5; }
   .conversation-list { max-height: 372px; overflow: auto; }
   .pesan-empty { min-height: 380px; padding: 36px 24px; }
-  .pesan-detail-layout { height: auto; grid-template-columns: 1fr; overflow: visible; }
-  .chat-detail { height: auto; min-height: 760px; grid-template-rows: auto minmax(420px, 1fr) auto; border-right: 0; }
+  .pesan-detail-layout { height: 100%; min-height: 0; grid-template-columns: 1fr; overflow: hidden; }
+  .chat-detail { height: 100%; min-height: 0; grid-template-rows: auto minmax(0, 1fr) auto; border-right: 0; }
   .creator-services { height: auto; border-top: 1px solid #e5e5e5; }
   .creator-services > div { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .pesan-detail-layout .creator-services { display: none; }
 }
 
 @media (max-width: 600px) {
