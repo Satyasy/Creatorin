@@ -8,6 +8,7 @@ import {
 import { ShaderFill } from "./lib/custom-effect-runtime";
 import { setup, render, manifest } from "./lib/custom-effects/CodeComponentId_c2b302fbdfce8a1ec92a5a80b10a5916ab506ed7_430";
 import { setup as waveSetup, render as waveRender, manifest as waveManifest } from "./lib/custom-effects/CodeComponentId_cd43ef0afb2cac168a28e7f79135150678ccfd25_433";
+import JelajahNav from "./JelajahNav";
 import "./App.css";
 
 type DiscoverTab = "Creator" | "Layanan" | "Proyek";
@@ -38,7 +39,7 @@ function Header() {
     <Brand />
     <button className="mobile-menu" onClick={() => setOpen(!open)} aria-label="Buka navigasi" aria-expanded={open}>{open ? <X /> : <Menu />}</button>
     <nav className={open ? "main-nav is-open" : "main-nav"} aria-label="Navigasi utama">
-      <Link href="/">Beranda</Link><Link className="active" href="/">Jelajah <ChevronDown /></Link><a href="#collaboration">Collaboration Room</a><a href="#brief">Brief Proyek</a>
+      <Link href="/">Beranda</Link><JelajahNav /><a href="#collaboration">Collaboration Room</a><a href="#brief">Brief Proyek</a>
     </nav>
     <div className="header-actions">
       <Link className="icon-button notification" href="/pesan" aria-label="Pesan"><MessageSquare /><i className="blue-dot" /></Link>
@@ -53,7 +54,7 @@ function Hero() {
     <div className="eyebrow"><span><Sparkles /></span><b>Platform Kolaborasi Kreatif</b><i />Marketplace Jasa Digital & UMKM</div>
     <h1><strong>Temukan</strong> Talenta Kreatif,<br />Wujudkan <em>Ide Digital.</em></h1>
     <p>Temukan creator berbakat untuk kebutuhan digitalmu, atau tampilkan keahlianmu dan dapatkan project yang tepat.</p>
-    <div className="hero-actions"><Link className="button button--dark" href="/">Jelajahi Creator <ArrowRight /></Link><a className="button button--light" href="#brief">Tawarkan Keahlian</a></div>
+    <div className="hero-actions"><Link className="button button--dark" href="/jelajah/creator">Jelajahi Creator <ArrowRight /></Link><a className="button button--light" href="#brief">Tawarkan Keahlian</a></div>
   </div></section>;
 }
 
@@ -103,16 +104,20 @@ function CreatorCard({ query }: { query: string }) {
   </article>;
 }
 
+function SearchMoreButton({ href }: { href: string }) {
+  return <div className="search-more"><Link href={href}>Lihat Lebih Banyak</Link></div>;
+}
+
 function Footer() {
   const columns = [
-    ["Jelajahi", "Cari Creator", "Layanan", "Project", "Collaboration Room"],
-    ["Untuk Bisnis", "Mulai Brief", "Jelajahi Creator", "Kelola Project", "Cara Kerja"],
-    ["Untuk Creator", "Bagikan Project", "Lihat Brief Project", "Portfolio", "Skor Rekam Jejak"],
-    ["Bantuan", "Pusat Bantuan", "FAQ", "Hubungi Kami", "Kebijakan & Privasi"],
-  ];
+    ["Jelajahi", ["Cari Creator", "/jelajah/creator"], ["Layanan", "/jelajah/layanan"], ["Project", "/jelajah/proyek"], ["Collaboration Room", "/"]],
+    ["Untuk Bisnis", ["Mulai Brief", "/"], ["Jelajahi Creator", "/jelajah/creator"], ["Kelola Project", "/jelajah/proyek"], ["Cara Kerja", "/"]],
+    ["Untuk Creator", ["Bagikan Project", "/jelajah/proyek"], ["Lihat Brief Project", "/jelajah/proyek"], ["Portfolio", "/profile"], ["Skor Rekam Jejak", "/profile"]],
+    ["Bantuan", ["Pusat Bantuan", "/"], ["FAQ", "/"], ["Hubungi Kami", "/"], ["Kebijakan & Privasi", "/"]],
+  ] as const;
   return <footer className="footer"><div className="footer-inner">
     <div className="footer-top"><Brand footer /><div className="social"><span>Social Media</span><a href="#twitter" aria-label="X Twitter"><Twitter /></a><a href="#instagram" aria-label="Instagram"><Instagram /></a><a href="#linkedin" aria-label="LinkedIn"><Linkedin /></a></div></div>
-    <div className="footer-body"><div className="about"><h3>Tentang Platform</h3><p>Hubungkan bisnis dengan creator yang tepat untuk membangun karya dan kolaborasi yang berdampak.</p><div className="partners"><img src="/creatorin/partner-1.png" alt="Innovation Room" /><img src="/creatorin/partners.png" alt="Partner Creatorin" /></div></div><div className="footer-columns">{columns.map(([title, ...links]) => <div key={title}><h3>{title}</h3>{links.map((link) => <a href="#top" key={link}>{link}</a>)}</div>)}</div></div>
+    <div className="footer-body"><div className="about"><h3>Tentang Platform</h3><p>Hubungkan bisnis dengan creator yang tepat untuk membangun karya dan kolaborasi yang berdampak.</p><div className="partners"><img src="/creatorin/partner-1.png" alt="Innovation Room" /><img src="/creatorin/partners.png" alt="Partner Creatorin" /></div></div><div className="footer-columns">{columns.map(([title, ...links]) => <div key={title}><h3>{title}</h3>{links.map(([label, href]) => <Link href={href} key={label}>{label}</Link>)}</div>)}</div></div>
     <div className="footer-word" aria-hidden="true">creatorin</div><div className="footer-bottom"><span>&copy; 2026 Creatorin. All rights reserved.</span><div><a href="#terms">Syarat & Ketentuan</a><a href="#privacy">Kebijakan Privasi</a><a href="#cookies">Cookie Policy</a></div></div>
   </div></footer>;
 }
@@ -125,9 +130,9 @@ export default function App() {
   const filteredServices = marketplaceServices.filter((item) => Object.values(item).join(" ").toLowerCase().includes(needle));
   const filteredProjects = projects.filter((item) => Object.values(item).join(" ").toLowerCase().includes(needle));
   return <div className="creatorin-app"><Header /><main><Hero /><section className="discover" id="discover"><DiscoverControls query={query} setQuery={setQuery} tab={tab} setTab={setTab} /><div id="discover-results" role="tabpanel">
-    {tab === "Creator" && <div className="creator-list">{Array.from({ length: 6 }, (_, id) => <CreatorCard query={query} key={id} />)}</div>}
-    {tab === "Layanan" && <div className="service-grid">{filteredServices.length ? filteredServices.map((item) => <ServiceListingCard item={item} key={item.id} />) : <p className="empty-state">Belum ada layanan yang cocok dengan pencarianmu.</p>}</div>}
-    {tab === "Proyek" && <div className="project-grid">{filteredProjects.length ? filteredProjects.map((item) => <ProjectCard item={item} key={item.id} />) : <p className="empty-state">Belum ada proyek yang cocok dengan pencarianmu.</p>}</div>}
+    {tab === "Creator" && <><div className="creator-list">{Array.from({ length: 6 }, (_, id) => <CreatorCard query={query} key={id} />)}</div><SearchMoreButton href="/jelajah/creator" /></>}
+    {tab === "Layanan" && <><div className="service-grid">{filteredServices.length ? filteredServices.map((item) => <ServiceListingCard item={item} key={item.id} />) : <p className="empty-state">Belum ada layanan yang cocok dengan pencarianmu.</p>}</div><SearchMoreButton href="/jelajah/layanan" /></>}
+    {tab === "Proyek" && <><div className="project-grid">{filteredProjects.length ? filteredProjects.map((item) => <ProjectCard item={item} key={item.id} />) : <p className="empty-state">Belum ada proyek yang cocok dengan pencarianmu.</p>}</div><SearchMoreButton href="/jelajah/proyek" /></>}
   </div></section></main><Footer />
     {briefVisible && <aside className="brief-toast" id="brief"><div><span><BriefcaseBusiness /></span><p><b>Start a Project Brief</b> &mdash; Tell us what you need and find the right creator.</p></div><div><Link href="/">Get Started</Link><button onClick={() => setBriefVisible(false)} aria-label="Tutup"><X /></button></div></aside>}
   </div>;

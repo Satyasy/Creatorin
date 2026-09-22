@@ -131,7 +131,7 @@ export default function ServiceDetailPage() {
         </section>
 
         <section className="service-related">
-          <header><h2>Layanan Serupa</h2><Link href="/">Lihat Banyak Lainnya <ChevronRight /></Link></header>
+          <header><h2>Layanan Serupa</h2><Link href="/jelajah/layanan">Lihat Banyak Lainnya <ChevronRight /></Link></header>
           <div>{related.map((item, index) => <RelatedCard title={item} index={index} key={item} />)}</div>
         </section>
       </main>

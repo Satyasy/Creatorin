@@ -11,6 +11,7 @@ import {
 import { ShaderFill } from "../../lib/custom-effect-runtime";
 import { setup, render, manifest } from "../../lib/custom-effects/CodeComponentId_c2b302fbdfce8a1ec92a5a80b10a5916ab506ed7_430";
 import { setup as waterSetup, render as waterRender, manifest as waterManifest } from "../../lib/custom-effects/CodeComponentId_40f03f78407c1c973fc891fbca9ff3d0387485e6_435";
+import JelajahNav from "../../JelajahNav";
 import "../../App.css";
 import "../../Profile.css";
 
@@ -30,21 +31,21 @@ const profileProjects = Array.from({ length: 4 }, (_, id) => ({
 function ProfileHeader() {
   return <header className="profile-header"><div className="profile-header-inner">
     <div className="profile-header-start"><Link className="brand" href="/" aria-label="Kembali ke Creatorin"><img src="/creatorin/logo.svg" alt="" /><span>Creatorin</span></Link><form className="profile-search" onSubmit={(event) => event.preventDefault()}><input aria-label="Cari" placeholder="Cari kreator, keahlian, atau video UGC..." /><button aria-label="Cari"><Search /></button></form></div>
-    <nav className="profile-nav" aria-label="Navigasi utama"><Link href="/">Beranda</Link><Link className="active" href="/">Jelajah <ChevronDown /></Link><a href="#collaboration">Collaboration Room</a><a href="#brief">Brief Proyek</a></nav>
+    <nav className="profile-nav" aria-label="Navigasi utama"><Link href="/">Beranda</Link><JelajahNav /><a href="#collaboration">Collaboration Room</a><a href="#brief">Brief Proyek</a></nav>
     <div className="header-actions"><Link className="icon-button notification" href="/pesan" aria-label="Pesan"><MessageSquare /><i className="blue-dot" /></Link><Link className="icon-button notification" href="/notifikasi" aria-label="Notifikasi"><Bell /><i className="pink-dot" /></Link><Link className="profile-button" href="/profile" aria-label="Profil creator"><img src="/creatorin/avatar.png" alt="Qaesyaar Aqeel" /><i /></Link></div>
   </div></header>;
 }
 
 function ProfileFooter() {
   const columns = [
-    ["Jelajahi", "Cari Creator", "Layanan", "Project", "Collaboration Room"],
-    ["Untuk Bisnis", "Mulai Brief", "Jelajahi Creator", "Kelola Project", "Cara Kerja"],
-    ["Untuk Creator", "Bagikan Project", "Lihat Brief Project", "Portfolio", "Skor Rekam Jejak"],
-    ["Bantuan", "Pusat Bantuan", "FAQ", "Hubungi Kami", "Kebijakan & Privasi"],
-  ];
+    ["Jelajahi", ["Cari Creator", "/jelajah/creator"], ["Layanan", "/jelajah/layanan"], ["Project", "/jelajah/proyek"], ["Collaboration Room", "/"]],
+    ["Untuk Bisnis", ["Mulai Brief", "/"], ["Jelajahi Creator", "/jelajah/creator"], ["Kelola Project", "/jelajah/proyek"], ["Cara Kerja", "/"]],
+    ["Untuk Creator", ["Bagikan Project", "/jelajah/proyek"], ["Lihat Brief Project", "/jelajah/proyek"], ["Portfolio", "/profile"], ["Skor Rekam Jejak", "/profile"]],
+    ["Bantuan", ["Pusat Bantuan", "/"], ["FAQ", "/"], ["Hubungi Kami", "/"], ["Kebijakan & Privasi", "/"]],
+  ] as const;
   return <footer className="footer profile-footer"><div className="footer-inner">
     <div className="footer-top"><Link className="brand brand--footer" href="/"><img src="/creatorin/logo.svg" alt="" /><span>Creatorin</span></Link><div className="social"><span>Social Media</span><a href="#twitter" aria-label="X Twitter"><Twitter /></a><a href="#instagram" aria-label="Instagram"><Instagram /></a><a href="#linkedin" aria-label="LinkedIn"><Linkedin /></a></div></div>
-    <div className="footer-body"><div className="about"><h3>Tentang Platform</h3><p>Hubungkan bisnis dengan creator yang tepat untuk membangun karya dan kolaborasi yang berdampak.</p><div className="partners"><img src="/creatorin/partner-1.png" alt="Innovation Room" /><img src="/creatorin/partners.png" alt="Partner Creatorin" /></div></div><div className="footer-columns">{columns.map(([title, ...links]) => <div key={title}><h3>{title}</h3>{links.map((link) => <Link href="/" key={link}>{link}</Link>)}</div>)}</div></div>
+    <div className="footer-body"><div className="about"><h3>Tentang Platform</h3><p>Hubungkan bisnis dengan creator yang tepat untuk membangun karya dan kolaborasi yang berdampak.</p><div className="partners"><img src="/creatorin/partner-1.png" alt="Innovation Room" /><img src="/creatorin/partners.png" alt="Partner Creatorin" /></div></div><div className="footer-columns">{columns.map(([title, ...links]) => <div key={title}><h3>{title}</h3>{links.map(([label, href]) => <Link href={href} key={label}>{label}</Link>)}</div>)}</div></div>
     <div className="footer-word" aria-hidden="true">creatorin</div><div className="footer-bottom"><span>&copy; 2026 Creatorin. All rights reserved.</span><div><a href="#terms">Syarat & Ketentuan</a><a href="#privacy">Kebijakan Privasi</a><a href="#cookies">Cookie Policy</a></div></div>
   </div></footer>;
 }
