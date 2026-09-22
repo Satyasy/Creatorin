@@ -47,6 +47,14 @@ export async function getAuthenticatedUser(req: NextRequest): Promise<AuthUser |
         fullName: "Qaesyaar Aqeel",
       };
     }
+    if (devUserId === "55555555-5555-5555-5555-555555555555") {
+      return {
+        id: devUserId,
+        email: "smkmitra@creatorin.id",
+        role: "school",
+        fullName: "SMK Mitra Creatorin",
+      };
+    }
 
     const db = getDb();
     if (db) {
