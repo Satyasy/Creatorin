@@ -129,21 +129,21 @@
   position: relative;
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
 }
 
 .jelajah-filter-actions button {
-  min-height: 34px;
-  padding: 8px 14px;
+  min-height: 30px;
+  padding: 6px 10px;
   display: inline-flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
   border: 1px solid #e5e5e5;
-  border-radius: 12px;
+  border-radius: 10px;
   background: #fff;
   color: #404040;
-  font-size: 12px;
-  line-height: 16px;
+  font-size: 11px;
+  line-height: 14px;
   font-weight: 700;
   cursor: pointer;
 }
@@ -154,30 +154,30 @@
 }
 
 .filter-menu-wrap > button {
-  width: 34px;
+  width: 30px;
   padding: 0;
   justify-content: center;
 }
 
 .jelajah-filter-actions svg {
-  width: 14px;
-  height: 14px;
+  width: 12px;
+  height: 12px;
 }
 
 .filter-panel {
   position: absolute;
   z-index: 70;
-  top: 46px;
+  top: 38px;
   right: 0;
-  width: min(488px, calc(100vw - 32px));
-  max-height: min(820px, calc(100vh - 132px));
+  width: min(320px, calc(100vw - 32px));
+  max-height: min(600px, calc(100vh - 132px));
   display: flex;
   flex-direction: column;
   overflow: hidden;
   border: 1px solid #f5f5f5;
-  border-radius: 32px;
+  border-radius: 16px;
   background: #fff;
-  box-shadow: 0 25px 25px rgba(0, 0, 0, .25);
+  box-shadow: 0 18px 36px rgba(13, 12, 34, .14);
   opacity: 0;
   pointer-events: none;
   transform: translateY(-10px) scale(.98);
@@ -192,8 +192,8 @@
 }
 
 .filter-panel-header {
-  min-height: 65px;
-  padding: 18px 24px;
+  min-height: 44px;
+  padding: 10px 14px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -203,18 +203,18 @@
 .filter-panel-header h2 {
   margin: 0;
   color: #0d0c22;
-  font-size: 18px;
-  line-height: 28px;
+  font-size: 13px;
+  line-height: 18px;
   font-weight: 800;
   letter-spacing: 0;
 }
 
 .filter-panel-header button {
   position: absolute;
-  top: 16px;
-  right: 18px;
-  width: 32px !important;
-  min-height: 32px;
+  top: 8px;
+  right: 10px;
+  width: 26px !important;
+  min-height: 26px;
   padding: 0 !important;
   justify-content: center;
   border: 0;
@@ -226,8 +226,8 @@
 }
 
 .filter-panel-header svg {
-  width: 20px;
-  height: 20px;
+  width: 14px;
+  height: 14px;
 }
 
 .filter-panel-body {
@@ -236,7 +236,7 @@
 }
 
 .filter-section {
-  padding: 24px;
+  padding: 12px 14px;
   border-bottom: 1px solid #f5f5f5;
 }
 
@@ -245,10 +245,10 @@
 }
 
 .filter-section h3 {
-  margin: 0 0 14px;
+  margin: 0 0 8px;
   color: #0d0c22;
-  font-size: 16px;
-  line-height: 24px;
+  font-size: 12px;
+  line-height: 16px;
   font-weight: 800;
   letter-spacing: 0;
 }
@@ -256,29 +256,29 @@
 .filter-category-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 10px;
+  gap: 6px;
 }
 
 .filter-category-grid button {
-  min-height: 42px;
+  min-height: 30px;
   justify-content: center;
   border-radius: 999px;
-  font-size: 14px;
-  line-height: 20px;
+  font-size: 11px;
+  line-height: 14px;
   font-weight: 500;
 }
 
 .filter-range {
   position: relative;
-  height: 20px;
-  margin: 22px 4px 16px;
+  height: 14px;
+  margin: 12px 4px 10px;
   display: flex;
   align-items: center;
 }
 
 .filter-range span {
   width: 100%;
-  height: 6px;
+  height: 4px;
   border-radius: 999px;
   background: #8c9eff;
 }
@@ -286,8 +286,8 @@
 .filter-range i {
   position: absolute;
   top: 0;
-  width: 20px;
-  height: 20px;
+  width: 14px;
+  height: 14px;
   border: 2px solid #8c9eff;
   border-radius: 999px;
   background: #fff;
@@ -295,60 +295,60 @@
 }
 
 .filter-range i:nth-child(2) {
-  left: -10px;
+  left: -7px;
 }
 
 .filter-range i:nth-child(3) {
-  right: -10px;
+  right: -7px;
 }
 
 .filter-budget-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 16px;
+  gap: 8px;
 }
 
 .filter-budget-grid label {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 4px;
 }
 
 .filter-budget-grid span {
   color: #737373;
-  font-size: 12px;
-  line-height: 16px;
+  font-size: 11px;
+  line-height: 14px;
 }
 
 .filter-budget-grid strong {
-  min-height: 42px;
-  padding: 10px 12px;
+  min-height: 32px;
+  padding: 7px 8px;
   display: flex;
   align-items: center;
   justify-content: center;
   border: 1px solid #e5e5e5;
   border-radius: 12px;
   color: #262626;
-  font-size: 14px;
-  line-height: 20px;
+  font-size: 11px;
+  line-height: 14px;
   font-weight: 700;
   text-align: center;
 }
 
 .filter-location {
-  min-height: 46px;
+  min-height: 34px;
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 0 16px;
+  gap: 7px;
+  padding: 0 10px;
   border: 1px solid #e5e5e5;
   border-radius: 12px;
   background: #fff;
 }
 
 .filter-location svg {
-  width: 16px;
-  height: 16px;
+  width: 12px;
+  height: 12px;
   color: #737373;
 }
 
@@ -358,7 +358,7 @@
   border: 0;
   outline: 0;
   color: #262626;
-  font-size: 14px;
+  font-size: 12px;
 }
 
 .filter-location input::placeholder {
@@ -367,21 +367,21 @@
 
 .filter-rating-list {
   display: grid;
-  gap: 12px;
+  gap: 7px;
 }
 
 .filter-rating-row {
-  min-height: 20px !important;
+  min-height: 16px !important;
   padding: 0 !important;
   border: 0 !important;
   border-radius: 0 !important;
   display: flex;
   align-items: center;
-  gap: 14px;
+  gap: 8px;
   background: transparent !important;
   color: #404040;
-  font-size: 14px;
-  line-height: 20px;
+  font-size: 12px;
+  line-height: 16px;
   font-weight: 500;
 }
 
@@ -390,8 +390,8 @@
 }
 
 .filter-radio {
-  width: 20px;
-  height: 20px;
+  width: 14px;
+  height: 14px;
   border: 1px solid #d4d4d4;
   border-radius: 999px;
 }
@@ -399,12 +399,12 @@
 .filter-stars {
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 3px;
 }
 
 .filter-stars svg {
-  width: 16px;
-  height: 16px;
+  width: 12px;
+  height: 12px;
 }
 
 .filter-stars .filled {
@@ -417,43 +417,43 @@
 
 .filter-switch-list {
   display: grid;
-  gap: 16px;
+  gap: 10px;
 }
 
 .filter-switch-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 18px;
+  gap: 10px;
 }
 
 .filter-switch-row span {
   min-width: 0;
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 2px;
 }
 
 .filter-switch-row strong {
   color: #262626;
-  font-size: 14px;
-  line-height: 20px;
+  font-size: 12px;
+  line-height: 16px;
 }
 
 .filter-switch-row small {
   overflow: hidden;
   color: #737373;
-  font-size: 12px;
-  line-height: 16px;
+  font-size: 10px;
+  line-height: 14px;
   white-space: nowrap;
   text-overflow: ellipsis;
 }
 
 .filter-switch-row input {
   appearance: none;
-  width: 44px;
-  height: 24px;
-  flex: 0 0 44px;
+  width: 34px;
+  height: 20px;
+  flex: 0 0 34px;
   border: 2px solid transparent;
   border-radius: 999px;
   background: #e5e5e5;
@@ -462,8 +462,8 @@
 
 .filter-switch-row input::before {
   content: "";
-  width: 20px;
-  height: 20px;
+  width: 16px;
+  height: 16px;
   display: block;
   border-radius: 999px;
   background: #fff;
@@ -476,37 +476,37 @@
 }
 
 .filter-switch-row input:checked::before {
-  transform: translateX(20px);
+  transform: translateX(14px);
 }
 
 .filter-panel-footer {
-  padding: 24px;
+  padding: 12px 14px;
   display: grid;
-  gap: 8px;
+  gap: 4px;
   border-top: 1px solid #f5f5f5;
   background: #fff;
 }
 
 .filter-panel-footer button:first-child {
-  min-height: 56px;
+  min-height: 36px;
   justify-content: center;
   border: 0;
   border-radius: 999px;
   background: #0d0c22;
   color: #fff;
-  font-size: 16px;
-  line-height: 24px;
+  font-size: 12px;
+  line-height: 16px;
   font-weight: 800;
   box-shadow: 0 4px 8px rgba(0, 0, 0, .18);
 }
 
 .filter-panel-footer button:last-child {
-  min-height: 24px;
+  min-height: 20px;
   justify-content: center;
   border: 0;
   background: transparent;
   color: #737373;
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 700;
 }
 

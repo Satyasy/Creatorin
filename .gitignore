@@ -46,3 +46,6 @@ next-env.d.ts
 
 # supabase temporary
 supabase/.temp/
+
+#MD
+*.md
