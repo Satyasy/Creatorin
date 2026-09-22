@@ -237,6 +237,16 @@ CREATE TABLE IF NOT EXISTS public.creator_wallets (
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
+CREATE TABLE IF NOT EXISTS public.wallet_transactions (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  wallet_id UUID NOT NULL REFERENCES public.creator_wallets(id) ON DELETE CASCADE,
+  type TEXT NOT NULL,
+  amount INT NOT NULL,
+  description TEXT,
+  status TEXT NOT NULL DEFAULT 'completed',
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
 -- =========================================================
 -- 13. Trigger: Automatically initialize Profile on SignUp
 -- =========================================================
