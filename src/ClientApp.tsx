@@ -1,7 +1,7 @@
 "use client";
 
-import App from "./App";
+import App, { DiscoverDataProps } from "./App";
 
-export default function ClientApp() {
-  return <App />;
+export default function ClientApp({ initialData }: { initialData?: DiscoverDataProps }) {
+  return <App initialData={initialData} />;
 }

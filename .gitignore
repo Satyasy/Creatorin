@@ -1,8 +1,48 @@
+# dependencies
 node_modules/
-.next/
-out/
-dist/
-*.log
+/.pnp
+.pnp.js
+
+# testing
+/coverage
+
+# next.js
+/.next/
+/out/
+
+# production
+/build
+/dist
+
+# misc
 .DS_Store
-*.local
-*.md
+*.pem
+
+# debug logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# local env files
+.env*.local
+.env
+.env.local
+.env.production.local
+.env.development.local
+
+# vercel
+.vercel
+
+# typescript
+*.tsbuildinfo
+next-env.d.ts
+
+# agent / ai caches & skills
+.agent/
+.claude/
+.gemini/
+.impeccable/
+
+# supabase temporary
+supabase/.temp/

@@ -91,16 +91,55 @@ function ProjectCard({ item }: { item: (typeof projects)[number] }) {
   </Link>;
 }
 
-function CreatorCard({ query }: { query: string }) {
+export type CreatorCardData = {
+  slug: string;
+  name: string;
+  avatar: string;
+  isPro: boolean;
+  rating: string;
+  reviewsCount: number;
+  completedProjects: number;
+  isPromoted: boolean;
+  startingPrice: string;
+  location: string;
+  careerScore: string;
+  skills: string[];
+  services?: (typeof services);
+};
+
+export type DiscoverDataProps = {
+  creators: CreatorCardData[];
+  marketplaceServices: (typeof marketplaceServices);
+  projects: (typeof projects);
+  isLiveDb?: boolean;
+};
+
+function CreatorCard({ query, data }: { query: string; data?: CreatorCardData }) {
   const [saved, setSaved] = useState(false);
-  const visibleServices = services.filter(({ title, category }) => `${title} ${category}`.toLowerCase().includes(query.toLowerCase()));
+  const creator = data ?? {
+    slug: "qaesyaar-aqeel",
+    name: "Qaesyaar Aqeel",
+    avatar: "/creatorin/avatar.png",
+    isPro: true,
+    rating: "5",
+    reviewsCount: 88,
+    completedProjects: 88,
+    isPromoted: true,
+    startingPrice: "Mulai Rp200.000/proyek",
+    location: "Bandung, Jawa Barat",
+    careerScore: "95%",
+    skills: skills,
+    services: services,
+  };
+  const currentServices = creator.services || services;
+  const visibleServices = currentServices.filter(({ title, category }) => `${title} ${category}`.toLowerCase().includes(query.toLowerCase()));
   return <article className="creator-card">
-    <div className="creator-head"><div className="creator-profile"><Link className="avatar-wrap" href="/profile/qaesyaar-aqeel" aria-label="Buka profil Qaesyaar Aqeel"><img src="/creatorin/avatar.png" alt="Qaesyaar Aqeel" /><span><Check /></span></Link><div className="creator-copy">
-      <div className="creator-title"><h3><Link href="/profile/qaesyaar-aqeel">Qaesyaar Aqeel</Link></h3><b>PRO+</b><span className="rating"><Star /> 5 <i>(88)</i></span><span><BriefcaseBusiness />88 proyek selesai</span><small>Promoted</small></div>
-      <div className="creator-details"><strong>Mulai Rp200.000/proyek</strong><i>&middot;</i><span><MapPin />Bandung, Jawa Barat</span><i>&middot;</i><span><b>95%</b> Skor Karir</span><i>&middot;</i><span>10 Layanan tersedia</span></div>
+    <div className="creator-head"><div className="creator-profile"><Link className="avatar-wrap" href={`/profile/${creator.slug}`} aria-label={`Buka profil ${creator.name}`}><img src={creator.avatar} alt={creator.name} /><span><Check /></span></Link><div className="creator-copy">
+      <div className="creator-title"><h3><Link href={`/profile/${creator.slug}`}>{creator.name}</Link></h3>{creator.isPro && <b>PRO+</b>}<span className="rating"><Star /> {creator.rating} <i>({creator.reviewsCount})</i></span><span><BriefcaseBusiness />{creator.completedProjects} proyek selesai</span>{creator.isPromoted && <small>Promoted</small>}</div>
+      <div className="creator-details"><strong>{creator.startingPrice}</strong><i>&middot;</i><span><MapPin />{creator.location}</span><i>&middot;</i><span><b>{creator.careerScore}</b> Skor Karir</span><i>&middot;</i><span>{currentServices.length} Layanan tersedia</span></div>
     </div></div><div className="creator-actions"><button className={saved ? "save-button saved" : "save-button"} onClick={() => setSaved(!saved)} aria-label={saved ? "Hapus dari tersimpan" : "Simpan creator"}><Bookmark fill={saved ? "currentColor" : "none"} /></button><Link className="contact-button" href="mailto:hello@creatorin.id">Hubungi</Link></div></div>
     <div className="portfolio-grid">{visibleServices.length ? visibleServices.map((item) => <PortfolioCard item={item} key={item.title} />) : <p className="empty-state">Belum ada layanan yang cocok dengan pencarianmu.</p>}</div>
-    <div className="skill-list">{skills.map((skill) => <span key={skill}>{skill}</span>)}<small>+2 keahlian lainnya</small></div>
+    <div className="skill-list">{creator.skills.slice(0, 5).map((skill) => <span key={skill}>{skill}</span>)}{creator.skills.length > 5 && <small>+{creator.skills.length - 5} keahlian lainnya</small>}</div>
   </article>;
 }
 
@@ -122,17 +161,106 @@ function Footer() {
   </div></footer>;
 }
 
-export default function App() {
+export default function App({ initialData }: { initialData?: DiscoverDataProps }) {
   const [query, setQuery] = useState("");
   const [tab, setTab] = useState<DiscoverTab>("Creator");
   const [briefVisible, setBriefVisible] = useState(true);
   const needle = query.trim().toLowerCase();
-  const filteredServices = marketplaceServices.filter((item) => Object.values(item).join(" ").toLowerCase().includes(needle));
-  const filteredProjects = projects.filter((item) => Object.values(item).join(" ").toLowerCase().includes(needle));
+
+  const creatorsList = initialData?.creators || [
+    {
+      slug: "qaesyaar-aqeel",
+      name: "Qaesyaar Aqeel",
+      avatar: "/creatorin/avatar.png",
+      isPro: true,
+      rating: "5",
+      reviewsCount: 88,
+      completedProjects: 88,
+      isPromoted: true,
+      startingPrice: "Mulai Rp200.000/proyek",
+      location: "Bandung, Jawa Barat",
+      careerScore: "95%",
+      skills: skills,
+      services: services,
+    },
+    {
+      slug: "maya-angelina",
+      name: "Maya Angelina",
+      avatar: "/creatorin/maya-angelina.png",
+      isPro: true,
+      rating: "4.9",
+      reviewsCount: 98,
+      completedProjects: 142,
+      isPromoted: true,
+      startingPrice: "Mulai Rp850.000/proyek",
+      location: "Jakarta Barat",
+      careerScore: "95%",
+      skills: ["TikTok UGC", "Beauty Review", "Reels Video", "Skincare Testing", "Script Writing"],
+      services: services,
+    },
+    {
+      slug: "sobakhul-munir-siroj",
+      name: "Sobakhul Munir Siroj",
+      avatar: "/creatorin/avatar.png",
+      isPro: false,
+      rating: "4.9",
+      reviewsCount: 52,
+      completedProjects: 64,
+      isPromoted: false,
+      startingPrice: "Mulai Rp1.500.000/proyek",
+      location: "Jakarta Selatan",
+      careerScore: "93%",
+      skills: ["UI/UX Design", "Framer", "Design System", "Product Design", "Interactive Web"],
+      services: services,
+    },
+  ];
+
+  const servicesList = (initialData?.marketplaceServices as unknown as typeof marketplaceServices) || marketplaceServices;
+  const projectsList = (initialData?.projects as unknown as typeof projects) || projects;
+
+  const filteredCreators = creatorsList.filter((c) =>
+    `${c.name} ${c.location} ${c.skills.join(" ")}`.toLowerCase().includes(needle)
+  );
+  const filteredServices = servicesList.filter((item) => Object.values(item).join(" ").toLowerCase().includes(needle));
+  const filteredProjects = projectsList.filter((item) => Object.values(item).join(" ").toLowerCase().includes(needle));
+
   return <div className="creatorin-app"><Header /><main><Hero /><section className="discover" id="discover"><DiscoverControls query={query} setQuery={setQuery} tab={tab} setTab={setTab} /><div id="discover-results" role="tabpanel">
-    {tab === "Creator" && <><div className="creator-list">{Array.from({ length: 6 }, (_, id) => <CreatorCard query={query} key={id} />)}</div><SearchMoreButton href="/jelajah/creator" /></>}
-    {tab === "Layanan" && <><div className="service-grid">{filteredServices.length ? filteredServices.map((item) => <ServiceListingCard item={item} key={item.id} />) : <p className="empty-state">Belum ada layanan yang cocok dengan pencarianmu.</p>}</div><SearchMoreButton href="/jelajah/layanan" /></>}
-    {tab === "Proyek" && <><div className="project-grid">{filteredProjects.length ? filteredProjects.map((item) => <ProjectCard item={item} key={item.id} />) : <p className="empty-state">Belum ada proyek yang cocok dengan pencarianmu.</p>}</div><SearchMoreButton href="/jelajah/proyek" /></>}
+    {tab === "Creator" && (
+      <>
+        <div className="creator-list">
+          {filteredCreators.length ? (
+            filteredCreators.map((c) => <CreatorCard query={query} data={c} key={c.slug} />)
+          ) : (
+            <p className="empty-state">Belum ada kreator yang cocok dengan pencarianmu.</p>
+          )}
+        </div>
+        <SearchMoreButton href="/jelajah/creator" />
+      </>
+    )}
+    {tab === "Layanan" && (
+      <>
+        <div className="service-grid">
+          {filteredServices.length ? (
+            filteredServices.map((item) => <ServiceListingCard item={item} key={item.id} />)
+          ) : (
+            <p className="empty-state">Belum ada layanan yang cocok dengan pencarianmu.</p>
+          )}
+        </div>
+        <SearchMoreButton href="/jelajah/layanan" />
+      </>
+    )}
+    {tab === "Proyek" && (
+      <>
+        <div className="project-grid">
+          {filteredProjects.length ? (
+            filteredProjects.map((item) => <ProjectCard item={item} key={item.id} />)
+          ) : (
+            <p className="empty-state">Belum ada proyek yang cocok dengan pencarianmu.</p>
+          )}
+        </div>
+        <SearchMoreButton href="/jelajah/proyek" />
+      </>
+    )}
   </div></section></main><Footer />
     {briefVisible && <aside className="brief-toast" id="brief"><div><span><BriefcaseBusiness /></span><p><b>Start a Project Brief</b> &mdash; Tell us what you need and find the right creator.</p></div><div><Link href="/">Get Started</Link><button onClick={() => setBriefVisible(false)} aria-label="Tutup"><X /></button></div></aside>}
   </div>;
