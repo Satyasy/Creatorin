@@ -16,7 +16,7 @@ import "../../App.css";
 import "../../Profile.css";
 import "../../Proportions.css";
 
-const tabs = ["Proyek", "Layanan", "Ulasan", "Statistik", "Postingan Diskusi", "Tentang"];
+const tabs = ["Proyek", "Layanan", "Ulasan", "Statistik", "Proyek Kolaborasi", "Tentang"];
 const creators = {
   "maya-angelina": { name: "Maya Angelina", avatar: "/creatorin/maya-angelina.png", headline: "Beauty & Lifestyle TikTok Content Creator", projects: "142+", rating: "4.9", reviews: "98", followers: "4.827", score: "95%", location: "Jakarta Barat", school: "SMK Telkom Sidoarjo" },
   "qaesyaar-aqeel": { name: "Qaesyaar Aqeel", avatar: "/creatorin/avatar.png", headline: "Brand Identity & Digital Content Creator", projects: "88+", rating: "5.0", reviews: "88", followers: "3.240", score: "95%", location: "Bandung, Jawa Barat", school: "Institut Teknologi Bandung" },
@@ -87,7 +87,7 @@ function ReviewsPanel() {
   return <div className="profile-reviews"><div className="reviews-heading"><div><h2>Ulasan Klien</h2><p>Seluruh testimoni berasal dari kolaborasi proyek yang telah selesai dan diserahterimakan di Creatorin.</p></div><div><button className="active">Terbaru</button><button>Rating Tertinggi</button></div></div>{reviewItems.map(([name, role, avatar, project, date, quote]) => <article className="review-item" key={name}><div className="review-person"><img src={`/creatorin/${avatar}`} alt="" /><div><h3>{name} <small>&middot; {role}</small></h3><p>Proyek: {project} <i>&middot;</i> Selesai {date}</p></div></div><div className="review-rating"><span aria-label="5 dari 5 bintang">5 / 5</span><b>5.0</b></div><blockquote>&ldquo;{quote}&rdquo;</blockquote></article>)}</div>;
 }
 function DiscussionPanel() {
-  return <div><div className="discussion-heading"><div><h2>Postingan Diskusi</h2><p>Gagasan, proses kreatif, dan percakapan terbaru dari kreator.</p></div><span><MessageSquare />4 postingan</span></div><div className="profile-discussion-grid">{profileProjects.map((item) => <ProfileProject item={item} key={item.id} />)}</div></div>;
+  return <div><div className="discussion-heading"><div><h2>Proyek Kolaborasi</h2><p>Portofolio kolaborasi terbaru yang dibuat bersama brand dan UMKM.</p></div><span><MessageSquare />4 proyek</span></div><div className="profile-discussion-grid">{profileProjects.map((item) => <ProfileProject item={item} key={item.id} />)}</div></div>;
 }
 function AboutPanel() {
   const skills = ["app ui", "branding", "dashboard", "design systems", "development", "front end development", "icons", "illustration", "mobile", "product design", "strategy", "ui", "ux", "web design", "website ui", "wordpress"];
@@ -107,7 +107,7 @@ export default function ProfilePage() {
       <div className="profile-identity"><h1>{creator.name}</h1><p>{creator.headline}</p><div className="profile-stats"><span><b>{creator.projects}</b> Proyek Selesai</span><span><b>{creator.rating} <Star fill="currentColor" /></b> ({creator.reviews} Ulasan)</span><span><b>{creator.followers}</b> Pengikut</span><span><b>{creator.score}</b> Skor Karir</span><span><MapPin />{creator.location}</span><span><GraduationCap />{creator.school}</span></div></div>
       <div className="profile-tabs-row"><div className="profile-tabs" role="tablist">{tabs.map((tab, index) => <button type="button" role="tab" aria-selected={activeTab === tab} className={activeTab === tab ? "active" : ""} onClick={() => setActiveTab(tab)} key={tab}>{tab}{index < 2 && <small>{index === 0 ? 4 : 3}</small>}</button>)}</div><button className="profile-sort"><SlidersHorizontal />Terbaru<ChevronDown /></button></div>
     </section>
-    <section className="profile-content" aria-live="polite">{activeTab === "Proyek" && <div className="profile-project-grid">{profileProjects.map((item) => <ProfileProject item={item} key={item.id} />)}</div>}{activeTab === "Layanan" && <ServicesPanel />}{activeTab === "Statistik" && <StatisticsPanel />}{activeTab === "Ulasan" && <ReviewsPanel />}{activeTab === "Postingan Diskusi" && <DiscussionPanel />}{activeTab === "Tentang" && <AboutPanel />}</section>
+    <section className="profile-content" aria-live="polite">{activeTab === "Proyek" && <div className="profile-project-grid">{profileProjects.map((item) => <ProfileProject item={item} key={item.id} />)}</div>}{activeTab === "Layanan" && <ServicesPanel />}{activeTab === "Statistik" && <StatisticsPanel />}{activeTab === "Ulasan" && <ReviewsPanel />}{activeTab === "Proyek Kolaborasi" && <DiscussionPanel />}{activeTab === "Tentang" && <AboutPanel />}</section>
   </main><ProfileFooter /></div>;
 }
 

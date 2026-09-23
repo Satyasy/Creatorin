@@ -63,6 +63,30 @@
   font-display: swap;
 }
 
+@keyframes detail-overlay-in {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes detail-overlay-out {
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes detail-sheet-in {
+  from {
+    transform: translateY(24px);
+  }
+}
+
+@keyframes detail-sheet-out {
+  to {
+    transform: translateY(100%);
+  }
+}
+
 :root {
   --font-sf-pro: "SF Pro Local", "SF Pro", "SF Pro Text", "SF Pro Display", "SF Pro Rounded", -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif;
   --container-wide: 1280px;

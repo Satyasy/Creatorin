@@ -11,9 +11,13 @@ import { ShaderFill } from "./lib/custom-effect-runtime";
 import { setup, render, manifest } from "./lib/custom-effects/CodeComponentId_c2b302fbdfce8a1ec92a5a80b10a5916ab506ed7_430";
 import { setup as waveSetup, render as waveRender, manifest as waveManifest } from "./lib/custom-effects/CodeComponentId_cd43ef0afb2cac168a28e7f79135150678ccfd25_433";
 import JelajahNav from "./JelajahNav";
+import ProjectDetailPanel from "./ProjectDetailPanel";
+import ServiceDetailPanel from "./ServiceDetailPanel";
 import "./App.css";
 import "./Profile.css";
 import "./Jelajah.css";
+import "./ProjectDetail.css";
+import "./ServiceDetail.css";
 import "./Proportions.css";
 
 type JelajahSection = "creator" | "layanan" | "proyek";
@@ -83,6 +87,10 @@ const projects = Array.from({ length: 16 }, (_, id) => ({
   creator: id % 2 ? "@munirs.design" : "@mayaangelina.ugc",
   views: id % 3 === 0 ? "710.0K" : id % 3 === 1 ? "218.0K" : "185.4K",
 }));
+
+type DetailModal =
+  | { type: "service"; item: (typeof marketplaceServices)[number] }
+  | { type: "project"; item: (typeof projects)[number] };
 const filterCategories = ["Logo & Branding", "Web Design", "Illustration", "Product Design", "Mobile", "Animation", "Typography", "Print"];
 const otherFilters = [
   ["Available for work", "Hanya tampilkan kreator yang siap terima project"],
@@ -133,21 +141,21 @@ function CreatorResultCard({ creator, index }: { creator: (typeof creators)[numb
   </article>;
 }
 
-function ServiceResultCard({ item }: { item: (typeof marketplaceServices)[number] }) {
+function ServiceResultCard({ item, onOpen }: { item: (typeof marketplaceServices)[number]; onOpen: (item: (typeof marketplaceServices)[number]) => void }) {
   return <article className="service-card">
-    <Link className="service-visual service-visual-link" href="/layanan/full-framer-interactive-website-build" aria-label={`Buka detail layanan ${item.title}`}><ShaderFill className="portfolio-shader" shader={{ setup: waveSetup, render: waveRender, manifest: waveManifest, params: { transform: { x: 50, y: 50, radius: 30, angle: 0 }, amplitude: 15, waveColor: { r: 1, g: 1, b: 1, a: 1 }, offset: item.id * 4, zoom: 1, glowIntensity: 1 } }} /></Link>
+    <button type="button" className="service-visual service-visual-link service-card-open" onClick={() => onOpen(item)} aria-label={`Buka detail layanan ${item.title}`}><ShaderFill className="portfolio-shader" shader={{ setup: waveSetup, render: waveRender, manifest: waveManifest, params: { transform: { x: 50, y: 50, radius: 30, angle: 0 }, amplitude: 15, waveColor: { r: 1, g: 1, b: 1, a: 1 }, offset: item.id * 4, zoom: 1, glowIntensity: 1 } }} /></button>
     <div className="service-topline"><span>{item.category}</span><Link className="service-creator" href="/profile/sobakhul-munir-siroj"><img src="/creatorin/avatar.png" alt="" />{item.creator}</Link></div>
-    <h3><Link href="/layanan/full-framer-interactive-website-build">{item.title}</Link></h3><p>{item.description}</p><div className="service-estimate"><Clock3 />Estimasi: {item.estimate}</div>
-    <div className="service-footer"><div><small>Harga</small><strong>{item.price}</strong></div><div className="service-actions"><button type="button" aria-label="Simpan layanan"><Heart /></button><Link href="/layanan/full-framer-interactive-website-build">Diskusikan</Link></div></div>
+    <h3><button type="button" className="service-title-button" onClick={() => onOpen(item)}>{item.title}</button></h3><p>{item.description}</p><div className="service-estimate"><Clock3 />Estimasi: {item.estimate}</div>
+    <div className="service-footer"><div><small>Harga</small><strong>{item.price}</strong></div><div className="service-actions"><button type="button" aria-label="Simpan layanan"><Heart /></button><button type="button" className="service-detail-button" onClick={() => onOpen(item)}>Diskusikan</button></div></div>
   </article>;
 }
 
-function ProjectResultCard({ item }: { item: (typeof projects)[number] }) {
-  return <Link className="project-card" href="/proyek/skincare-barrier-restoring-serum" aria-label={`Buka detail proyek ${item.title}`}>
+function ProjectResultCard({ item, onOpen }: { item: (typeof projects)[number]; onOpen: (item: (typeof projects)[number]) => void }) {
+  return <button type="button" className="project-card project-card-button" onClick={() => onOpen(item)} aria-label={`Buka detail proyek ${item.title}`}>
     <ShaderFill className="portfolio-shader" shader={{ setup, render, manifest, params: { falloff: 1, inverseFalloff: false, ringCount: 20, offset: item.id * .03, shape: 1, transform: { x: 50, y: 50, radius: 50, angle: 0 }, color: { r: 1, g: 1, b: 1, a: 1 } } }} />
     <span className="project-play" aria-hidden="true"><Play fill="currentColor" /></span>
     <div className="project-info"><h3>{item.title}</h3><div><span>{item.creator}</span><span>{item.views}</span></div></div>
-  </Link>;
+  </button>;
 }
 
 function RatingRow({ score }: { score: number }) {
@@ -195,6 +203,31 @@ function FilterMenuButton() {
 export default function JelajahPage({ initialSection = "creator" }: { initialSection?: string }) {
   const activeSection = normalizeSection(initialSection);
   const copy = sectionCopy[activeSection];
+  const [detailModal, setDetailModal] = useState<DetailModal | null>(null);
+  const [detailClosing, setDetailClosing] = useState(false);
+  const openDetail = (modal: DetailModal) => {
+    setDetailClosing(false);
+    setDetailModal(modal);
+  };
+  const closeDetail = () => {
+    setDetailClosing(true);
+    window.setTimeout(() => {
+      setDetailModal(null);
+      setDetailClosing(false);
+    }, 220);
+  };
+
+  useEffect(() => {
+    if (!detailModal) return;
+
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+
+    return () => {
+      document.body.style.overflow = previousOverflow;
+    };
+  }, [detailModal]);
+
   return <div className="creatorin-app jelajah-page"><JelajahHeader /><main className="jelajah-main">
     <div className="jelajah-breadcrumb"><Link href="/jelajah/creator">Jelajah</Link><span>/</span><strong>{copy.crumb}</strong></div>
     <section className="jelajah-intro">
@@ -207,7 +240,10 @@ export default function JelajahPage({ initialSection = "creator" }: { initialSec
       <div className="jelajah-filter-actions"><FilterMenuButton />{copy.filters.map((filter) => <button type="button" key={filter}>{filter}<ChevronDown /></button>)}</div>
     </section>
     {activeSection === "creator" && <div className="creator-list jelajah-creator-list">{creators.map((creator, index) => <CreatorResultCard creator={creator} index={index} key={`${creator.name}-${index}`} />)}</div>}
-    {activeSection === "layanan" && <div className="service-grid jelajah-service-grid">{marketplaceServices.map((item) => <ServiceResultCard item={item} key={item.id} />)}</div>}
-    {activeSection === "proyek" && <div className="project-grid jelajah-project-grid">{projects.map((item) => <ProjectResultCard item={item} key={item.id} />)}</div>}
-  </main><JelajahFooter /></div>;
+    {activeSection === "layanan" && <div className="service-grid jelajah-service-grid">{marketplaceServices.map((item) => <ServiceResultCard item={item} onOpen={(selected) => openDetail({ type: "service", item: selected })} key={item.id} />)}</div>}
+    {activeSection === "proyek" && <div className="project-grid jelajah-project-grid">{projects.map((item) => <ProjectResultCard item={item} onOpen={(selected) => openDetail({ type: "project", item: selected })} key={item.id} />)}</div>}
+  </main><JelajahFooter />
+    {detailModal?.type === "service" && <ServiceDetailPanel isModal isClosing={detailClosing} onClose={closeDetail} title={detailModal.item.title} category={detailModal.item.category} creator={detailModal.item.creator} price={detailModal.item.price} time={detailModal.item.estimate} />}
+    {detailModal?.type === "project" && <ProjectDetailPanel isModal isClosing={detailClosing} onClose={closeDetail} title={detailModal.item.title} creator={detailModal.item.creator} views={detailModal.item.views} />}
+  </div>;
 }

@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   ArrowRight, Bell, Bookmark, BriefcaseBusiness, Check, ChevronDown,
   Clock3, FolderKanban, Grid2X2, Instagram, Linkedin, MapPin, Menu,
@@ -9,7 +9,11 @@ import { ShaderFill } from "./lib/custom-effect-runtime";
 import { setup, render, manifest } from "./lib/custom-effects/CodeComponentId_c2b302fbdfce8a1ec92a5a80b10a5916ab506ed7_430";
 import { setup as waveSetup, render as waveRender, manifest as waveManifest } from "./lib/custom-effects/CodeComponentId_cd43ef0afb2cac168a28e7f79135150678ccfd25_433";
 import JelajahNav from "./JelajahNav";
+import ProjectDetailPanel from "./ProjectDetailPanel";
+import ServiceDetailPanel from "./ServiceDetailPanel";
 import "./App.css";
+import "./ProjectDetail.css";
+import "./ServiceDetail.css";
 import "./Proportions.css";
 
 type DiscoverTab = "Creator" | "Layanan" | "Proyek";
@@ -29,6 +33,10 @@ const marketplaceServices = Array.from({ length: 16 }, (_, id) => ({
 const projects = Array.from({ length: 16 }, (_, id) => ({
   id, title: "Skincare Barrier Restoring Serum 14-Day Honest Review (TikTok UGC Viral)", creator: "@mayaangelina.ugc", views: "710.0K",
 }));
+
+type DetailModal =
+  | { type: "service"; item: (typeof marketplaceServices)[number] }
+  | { type: "project"; item: (typeof projects)[number] };
 
 function Brand({ footer = false }: { footer?: boolean }) {
   return <a className={`brand ${footer ? "brand--footer" : ""}`} href="#top" aria-label="Creatorin home"><img src="/creatorin/logo.svg" alt="" /><span>Creatorin</span></a>;
@@ -74,22 +82,22 @@ function PortfolioCard({ item }: { item: (typeof services)[number] }) {
     <span>{item.category}</span></div><h4>{item.title}</h4><div className="portfolio-meta"><strong>{item.price}</strong><span>{item.time}</span></div></article>;
 }
 
-function ServiceListingCard({ item }: { item: (typeof marketplaceServices)[number] }) {
+function ServiceListingCard({ item, onOpen }: { item: (typeof marketplaceServices)[number]; onOpen: (item: (typeof marketplaceServices)[number]) => void }) {
   const [saved, setSaved] = useState(false);
   return <article className="service-card">
-    <Link className="service-visual service-visual-link" href="/layanan/full-framer-interactive-website-build" aria-label={`Buka detail layanan ${item.title}`}><ShaderFill className="portfolio-shader" shader={{ setup: waveSetup, render: waveRender, manifest: waveManifest, params: { transform: { x: 50, y: 50, radius: 30, angle: 0 }, amplitude: 15, waveColor: { r: 1, g: 1, b: 1, a: 1 }, offset: item.id * 4, zoom: 1, glowIntensity: 1 } }} /></Link>
+    <button type="button" className="service-visual service-visual-link service-card-open" onClick={() => onOpen(item)} aria-label={`Buka detail layanan ${item.title}`}><ShaderFill className="portfolio-shader" shader={{ setup: waveSetup, render: waveRender, manifest: waveManifest, params: { transform: { x: 50, y: 50, radius: 30, angle: 0 }, amplitude: 15, waveColor: { r: 1, g: 1, b: 1, a: 1 }, offset: item.id * 4, zoom: 1, glowIntensity: 1 } }} /></button>
     <div className="service-topline"><span>{item.category}</span><Link className="service-creator" href="/profile/sobakhul-munir-siroj"><img src="/creatorin/avatar.png" alt="" />{item.creator}</Link></div>
-    <h3><Link href="/layanan/full-framer-interactive-website-build">{item.title}</Link></h3><p>{item.description}</p><div className="service-estimate"><Clock3 />Estimasi: {item.estimate}</div>
-    <div className="service-footer"><div><small>Harga</small><strong>{item.price}</strong></div><div className="service-actions"><button type="button" className={saved ? "saved" : ""} onClick={() => setSaved(!saved)} aria-label={saved ? "Hapus layanan dari tersimpan" : "Simpan layanan"}><Bookmark fill={saved ? "currentColor" : "none"} /></button><Link href="/layanan/full-framer-interactive-website-build">Detail</Link></div></div>
+    <h3><button type="button" className="service-title-button" onClick={() => onOpen(item)}>{item.title}</button></h3><p>{item.description}</p><div className="service-estimate"><Clock3 />Estimasi: {item.estimate}</div>
+    <div className="service-footer"><div><small>Harga</small><strong>{item.price}</strong></div><div className="service-actions"><button type="button" className={saved ? "saved" : ""} onClick={() => setSaved(!saved)} aria-label={saved ? "Hapus layanan dari tersimpan" : "Simpan layanan"}><Bookmark fill={saved ? "currentColor" : "none"} /></button><button type="button" className="service-detail-button" onClick={() => onOpen(item)}>Detail</button></div></div>
   </article>;
 }
 
-function ProjectCard({ item }: { item: (typeof projects)[number] }) {
-  return <Link className="project-card" href="/proyek/skincare-barrier-restoring-serum" aria-label={`Buka detail proyek ${item.title}`}>
+function ProjectCard({ item, onOpen }: { item: (typeof projects)[number]; onOpen: (item: (typeof projects)[number]) => void }) {
+  return <button type="button" className="project-card project-card-button" onClick={() => onOpen(item)} aria-label={`Buka detail proyek ${item.title}`}>
     <ShaderFill className="portfolio-shader" shader={{ setup, render, manifest, params: { falloff: 1, inverseFalloff: false, ringCount: 20, offset: item.id * .03, shape: 1, transform: { x: 50, y: 50, radius: 50, angle: 0 }, color: { r: 1, g: 1, b: 1, a: 1 } } }} />
     <span className="project-play" aria-hidden="true"><Play fill="currentColor" /></span>
     <div className="project-info"><h3>{item.title}</h3><div><span>{item.creator}</span><span>{item.views}</span></div></div>
-  </Link>;
+  </button>;
 }
 
 export type CreatorCardData = {
@@ -166,6 +174,8 @@ export default function App({ initialData }: { initialData?: DiscoverDataProps }
   const [query, setQuery] = useState("");
   const [tab, setTab] = useState<DiscoverTab>("Creator");
   const [briefVisible, setBriefVisible] = useState(true);
+  const [detailModal, setDetailModal] = useState<DetailModal | null>(null);
+  const [detailClosing, setDetailClosing] = useState(false);
   const needle = query.trim().toLowerCase();
 
   const creatorsList = initialData?.creators || [
@@ -224,6 +234,28 @@ export default function App({ initialData }: { initialData?: DiscoverDataProps }
   );
   const filteredServices = servicesList.filter((item) => Object.values(item).join(" ").toLowerCase().includes(needle));
   const filteredProjects = projectsList.filter((item) => Object.values(item).join(" ").toLowerCase().includes(needle));
+  const openDetail = (modal: DetailModal) => {
+    setDetailClosing(false);
+    setDetailModal(modal);
+  };
+  const closeDetail = () => {
+    setDetailClosing(true);
+    window.setTimeout(() => {
+      setDetailModal(null);
+      setDetailClosing(false);
+    }, 220);
+  };
+
+  useEffect(() => {
+    if (!detailModal) return;
+
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+
+    return () => {
+      document.body.style.overflow = previousOverflow;
+    };
+  }, [detailModal]);
 
   return <div className="creatorin-app"><Header /><main><Hero /><section className="discover" id="discover"><DiscoverControls query={query} setQuery={setQuery} tab={tab} setTab={setTab} /><div id="discover-results" role="tabpanel">
     {tab === "Creator" && (
@@ -242,7 +274,7 @@ export default function App({ initialData }: { initialData?: DiscoverDataProps }
       <>
         <div className="service-grid">
           {filteredServices.length ? (
-            filteredServices.map((item) => <ServiceListingCard item={item} key={item.id} />)
+            filteredServices.map((item) => <ServiceListingCard item={item} onOpen={(selected) => openDetail({ type: "service", item: selected })} key={item.id} />)
           ) : (
             <p className="empty-state">Belum ada layanan yang cocok dengan pencarianmu.</p>
           )}
@@ -254,7 +286,7 @@ export default function App({ initialData }: { initialData?: DiscoverDataProps }
       <>
         <div className="project-grid">
           {filteredProjects.length ? (
-            filteredProjects.map((item) => <ProjectCard item={item} key={item.id} />)
+            filteredProjects.map((item) => <ProjectCard item={item} onOpen={(selected) => openDetail({ type: "project", item: selected })} key={item.id} />)
           ) : (
             <p className="empty-state">Belum ada proyek yang cocok dengan pencarianmu.</p>
           )}
@@ -264,6 +296,8 @@ export default function App({ initialData }: { initialData?: DiscoverDataProps }
     )}
   </div></section></main><Footer />
     {briefVisible && <aside className="brief-toast" id="brief"><div><span><BriefcaseBusiness /></span><p><b>Start a Project Brief</b> &mdash; Tell us what you need and find the right creator.</p></div><div><Link href="/brief">Get Started</Link><button onClick={() => setBriefVisible(false)} aria-label="Tutup"><X /></button></div></aside>}
+    {detailModal?.type === "service" && <ServiceDetailPanel isModal isClosing={detailClosing} onClose={closeDetail} title={detailModal.item.title} category={detailModal.item.category} creator={detailModal.item.creator} price={detailModal.item.price} time={detailModal.item.estimate} />}
+    {detailModal?.type === "project" && <ProjectDetailPanel isModal isClosing={detailClosing} onClose={closeDetail} title={detailModal.item.title} creator={detailModal.item.creator} views={detailModal.item.views} />}
   </div>;
 }
 
