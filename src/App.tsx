@@ -10,6 +10,7 @@ import { setup, render, manifest } from "./lib/custom-effects/CodeComponentId_c2
 import { setup as waveSetup, render as waveRender, manifest as waveManifest } from "./lib/custom-effects/CodeComponentId_cd43ef0afb2cac168a28e7f79135150678ccfd25_433";
 import JelajahNav from "./JelajahNav";
 import "./App.css";
+import "./Proportions.css";
 
 type DiscoverTab = "Creator" | "Layanan" | "Proyek";
 

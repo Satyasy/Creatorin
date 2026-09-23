@@ -7,6 +7,7 @@ import JelajahNav from "../../JelajahNav";
 import "../../App.css";
 import "../../Profile.css";
 import "../../Pesan.css";
+import "../../Proportions.css";
 
 const conversations = [
   { name: "Sobakhul Munir Siroj", avatar: "/creatorin/avatar.png", time: "10:45", preview: "Berikut invoice resmi untuk pengerjaan project ini.", unread: true, online: true, role: "UI/UX & Framer" },

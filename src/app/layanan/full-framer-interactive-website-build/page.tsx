@@ -18,6 +18,7 @@ import {
 } from "lucide-react";
 import "../../../App.css";
 import "../../../ServiceDetail.css";
+import "../../../Proportions.css";
 import { ShaderFill } from "../../../lib/custom-effect-runtime";
 import { setup as waveSetup, render as waveRender, manifest as waveManifest } from "../../../lib/custom-effects/CodeComponentId_cd43ef0afb2cac168a28e7f79135150678ccfd25_433";
 

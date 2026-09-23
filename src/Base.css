@@ -1,9 +1,7 @@
-@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500&display=swap');
-
 .creatorin-app { min-height: 100vh; background: #fff; }
 .site-header { position: relative; z-index: 50; height: 81px; border-bottom: 1px solid rgba(229,229,229,.8); background: rgba(255,255,255,.96); }
 .header-inner { width: min(1600px, calc(100% - 64px)); height: 80px; margin: auto; padding: 0 32px; display: flex; align-items: center; justify-content: space-between; }
-.brand { display: inline-flex; align-items: center; gap: 7px; min-width: 141px; font: 500 23.8px/1 "Space Grotesk", sans-serif; letter-spacing: -.7px; color: #000; }
+.brand { display: inline-flex; align-items: center; gap: 7px; min-width: 141px; font: 800 23.8px/1 var(--font-sf-pro); letter-spacing: 0; color: #000; }
 .brand img { width: 34px; height: 33px; object-fit: contain; }
 .main-nav { display: flex; align-items: center; gap: 28px; font-size: 14px; font-weight: 600; color: #404040; }
 .main-nav > a { height: 68px; display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; }

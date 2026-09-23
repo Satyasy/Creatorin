@@ -20,6 +20,7 @@ import JelajahNav from "../../JelajahNav";
 import "../../App.css";
 import "../../Profile.css";
 import "../../Notifikasi.css";
+import "../../Proportions.css";
 
 type NotificationFilter = "Semua" | "Belum Dibaca" | "Kolaborasi" | "Pesan" | "Transaksi";
 type NotificationItem = {

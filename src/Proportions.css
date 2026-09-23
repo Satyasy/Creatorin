@@ -1,0 +1,340 @@
+@font-face {
+  font-family: "SF Pro Local";
+  src:
+    local("SF Pro Text Regular"),
+    local("SFProText-Regular"),
+    local("SF Pro Display Regular"),
+    local("SFProDisplay-Regular"),
+    local("SF Pro");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "SF Pro Local";
+  src:
+    local("SF Pro Text Medium"),
+    local("SFProText-Medium"),
+    local("SF Pro Display Medium"),
+    local("SFProDisplay-Medium");
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "SF Pro Local";
+  src:
+    local("SF Pro Text Semibold"),
+    local("SFProText-Semibold"),
+    local("SF Pro Display Semibold"),
+    local("SFProDisplay-Semibold");
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "SF Pro Local";
+  src:
+    local("SF Pro Text Bold"),
+    local("SFProText-Bold"),
+    local("SF Pro Display Bold"),
+    local("SFProDisplay-Bold");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "SF Pro Local";
+  src:
+    local("SF Pro Text Heavy"),
+    local("SFProText-Heavy"),
+    local("SF Pro Text Black"),
+    local("SFProText-Black"),
+    local("SF Pro Display Heavy"),
+    local("SFProDisplay-Heavy"),
+    local("SF Pro Display Black"),
+    local("SFProDisplay-Black");
+  font-weight: 800 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+:root {
+  --font-sf-pro: "SF Pro Local", "SF Pro", "SF Pro Text", "SF Pro Display", "SF Pro Rounded", -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif;
+  --container-wide: 1280px;
+  --container-reading: 960px;
+  --page-gutter: clamp(24px, 5vw, 96px);
+  --text-body: 15px;
+  --text-small: 12px;
+  --text-card-title: 16px;
+  --text-section-title: clamp(22px, 2.1vw, 30px);
+  --text-page-title: clamp(28px, 3vw, 42px);
+}
+
+html,
+body,
+*,
+*::before,
+*::after,
+button,
+input,
+textarea,
+select {
+  font-family: var(--font-sf-pro) !important;
+}
+
+body {
+  font-size: var(--text-body);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+strong,
+b {
+  font-weight: 800;
+}
+
+p,
+li,
+blockquote,
+input,
+textarea {
+  font-weight: 400;
+}
+
+button,
+a,
+nav,
+label,
+small,
+.tabs button,
+.profile-tabs button,
+.brief-detail-tabs button {
+  font-weight: 700;
+}
+
+.brand,
+.brand--footer {
+  font-family: var(--font-sf-pro) !important;
+  font-weight: 800 !important;
+  letter-spacing: 0 !important;
+}
+
+.header-inner,
+.profile-header-inner,
+.discover,
+.brief-main,
+.jelajah-main,
+.footer-inner,
+.service-detail-footer-inner,
+.profile-hero,
+.profile-content,
+.umkm-profile-tabbar > div {
+  width: min(var(--container-wide), calc(100% - (var(--page-gutter) * 2))) !important;
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+}
+
+.hero-content,
+.brief-detail-main,
+.service-detail-main,
+.project-content,
+.project-detail-header-inner,
+.service-detail-header-inner,
+.brief-detail-header > div {
+  width: min(var(--container-reading), calc(100% - (var(--page-gutter) * 2))) !important;
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+}
+
+.hero {
+  min-height: 500px !important;
+}
+
+.hero-content {
+  padding-top: 68px !important;
+  padding-bottom: 56px !important;
+}
+
+.hero h1 {
+  max-width: 840px;
+  margin-inline: auto !important;
+  font-size: clamp(38px, 3.4vw, 56px) !important;
+  line-height: 1.12 !important;
+  font-weight: 800 !important;
+  letter-spacing: 0 !important;
+}
+
+.hero-content > p {
+  max-width: 640px !important;
+  font-size: 17px !important;
+  line-height: 1.55 !important;
+  letter-spacing: 0 !important;
+}
+
+.brief-intro h1,
+.jelajah-intro h1,
+.profile-identity h1,
+.service-heading h1,
+.project-content h1,
+.brief-detail-main > h1 {
+  font-size: var(--text-page-title) !important;
+  line-height: 1.22 !important;
+  font-weight: 800 !important;
+  letter-spacing: 0 !important;
+}
+
+.brief-toolbar h2,
+.jelajah-toolbar h2,
+.brief-section-heading h2,
+.brief-applicants h2,
+.brief-related h2,
+.reviews-heading h2,
+.discussion-heading h2,
+.profile-about h2,
+.service-detail-grid h2,
+.service-related h2,
+.related-projects h2,
+.umkm-section-heading h2,
+.umkm-brand-panel h2 {
+  font-size: var(--text-section-title) !important;
+  line-height: 1.28 !important;
+  font-weight: 800 !important;
+  letter-spacing: 0 !important;
+}
+
+.brief-intro p,
+.jelajah-intro p,
+.profile-identity > p,
+.service-heading p,
+.project-copy,
+.brief-copy > p,
+.profile-about > div > p,
+.umkm-brand-panel p {
+  max-width: 68ch !important;
+  font-size: var(--text-body) !important;
+  line-height: 1.55 !important;
+  letter-spacing: 0 !important;
+}
+
+.creator-card,
+.brief-card,
+.applicant-card,
+.service-card,
+.profile-service-card,
+.umkm-brief-card {
+  padding: 24px !important;
+  border-radius: 12px !important;
+}
+
+.creator-card h3,
+.brief-card h3,
+.service-card h3,
+.profile-service-card h3,
+.umkm-brief-card h3,
+.service-related-card h3,
+.portfolio-card h4 {
+  font-size: var(--text-card-title) !important;
+  line-height: 1.35 !important;
+  font-weight: 800 !important;
+  letter-spacing: 0 !important;
+}
+
+.brief-card-body,
+.brief-card footer,
+.brief-related .brief-card-body,
+.brief-related .brief-card footer {
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+}
+
+.brief-card-body {
+  padding-top: 0 !important;
+}
+
+.brief-card footer {
+  padding-bottom: 0 !important;
+}
+
+.brief-card p,
+.brief-card li,
+.service-card > p,
+.profile-service-card > p,
+.service-related-card p,
+.applicant-card > p,
+.review-item blockquote {
+  font-size: 13px !important;
+  line-height: 1.5 !important;
+  letter-spacing: 0 !important;
+}
+
+.brief-grid,
+.service-grid,
+.profile-service-grid,
+.umkm-brief-grid,
+.profile-project-grid,
+.project-grid {
+  gap: 20px !important;
+}
+
+.brief-card,
+.service-card,
+.profile-service-card,
+.umkm-brief-card {
+  min-height: auto !important;
+}
+
+.brief-metrics article,
+.service-detail-metric {
+  min-height: 124px !important;
+  padding: 18px !important;
+}
+
+.brief-metrics strong,
+.service-detail-metric strong,
+.score-heading strong {
+  font-size: clamp(24px, 2.4vw, 34px) !important;
+  line-height: 1.15 !important;
+}
+
+.footer-word,
+.service-footer-word {
+  font-size: clamp(84px, 10vw, 148px) !important;
+  letter-spacing: 0 !important;
+}
+
+@media (max-width: 900px) {
+  :root {
+    --page-gutter: 20px;
+  }
+
+  .hero h1 {
+    font-size: clamp(34px, 10vw, 46px) !important;
+  }
+
+  .header-inner,
+  .profile-header-inner,
+  .discover,
+  .brief-main,
+  .jelajah-main,
+  .footer-inner,
+  .profile-hero,
+  .profile-content,
+  .hero-content,
+  .brief-detail-main,
+  .service-detail-main,
+  .project-content {
+    width: calc(100% - 32px) !important;
+  }
+}

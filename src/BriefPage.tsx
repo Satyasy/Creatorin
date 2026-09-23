@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Bell, BriefcaseBusiness, Check, CheckCircle2, ChevronDown, Clock3,
   ExternalLink, Eye, Globe, Instagram, Linkedin, Mail, MapPin, MessageCircle,
@@ -13,11 +13,11 @@ import JelajahNav from "./JelajahNav";
 import "./App.css";
 import "./Profile.css";
 import "./Brief.css";
+import "./Proportions.css";
 
 type BriefTab = "rincian" | "pelamar" | "tentang-umkm";
 type UmkmProfileTab = "brief" | "collaboration" | "brand";
 
-const briefSlug = "/brief/rincian";
 const popularTags = ["#ReelsInstagram", "#TikTokViral", "#UIUXDesign", "#FotoProduk", "#DesignSystems", "#CinematicBRoll", "#FigmaCommunity", "#PackagingDesign", "#ASMRCoffee"];
 
 const briefs = [
@@ -203,20 +203,48 @@ function FilterButton({ children }: { children: React.ReactNode }) {
   return <button type="button">{children}<ChevronDown /></button>;
 }
 
-function BriefCard({ brief }: { brief: (typeof briefs)[number] }) {
+function BriefCard({ brief, onOpen }: { brief: (typeof briefs)[number]; onOpen?: () => void }) {
   return <article className="brief-card">
     <div className="brief-card-body">
       <div className="brief-card-top"><span>{brief.category}</span><small><Clock3 />{brief.time}</small></div>
-      <h3><Link href={briefSlug}>{brief.title}</Link></h3>
+      <h3>{onOpen ? <button type="button" className="brief-title-button" onClick={onOpen}>{brief.title}</button> : <Link href="/brief/rincian">{brief.title}</Link>}</h3>
       <p>{brief.description}</p>
       <ul>{brief.deliverables.map((item) => <li key={item}><Check />{item}</li>)}</ul>
       <div className="brief-tags">{brief.tags.map((tag) => <span key={tag}>{tag}</span>)}</div>
     </div>
-    <footer><div><small>Estimasi Anggaran</small><strong>{brief.budget}</strong></div><Link href={briefSlug}><Send />Lamar</Link></footer>
+    <footer><div><small>Estimasi Anggaran</small><strong>{brief.budget}</strong></div>{onOpen ? <button type="button" onClick={onOpen}><Send />Lamar</button> : <Link href="/brief/rincian"><Send />Lamar</Link>}</footer>
   </article>;
 }
 
 export default function BriefPage() {
+  const [detailOpen, setDetailOpen] = useState(false);
+  const [detailClosing, setDetailClosing] = useState(false);
+  const [activeDetailTab, setActiveDetailTab] = useState<BriefTab>("rincian");
+
+  useEffect(() => {
+    if (!detailOpen) return;
+
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = previousOverflow;
+    };
+  }, [detailOpen]);
+
+  function openDetail() {
+    setActiveDetailTab("rincian");
+    setDetailClosing(false);
+    setDetailOpen(true);
+  }
+
+  function closeDetail() {
+    setDetailClosing(true);
+    window.setTimeout(() => {
+      setDetailOpen(false);
+      setDetailClosing(false);
+    }, 220);
+  }
+
   return <div className="creatorin-app brief-page"><BriefHeader /><main className="brief-main">
     <section className="brief-intro">
       <div><h1>Papan Brief Proyek & Kebutuhan UMKM</h1><p>Temukan peluang proyek langsung dari pelaku bisnis dan ajukan penawaran yang paling sesuai dengan portofoliomu.</p></div>
@@ -227,8 +255,8 @@ export default function BriefPage() {
       <div><h2>Cari Proyek berdasarkan Kategori</h2><span>8 Brief</span></div>
       <div className="brief-filter-actions"><button type="button" aria-label="Filter lanjutan"><SlidersHorizontal /></button><FilterButton>Kategori</FilterButton><FilterButton>Anggaran</FilterButton><FilterButton>Tenggat Waktu</FilterButton><FilterButton>Kirim Produk</FilterButton><FilterButton>Urutkan: Rekomendasi</FilterButton></div>
     </section>
-    <section className="brief-grid" aria-label="Daftar brief proyek">{briefs.map((brief) => <BriefCard brief={brief} key={brief.title} />)}</section>
-  </main><BriefFooter /></div>;
+    <section className="brief-grid" aria-label="Daftar brief proyek">{briefs.map((brief) => <BriefCard brief={brief} onOpen={openDetail} key={brief.title} />)}</section>
+  </main><BriefFooter />{detailOpen && <DetailShell active={activeDetailTab} isClosing={detailClosing} onClose={closeDetail} onTabChange={setActiveDetailTab}>{activeDetailTab === "pelamar" ? <PelamarContent /> : activeDetailTab === "tentang-umkm" ? <UmkmBrandPanel /> : <RincianContent />}</DetailShell>}</div>;
 }
 
 function DetailHeader() {
@@ -238,25 +266,25 @@ function DetailHeader() {
   </div></header>;
 }
 
-function DetailTabs({ active }: { active: BriefTab }) {
+function DetailTabs({ active, onTabChange }: { active: BriefTab; onTabChange?: (tab: BriefTab) => void }) {
   const tabs: { id: BriefTab; label: string; count?: string }[] = [
     { id: "rincian", label: "Rincian Brief" },
     { id: "pelamar", label: "Pelamar", count: "4" },
     { id: "tentang-umkm", label: "Tentang UMKM" },
   ];
-  return <nav className="brief-detail-tabs" aria-label="Detail brief">{tabs.map((tab) => <Link className={active === tab.id ? "active" : ""} href={`/brief/${tab.id}`} key={tab.id}>{tab.label}{tab.count && <small>{tab.count}</small>}</Link>)}</nav>;
+  return <nav className="brief-detail-tabs" aria-label="Detail brief">{tabs.map((tab) => onTabChange ? <button type="button" className={active === tab.id ? "active" : ""} onClick={() => onTabChange(tab.id)} key={tab.id}>{tab.label}{tab.count && <small>{tab.count}</small>}</button> : <Link className={active === tab.id ? "active" : ""} href={`/brief/${tab.id}`} key={tab.id}>{tab.label}{tab.count && <small>{tab.count}</small>}</Link>)}</nav>;
 }
 
-function DetailShell({ active, children }: { active: BriefTab; children: React.ReactNode }) {
-  return <div className="brief-detail-page"><Link className="brief-detail-close" href="/brief" aria-label="Tutup detail">x</Link><div className="brief-detail-sheet"><DetailHeader /><main className="brief-detail-main">
+function DetailShell({ active, children, isClosing = false, onClose, onTabChange }: { active: BriefTab; children: React.ReactNode; isClosing?: boolean; onClose?: () => void; onTabChange?: (tab: BriefTab) => void }) {
+  return <div className={`brief-detail-page${onClose ? " is-modal" : ""}${isClosing ? " is-closing" : ""}`}>{onClose ? <button type="button" className="brief-detail-close" onClick={onClose} aria-label="Tutup detail">x</button> : <Link className="brief-detail-close" href="/brief" aria-label="Tutup detail">x</Link>}<div className="brief-detail-sheet"><DetailHeader /><div className="brief-detail-scroll"><main className="brief-detail-main">
     <span className="brief-category">Reels Instagram</span>
     <h1>Produksi 3x Video Reels Instagram & TikTok untuk Launching Kopi Susu Botolan</h1>
     <div className="brief-metrics">{metrics.map(({ label, value, detail, Icon }) => <article key={label}><header><span>{label}</span><i><Icon /></i></header><strong>{value}</strong><p>{detail}</p></article>)}</div>
-    <DetailTabs active={active} />
+    <DetailTabs active={active} onTabChange={onTabChange} />
     {children}
     <BusinessSummary />
     <RelatedBriefs />
-  </main><BriefFooter /></div></div>;
+  </main><BriefFooter /></div></div></div>;
 }
 
 function RincianContent() {

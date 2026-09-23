@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 :root {
-  font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-family: "SF Pro Local", "SF Pro", "SF Pro Text", "SF Pro Display", -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif;
   color: #0d0c22;
   background: #fff;
   font-synthesis: none;
@@ -12,3 +12,40 @@ html { scroll-behavior: smooth; }
 body { margin: 0; min-width: 320px; }
 button, input { font: inherit; }
 a { color: inherit; text-decoration: none; }
+
+.page-transition-shell {
+  min-height: 100vh;
+}
+
+::view-transition {
+  pointer-events: none;
+}
+
+::view-transition-old(.page-exit) {
+  animation: page-fade-out 45ms ease-out both;
+}
+
+::view-transition-new(.page-enter) {
+  animation: page-fade-in 75ms ease-out both;
+}
+
+@keyframes page-fade-out {
+  to {
+    opacity: .94;
+  }
+}
+
+@keyframes page-fade-in {
+  from {
+    opacity: .96;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-old(*),
+  ::view-transition-new(*),
+  ::view-transition-group(*) {
+    animation-duration: 0s !important;
+    animation-delay: 0s !important;
+  }
+}

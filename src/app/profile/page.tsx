@@ -14,6 +14,7 @@ import { setup as waterSetup, render as waterRender, manifest as waterManifest }
 import JelajahNav from "../../JelajahNav";
 import "../../App.css";
 import "../../Profile.css";
+import "../../Proportions.css";
 
 const tabs = ["Proyek", "Layanan", "Ulasan", "Statistik", "Postingan Diskusi", "Tentang"];
 const creators = {

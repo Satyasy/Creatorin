@@ -5,6 +5,7 @@ import { useState } from "react";
 import { Heart, Info, MessageCircle, Play, Send, Share2, Volume2, X } from "lucide-react";
 import "../../../App.css";
 import "../../../ProjectDetail.css";
+import "../../../Proportions.css";
 
 const comments = [
   { name: "Mukhlasur Rahman", avatar: "/creatorin/comment-mukhlasur.png", body: "Impressive work!", time: "about 1 hour" },

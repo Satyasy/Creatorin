@@ -14,6 +14,7 @@ import JelajahNav from "./JelajahNav";
 import "./App.css";
 import "./Profile.css";
 import "./Jelajah.css";
+import "./Proportions.css";
 
 type JelajahSection = "creator" | "layanan" | "proyek";
 
