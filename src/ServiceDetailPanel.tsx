@@ -14,8 +14,8 @@ import {
   RefreshCcw,
   ShieldCheck,
   Twitter,
-  X,
 } from "lucide-react";
+import DetailSurface from "./DetailSurface";
 import { ShaderFill } from "./lib/custom-effect-runtime";
 import { setup as waveSetup, render as waveRender, manifest as waveManifest } from "./lib/custom-effects/CodeComponentId_cd43ef0afb2cac168a28e7f79135150678ccfd25_433";
 
@@ -88,7 +88,6 @@ export default function ServiceDetailPanel({ isModal = false, isClosing = false,
   const serviceCreator = creator || "Sobakhul Munir Siroj";
   const servicePrice = price || "Rp3.800.000";
   const serviceTime = time || "4 Hari Kerja";
-  const className = `service-detail-page${isModal ? " is-modal" : ""}${isClosing ? " is-closing" : ""}`;
   const showPreviousImage = () => setActive((index) => (index + gallery.length - 1) % gallery.length);
   const showNextImage = () => setActive((index) => (index + 1) % gallery.length);
 
@@ -101,23 +100,18 @@ export default function ServiceDetailPanel({ isModal = false, isClosing = false,
     return () => window.clearInterval(timer);
   }, []);
 
-  return <div className={className} role={isModal ? "dialog" : undefined} aria-modal={isModal || undefined} aria-label={isModal ? "Detail layanan" : undefined}>
-    <div className="service-detail-close">{onClose ? <button type="button" onClick={onClose} aria-label="Tutup detail layanan"><X /></button> : <Link href="/" aria-label="Tutup detail layanan"><X /></Link>}</div>
-    <div className="service-detail-sheet">
-      <header className="service-detail-header">
-        <div className="service-detail-header-inner">
-          <Link className="service-detail-author" href="/profile/sobakhul-munir-siroj">
-            <span><img src="/creatorin/avatar.png" alt="" /><i /></span>
-            <div><h2>{serviceCreator}</h2><p><b>Available for work</b><em>Follow</em><small>sobakhulmunir.creatorin.id</small><small>hello@sobakhulmunir.com</small></p></div>
-          </Link>
-          <div className="service-detail-actions">
-            <button type="button" className={saved ? "is-saved" : ""} onClick={() => setSaved(!saved)} aria-label={saved ? "Hapus layanan dari tersimpan" : "Simpan layanan"}><Bookmark fill={saved ? "currentColor" : "none"} /></button>
-            <Link href="/pesan">Diskusikan Layanan</Link>
-          </div>
-        </div>
-      </header>
-
-      <div className="service-detail-scroll">
+  return <DetailSurface kind="service" isModal={isModal} isClosing={isClosing} onClose={onClose} closeLabel="Tutup detail layanan" dialogLabel="Detail layanan" header={
+    <div className="service-detail-header-inner">
+      <Link className="service-detail-author" href="/profile/sobakhul-munir-siroj">
+        <span><img src="/creatorin/avatar.png" alt="" /><i /></span>
+        <div><h2>{serviceCreator}</h2><p><b>Available for work</b><em>Follow</em><small>sobakhulmunir.creatorin.id</small><small>hello@sobakhulmunir.com</small></p></div>
+      </Link>
+      <div className="service-detail-actions">
+        <button type="button" className={saved ? "is-saved" : ""} onClick={() => setSaved(!saved)} aria-label={saved ? "Hapus layanan dari tersimpan" : "Simpan layanan"}><Bookmark fill={saved ? "currentColor" : "none"} /></button>
+        <Link href="/pesan">Diskusikan Layanan</Link>
+      </div>
+    </div>
+  }>
         <main className="service-detail-main">
           <section className="service-gallery" aria-label="Galeri layanan">
             <div className="service-hero-image">
@@ -176,7 +170,5 @@ export default function ServiceDetailPanel({ isModal = false, isClosing = false,
             <div className="service-footer-bottom"><span>&copy; 2026 Creatorin. All rights reserved.</span><nav><a href="#terms">Syarat & Ketentuan</a><a href="#privacy">Kebijakan Privasi</a><a href="#cookies">Cookie Policy</a></nav></div>
           </div>
         </footer>
-      </div>
-    </div>
-  </div>;
+  </DetailSurface>;
 }

@@ -2,7 +2,8 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { Heart, Info, MessageCircle, Play, Send, Share2, Volume2, X } from "lucide-react";
+import { Heart, Info, MessageCircle, Play, Send, Share2, Volume2 } from "lucide-react";
+import DetailSurface from "./DetailSurface";
 
 const comments = [
   { name: "Mukhlasur Rahman", avatar: "/creatorin/comment-mukhlasur.png", body: "Impressive work!", time: "about 1 hour" },
@@ -43,16 +44,12 @@ export default function ProjectDetailPanel({ isModal = false, isClosing = false,
   const heading = title || "POV: Simulasi Prewed Anak Gym (Humor UGC & Fitness Brand Placement)";
   const creatorHandle = creator || "@mayaangelina.ugc";
   const viewCount = views || "890.1K";
-  const className = `project-detail-page${isModal ? " is-modal" : ""}${isClosing ? " is-closing" : ""}`;
-
-  return <div className={className} role={isModal ? "dialog" : undefined} aria-modal={isModal || undefined} aria-label={isModal ? "Detail proyek" : undefined}>
-    <div className="project-close">{onClose ? <button type="button" onClick={onClose} aria-label="Tutup detail proyek"><X /></button> : <Link href="/" aria-label="Tutup detail proyek"><X /></Link>}</div>
-    <div className={commentsOpen ? "project-sheet comments-open" : "project-sheet"}>
-      <header className="project-detail-header"><div className="project-detail-header-inner">
+  return <DetailSurface kind="project" isModal={isModal} isClosing={isClosing} onClose={onClose} closeLabel="Tutup detail proyek" dialogLabel="Detail proyek" sheetClassName={commentsOpen ? "comments-open" : ""} header={
+      <div className="project-detail-header-inner">
         <div className="project-author"><span className="project-author-avatar"><img src="/creatorin/maya-angelina.png" alt="" /><i /></span><div><h2>Maya Angelina</h2><div className="project-author-meta"><span className="project-status"><i />Available for work</span><span className="project-follow">Follow</span><span>mayaangelina.creatorin.id</span><span>inquiry@mayaangelina.com</span></div></div></div>
         <div className="project-actions"><button className="project-save" type="button" aria-label="Simpan project"><Heart /></button><Link className="project-message" href="/pesan">Kirim Pesan</Link></div>
-      </div></header>
-      <div className="project-detail-scroll">
+      </div>
+    } sheetAfter={<FloatingActions open={commentsOpen} placement="side" setOpen={setCommentsOpen} />}>
         <div className="project-body">
           <main className="project-content">
           <h1>{heading}</h1>
@@ -71,8 +68,5 @@ export default function ProjectDetailPanel({ isModal = false, isClosing = false,
           </aside>
         </div>
         <footer className="project-detail-footer"><div className="project-detail-footer-inner"><Link className="brand" href="/"><img src="/creatorin/logo.svg" alt="" /><span>Creatorin</span></Link><span>&copy; 2026 Creatorin. All rights reserved.</span></div></footer>
-      </div>
-      <FloatingActions open={commentsOpen} placement="side" setOpen={setCommentsOpen} />
-    </div>
-  </div>;
+  </DetailSurface>;
 }

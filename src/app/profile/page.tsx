@@ -6,7 +6,7 @@ import { useState } from "react";
 import {
   BadgeCheck, Bell, Check, ChevronDown, Clock3, Ellipsis, Globe, GraduationCap,
   Heart, Instagram, Linkedin, Mail, MapPin, MessageSquare, Play, Search, SlidersHorizontal,
-  Star, Twitter,
+  PenLine, Plus, Share2, Star, Twitter, X,
 } from "lucide-react";
 import { ShaderFill } from "../../lib/custom-effect-runtime";
 import { setup, render, manifest } from "../../lib/custom-effects/CodeComponentId_c2b302fbdfce8a1ec92a5a80b10a5916ab506ed7_430";
@@ -29,11 +29,15 @@ const profileProjects = Array.from({ length: 4 }, (_, id) => ({
   views: "185.4K",
 }));
 
+type ProfileViewProps = {
+  owner?: boolean;
+};
+
 function ProfileHeader() {
   return <header className="profile-header"><div className="profile-header-inner">
     <div className="profile-header-start"><Link className="brand" href="/" aria-label="Kembali ke Creatorin"><img src="/creatorin/logo.svg" alt="" /><span>Creatorin</span></Link><form className="profile-search" onSubmit={(event) => event.preventDefault()}><input aria-label="Cari" placeholder="Cari kreator, keahlian, atau video UGC..." /><button aria-label="Cari"><Search /></button></form></div>
     <nav className="profile-nav" aria-label="Navigasi utama"><Link href="/">Beranda</Link><JelajahNav /><Link href="/">Collaboration Room</Link><Link href="/brief">Brief Proyek</Link></nav>
-    <div className="header-actions"><Link className="icon-button notification" href="/pesan" aria-label="Pesan"><MessageSquare /><i className="blue-dot" /></Link><Link className="icon-button notification" href="/notifikasi" aria-label="Notifikasi"><Bell /><i className="pink-dot" /></Link><Link className="profile-button" href="/profile" aria-label="Profil creator"><img src="/creatorin/avatar.png" alt="Qaesyaar Aqeel" /><i /></Link></div>
+    <div className="header-actions"><Link className="icon-button notification" href="/pesan" aria-label="Pesan"><MessageSquare /><i className="blue-dot" /></Link><Link className="icon-button notification" href="/notifikasi" aria-label="Notifikasi"><Bell /><i className="pink-dot" /></Link><Link className="profile-button" href="/myprofile" aria-label="Profil saya"><img src="/creatorin/avatar.png" alt="Qaesyaar Aqeel" /><i /></Link></div>
   </div></header>;
 }
 
@@ -41,7 +45,7 @@ function ProfileFooter() {
   const columns = [
     ["Jelajahi", ["Cari Creator", "/jelajah/creator"], ["Layanan", "/jelajah/layanan"], ["Project", "/jelajah/proyek"], ["Collaboration Room", "/"]],
     ["Untuk Bisnis", ["Mulai Brief", "/"], ["Jelajahi Creator", "/jelajah/creator"], ["Kelola Project", "/jelajah/proyek"], ["Cara Kerja", "/"]],
-    ["Untuk Creator", ["Bagikan Project", "/jelajah/proyek"], ["Lihat Brief Project", "/jelajah/proyek"], ["Portfolio", "/profile"], ["Skor Rekam Jejak", "/profile"]],
+    ["Untuk Creator", ["Bagikan Project", "/jelajah/proyek"], ["Lihat Brief Project", "/jelajah/proyek"], ["Portfolio", "/myprofile"], ["Skor Rekam Jejak", "/myprofile"]],
     ["Bantuan", ["Pusat Bantuan", "/"], ["FAQ", "/"], ["Hubungi Kami", "/"], ["Kebijakan & Privasi", "/"]],
   ] as const;
   return <footer className="footer profile-footer"><div className="footer-inner">
@@ -56,6 +60,29 @@ function ProfileProject({ item }: { item: (typeof profileProjects)[number] }) {
     <ShaderFill className="profile-project-shader" shader={{ setup, render, manifest, params: { falloff: 1, inverseFalloff: false, ringCount: 20, offset: item.id * .04, shape: 0, transform: { x: 50, y: 50, radius: 50, angle: 0 }, color: { r: 1, g: 1, b: 1, a: 1 } } }} />
     <span className="profile-project-play"><Play fill="currentColor" /></span><div className="profile-project-info"><h3>{item.title}</h3><div><span>{item.creator}</span><span>{item.views}</span></div></div>
   </article>;
+}
+
+function EditPin({ label, className = "" }: { label: string; className?: string }) {
+  return <span className={`profile-edit-pin ${className}`} aria-label={label}><PenLine /></span>;
+}
+
+function InlineEditPin({ label }: { label: string }) {
+  return <span className="profile-inline-edit" aria-label={label}><PenLine /></span>;
+}
+
+function UploadCard({ label, description, onClick }: { label: string; description: string; onClick: () => void }) {
+  return <button type="button" className="profile-upload-card" onClick={onClick}>
+    <span><Plus /></span>
+    <strong>{label}</strong>
+    <small>{description}</small>
+  </button>;
+}
+
+function ProjectsPanel({ owner, uploadNotice, onUpload }: { owner: boolean; uploadNotice: string; onUpload: () => void }) {
+  return <div>
+    <div className="profile-project-grid">{owner && <UploadCard label="Upload Proyek" description="Tambahkan karya terbaikmu ke portofolio." onClick={onUpload} />}{profileProjects.map((item) => <ProfileProject item={item} key={item.id} />)}</div>
+    {uploadNotice && <p className="profile-upload-note">{uploadNotice}</p>}
+  </div>;
 }
 
 
@@ -73,11 +100,11 @@ const reviewItems = [
   ["Jessica Tanuwidjaja", "Creative Director, Artisan Goods Co.", "jessica-tanuwidjaja.png", "Webflow Portfolio & Digital Brand Identity", "14 Juli 2026", "Salah satu kreator paling solutif yang pernah kami ajak kerja sama. Bukan hanya mengeksekusi apa yang tertulis di brief, tapi juga aktif memberikan masukan cerdas untuk pengalaman pengguna yang lebih baik."],
   ["Dimas Wicaksono", "Founder, TeknoVibe Studio", "dimas-wicaksono.png", "Landing Page Promosi Aplikasi Mobile", "30 Juni 2026", "Proses serah terima cepat, zero drama, dan langsung siap dideploy ke produksi. Komitmen terhadap deadline dan akurasi brief benar-benar terbukti sepanjang kolaborasi di platform ini."],
 ];
-function ServicesPanel() {
-  return <div className="profile-service-grid">{profileServices.map(([title, category, price, time]) => <article className="profile-service-card" key={title}>
+function ServicesPanel({ owner, uploadNotice, onUpload }: { owner: boolean; uploadNotice: string; onUpload: () => void }) {
+  return <div><div className="profile-service-grid">{owner && <UploadCard label="Upload Layanan" description="Tawarkan layanan baru untuk calon klien." onClick={onUpload} />}{profileServices.map(([title, category, price, time]) => <article className="profile-service-card" key={title}>
     <div className="profile-service-visual"><ShaderFill className="profile-cover-shader" shader={{ setup: setup, render, manifest, params: { falloff: 1, inverseFalloff: false, ringCount: 20, offset: 0, shape: 1, transform: { x: 50, y: 50, radius: 50, angle: 0 }, color: { r: 1, g: 1, b: 1, a: 1 } } }} /></div>
     <span className="profile-service-tag">{category}</span><h3>{title}</h3><p>Pengerjaan profesional dengan jaminan kepatuhan brief dan revisi cepat.</p><div className="profile-service-time"><Clock3 /> Estimasi: {time}</div><div className="profile-service-footer"><div><small>HARGA</small><strong>{price}</strong></div><button aria-label="Simpan layanan"><Heart /></button><Link href="/brief">Diskusikan</Link></div>
-  </article>)}</div>;
+  </article>)}</div>{uploadNotice && <p className="profile-upload-note">{uploadNotice}</p>}</div>;
 }
 function StatisticsPanel() {
   const metrics = [["Respons & Profesionalitas", 94, "Kecepatan membalas pesan, kejelasan koordinasi brief, dan etika komunikasi profesional."], ["Performa Proyek", 93, "Kesesuaian hasil akhir dengan ruang lingkup brief, akurasi deadline, dan efisiensi revisi."], ["Kepuasan Klien", 89, "Tingkat penerimaan deliverable final tanpa kendala serta konsistensi feedback positif."]];
@@ -94,21 +121,35 @@ function AboutPanel() {
   return <div className="profile-about"><div><h2>Biography</h2><p>We are Kreativa Studio &mdash; a forward-thinking digital design studio delivering meticulous experiences that connect with people.</p><p>Our creations help clients around the world, ranging from industry icons and brands the likes of Tony Robbins, Sony, Hasbro, Toyota and Government of Dubai, to small ambitious startups such as EnduroSat, Backpack and Ybot.</p><p>From concept to execution, we partner with clients to establish brands that resonate, launch impeccable apps, and create websites and products ready for what&apos;s next.</p><p>If you&apos;re looking for the right dance partner for your next step and think we might be a good fit, reach out &mdash; let&apos;s create something special together.</p><h2>Languages</h2><div className="profile-pills"><span>English</span><span>Indonesia</span><span>Jawa</span></div><h2>Skills</h2><div className="profile-pills">{skills.map((skill) => <span key={skill}>{skill}</span>)}</div><div className="about-stats"><b>142+ <small>Proyek Selesai</small></b><b>4,827 <small>Pengikut</small></b><b>4.9 <Star fill="currentColor" /> <small>(98 Ulasan)</small></b></div></div><aside className="about-aside"><div className="about-summary"><p><MapPin />Croatia</p><p><BadgeCheck />Creatorin Pro</p><p><Clock3 />Bergabung sejak Mei 2011</p></div><h3>Informasi Kontak</h3><p><Globe />kreativa.studio</p><p><Mail />hello@kreativa.studio</p><h3>Sosial</h3><p><Instagram />kreativa.studio</p><p><Twitter />Twitter</p><p><Linkedin />LinkedIn</p></aside></div>;
 }
 
-export default function ProfilePage() {
+export function ProfileView({ owner = false }: ProfileViewProps) {
   const params = useParams<{ creator?: string }>();
-  const slug = typeof params.creator === "string" ? params.creator : "maya-angelina";
+  const slug = owner ? "qaesyaar-aqeel" : typeof params.creator === "string" ? params.creator : "maya-angelina";
   const creator = creators[slug as keyof typeof creators] ?? creators["maya-angelina"];
   const [following, setFollowing] = useState(true);
+  const [editing, setEditing] = useState(false);
+  const [shareNotice, setShareNotice] = useState(false);
+  const [uploadNotice, setUploadNotice] = useState("");
   const [activeTab, setActiveTab] = useState("Proyek");
+  const shareProfile = () => {
+    if (typeof window !== "undefined") {
+      void navigator.clipboard?.writeText(window.location.href).catch(() => undefined);
+    }
+    setShareNotice(true);
+  };
   return <div className="creatorin-app profile-page"><ProfileHeader /><main className="profile-main">
     <section className="profile-hero">
-      <div className="profile-cover"><ShaderFill className="profile-cover-shader" shader={{ setup: waterSetup, render: waterRender, manifest: waterManifest, params: { center: { x: 50, y: 50 }, scale: 1, playhead: 0, highlightColor: { r: .804, g: .961, b: 1, a: 1 }, waterColor: { r: 0, g: .388, b: .706, a: 1 }, intensity: .5 } }} /></div>
-      <div className="profile-overlap"><div className="profile-avatar"><img src={creator.avatar} alt={creator.name} /><span><Check /></span></div><div className="profile-actions"><button className="profile-more" aria-label="Opsi lainnya"><Ellipsis /></button><button className="profile-follow" onClick={() => setFollowing(!following)}>{following ? "Following" : "Follow"}</button><Link className="profile-message" href="/pesan"><MessageSquare />Kirim Pesan</Link></div></div>
-      <div className="profile-identity"><h1>{creator.name}</h1><p>{creator.headline}</p><div className="profile-stats"><span><b>{creator.projects}</b> Proyek Selesai</span><span><b>{creator.rating} <Star fill="currentColor" /></b> ({creator.reviews} Ulasan)</span><span><b>{creator.followers}</b> Pengikut</span><span><b>{creator.score}</b> Skor Karir</span><span><MapPin />{creator.location}</span><span><GraduationCap />{creator.school}</span></div></div>
-      <div className="profile-tabs-row"><div className="profile-tabs" role="tablist">{tabs.map((tab, index) => <button type="button" role="tab" aria-selected={activeTab === tab} className={activeTab === tab ? "active" : ""} onClick={() => setActiveTab(tab)} key={tab}>{tab}{index < 2 && <small>{index === 0 ? 4 : 3}</small>}</button>)}</div><button className="profile-sort"><SlidersHorizontal />Terbaru<ChevronDown /></button></div>
+      <div className="profile-cover"><ShaderFill className="profile-cover-shader" shader={{ setup: waterSetup, render: waterRender, manifest: waterManifest, params: { center: { x: 50, y: 50 }, scale: 1, playhead: 0, highlightColor: { r: .804, g: .961, b: 1, a: 1 }, waterColor: { r: 0, g: .388, b: .706, a: 1 }, intensity: .5 } }} />{owner && editing && <EditPin label="Edit banner" className="profile-edit-pin--cover" />}</div>
+      <div className="profile-overlap"><div className="profile-avatar"><img src={creator.avatar} alt={creator.name} />{owner && editing ? <EditPin label="Edit foto profil" className="profile-edit-pin--avatar" /> : <span><Check /></span>}</div><div className="profile-actions">{owner ? <><button type="button" className={editing ? "profile-edit active" : "profile-edit"} aria-pressed={editing} onClick={() => setEditing((value) => !value)}>{editing ? <X /> : <PenLine />}{editing ? "Batalkan Edit" : "Edit Profile"}</button><button type="button" className="profile-share" onClick={shareProfile}><Share2 />Bagikan Profile</button></> : <><button className="profile-more" aria-label="Opsi lainnya"><Ellipsis /></button><button className="profile-follow" onClick={() => setFollowing(!following)}>{following ? "Following" : "Follow"}</button><Link className="profile-message" href="/pesan"><MessageSquare />Kirim Pesan</Link></>}</div></div>
+      {owner && shareNotice && <p className="profile-action-note">Link profile disalin.</p>}
+      <div className="profile-identity"><h1>{creator.name}{owner && editing && <InlineEditPin label="Edit username" />}</h1><p>{creator.headline}{owner && editing && <InlineEditPin label="Edit bio" />}</p><div className="profile-stats"><span><b>{creator.projects}</b> Proyek Selesai</span><span><b>{creator.rating} <Star fill="currentColor" /></b> ({creator.reviews} Ulasan)</span><span><b>{creator.followers}</b> Pengikut</span><span><b>{creator.score}</b> Skor Karir</span><span><MapPin />{creator.location}</span><span><GraduationCap />{creator.school}</span></div></div>
+      <div className="profile-tabs-row"><div className="profile-tabs" role="tablist">{tabs.map((tab, index) => <button type="button" role="tab" aria-selected={activeTab === tab} className={activeTab === tab ? "active" : ""} onClick={() => { setActiveTab(tab); setUploadNotice(""); }} key={tab}>{tab}{index < 2 && <small>{index === 0 ? 4 : 3}</small>}</button>)}</div><button className="profile-sort"><SlidersHorizontal />Terbaru<ChevronDown /></button></div>
     </section>
-    <section className="profile-content" aria-live="polite">{activeTab === "Proyek" && <div className="profile-project-grid">{profileProjects.map((item) => <ProfileProject item={item} key={item.id} />)}</div>}{activeTab === "Layanan" && <ServicesPanel />}{activeTab === "Statistik" && <StatisticsPanel />}{activeTab === "Ulasan" && <ReviewsPanel />}{activeTab === "Proyek Kolaborasi" && <DiscussionPanel />}{activeTab === "Tentang" && <AboutPanel />}</section>
+    <section className="profile-content" aria-live="polite">{activeTab === "Proyek" && <ProjectsPanel owner={owner} uploadNotice={uploadNotice} onUpload={() => setUploadNotice("Form upload proyek akan disambungkan ke alur unggah berikutnya.")} />}{activeTab === "Layanan" && <ServicesPanel owner={owner} uploadNotice={uploadNotice} onUpload={() => setUploadNotice("Form upload layanan akan disambungkan ke alur unggah berikutnya.")} />}{activeTab === "Statistik" && <StatisticsPanel />}{activeTab === "Ulasan" && <ReviewsPanel />}{activeTab === "Proyek Kolaborasi" && <DiscussionPanel />}{activeTab === "Tentang" && <AboutPanel />}</section>
   </main><ProfileFooter /></div>;
+}
+
+export default function ProfilePage() {
+  return <ProfileView />;
 }
 
 

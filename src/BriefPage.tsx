@@ -9,6 +9,7 @@ import {
   Users, Wallet,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
+import DetailSurface from "./DetailSurface";
 import JelajahNav from "./JelajahNav";
 import "./App.css";
 import "./Profile.css";
@@ -181,7 +182,7 @@ function BriefHeader({ activeBrief = true }: { activeBrief?: boolean } = {}) {
   return <header className="profile-header"><div className="profile-header-inner">
     <div className="profile-header-start"><BrandLink /><form className="profile-search" onSubmit={(event) => event.preventDefault()}><input aria-label="Cari" placeholder="Cari kreator, keahlian, atau video UGC..." /><button aria-label="Cari"><Search /></button></form></div>
     <nav className="profile-nav" aria-label="Navigasi utama"><Link href="/">Beranda</Link><JelajahNav /><Link href="/">Collaboration Room</Link><Link className={activeBrief ? "active" : undefined} href="/brief">Brief Proyek</Link></nav>
-    <div className="header-actions"><Link className="icon-button notification" href="/pesan" aria-label="Pesan"><MessageSquare /><i className="blue-dot" /></Link><Link className="icon-button notification" href="/notifikasi" aria-label="Notifikasi"><Bell /><i className="pink-dot" /></Link><Link className="profile-button" href="/profile" aria-label="Profil creator"><img src="/creatorin/avatar.png" alt="Qaesyaar Aqeel" /><i /></Link></div>
+    <div className="header-actions"><Link className="icon-button notification" href="/pesan" aria-label="Pesan"><MessageSquare /><i className="blue-dot" /></Link><Link className="icon-button notification" href="/notifikasi" aria-label="Notifikasi"><Bell /><i className="pink-dot" /></Link><Link className="profile-button" href="/myprofile" aria-label="Profil saya"><img src="/creatorin/avatar.png" alt="Qaesyaar Aqeel" /><i /></Link></div>
   </div></header>;
 }
 
@@ -189,7 +190,7 @@ function BriefFooter() {
   const columns = [
     ["Jelajahi", ["Cari Creator", "/jelajah/creator"], ["Layanan", "/jelajah/layanan"], ["Project", "/jelajah/proyek"], ["Collaboration Room", "/"]],
     ["Untuk Bisnis", ["Mulai Brief", "/brief"], ["Jelajahi Creator", "/jelajah/creator"], ["Kelola Project", "/brief"], ["Cara Kerja", "/"]],
-    ["Untuk Creator", ["Bagikan Project", "/jelajah/proyek"], ["Lihat Brief Project", "/brief"], ["Portfolio", "/profile"], ["Skor Rekam Jejak", "/profile"]],
+    ["Untuk Creator", ["Bagikan Project", "/jelajah/proyek"], ["Lihat Brief Project", "/brief"], ["Portfolio", "/myprofile"], ["Skor Rekam Jejak", "/myprofile"]],
     ["Bantuan", ["Pusat Bantuan", "/"], ["FAQ", "/"], ["Hubungi Kami", "/"], ["Kebijakan & Privasi", "/"]],
   ] as const;
   return <footer className="footer profile-footer"><div className="footer-inner">
@@ -260,10 +261,10 @@ export default function BriefPage() {
 }
 
 function DetailHeader() {
-  return <header className="brief-detail-header"><div>
+  return <div>
     <Link className="brief-business" href="/brief/tentang-umkm"><img src="/creatorin/partner-1.png" alt="" /><span><b>Kopi Kenangan Senja</b><small><Globe />kopikenangansenja.creatorin.id <i /> <Mail />halo@kopikenangansenja.com <i /> <MapPin />Jakarta Selatan</small></span></Link>
     <div className="brief-detail-actions"><Link className="brief-icon-btn" href="/brief/tentang-umkm" aria-label="Lihat profil UMKM"><Eye /></Link><Link className="brief-apply" href="/pesan"><Send />Lamar</Link></div>
-  </div></header>;
+  </div>;
 }
 
 function DetailTabs({ active, onTabChange }: { active: BriefTab; onTabChange?: (tab: BriefTab) => void }) {
@@ -276,7 +277,8 @@ function DetailTabs({ active, onTabChange }: { active: BriefTab; onTabChange?: (
 }
 
 function DetailShell({ active, children, isClosing = false, onClose, onTabChange }: { active: BriefTab; children: React.ReactNode; isClosing?: boolean; onClose?: () => void; onTabChange?: (tab: BriefTab) => void }) {
-  return <div className={`brief-detail-page${onClose ? " is-modal" : ""}${isClosing ? " is-closing" : ""}`}>{onClose ? <button type="button" className="brief-detail-close" onClick={onClose} aria-label="Tutup detail">x</button> : <Link className="brief-detail-close" href="/brief" aria-label="Tutup detail">x</Link>}<div className="brief-detail-sheet"><DetailHeader /><div className="brief-detail-scroll"><main className="brief-detail-main">
+  return <DetailSurface kind="brief" isModal={Boolean(onClose)} isClosing={isClosing} onClose={onClose} closeHref="/brief" closeLabel="Tutup detail" dialogLabel="Detail brief" header={<DetailHeader />}>
+  <main className="brief-detail-main">
     <span className="brief-category">Reels Instagram</span>
     <h1>Produksi 3x Video Reels Instagram & TikTok untuk Launching Kopi Susu Botolan</h1>
     <div className="brief-metrics">{metrics.map(({ label, value, detail, Icon }) => <article key={label}><header><span>{label}</span><i><Icon /></i></header><strong>{value}</strong><p>{detail}</p></article>)}</div>
@@ -284,7 +286,7 @@ function DetailShell({ active, children, isClosing = false, onClose, onTabChange
     {children}
     <BusinessSummary />
     <RelatedBriefs />
-  </main><BriefFooter /></div></div></div>;
+  </main><BriefFooter /></DetailSurface>;
 }
 
 function RincianContent() {

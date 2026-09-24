@@ -33,6 +33,18 @@
 .profile-follow { min-width: 98px; padding: 0 20px; border: 1px solid #d4d4d4; background: #fff; color: #0d0c22; }
 .profile-message { gap: 8px; padding: 0 24px; background: #0d0c22; color: #fff; }
 .profile-message svg { width: 14px; height: 14px; }
+.profile-edit { gap: 8px; padding: 0 20px; border: 0; background: #0d0c22; color: #fff; }
+.profile-edit.active { box-shadow: 0 8px 18px rgba(13,12,34,.14); }
+.profile-edit svg { width: 14px; height: 14px; }
+.profile-share { gap: 8px; padding: 0 18px; border: 1px solid #d4d4d4; background: #fff; color: #0d0c22; }
+.profile-share svg { width: 14px; height: 14px; }
+.profile-action-note { width: fit-content; margin: 8px 12px 0 auto; color: #737373; font-size: 12px; line-height: 16px; }
+.profile-edit-pin { position: absolute; z-index: 5; width: 28px; height: 28px; display: grid; place-items: center; border: 2px solid #fff; border-radius: 50%; background: #0d0c22; color: #fff; box-shadow: 0 8px 18px rgba(13,12,34,.18); }
+.profile-edit-pin svg { width: 13px; height: 13px; stroke-width: 2.6; }
+.profile-edit-pin--cover { right: 16px; bottom: 16px; }
+.profile-avatar > .profile-edit-pin--avatar { top: 8px; right: 2px; bottom: auto; width: 28px; height: 28px; border-width: 2px; }
+.profile-inline-edit { width: 24px; height: 24px; margin-left: 8px; display: inline-grid; place-items: center; vertical-align: middle; border-radius: 50%; background: #f3f3f4; color: #0d0c22; }
+.profile-inline-edit svg { width: 13px; height: 13px; stroke-width: 2.5; }
 .profile-identity { padding: 16px 16px 0; }
 .profile-identity h1 { margin: 0; font-size: 32px; line-height: 38.4px; font-weight: 850; letter-spacing: -.4px; }
 .profile-identity > p { margin: 4px 0 0; color: #525252; font-size: 16px; line-height: 26px; }
@@ -50,6 +62,18 @@
 .profile-sort { height: 38px; margin-bottom: 14px; padding: 0 16px; display: flex; align-items: center; gap: 8px; border: 1px solid #d4d4d4; border-radius: 999px; background: #fff; color: #0d0c22; font-size: 12px; font-weight: 600; cursor: pointer; }
 .profile-sort svg { width: 14px; height: 14px; }
 .profile-content { width: min(1440px, calc(100% - 64px)); min-height: 505px; margin: auto; padding: 48px 32px 56px; }
+.profile-panel-actions { margin-bottom: 18px; display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+.profile-panel-actions p { margin: 0; color: #737373; font-size: 12px; line-height: 18px; }
+.profile-upload-project { min-height: 38px; padding: 0 16px; display: inline-flex; align-items: center; justify-content: center; gap: 8px; border: 0; border-radius: 999px; background: #0d0c22; color: #fff; font-size: 12px; font-weight: 700; cursor: pointer; transition: transform .18s, box-shadow .18s; }
+.profile-upload-project:hover { transform: translateY(-2px); box-shadow: 0 8px 18px rgba(13,12,34,.14); }
+.profile-upload-project svg { width: 14px; height: 14px; }
+.profile-upload-card { min-width: 0; min-height: 100%; padding: 24px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; border: 1px dashed #acacac; border-radius: 6px; background: #fff; color: #0d0c22; text-align: center; cursor: pointer; transition: border-color .18s, background .18s, transform .18s; }
+.profile-upload-card:hover { border-color: #0d0c22; background: #fafafa; transform: translateY(-2px); }
+.profile-upload-card span { width: 42px; height: 42px; display: grid; place-items: center; color: #acacac; }
+.profile-upload-card svg { width: 32px; height: 32px; stroke-width: 1.6; }
+.profile-upload-card strong { font-size: 20px; line-height: 1.15; font-weight: 800; }
+.profile-upload-card small { max-width: 190px; color: #0d0c22; font-size: 12px; line-height: 1.4; font-weight: 400; }
+.profile-upload-note { margin: 12px 0 0; color: #737373; font-size: 12px; line-height: 18px; }
 .profile-project-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 24px; }
 .profile-project { position: relative; aspect-ratio: 326 / 408; overflow: hidden; border-radius: 6px; background: #171717; isolation: isolate; cursor: pointer; }
 .profile-project::after { content: ""; position: absolute; z-index: 1; inset: 52% 0 0; background: linear-gradient(to top, rgba(0,0,0,.9), rgba(0,0,0,.35) 55%, transparent); }
@@ -78,9 +102,12 @@
   .profile-hero { padding-top: 16px; }.profile-cover { height: 190px; border-radius: 22px; }.profile-overlap { margin-top: -52px; padding-inline: 10px; }
   .profile-avatar { width: 104px; height: 104px; padding: 5px; }.profile-avatar > img { width: 94px; height: 94px; }.profile-avatar > span { width: 23px; height: 23px; }
   .profile-more { display: none !important; }.profile-follow { min-width: 82px; padding-inline: 15px; }.profile-message { width: 40px; padding: 0; font-size: 0; }.profile-message svg { width: 16px; height: 16px; }
+  .profile-edit, .profile-share { height: 38px; padding-inline: 15px; font-size: 12px; }
+  .profile-share { width: 38px; padding: 0; font-size: 0; }
+  .profile-share svg { width: 15px; height: 15px; }
   .profile-identity { padding-inline: 10px; }.profile-identity h1 { font-size: 27px; }.profile-identity > p { font-size: 14px; }.profile-stats { gap: 9px 14px; font-size: 12px; }
   .profile-tabs-row { height: 76px; }.profile-tabs { max-width: calc(100vw - 132px); }.profile-tabs button { height: 34px; padding-inline: 13px; }.profile-sort { width: 42px; padding: 0; justify-content: center; font-size: 0; }.profile-sort svg:last-child { display: none; }
-  .profile-content { padding-top: 28px; }.profile-project-grid { gap: 6px; }.profile-project-info { padding: 9px; }.profile-project-info h3 { height: 31px; font-size: 11px; line-height: 15px; }.profile-project-info > div { font-size: 9px; }
+  .profile-content { padding-top: 28px; }.profile-panel-actions { display: block; }.profile-panel-actions p { margin-top: 8px; }.profile-project-grid { gap: 6px; }.profile-upload-card { padding: 16px 12px; }.profile-upload-card strong { font-size: 15px; }.profile-upload-card small { display: none; }.profile-project-info { padding: 9px; }.profile-project-info h3 { height: 31px; font-size: 11px; line-height: 15px; }.profile-project-info > div { font-size: 9px; }
 }
 
 .profile-service-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 24px; }

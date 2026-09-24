@@ -53,7 +53,7 @@ function Header() {
     <div className="header-actions">
       <Link className="icon-button notification" href="/pesan" aria-label="Pesan"><MessageSquare /><i className="blue-dot" /></Link>
       <Link className="icon-button notification" href="/notifikasi" aria-label="Notifikasi"><Bell /><i className="pink-dot" /></Link>
-      <Link className="profile-button" href="/profile" aria-label="Buka profil creator"><img src="/creatorin/avatar.png" alt="Qaesyaar Aqeel" /><i /></Link>
+      <Link className="profile-button" href="/myprofile" aria-label="Buka profil saya"><img src="/creatorin/avatar.png" alt="Qaesyaar Aqeel" /><i /></Link>
     </div>
   </div></header>;
 }
@@ -160,7 +160,7 @@ function Footer() {
   const columns = [
     ["Jelajahi", ["Cari Creator", "/jelajah/creator"], ["Layanan", "/jelajah/layanan"], ["Project", "/jelajah/proyek"], ["Collaboration Room", "/"]],
     ["Untuk Bisnis", ["Mulai Brief", "/"], ["Jelajahi Creator", "/jelajah/creator"], ["Kelola Project", "/jelajah/proyek"], ["Cara Kerja", "/"]],
-    ["Untuk Creator", ["Bagikan Project", "/jelajah/proyek"], ["Lihat Brief Project", "/jelajah/proyek"], ["Portfolio", "/profile"], ["Skor Rekam Jejak", "/profile"]],
+    ["Untuk Creator", ["Bagikan Project", "/jelajah/proyek"], ["Lihat Brief Project", "/jelajah/proyek"], ["Portfolio", "/myprofile"], ["Skor Rekam Jejak", "/myprofile"]],
     ["Bantuan", ["Pusat Bantuan", "/"], ["FAQ", "/"], ["Hubungi Kami", "/"], ["Kebijakan & Privasi", "/"]],
   ] as const;
   return <footer className="footer"><div className="footer-inner">
