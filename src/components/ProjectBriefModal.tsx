@@ -1,20 +1,21 @@
-"use client";
-
 import React, { useState } from 'react';
 import { X, Send, Sparkles, CheckCircle2, ShieldCheck, DollarSign, Calendar, FileText } from 'lucide-react';
-import { Creator } from './types';
+import { Creator } from '../types';
 
 interface ProjectBriefModalProps {
   isOpen: boolean;
   onClose: () => void;
   targetCreator?: Creator | null;
+  preselectedCreator?: Creator | null;
 }
 
 export const ProjectBriefModal: React.FC<ProjectBriefModalProps> = ({
   isOpen,
   onClose,
-  targetCreator
+  targetCreator,
+  preselectedCreator
 }) => {
+  const selectedCreator = targetCreator ?? preselectedCreator ?? null;
   const [projectTitle, setProjectTitle] = useState('');
   const [projectType, setProjectType] = useState('UGC Video / TikTok');
   const [budget, setBudget] = useState('Rp500.000 - Rp1.500.000');
@@ -44,10 +45,10 @@ export const ProjectBriefModal: React.FC<ProjectBriefModalProps> = ({
         <div className="p-6 border-b border-neutral-100 flex items-center justify-between">
           <div>
             <h3 className="text-xl font-bold text-[#0d0c22]">
-              {targetCreator ? `Hubungi ${targetCreator.name}` : 'Buat Brief Proyek Baru'}
+              {selectedCreator ? `Hubungi ${selectedCreator.name}` : 'Buat Brief Proyek Baru'}
             </h3>
             <p className="text-xs text-neutral-500 mt-0.5">
-              {targetCreator 
+              {selectedCreator 
                 ? `Mulai kolaborasi aman dengan garansi Career Score.` 
                 : 'Kirim brief ke talenta terbaik di Creatorin untuk mendapatkan penawaran.'}
             </p>
@@ -69,8 +70,8 @@ export const ProjectBriefModal: React.FC<ProjectBriefModalProps> = ({
               </div>
               <h4 className="text-xl font-bold text-[#0d0c22]">Brief Berhasil Dikirim!</h4>
               <p className="text-sm text-neutral-600 max-w-md mx-auto">
-                {targetCreator 
-                  ? `Notifikasi telah dikirim ke ${targetCreator.name}. Estimasi balasan: ${targetCreator.responseTime || '1 jam'}.` 
+                {selectedCreator 
+                  ? `Notifikasi telah dikirim ke ${selectedCreator.name}. Estimasi balasan: ${selectedCreator.responseTime || '1 jam'}.` 
                   : 'Brief proyek Anda telah disiarkan ke talenta terverifikasi yang cocok dengan kriteria Anda.'}
               </p>
               <div className="pt-4">
@@ -85,16 +86,16 @@ export const ProjectBriefModal: React.FC<ProjectBriefModalProps> = ({
           ) : (
             <form onSubmit={handleSubmit} className="space-y-4">
               
-              {targetCreator && (
+              {selectedCreator && (
                 <div className="flex items-center gap-3 p-3 rounded-2xl bg-neutral-50 border border-neutral-200/80 mb-2">
                   <img
-                    src={targetCreator.avatar}
-                    alt={targetCreator.name}
+                    src={selectedCreator.avatar}
+                    alt={selectedCreator.name}
                     className="w-10 h-10 rounded-full object-cover"
                   />
                   <div>
-                    <div className="text-xs font-bold text-[#0d0c22]">{targetCreator.name}</div>
-                    <div className="text-[11px] text-neutral-500">{targetCreator.roleTitle} • {targetCreator.formattedRate}</div>
+                    <div className="text-xs font-bold text-[#0d0c22]">{selectedCreator.name}</div>
+                    <div className="text-[11px] text-neutral-500">{selectedCreator.roleTitle} • {selectedCreator.formattedRate}</div>
                   </div>
                 </div>
               )}

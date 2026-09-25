@@ -1,5 +1,5 @@
-import { ProfileView } from "../profile/page";
+import SpaPage from "../SpaPage";
 
 export default function MyProfilePage() {
-  return <ProfileView owner />;
+  return <SpaPage initialPage="creator-profile" />;
 }

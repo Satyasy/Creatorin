@@ -1,7 +1,5 @@
-import ClientApp from "../ClientApp";
-import { getDiscoverData } from "../lib/db/queries/discover";
+import SpaPage from "./SpaPage";
 
-export default async function Home() {
-  const data = await getDiscoverData();
-  return <ClientApp initialData={data as any} />;
+export default function Home() {
+  return <SpaPage initialPage="home" />;
 }

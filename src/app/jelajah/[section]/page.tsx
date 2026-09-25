@@ -1,6 +1,5 @@
-import JelajahPage from "../../../JelajahPage";
+import SpaPage from "../../SpaPage";
 
-export default async function JelajahSectionPage({ params }: { params: Promise<{ section: string }> }) {
-  const { section } = await params;
-  return <JelajahPage initialSection={section} />;
+export default function JelajahSectionPage() {
+  return <SpaPage initialPage="explore" />;
 }

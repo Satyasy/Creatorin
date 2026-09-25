@@ -1,5 +1,5 @@
-import JelajahPage from "../../JelajahPage";
+import SpaPage from "../SpaPage";
 
 export default function JelajahIndexPage() {
-  return <JelajahPage initialSection="creator" />;
+  return <SpaPage initialPage="explore" />;
 }

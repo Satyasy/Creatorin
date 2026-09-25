@@ -1,10 +1,5 @@
-"use client";
-
-import "../../../App.css";
-import "../../../ProjectDetail.css";
-import "../../../Proportions.css";
-import ProjectDetailPanel from "../../../ProjectDetailPanel";
+import SpaPage from "../../SpaPage";
 
 export default function ProjectDetailPage() {
-  return <ProjectDetailPanel />;
+  return <SpaPage initialPage="projects" />;
 }

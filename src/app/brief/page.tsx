@@ -1,7 +1,5 @@
-"use client";
+import SpaPage from "../SpaPage";
 
-import ProjectBriefsPage from "../../ProjectBriefsPage";
-
-export default function BriefIndexPage() {
-  return <ProjectBriefsPage />;
+export default function BriefPage() {
+  return <SpaPage initialPage="briefs" />;
 }

@@ -1,39 +1,22 @@
-"use client";
-
 import React from 'react';
-import { useRouter } from 'next/navigation';
-import { ActivePage } from './types';
+import { ActivePage } from '../types';
 import { Twitter, Instagram, Linkedin } from 'lucide-react';
 
 interface FooterProps {
-  onNavigate?: (page: ActivePage) => void;
+  onNavigate: (page: ActivePage) => void;
   onOpenBrief?: () => void;
 }
 
 export const Footer: React.FC<FooterProps> = ({ onNavigate, onOpenBrief }) => {
-  const router = useRouter();
-  const navigate = (page: ActivePage) => {
-    if (onNavigate) {
-      onNavigate(page);
-      return;
-    }
-    if (page === 'home' || page === 'landing') router.push('/');
-    else if (page === 'services') router.push('/jelajah/layanan');
-    else if (page === 'projects') router.push('/jelajah/proyek');
-    else if (page === 'creators' || page === 'creator-profile') router.push('/jelajah/creator');
-    else if (page === 'briefs') router.push('/brief');
-    else if (page === 'chat') router.push('/pesan');
-    else router.push('/');
-  };
   return (
     <footer className="w-full bg-white border-t border-neutral-200/80 pt-12 sm:pt-16 pb-10 sm:pb-14 font-sans text-[#0d0c22]">
-      <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-[1600px] mx-auto px-6 lg:px-8">
         
         {/* Top Bar: Brand Logo di Kiri & Social Media di Kanan */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 pb-8 border-b border-neutral-200/80">
           <div
             className="inline-flex items-center gap-1.5 cursor-pointer select-none group w-fit"
-            onClick={() => navigate('home')}
+            onClick={() => onNavigate('home')}
           >
             <span className="text-2xl sm:text-3xl font-bold tracking-tight text-[#0d0c22] font-sans group-hover:text-neutral-700 transition">
               Creatorin
@@ -99,7 +82,7 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, onOpenBrief }) => {
                 <li>
                   <button
                     type="button"
-                    onClick={() => navigate('landing')}
+                    onClick={() => onNavigate('landing')}
                     className="hover:text-[#0d0c22] transition cursor-pointer text-left"
                   >
                     Cari Creator
@@ -108,7 +91,7 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, onOpenBrief }) => {
                 <li>
                   <button
                     type="button"
-                    onClick={() => navigate('services')}
+                    onClick={() => onNavigate('services')}
                     className="hover:text-[#0d0c22] transition cursor-pointer text-left"
                   >
                     Layanan
@@ -117,7 +100,7 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, onOpenBrief }) => {
                 <li>
                   <button
                     type="button"
-                    onClick={() => navigate('projects')}
+                    onClick={() => onNavigate('projects')}
                     className="hover:text-[#0d0c22] transition cursor-pointer text-left"
                   >
                     Project
@@ -126,7 +109,7 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, onOpenBrief }) => {
                 <li>
                   <button
                     type="button"
-                    onClick={() => navigate('chat')}
+                    onClick={() => onNavigate('chat')}
                     className="hover:text-[#0d0c22] transition cursor-pointer text-left"
                   >
                     Collaboration Room
@@ -144,7 +127,7 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, onOpenBrief }) => {
                     type="button"
                     onClick={() => {
                       if (onOpenBrief) onOpenBrief();
-                      else navigate('briefs');
+                      else onNavigate('briefs');
                     }}
                     className="hover:text-[#0d0c22] transition cursor-pointer text-left"
                   >
@@ -154,7 +137,7 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, onOpenBrief }) => {
                 <li>
                   <button
                     type="button"
-                    onClick={() => navigate('landing')}
+                    onClick={() => onNavigate('landing')}
                     className="hover:text-[#0d0c22] transition cursor-pointer text-left"
                   >
                     Jelajahi Creator
@@ -163,7 +146,7 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, onOpenBrief }) => {
                 <li>
                   <button
                     type="button"
-                    onClick={() => navigate('projects')}
+                    onClick={() => onNavigate('projects')}
                     className="hover:text-[#0d0c22] transition cursor-pointer text-left"
                   >
                     Kelola Project
@@ -172,7 +155,7 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, onOpenBrief }) => {
                 <li>
                   <button
                     type="button"
-                    onClick={() => navigate('home')}
+                    onClick={() => onNavigate('home')}
                     className="hover:text-[#0d0c22] transition cursor-pointer text-left"
                   >
                     Cara Kerja
@@ -188,7 +171,7 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, onOpenBrief }) => {
                 <li>
                   <button
                     type="button"
-                    onClick={() => navigate('projects')}
+                    onClick={() => onNavigate('projects')}
                     className="hover:text-[#0d0c22] transition cursor-pointer text-left"
                   >
                     Bagikan Project
@@ -197,7 +180,7 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, onOpenBrief }) => {
                 <li>
                   <button
                     type="button"
-                    onClick={() => navigate('briefs')}
+                    onClick={() => onNavigate('briefs')}
                     className="hover:text-[#0d0c22] transition cursor-pointer text-left"
                   >
                     Lihat Brief Project
@@ -206,7 +189,7 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, onOpenBrief }) => {
                 <li>
                   <button
                     type="button"
-                    onClick={() => navigate('creator-profile')}
+                    onClick={() => onNavigate('creator-profile')}
                     className="hover:text-[#0d0c22] transition cursor-pointer text-left"
                   >
                     Portfolio
@@ -215,7 +198,7 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, onOpenBrief }) => {
                 <li>
                   <button
                     type="button"
-                    onClick={() => navigate('creator-profile')}
+                    onClick={() => onNavigate('creator-profile')}
                     className="hover:text-[#0d0c22] transition cursor-pointer text-left"
                   >
                     Skor Rekam Jejak
@@ -231,7 +214,7 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, onOpenBrief }) => {
                 <li>
                   <button
                     type="button"
-                    onClick={() => navigate('home')}
+                    onClick={() => onNavigate('home')}
                     className="hover:text-[#0d0c22] transition cursor-pointer text-left"
                   >
                     Pusat Bantuan
@@ -240,7 +223,7 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, onOpenBrief }) => {
                 <li>
                   <button
                     type="button"
-                    onClick={() => navigate('home')}
+                    onClick={() => onNavigate('home')}
                     className="hover:text-[#0d0c22] transition cursor-pointer text-left"
                   >
                     FAQ
@@ -249,7 +232,7 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, onOpenBrief }) => {
                 <li>
                   <button
                     type="button"
-                    onClick={() => navigate('chat')}
+                    onClick={() => onNavigate('chat')}
                     className="hover:text-[#0d0c22] transition cursor-pointer text-left"
                   >
                     Hubungi Kami
@@ -258,7 +241,7 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, onOpenBrief }) => {
                 <li>
                   <button
                     type="button"
-                    onClick={() => navigate('home')}
+                    onClick={() => onNavigate('home')}
                     className="hover:text-[#0d0c22] transition cursor-pointer text-left"
                   >
                     Kebijakan & Privasi
@@ -287,21 +270,21 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, onOpenBrief }) => {
           <div className="flex items-center gap-5 sm:gap-6 text-xs text-neutral-500 font-medium">
             <button
               type="button"
-              onClick={() => navigate('home')}
+              onClick={() => onNavigate('home')}
               className="hover:text-[#0d0c22] transition cursor-pointer"
             >
               Syarat & Ketentuan
             </button>
             <button
               type="button"
-              onClick={() => navigate('home')}
+              onClick={() => onNavigate('home')}
               className="hover:text-[#0d0c22] transition cursor-pointer"
             >
               Kebijakan Privasi
             </button>
             <button
               type="button"
-              onClick={() => navigate('home')}
+              onClick={() => onNavigate('home')}
               className="hover:text-[#0d0c22] transition cursor-pointer"
             >
               Cookie Policy

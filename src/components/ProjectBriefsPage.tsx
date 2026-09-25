@@ -1,7 +1,4 @@
-"use client";
-
 import React, { useState, useMemo } from 'react';
-import { useRouter } from 'next/navigation';
 import { 
   Search, 
   Clock, 
@@ -30,11 +27,11 @@ import {
   Users,
   Edit3
 } from 'lucide-react';
-import { Navbar } from './Navbar';
+import { NavbarSearch } from './NavbarSearch';
 import { ProjectBriefModal } from './ProjectBriefModal';
 import { BriefDetailPage } from './BriefDetailPage';
-import { MOCK_PROJECTS } from './mockProjects';
-import { ActivePage, AuthState, ProjectListing } from './types';
+import { MOCK_PROJECTS } from '../data/mockProjects';
+import { ActivePage, AuthState, ProjectListing } from '../types';
 
 // Format budget display to single clean number (e.g. Rp1.500.000)
 const formatDisplayBudget = (formatted?: string, budgetMin?: number) => {
@@ -49,7 +46,7 @@ const formatDisplayBudget = (formatted?: string, budgetMin?: number) => {
 interface ProjectBriefsPageProps {
   currentUser?: AuthState['user'];
   onSignOut?: () => void;
-  onNavigate?: (page: ActivePage) => void;
+  onNavigate: (page: ActivePage) => void;
   onViewCreatorProfile?: (creator: any) => void;
   onViewBrief?: (brief: ProjectListing) => void;
 }
@@ -85,20 +82,6 @@ export const ProjectBriefsPage: React.FC<ProjectBriefsPageProps> = ({
   onViewCreatorProfile,
   onViewBrief
 }) => {
-  const router = useRouter();
-  const handleNavigate = (page: ActivePage) => {
-    if (onNavigate) {
-      onNavigate(page);
-      return;
-    }
-    if (page === 'landing' || page === 'home') router.push('/');
-    else if (page === 'briefs') router.push('/brief');
-    else if (page === 'chat') router.push('/pesan');
-    else if (page === 'creator-profile' || page === 'creators') router.push('/jelajah/creator');
-    else if (page === 'services') router.push('/jelajah/layanan');
-    else if (page === 'projects') router.push('/jelajah/proyek');
-    else router.push('/');
-  };
   // Projects data state (so creators can apply and UMKM can add briefs in-session)
   const [projectsList, setProjectsList] = useState<ProjectListing[]>(MOCK_PROJECTS);
   
@@ -228,7 +211,7 @@ export const ProjectBriefsPage: React.FC<ProjectBriefsPageProps> = ({
       // Update proposal count in list
       setProjectsList(prev => prev.map(p => {
         if (p.id === selectedBriefForApply.id) {
-          return { ...p, proposalsCount: (p.proposalsCount ?? 0) + 1 };
+          return { ...p, proposalsCount: p.proposalsCount + 1 };
         }
         return p;
       }));
@@ -256,7 +239,7 @@ export const ProjectBriefsPage: React.FC<ProjectBriefsPageProps> = ({
         const matchDesc = proj.description.toLowerCase().includes(q);
         const matchClient = proj.clientName.toLowerCase().includes(q);
         const matchLoc = proj.clientLocation.toLowerCase().includes(q);
-        const matchSkills = proj.requiredSkills.some((s: string) => s.toLowerCase().includes(q));
+        const matchSkills = proj.requiredSkills.some(s => s.toLowerCase().includes(q));
         if (!matchTitle && !matchDesc && !matchClient && !matchLoc && !matchSkills) {
           return false;
         }
@@ -272,7 +255,7 @@ export const ProjectBriefsPage: React.FC<ProjectBriefsPageProps> = ({
         const cleanTag = selectedTag.replace('#', '').toLowerCase();
         const matchesTag = 
           proj.category.toLowerCase().includes(cleanTag) ||
-          proj.requiredSkills.some((s: string) => s.toLowerCase().includes(cleanTag)) ||
+          proj.requiredSkills.some(s => s.toLowerCase().includes(cleanTag)) ||
           proj.title.toLowerCase().includes(cleanTag);
         if (!matchesTag) return false;
       }
@@ -300,7 +283,7 @@ export const ProjectBriefsPage: React.FC<ProjectBriefsPageProps> = ({
         return a.budgetMin - b.budgetMin;
       }
       if (selectedSort === 'fewest_proposals') {
-        return (a.proposalsCount ?? 0) - (b.proposalsCount ?? 0);
+        return a.proposalsCount - b.proposalsCount;
       }
       // default: newest (urgent first, then by id order)
       if (a.isUrgent && !b.isUrgent) return -1;
@@ -344,22 +327,22 @@ export const ProjectBriefsPage: React.FC<ProjectBriefsPageProps> = ({
       )}
 
       {/* Main Navbar */}
-      <Navbar 
+      <NavbarSearch 
         currentUser={currentUser}
         onSignOut={onSignOut}
-        onNavigate={handleNavigate}
+        onNavigate={onNavigate}
         activePage="briefs"
-        onSearch={(q: string) => setSearchQuery(q)}
+        onSearch={(q) => setSearchQuery(q)}
         onOpenBriefModal={() => setIsPostBriefModalOpen(true)}
       />
 
       {/* Main Container */}
-      <main className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6">
+      <main className="max-w-[1600px] mx-auto px-6 lg:px-8 py-4 sm:py-6">
         
         {/* Breadcrumbs Navigation */}
         <div className="flex items-center gap-2 text-xs font-medium text-neutral-400 mb-2.5">
           <button 
-            onClick={() => handleNavigate('landing')}
+            onClick={() => onNavigate('landing')}
             className="hover:text-neutral-900 transition cursor-pointer"
           >
             Jelajah
@@ -732,7 +715,7 @@ export const ProjectBriefsPage: React.FC<ProjectBriefsPageProps> = ({
                   {/* Key Scope & Deliverables (Clean Minimal List without nested gray box) */}
                   {project.deliverables && project.deliverables.length > 0 && (
                     <div className="space-y-1.5 mb-4">
-                      {project.deliverables.slice(0, 2).map((item: string, idx: number) => (
+                      {project.deliverables.slice(0, 2).map((item, idx) => (
                         <div key={idx} className="flex items-center gap-2 text-xs text-neutral-600 font-medium">
                           <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
                           <span className="truncate">{item}</span>
@@ -743,7 +726,7 @@ export const ProjectBriefsPage: React.FC<ProjectBriefsPageProps> = ({
 
                   {/* Skills Tags */}
                   <div className="flex flex-wrap gap-1.5 pt-1">
-                    {project.requiredSkills.map((sk: string, idx: number) => (
+                    {project.requiredSkills.map((sk, idx) => (
                       <span key={idx} className="px-2.5 py-1 rounded-lg bg-[#f3f3f4] text-neutral-700 text-xs font-medium">
                         {sk}
                       </span>
@@ -850,7 +833,7 @@ export const ProjectBriefsPage: React.FC<ProjectBriefsPageProps> = ({
                     <button
                       onClick={() => {
                         setSelectedBriefForApply(null);
-                        handleNavigate('chat');
+                        onNavigate('chat');
                       }}
                       className="w-full sm:w-auto px-5 py-2.5 rounded-full bg-[#0d0c22] hover:bg-neutral-800 text-white text-xs font-semibold transition cursor-pointer"
                     >
@@ -1128,5 +1111,3 @@ export const ProjectBriefsPage: React.FC<ProjectBriefsPageProps> = ({
     </div>
   );
 };
-
-export default ProjectBriefsPage;

@@ -1,131 +1,399 @@
-export type ActivePage =
-  | 'home'
-  | 'landing'
-  | 'creators'
-  | 'services'
-  | 'projects'
-  | 'briefs'
-  | 'brief-detail'
-  | 'creator-profile'
-  | 'umkm-profile'
-  | 'chat'
-  | 'notifications'
-  | 'my-profile'
-  | string;
+export type UserRole = 'umkm' | 'creator';
+export type CreatorCategory = 'Video' | 'Image';
 
-export interface AuthUser {
-  id?: string;
-  name?: string;
-  email?: string;
-  avatar?: string;
-  role?: 'creator' | 'umkm' | 'admin' | string;
-  [key: string]: unknown;
+export interface CareerScoreBreakdown {
+  overall: number; // 0 - 100
+  deadlineAccuracy: number; // e.g. 98%
+  revisionRate: number; // average revisions, e.g. 1.1
+  completionRate: number; // e.g. 100%
+  clientRating: number; // e.g. 4.9
+  completedProjects: number;
+  tier: 'Top Tier' | 'Rising Star' | 'Verified Talent';
 }
 
-export interface AuthState {
-  user?: AuthUser | null;
-  isAuthenticated?: boolean;
+export interface PortfolioItem {
+  id: string;
+  title: string;
+  categoryTag: string; // e.g. 'WEBSITES', 'UX/UI DESIGN', 'UGC REELS', 'FOTO PRODUK'
+  thumbnail: string;
+  type?: 'video' | 'image';
+  views?: string;
+  likes?: string;
+}
+
+export interface CreatorService {
+  id: string;
+  title: string;
+  price: number;
+  formattedPrice: string; // e.g. "Rp450.000"
+  deliveryDays?: string; // e.g. "2 Hari Kerja"
+  tag?: string; // e.g. "UGC Video", "Foto Produk", "Design"
+  coverImage?: string;
+  description?: string;
+  deliverables?: string[];
+  features?: string[];
+  revisions?: string;
+  fileFormats?: string[];
+  galleryImages?: string[];
+  category?: string;
+  toolsUsed?: string[];
+}
+
+export interface Creator {
+  id: string;
+  name: string;
+  username?: string;
+  avatar: string;
+  category: CreatorCategory;
+  roleTitle: string;
+  bio: string;
+  location: string;
+  startingRate: number; // in IDR
+  formattedRate: string; // e.g. "Rp150.000"
+  careerScore: CareerScoreBreakdown;
+  stats?: {
+    completedProjects?: number | string;
+    [key: string]: unknown;
+  };
+  rating?: number | string;
+  reviewCount?: number | string;
+  skills: string[];
+  portfolioSamples?: PortfolioItem[];
+  services?: CreatorService[];
+  joinedDate: string;
+  isPromoted?: boolean;
+  proBadge?: boolean;
+  selectBadge?: boolean;
+  verified?: boolean;
+  responseTime?: string;
+  servicesAvailableCount?: number;
+  highlightCard?: {
+    heading: string;
+    subheading: string;
+    accentColor?: string;
+  };
+  testimonialQuote?: {
+    text: string;
+    clientName: string;
+    rating: number;
+    source: string;
+  };
+  heroHeadline?: string;
+  followersCount?: number;
+  followingCount?: number;
+  likesCount?: number;
+  bannerQuote?: string;
+  copyrightName?: string;
+  cursorTag?: string;
+  aboutMeStory?: string;
+  handle?: string;
+  collections?: { id: string; title: string; count: number; coverImage: string }[];
+  reviewsList?: { id: string; clientName: string; clientCompany: string; rating: number; comment: string; date: string; projectTitle: string }[];
 }
 
 export interface ProjectListing {
   id: string;
   title: string;
   clientName: string;
-  clientAvatar: string;
-  coverImage?: string;
+  clientAvatar?: string;
   clientLocation: string;
-  clientIndustry?: string;
   category: string;
   budgetMin: number;
   budgetMax: number;
   formattedBudget: string;
   deadline: string;
-  scopeDurationDays?: number;
   description: string;
   deliverables: string[];
   requiredSkills: string[];
-  proposalsCount?: number;
-  postedTimeAgo?: string;
+  proposalsCount: number;
+  postedTimeAgo: string;
   isUrgent?: boolean;
   isVerifiedClient?: boolean;
+  clientIndustry?: string;
   productShippingProvided?: boolean;
+  coverImage?: string;
   clientRating?: number;
   clientProjectsCount?: number;
-  status?: 'open' | 'in_progress' | 'completed' | 'closed';
+  scopeDurationDays?: number;
 }
 
-export interface Creator {
-  id?: string;
-  name: string;
-  slug?: string;
-  avatar: string;
-  roleTitle?: string;
-  rate?: string;
-  formattedRate?: string;
-  responseTime?: string;
-  city?: string;
-  score?: string | number;
-  projects?: string | number;
-  services?: string | number;
-  rating?: string | number;
-  reviews?: string | number;
-  promoted?: boolean;
-  [key: string]: unknown;
-}
-
-export interface PortfolioSample {
+export interface FeedProject {
   id: string;
   title: string;
-  thumbnail: string;
-  views?: string;
-  likes?: string;
-  type?: string;
+  description?: string;
+  coverImage: string;
+  mediaUrl?: string;
+  carouselImages?: string[];
+  additionalMedia?: string[];
+  videoUrl?: string;
+  mediaType: 'video' | 'carousel' | 'image';
+  aspectRatio?: 'square' | 'portrait' | 'tall' | '4/5';
+  platform?: 'instagram' | 'tiktok' | 'direct' | 'youtube';
+  socialHandle?: string;
+  socialUrl?: string;
+  creatorId?: string;
+  creator: Creator;
+  category: string;
+  caption?: string;
+  tags: string[];
+  likesCount: number;
+  commentsCount: number;
+  viewsCount: string;
+  sharesCount: number;
+  postedDate?: string;
+  createdAt?: string;
+  stats?: {
+    likes: number;
+    comments: number;
+    shares: number;
+    views: number;
+  };
+  projectPrice?: string;
+  deliveryDays?: string;
+  toolsUsed?: string[];
+  clientBrand?: string;
+  clientReviewSnippet?: {
+    clientName: string;
+    rating: number;
+    text: string;
+    brandName?: string;
+  };
+  servicesUsed?: {
+    serviceId: string;
+    serviceTitle: string;
+    price: number;
+  }[];
 }
 
-export interface BriefApplicant {
+export interface AuthState {
+  isAuthenticated: boolean;
+  user: {
+    name: string;
+    email: string;
+    role: UserRole;
+    creatorCategory?: CreatorCategory;
+    avatar?: string;
+  } | null;
+}
+
+export type ActivePage = 'home' | 'landing' | 'signup' | 'signin' | 'explore' | 'projects' | 'services' | 'creator-profile' | 'notifications' | 'chat' | 'briefs' | 'umkm-profile' | 'brief-detail' | 'invoice' | 'collaboration-room';
+
+export type CollabStage = 'brief' | 'in_progress' | 'review' | 'revision' | 'approval' | 'completed';
+
+export interface CollabDeliverable {
   id: string;
-  briefId: string;
+  version: number;
+  title: string;
+  type: 'video' | 'image' | 'design_file';
+  url: string;
+  uploadedAt: string;
+  filesize?: string;
+  creatorNote?: string;
+  previewThumbnail?: string;
+  externalLink?: string;
+}
+
+export interface CollabRevision {
+  id: string;
+  revisionRound: number;
+  requestedAt: string;
+  feedbackText: string;
+  status: 'pending' | 'resolved';
+  resolvedAt?: string;
+}
+
+export interface CollabActivityLog {
+  id: string;
+  senderRole: 'system' | 'business' | 'creator';
+  senderName: string;
+  action: string;
+  timestamp: string;
+  detail?: string;
+  type?: 'escrow_locked' | 'brief_confirmed' | 'draft_submitted' | 'revision_requested' | 'approved' | 'rated';
+}
+
+export interface CollabRating {
+  score: number;
+  aspects: {
+    quality: number;
+    communication: number;
+    speed: number;
+  };
+  reviewText: string;
+  tags: string[];
+  submittedAt: string;
+}
+
+export interface CollaborationItem {
+  id: string;
+  roomCode: string; // e.g. "CR-2026-081"
+  projectTitle: string;
+  category: string;
+  budgetFormatted: string;
+  budgetAmount: number;
+  escrowStatus: 'held_in_escrow' | 'released_to_creator' | 'refunded';
+  invoiceNumber: string;
+  invoicePaidDate: string;
+  
+  // Creator Info
   creatorId: string;
   creatorName: string;
-  creatorUsername: string;
   creatorAvatar: string;
   creatorRole: string;
-  careerScore: number;
-  careerTier?: string;
-  location: string;
-  rating: number;
-  completedProjects: number;
-  appliedDate: string;
-  bidAmount: number;
-  formattedBid: string;
-  durationDays: string;
-  pitch: string;
-  status: 'pending' | 'shortlisted' | 'accepted' | 'rejected';
-  portfolioSamples?: PortfolioSample[];
-  isPro?: boolean;
+  creatorRating: number;
+  
+  // Business / UMKM Info
+  businessName: string;
+  businessBrand: string;
+  businessAvatar: string;
+  
+  // Timeline
+  startDate: string;
+  deadlineDate: string;
+  daysRemaining: number;
+  
+  // Current Progress State
+  currentStage: CollabStage;
+  progressPercent: number; // 0 - 100
+  
+  // Stage Data
+  briefDetails: {
+    summary: string;
+    requirements: string[];
+    brandAssets: { name: string; size: string }[];
+  };
+  deliverables: CollabDeliverable[];
+  revisions: CollabRevision[];
+  activityLogs: CollabActivityLog[];
+  rating?: CollabRating;
+  
+  // Published Portfolio Link when completed
+  publishedPortfolioId?: string;
 }
 
-export interface UmkmBrandGuide {
-  brandValues?: string[];
-  targetAudience?: string;
-  sampleShippingPolicy?: string;
-  primaryColor?: string;
-  secondaryColor?: string;
-}
-
-export interface UmkmProfile {
+export interface UMKMCompletedCollab {
   id: string;
+  title: string;
+  creatorId?: string;
+  creatorName: string;
+  creatorAvatar: string;
+  creatorRole: string;
+  category: string;
+  completedDate: string;
+  deliverableMedia: string;
+  mediaType: 'video' | 'image';
+  ratingGiven: number;
+  budgetFormatted: string;
+  reviewComment?: string;
+}
+
+export interface UMKMCreatorReview {
+  id: string;
+  creatorId?: string;
+  creatorName: string;
+  creatorAvatar: string;
+  creatorRole: string;
+  rating: number;
+  date: string;
+  comment: string;
+  projectTitle: string;
+  tags: string[];
+}
+
+export interface UMKMProfile {
+  id: string;
+  name: string;
   brandName: string;
+  logo: string;
+  coverBanner: string;
+  industry: string;
+  category: string;
+  tagline: string;
   bio: string;
   location: string;
-  joinedDate: string;
   website?: string;
-  whatsapp?: string;
   instagram?: string;
-  email?: string;
-  brandGuide?: UmkmBrandGuide;
+  marketplaceUrl?: string; // Shopee / Tokopedia
+  whatsapp?: string;
+  verified: boolean;
+  joinedDate: string;
   stats: {
-    completedProjects: number;
     activeBriefs: number;
+    completedProjects: number;
+    totalPaidFormatted: string;
+    ratingFromCreators: number;
+    reviewCount: number;
+    paymentOnTimeRate: number; // e.g. 100%
+    avgResponseHours: number; // e.g. 1.5
   };
+  brandGuide?: {
+    primaryColor: string;
+    secondaryColor: string;
+    targetAudience: string;
+    brandValues: string[];
+    sampleShippingPolicy: string;
+  };
+  activeBriefsList?: ProjectListing[];
+  completedCollaborations?: UMKMCompletedCollab[];
+  creatorReviews?: UMKMCreatorReview[];
 }
+
+export interface AppNotification {
+  id: string;
+  type: 'project_inquiry' | 'order' | 'like' | 'comment' | 'system' | 'proposal' | 'review' | 'message' | 'invoice' | 'collaboration' | 'revision' | 'approval';
+  category?: 'collaboration' | 'messages' | 'transactions' | 'general';
+  timeGroup?: 'today' | 'yesterday' | 'earlier';
+  title: string;
+  description: string;
+  timeAgo: string;
+  read: boolean;
+  avatar?: string;
+  senderName?: string;
+  actionUrl?: string;
+  targetPage?: ActivePage;
+  badge?: string;
+}
+
+export interface ChatInvoice {
+  id: string;
+  serviceTitle: string;
+  amount: string;
+  status: 'unpaid' | 'paid';
+  dueDate?: string;
+  scopeSummary?: string;
+}
+
+export interface ChatMessage {
+  id: string;
+  senderId: string;
+  text: string;
+  timestamp: string;
+  isSelf: boolean;
+  status?: 'sent' | 'delivered' | 'read';
+  attachment?: {
+    type: 'image' | 'file';
+    url: string;
+    name: string;
+    size?: string;
+  };
+  serviceInquiry?: CreatorService;
+  invoice?: ChatInvoice;
+}
+
+export interface ChatConversation {
+  id: string;
+  creatorId: string;
+  name: string;
+  roleTitle: string;
+  avatar: string;
+  verified?: boolean;
+  online: boolean;
+  lastSeen?: string;
+  lastMessage: string;
+  lastMessageTime: string;
+  unreadCount: number;
+  messages: ChatMessage[];
+  category?: string;
+  rate?: string;
+}
+

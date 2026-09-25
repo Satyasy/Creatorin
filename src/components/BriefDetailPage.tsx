@@ -1,7 +1,4 @@
-"use client";
-
 import React, { useState, useEffect, useMemo, useRef } from 'react';
-import { useRouter } from 'next/navigation';
 import {
   ArrowLeft,
   Share2,
@@ -43,11 +40,11 @@ import {
 } from 'lucide-react';
 import { Navbar } from './Navbar';
 import { Footer } from './Footer';
-import { ProjectListing, AuthState, ActivePage, Creator, BriefApplicant, UmkmProfile } from './types';
-import { MOCK_PROJECTS } from './mockProjects';
-import { MOCK_CREATORS } from './data/mockCreators';
-import { MOCK_BRIEF_APPLICANTS } from './data/mockBriefApplicants';
-import { MOCK_PRIMARY_UMKM, MOCK_ALL_UMKM } from './data/mockUmkm';
+import { ProjectListing, AuthState, ActivePage, Creator } from '../types';
+import { MOCK_PROJECTS } from '../data/mockProjects';
+import { MOCK_CREATORS } from '../data/mockCreators';
+import { MOCK_BRIEF_APPLICANTS, BriefApplicant } from '../data/mockBriefApplicants';
+import { MOCK_PRIMARY_UMKM, MOCK_ALL_UMKM } from '../data/mockUmkm';
 
 // Helper to format clean display budget
 const formatDisplayBudget = (formatted?: string, budgetMin?: number) => {
@@ -63,7 +60,7 @@ interface BriefDetailPageProps {
   brief: ProjectListing;
   currentUser?: AuthState['user'];
   onSignOut?: () => void;
-  onNavigate?: (page: ActivePage) => void;
+  onNavigate: (page: ActivePage) => void;
   onClose?: () => void;
   onViewCreatorProfile?: (creator: Creator) => void;
   onEditBrief?: (brief: ProjectListing) => void;
@@ -78,20 +75,6 @@ export const BriefDetailPage: React.FC<BriefDetailPageProps> = ({
   onViewCreatorProfile,
   onEditBrief
 }) => {
-  const router = useRouter();
-  const handleNavigate = (page: ActivePage) => {
-    if (onNavigate) {
-      onNavigate(page);
-      return;
-    }
-    if (page === 'landing' || page === 'home') router.push('/');
-    else if (page === 'briefs') router.push('/brief');
-    else if (page === 'chat') router.push('/pesan');
-    else if (page === 'creator-profile' || page === 'creators') router.push('/jelajah/creator');
-    else if (page === 'services') router.push('/jelajah/layanan');
-    else if (page === 'projects') router.push('/jelajah/proyek');
-    else router.push('/');
-  };
   const [currentBrief, setCurrentBrief] = useState<ProjectListing>(initialBrief);
   const [activeTab, setActiveTab] = useState<'rincian' | 'pelamar' | 'klien'>('rincian');
   const [isSaved, setIsSaved] = useState(false);
@@ -105,7 +88,7 @@ export const BriefDetailPage: React.FC<BriefDetailPageProps> = ({
     if (onClose) {
       onClose();
     } else {
-      handleNavigate('briefs');
+      onNavigate('briefs');
     }
   };
 
@@ -121,7 +104,7 @@ export const BriefDetailPage: React.FC<BriefDetailPageProps> = ({
   
   // Matched UMKM Profile for About section
   const matchedUmkm = useMemo(() => {
-    return MOCK_ALL_UMKM.find((u: UmkmProfile) => 
+    return MOCK_ALL_UMKM.find(u => 
       u.brandName.toLowerCase() === currentBrief.clientName?.toLowerCase() ||
       currentBrief.clientName?.toLowerCase().includes(u.brandName.toLowerCase()) ||
       u.brandName.toLowerCase().includes(currentBrief.clientName?.toLowerCase())
@@ -263,11 +246,11 @@ export const BriefDetailPage: React.FC<BriefDetailPageProps> = ({
     const minNum = parseInt(editForm.budgetMin) || 1500000;
     const deliverablesList = editForm.deliverables
       .split('\n')
-      .map((d: string) => d.trim())
+      .map(d => d.trim())
       .filter(Boolean);
     const skillsList = editForm.skills
       .split(',')
-      .map((s: string) => s.trim())
+      .map(s => s.trim())
       .filter(Boolean);
 
     const updatedBrief: ProjectListing = {
@@ -303,7 +286,7 @@ export const BriefDetailPage: React.FC<BriefDetailPageProps> = ({
   const clientEmail = `halo@${currentBrief.clientName.toLowerCase().replace(/[^a-z0-9]/g, '')}.com`;
 
   // Filter other briefs from MOCK_PROJECTS
-  const otherBriefs = MOCK_PROJECTS.filter((p: ProjectListing) => p.id !== currentBrief.id).slice(0, 3);
+  const otherBriefs = MOCK_PROJECTS.filter(p => p.id !== currentBrief.id).slice(0, 3);
 
   return (
     <div
@@ -369,7 +352,7 @@ export const BriefDetailPage: React.FC<BriefDetailPageProps> = ({
           </button>
 
           <button
-            onClick={() => handleNavigate('chat')}
+            onClick={() => onNavigate('chat')}
             className="w-10 h-10 rounded-full border border-neutral-200 bg-white hover:bg-neutral-50 text-neutral-600 hover:text-blue-600 flex items-center justify-center transition-colors cursor-pointer shadow-xs"
             title="Diskusikan via Chat"
           >
@@ -379,12 +362,12 @@ export const BriefDetailPage: React.FC<BriefDetailPageProps> = ({
 
         {/* FIXED SUB-HEADER: Client Profile Bar (Matching Screenshot) */}
         <header className="border-b border-neutral-100 bg-white/95 backdrop-blur-xs sticky top-0 z-30 shrink-0">
-          <div className="w-full max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div className="w-full max-w-5xl mx-auto px-6 lg:px-8 py-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             
             {/* Left: Avatar & Profile Details */}
             <div className="flex items-start sm:items-center gap-3.5 min-w-0">
               <div 
-                onClick={() => handleNavigate('umkm-profile')}
+                onClick={() => onNavigate('umkm-profile')}
                 className="relative cursor-pointer group shrink-0"
               >
                 <div className="w-11 h-11 sm:w-12 sm:h-12 rounded-full p-0.5 bg-linear-to-tr from-blue-600 to-indigo-500 shadow-xs">
@@ -409,7 +392,7 @@ export const BriefDetailPage: React.FC<BriefDetailPageProps> = ({
                 {/* Row 1: Client Name & Category & Status */}
                 <div className="flex flex-wrap items-center gap-2">
                   <span 
-                    onClick={() => handleNavigate('umkm-profile')}
+                    onClick={() => onNavigate('umkm-profile')}
                     className="font-bold text-sm sm:text-base text-[#0d0c22] hover:underline cursor-pointer truncate"
                   >
                     {currentBrief.clientName}
@@ -427,7 +410,7 @@ export const BriefDetailPage: React.FC<BriefDetailPageProps> = ({
                 <div className="flex flex-wrap items-center gap-2 text-xs text-neutral-500 font-medium">
                   <span 
                     className="flex items-center gap-1 hover:text-blue-600 transition cursor-pointer"
-                    onClick={() => handleNavigate('umkm-profile')}
+                    onClick={() => onNavigate('umkm-profile')}
                   >
                     <Globe className="w-3.5 h-3.5 text-neutral-400" />
                     <span>{clientDomain}</span>
@@ -503,7 +486,7 @@ export const BriefDetailPage: React.FC<BriefDetailPageProps> = ({
 
         {/* SCROLLABLE MAIN BODY */}
         <div ref={modalContainerRef} className="flex-1 overflow-y-auto min-h-0 bg-white">
-          <main className="w-full max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-7 text-left">
+          <main className="w-full max-w-5xl mx-auto px-6 lg:px-8 py-6 sm:py-8 space-y-7 text-left">
             {/* 1. BRIEF HEADLINE & TAGS */}
         <div className="space-y-3">
           <div className="flex flex-wrap items-center gap-2">
@@ -655,7 +638,7 @@ export const BriefDetailPage: React.FC<BriefDetailPageProps> = ({
               </div>
 
               <div className="space-y-2.5 max-w-3xl">
-                {currentBrief.deliverables?.map((item: string, idx: number) => (
+                {currentBrief.deliverables?.map((item, idx) => (
                   <div key={idx} className="flex items-start gap-3 text-sm text-neutral-700 leading-relaxed">
                     <span className="w-5 h-5 rounded-md bg-neutral-100 text-blue-600 flex items-center justify-center shrink-0 mt-0.5">
                       <Check className="w-3.5 h-3.5 stroke-[2]" />
@@ -668,7 +651,7 @@ export const BriefDetailPage: React.FC<BriefDetailPageProps> = ({
 
             {/* 3. Tagar (Langsung tagar tanpa headline) */}
             <div className="flex flex-wrap items-center gap-2 pt-1">
-              {currentBrief.requiredSkills.map((sk: string, idx: number) => (
+              {currentBrief.requiredSkills.map((sk, idx) => (
                 <span
                   key={idx}
                   className="px-4 py-1.5 rounded-full bg-neutral-100 hover:bg-neutral-200 text-neutral-800 text-xs font-semibold transition cursor-pointer"
@@ -711,9 +694,9 @@ export const BriefDetailPage: React.FC<BriefDetailPageProps> = ({
                       <div 
                         className="relative shrink-0 cursor-pointer group"
                         onClick={() => {
-                          const match = MOCK_CREATORS.find((c: Creator) => c.name === applicant.creatorName) || MOCK_CREATORS[0];
+                          const match = MOCK_CREATORS.find(c => c.name === applicant.creatorName) || MOCK_CREATORS[0];
                           if (onViewCreatorProfile) onViewCreatorProfile(match);
-                          else handleNavigate('creator-profile');
+                          else onNavigate('creator-profile');
                         }}
                       >
                         <img
@@ -731,9 +714,9 @@ export const BriefDetailPage: React.FC<BriefDetailPageProps> = ({
                         <div className="flex flex-wrap items-center gap-2">
                           <h3 
                             onClick={() => {
-                              const match = MOCK_CREATORS.find((c: Creator) => c.name === applicant.creatorName) || MOCK_CREATORS[0];
+                              const match = MOCK_CREATORS.find(c => c.name === applicant.creatorName) || MOCK_CREATORS[0];
                               if (onViewCreatorProfile) onViewCreatorProfile(match);
-                              else handleNavigate('creator-profile');
+                              else onNavigate('creator-profile');
                             }}
                             className="text-lg sm:text-xl font-bold tracking-tight text-[#0d0c22] hover:text-blue-600 transition-colors cursor-pointer"
                           >
@@ -794,9 +777,9 @@ export const BriefDetailPage: React.FC<BriefDetailPageProps> = ({
                     <button
                       type="button"
                       onClick={() => {
-                        const match = MOCK_CREATORS.find((c: Creator) => c.name === applicant.creatorName) || MOCK_CREATORS[0];
+                        const match = MOCK_CREATORS.find(c => c.name === applicant.creatorName) || MOCK_CREATORS[0];
                         if (onViewCreatorProfile) onViewCreatorProfile(match);
-                        else handleNavigate('creator-profile');
+                        else onNavigate('creator-profile');
                       }}
                       className="text-xs font-semibold text-neutral-600 hover:text-[#0d0c22] transition flex items-center gap-1 cursor-pointer"
                     >
@@ -807,7 +790,7 @@ export const BriefDetailPage: React.FC<BriefDetailPageProps> = ({
                     <div className="flex items-center gap-2">
                       <button
                         type="button"
-                        onClick={() => handleNavigate('chat')}
+                        onClick={() => onNavigate('chat')}
                         aria-label={`Chat dengan ${applicant.creatorName}`}
                         title="Chat"
                         className="w-9 h-9 rounded-full border border-neutral-200/90 hover:border-neutral-300 bg-neutral-50 hover:bg-neutral-100 text-neutral-700 hover:text-[#0d0c22] transition flex items-center justify-center cursor-pointer active:scale-95"
@@ -865,7 +848,7 @@ export const BriefDetailPage: React.FC<BriefDetailPageProps> = ({
                     Nilai & Karakter Brand
                   </h3>
                   <div className="flex flex-wrap gap-2">
-                    {matchedUmkm.brandGuide.brandValues.map((val: string, idx: number) => (
+                    {matchedUmkm.brandGuide.brandValues.map((val, idx) => (
                       <span
                         key={idx}
                         className="px-3.5 py-1.5 rounded-lg bg-[#f3f3f4] text-neutral-800 text-xs font-medium hover:bg-neutral-200/70 transition cursor-default"
@@ -1015,7 +998,7 @@ export const BriefDetailPage: React.FC<BriefDetailPageProps> = ({
               <div className="pt-2">
                 <button
                   type="button"
-                  onClick={() => handleNavigate('umkm-profile')}
+                  onClick={() => onNavigate('umkm-profile')}
                   className="w-full py-2.5 px-4 rounded-xl border border-neutral-300 hover:border-neutral-400 bg-white hover:bg-neutral-50 text-[#0d0c22] text-xs font-semibold transition cursor-pointer flex items-center justify-center gap-2 shadow-2xs"
                 >
                   <span>Buka Halaman Profil Brand</span>
@@ -1039,7 +1022,7 @@ export const BriefDetailPage: React.FC<BriefDetailPageProps> = ({
           {/* Centered Avatar */}
           <div className="relative z-10 inline-block -mt-6">
             <div 
-              onClick={() => handleNavigate('umkm-profile')}
+              onClick={() => onNavigate('umkm-profile')}
               className="w-16 h-16 rounded-full p-1 bg-white ring-4 ring-neutral-100 cursor-pointer group mx-auto"
             >
               {currentBrief.clientAvatar ? (
@@ -1059,7 +1042,7 @@ export const BriefDetailPage: React.FC<BriefDetailPageProps> = ({
           {/* Client Details */}
           <div className="mt-4 space-y-2 max-w-xl mx-auto text-center">
             <h2 
-              onClick={() => handleNavigate('umkm-profile')}
+              onClick={() => onNavigate('umkm-profile')}
               className="text-lg sm:text-xl font-black text-[#0d0c22] tracking-wider uppercase cursor-pointer hover:underline"
             >
               {currentBrief.clientName}
@@ -1078,13 +1061,13 @@ export const BriefDetailPage: React.FC<BriefDetailPageProps> = ({
 
             <div className="flex items-center justify-center gap-3 pt-3">
               <button
-                onClick={() => handleNavigate('chat')}
+                onClick={() => onNavigate('chat')}
                 className="px-6 py-2.5 rounded-full bg-[#0d0c22] hover:bg-neutral-800 text-white text-xs font-bold transition cursor-pointer"
               >
                 Kirim Pesan
               </button>
               <button
-                onClick={() => handleNavigate('umkm-profile')}
+                onClick={() => onNavigate('umkm-profile')}
                 className="px-6 py-2.5 rounded-full bg-white hover:bg-neutral-50 text-[#0d0c22] border border-neutral-300 text-xs font-bold transition cursor-pointer"
               >
                 Lihat Profil UMKM
@@ -1108,7 +1091,7 @@ export const BriefDetailPage: React.FC<BriefDetailPageProps> = ({
               Brief Proyek Lainnya yang Sedang Aktif
             </h3>
             <button
-              onClick={() => handleNavigate('briefs')}
+              onClick={() => onNavigate('briefs')}
               className="text-xs font-semibold text-neutral-500 hover:text-[#0d0c22] transition cursor-pointer"
             >
               Lihat Semua Brief →
@@ -1116,7 +1099,7 @@ export const BriefDetailPage: React.FC<BriefDetailPageProps> = ({
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {otherBriefs.map((project: ProjectListing) => (
+            {otherBriefs.map((project) => (
               <div
                 key={project.id}
                 onClick={() => {
@@ -1155,7 +1138,7 @@ export const BriefDetailPage: React.FC<BriefDetailPageProps> = ({
                   {/* Key Scope & Deliverables */}
                   {project.deliverables && project.deliverables.length > 0 && (
                     <div className="space-y-1.5 mb-4">
-                      {project.deliverables.slice(0, 2).map((item: string, idx: number) => (
+                      {project.deliverables.slice(0, 2).map((item, idx) => (
                         <div key={idx} className="flex items-center gap-2 text-xs text-neutral-600 font-medium">
                           <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
                           <span className="truncate">{item}</span>
@@ -1167,7 +1150,7 @@ export const BriefDetailPage: React.FC<BriefDetailPageProps> = ({
                   {/* Skills Tags */}
                   {project.requiredSkills && project.requiredSkills.length > 0 && (
                     <div className="flex flex-wrap gap-1.5 pt-1">
-                      {project.requiredSkills.map((sk: string, idx: number) => (
+                      {project.requiredSkills.map((sk, idx) => (
                         <span key={idx} className="px-2.5 py-1 rounded-lg bg-[#f3f3f4] text-neutral-700 text-xs font-medium">
                           {sk}
                         </span>
@@ -1214,7 +1197,7 @@ export const BriefDetailPage: React.FC<BriefDetailPageProps> = ({
       </main>
 
       {/* Footer inside scrollable container */}
-      <Footer onNavigate={handleNavigate} />
+      <Footer onNavigate={onNavigate} />
     </div>
 
       {/* =============================================================== */}
@@ -1582,5 +1565,3 @@ export const BriefDetailPage: React.FC<BriefDetailPageProps> = ({
     </div>
   );
 };
-
-export default BriefDetailPage;
