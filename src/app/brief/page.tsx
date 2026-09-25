@@ -1,5 +1,7 @@
-import BriefPage from "../../BriefPage";
+"use client";
+
+import ProjectBriefsPage from "../../ProjectBriefsPage";
 
 export default function BriefIndexPage() {
-  return <BriefPage />;
+  return <ProjectBriefsPage />;
 }
