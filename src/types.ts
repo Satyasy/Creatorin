@@ -176,7 +176,7 @@ export interface AuthState {
   } | null;
 }
 
-export type ActivePage = 'home' | 'landing' | 'signup' | 'signin' | 'explore' | 'projects' | 'services' | 'creator-profile' | 'notifications' | 'chat' | 'briefs' | 'umkm-profile' | 'brief-detail' | 'invoice' | 'collaboration-room';
+export type ActivePage = 'home' | 'landing' | 'signup' | 'signin' | 'explore' | 'projects' | 'services' | 'creator-profile' | 'notifications' | 'chat' | 'briefs' | 'umkm-profile' | 'brief-detail' | 'invoice' | 'collaboration-room' | 'settings';
 
 export type CollabStage = 'brief' | 'in_progress' | 'review' | 'revision' | 'approval' | 'completed';
 

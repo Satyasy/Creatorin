@@ -14,7 +14,8 @@ import {
   UserCheck,
   TrendingUp,
   Briefcase,
-  Building2
+  Building2,
+  Settings
 } from 'lucide-react';
 import { ActivePage, AuthState } from '@/types';
 import { useAuth } from '@/providers/AuthProvider';
@@ -65,6 +66,7 @@ export const Navbar: React.FC<NavbarProps> = ({
   const [userDropdownOpen, setUserDropdownOpen] = useState(false);
   const [exploreDropdownOpen, setExploreDropdownOpen] = useState(false);
   const exploreDropdownRef = useRef<HTMLDivElement>(null);
+  const userDropdownRef = useRef<HTMLDivElement>(null);
 
   const isSearchVisible = showSearch || pathname?.startsWith('/explore') || pathname?.startsWith('/briefs');
 
@@ -73,6 +75,9 @@ export const Navbar: React.FC<NavbarProps> = ({
     const handleClickOutside = (event: MouseEvent) => {
       if (exploreDropdownRef.current && !exploreDropdownRef.current.contains(event.target as Node)) {
         setExploreDropdownOpen(false);
+      }
+      if (userDropdownRef.current && !userDropdownRef.current.contains(event.target as Node)) {
+        setUserDropdownOpen(false);
       }
     };
     document.addEventListener('mousedown', handleClickOutside);
@@ -321,10 +326,12 @@ export const Navbar: React.FC<NavbarProps> = ({
 
           {/* User Profile Avatar / Sign In Buttons */}
           {currentUser ? (
-            <div className="relative">
+            <div className="relative" ref={userDropdownRef}>
               <button
+                id="nav-user-profile-logo-btn"
                 onClick={() => setUserDropdownOpen(!userDropdownOpen)}
                 className="flex items-center gap-1.5 p-1 rounded-full hover:bg-neutral-100 transition cursor-pointer"
+                title="Buka menu profil"
               >
                 <div className="relative">
                   <img
@@ -337,65 +344,40 @@ export const Navbar: React.FC<NavbarProps> = ({
               </button>
 
               {userDropdownOpen && (
-                <div className="absolute right-0 mt-2 w-56 bg-white rounded-2xl border border-neutral-200 shadow-xl py-2 z-50 animate-in fade-in zoom-in-95">
-                  <div className="px-4 py-2.5 border-b border-neutral-100">
-                    <div className="text-xs font-bold text-[#0d0c22] truncate">{currentUser.name}</div>
-                    <div className="text-[11px] text-neutral-400 truncate">{currentUser.email}</div>
-                    <span className="inline-block mt-1 text-[10px] font-semibold px-2 py-0.5 rounded-full bg-neutral-100 text-neutral-700 capitalize">
-                      {currentUser.role === 'creator' ? 'Content Creator' : 'UMKM / Brand'}
-                    </span>
-                  </div>
-                  <button
-                    onClick={() => {
-                      setUserDropdownOpen(false);
-                      navigateTo('chat', '/chat');
-                    }}
-                    className="w-full px-4 py-2 text-left text-xs font-medium text-neutral-700 hover:bg-neutral-50 flex items-center gap-2 cursor-pointer"
-                  >
-                    <MessageSquare className="w-4 h-4 text-neutral-400" />
-                    <span>Pesan & Diskusi</span>
-                  </button>
-                  <button
-                    onClick={() => {
-                      setUserDropdownOpen(false);
-                      navigateTo('notifications', '/notifications');
-                    }}
-                    className="w-full px-4 py-2 text-left text-xs font-medium text-neutral-700 hover:bg-neutral-50 flex items-center gap-2 cursor-pointer"
-                  >
-                    <Bell className="w-4 h-4 text-neutral-400" />
-                    <span>Notifikasi</span>
-                  </button>
-                  <button
-                    id="nav-user-umkm-profile-btn"
-                    onClick={() => {
-                      setUserDropdownOpen(false);
-                      navigateTo('umkm-profile', '/umkm/umkm-1');
-                    }}
-                    className="w-full px-4 py-2 text-left text-xs font-medium text-neutral-700 hover:bg-neutral-50 flex items-center gap-2 cursor-pointer"
-                  >
-                    <Building2 className="w-4 h-4 text-blue-600" />
-                    <span>Profil UMKM / Brand</span>
-                  </button>
+                <div className="absolute right-0 mt-2 w-48 bg-white rounded-2xl border border-neutral-200 shadow-xl py-1.5 z-50 animate-in fade-in zoom-in-95">
                   <button
                     id="nav-user-creator-profile-btn"
                     onClick={() => {
                       setUserDropdownOpen(false);
                       navigateTo('creator-profile', '/creator/cr-1');
                     }}
-                    className="w-full px-4 py-2 text-left text-xs font-medium text-neutral-700 hover:bg-neutral-50 flex items-center gap-2 cursor-pointer"
+                    className="w-full px-4 py-2.5 text-left text-xs font-semibold text-neutral-700 hover:bg-neutral-50 hover:text-[#0d0c22] flex items-center gap-2.5 cursor-pointer transition-colors"
                   >
-                    <User className="w-4 h-4 text-neutral-400" />
-                    <span>Profil Kreator</span>
+                    <User className="w-4 h-4 text-neutral-500" />
+                    <span>Profile Creator</span>
                   </button>
                   <button
+                    id="nav-user-settings-btn"
+                    onClick={() => {
+                      setUserDropdownOpen(false);
+                      navigateTo('settings', '/settings');
+                    }}
+                    className="w-full px-4 py-2.5 text-left text-xs font-semibold text-neutral-700 hover:bg-neutral-50 hover:text-[#0d0c22] flex items-center gap-2.5 cursor-pointer transition-colors"
+                  >
+                    <Settings className="w-4 h-4 text-neutral-500" />
+                    <span>Setting</span>
+                  </button>
+                  <div className="my-1 border-t border-neutral-100" />
+                  <button
+                    id="nav-user-logout-btn"
                     onClick={() => {
                       setUserDropdownOpen(false);
                       handleSignOutAction();
                     }}
-                    className="w-full px-4 py-2 text-left text-xs font-medium text-rose-600 hover:bg-rose-50 flex items-center gap-2 cursor-pointer"
+                    className="w-full px-4 py-2.5 text-left text-xs font-semibold text-rose-600 hover:bg-rose-50 flex items-center gap-2.5 cursor-pointer transition-colors"
                   >
                     <LogOut className="w-4 h-4 text-rose-500" />
-                    <span>Keluar Akun</span>
+                    <span>Keluar</span>
                   </button>
                 </div>
               )}

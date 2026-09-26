@@ -65,13 +65,17 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({ creator, isOpen = tr
               <div className="flex flex-wrap items-center gap-2">
                 <h3 className="text-2xl font-bold text-[#0d0c22]">{creator.name}</h3>
                 {creator.proBadge && (
-                  <span className="text-[10px] font-extrabold uppercase px-2 py-0.5 rounded-full bg-[#0d0c22] text-white tracking-wider">
-                    PRO+
-                  </span>
-                )}
-                {creator.selectBadge && (
-                  <span className="text-[10px] font-extrabold uppercase px-2 py-0.5 rounded-full bg-neutral-800 text-neutral-200 tracking-wider">
-                    SELECT
+                  <span
+                    className="uppercase px-2 py-0.5 rounded bg-[#0d0c22] tracking-[0.62px] leading-[15px]"
+                    style={{
+                      color: '#FFF',
+                      fontFamily: '"SF Pro", -apple-system, BlinkMacSystemFont, sans-serif',
+                      fontSize: '10px',
+                      fontStyle: 'normal',
+                      fontWeight: 900,
+                    }}
+                  >
+                    PRO
                   </span>
                 )}
                 <span className="inline-flex items-center gap-1 text-xs font-bold text-neutral-800">

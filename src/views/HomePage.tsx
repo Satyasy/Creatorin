@@ -175,6 +175,7 @@ export const HomePage: React.FC<HomePageProps> = ({
         'briefs': '/briefs',
         'signin': '/sign-in',
         'signup': '/sign-up',
+        'settings': '/settings',
       };
       router.push(routeMap[page] || '/explore');
     }
@@ -824,14 +825,17 @@ export const HomePage: React.FC<HomePageProps> = ({
                                 </h3>
 
                                 {creator.proBadge && (
-                                  <span className="text-[10px] font-black uppercase px-2 py-0.5 rounded bg-[#0d0c22] text-white tracking-[0.62px] leading-[15px]">
-                                    PRO+
-                                  </span>
-                                )}
-
-                                {creator.selectBadge && (
-                                  <span className="text-[10px] font-black uppercase px-2 py-0.5 rounded bg-[#2b2a45] text-white tracking-[0.62px] leading-[15px]">
-                                    SELECT
+                                  <span
+                                    className="uppercase px-2 py-0.5 rounded bg-[#0d0c22] tracking-[0.62px] leading-[15px]"
+                                    style={{
+                                      color: '#FFF',
+                                      fontFamily: '"SF Pro", -apple-system, BlinkMacSystemFont, sans-serif',
+                                      fontSize: '10px',
+                                      fontStyle: 'normal',
+                                      fontWeight: 900,
+                                    }}
+                                  >
+                                    PRO
                                   </span>
                                 )}
 
