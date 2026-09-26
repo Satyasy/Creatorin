@@ -1,8 +1,12 @@
+'use client';
+
 import React, { useState, useMemo } from 'react';
-import { Creator, CreatorCategory, AuthState, ActivePage } from '../types';
-import { MOCK_CREATORS } from '../data/mockCreators';
-import { CareerScoreBadge } from './CareerScoreBadge';
-import { ProfileModal } from './ProfileModal';
+import { useRouter } from 'next/navigation';
+import { useAuth } from '@/providers/AuthProvider';
+import { Creator, CreatorCategory, AuthState, ActivePage } from '@/types';
+import { MOCK_CREATORS } from '@/data/mockCreators';
+import { CareerScoreBadge } from '@/components/common/CareerScoreBadge';
+import { ProfileModal } from '@/components/modals/ProfileModal';
 import { 
   ShieldCheck, 
   Search, 
@@ -28,13 +32,45 @@ import {
 } from 'lucide-react';
 
 interface ExplorePageProps {
-  currentUser: AuthState['user'];
-  onSignOut: () => void;
-  onNavigate: (page: ActivePage) => void;
+  currentUser?: AuthState['user'];
+  onSignOut?: () => void;
+  onNavigate?: (page: ActivePage) => void;
   onViewCreatorProfile?: (creator: Creator) => void;
 }
 
-export const ExplorePage: React.FC<ExplorePageProps> = ({ currentUser, onSignOut, onNavigate, onViewCreatorProfile }) => {
+export const ExplorePage: React.FC<ExplorePageProps> = ({ currentUser: propUser, onSignOut, onNavigate, onViewCreatorProfile }) => {
+  const router = useRouter();
+  const { user: authUser, logout } = useAuth();
+  const currentUser = propUser !== undefined ? propUser : authUser;
+
+  const navigateTo = (page: ActivePage, path?: string) => {
+    if (onNavigate) {
+      onNavigate(page);
+    } else if (path) {
+      router.push(path);
+    } else {
+      const routeMap: Record<string, string> = {
+        'home': '/',
+        'landing': '/landing',
+        'explore': '/explore',
+        'explore-projects': '/explore/projects',
+        'explore-services': '/explore/services',
+        'chat': '/chat',
+        'collaboration': '/collaboration',
+        'collaboration-room': '/collaboration',
+        'notifications': '/notifications',
+        'briefs': '/briefs',
+        'signin': '/sign-in',
+        'signup': '/sign-up',
+      };
+      router.push(routeMap[page] || '/explore');
+    }
+  };
+
+  const handleCreatorClick = (creator: Creator) => {
+    if (onViewCreatorProfile) onViewCreatorProfile(creator);
+    else router.push(`/creator/${creator.id}`);
+  };
   // State for search and filters
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<'All' | CreatorCategory>('All');
@@ -126,7 +162,7 @@ export const ExplorePage: React.FC<ExplorePageProps> = ({ currentUser, onSignOut
         <div className="p-5 flex flex-col gap-6">
           {/* Logo & Brand */}
           <button
-            onClick={() => onNavigate('landing')}
+            onClick={() => navigateTo('landing', '/landing')}
             className="flex items-center gap-2.5 text-left focus:outline-hidden group"
           >
             <div className="w-9 h-9 rounded-xl bg-indigo-600 flex items-center justify-center text-white shadow-sm shadow-indigo-600/20 group-hover:bg-indigo-700 transition-colors">
@@ -589,13 +625,7 @@ export const ExplorePage: React.FC<ExplorePageProps> = ({ currentUser, onSignOut
                   <div className="mt-5 pt-3 border-t border-slate-100 flex items-center gap-2">
                     <button
                       id={`view-profile-btn-${creator.id}`}
-                      onClick={() => {
-                        if (onViewCreatorProfile) {
-                          onViewCreatorProfile(creator);
-                        } else {
-                          setSelectedCreatorForModal(creator);
-                        }
-                      }}
+                      onClick={() => handleCreatorClick(creator)}
                       className="w-full py-2.5 px-3 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-xs rounded-xl shadow-xs shadow-indigo-600/20 transition-all flex items-center justify-center gap-1.5 cursor-pointer"
                     >
                       <span>View Profile & Score</span>
@@ -666,7 +696,8 @@ export const ExplorePage: React.FC<ExplorePageProps> = ({ currentUser, onSignOut
             <button
               onClick={() => {
                 setMobileSidebarOpen(false);
-                onSignOut();
+                if (onSignOut) onSignOut();
+                else logout();
               }}
               className="w-full py-2.5 text-xs font-bold text-rose-600 border border-rose-200 rounded-xl hover:bg-rose-50"
             >

@@ -15,7 +15,7 @@ import {
   CreditCard,
   RotateCcw
 } from 'lucide-react';
-import { CreatorService, Creator, ActivePage } from '../types';
+import { CreatorService, Creator, ActivePage } from '@/types';
 
 export interface ServiceDetailModalProps {
   service: CreatorService;

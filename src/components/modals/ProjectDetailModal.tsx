@@ -17,8 +17,8 @@ import {
   Layers,
   ArrowUpRight
 } from 'lucide-react';
-import { FeedProject, Creator } from '../types';
-import { MOCK_FEED_PROJECTS } from '../data/mockFeedProjects';
+import { FeedProject, Creator } from '@/types';
+import { MOCK_FEED_PROJECTS } from '@/data/mockFeedProjects';
 
 export interface ProjectDetailModalProps {
   project: FeedProject;

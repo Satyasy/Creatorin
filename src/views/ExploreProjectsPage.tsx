@@ -1,4 +1,8 @@
+'use client';
+
 import React, { useState, useMemo } from 'react';
+import { useRouter } from 'next/navigation';
+import { useAuth } from '@/providers/AuthProvider';
 import { 
   Search, 
   Play, 
@@ -27,17 +31,15 @@ import {
   TrendingUp,
   Tag
 } from 'lucide-react';
-import { NavbarSearch } from './NavbarSearch';
-import { ProjectBriefModal } from './ProjectBriefModal';
-import { ProjectDetailModal } from './ProjectDetailModal';
-import { Footer } from './Footer';
-import { MOCK_FEED_PROJECTS } from '../data/mockFeedProjects';
-import { ActivePage, AuthState, FeedProject, Creator } from '../types';
+import { ProjectBriefModal } from '@/components/modals/ProjectBriefModal';
+import { ProjectDetailModal } from '@/components/modals/ProjectDetailModal';
+import { MOCK_FEED_PROJECTS } from '@/data/mockFeedProjects';
+import { ActivePage, AuthState, FeedProject, Creator } from '@/types';
 
 interface ExploreProjectsPageProps {
   currentUser?: AuthState['user'];
   onSignOut?: () => void;
-  onNavigate: (page: ActivePage) => void;
+  onNavigate?: (page: ActivePage) => void;
   onViewCreatorProfile?: (creator: Creator) => void;
 }
 
@@ -71,11 +73,43 @@ const POPULAR_PROJECT_TAGS = [
 ];
 
 export const ExploreProjectsPage: React.FC<ExploreProjectsPageProps> = ({
-  currentUser,
+  currentUser: propUser,
   onSignOut,
   onNavigate,
   onViewCreatorProfile
 }) => {
+  const router = useRouter();
+  const { user: authUser } = useAuth();
+  const currentUser = propUser !== undefined ? propUser : authUser;
+
+  const navigateTo = (page: ActivePage, path?: string) => {
+    if (onNavigate) {
+      onNavigate(page);
+    } else if (path) {
+      router.push(path);
+    } else {
+      const routeMap: Record<string, string> = {
+        'home': '/',
+        'landing': '/landing',
+        'explore': '/explore',
+        'explore-projects': '/explore/projects',
+        'explore-services': '/explore/services',
+        'chat': '/chat',
+        'collaboration': '/collaboration',
+        'collaboration-room': '/collaboration',
+        'notifications': '/notifications',
+        'briefs': '/briefs',
+        'signin': '/sign-in',
+        'signup': '/sign-up',
+      };
+      router.push(routeMap[page] || '/explore');
+    }
+  };
+
+  const handleCreatorClick = (creator: Creator) => {
+    if (onViewCreatorProfile) onViewCreatorProfile(creator);
+    else router.push(`/creator/${creator.id}`);
+  };
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('Semua');
   const [selectedPlatform, setSelectedPlatform] = useState<string>('all');
@@ -223,7 +257,7 @@ export const ExploreProjectsPage: React.FC<ExploreProjectsPageProps> = ({
   };
 
   return (
-    <div className="min-h-screen bg-[#fafafa] text-[#0d0c22] font-sans selection:bg-[#0d0c22] selection:text-white">
+    <div className="w-full bg-[#fafafa] text-[#0d0c22] font-sans selection:bg-[#0d0c22] selection:text-white">
       {/* Toast Notification */}
       {toastMessage && (
         <div className="fixed bottom-6 right-6 z-50 bg-[#0d0c22] text-white px-5 py-3 rounded-2xl shadow-xl text-sm font-medium flex items-center gap-2 animate-in fade-in slide-in-from-bottom-3 duration-200">
@@ -232,25 +266,13 @@ export const ExploreProjectsPage: React.FC<ExploreProjectsPageProps> = ({
         </div>
       )}
 
-      {/* Main Navbar */}
-      <NavbarSearch 
-        currentUser={currentUser}
-        onSignOut={onSignOut}
-        onNavigate={onNavigate}
-        onSearch={(q) => setSearchQuery(q)}
-        onOpenBriefModal={() => {
-          setTargetCreatorForBrief(undefined);
-          setIsBriefModalOpen(true);
-        }}
-      />
-
       {/* Main Container */}
       <main className="max-w-[1440px] mx-auto px-6 lg:px-8 py-4 sm:py-6">
         
         {/* Breadcrumbs Navigation */}
         <div className="flex items-center gap-2 text-xs font-medium text-neutral-400 mb-2.5">
           <button 
-            onClick={() => onNavigate('landing')}
+            onClick={() => navigateTo('landing', '/landing')}
             className="hover:text-neutral-900 transition cursor-pointer"
           >
             Jelajah
@@ -622,9 +644,6 @@ export const ExploreProjectsPage: React.FC<ExploreProjectsPageProps> = ({
 
       </main>
 
-      {/* Footer Modern Rounded Container */}
-      <Footer onNavigate={onNavigate} onOpenBrief={() => setIsBriefModalOpen(true)} />
-
       {/* Full Preview Modal matching requested design */}
       {selectedProject && (
         <ProjectDetailModal
@@ -632,10 +651,8 @@ export const ExploreProjectsPage: React.FC<ExploreProjectsPageProps> = ({
           onClose={() => setSelectedProject(null)}
           onSelectProject={(newProj) => setSelectedProject(newProj)}
           onViewCreatorProfile={(c) => {
-            if (onViewCreatorProfile) {
-              onViewCreatorProfile(c);
-              setSelectedProject(null);
-            }
+            handleCreatorClick(c);
+            setSelectedProject(null);
           }}
           onGetInTouch={(c) => {
             setSelectedProject(null);
@@ -647,7 +664,7 @@ export const ExploreProjectsPage: React.FC<ExploreProjectsPageProps> = ({
             setTargetCreatorForBrief(c);
             setIsBriefModalOpen(true);
           }}
-          onNavigate={onNavigate}
+          onNavigate={navigateTo}
           allProjects={MOCK_FEED_PROJECTS}
         />
       )}

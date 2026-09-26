@@ -1,3 +1,5 @@
+'use client';
+
 import React, { useState, useMemo } from 'react';
 import { 
   Search, 
@@ -27,11 +29,12 @@ import {
   Users,
   Edit3
 } from 'lucide-react';
-import { NavbarSearch } from './NavbarSearch';
-import { ProjectBriefModal } from './ProjectBriefModal';
+import { useRouter } from 'next/navigation';
+import { useAuth } from '@/providers/AuthProvider';
+import { ProjectBriefModal } from '@/components/modals/ProjectBriefModal';
 import { BriefDetailPage } from './BriefDetailPage';
-import { MOCK_PROJECTS } from '../data/mockProjects';
-import { ActivePage, AuthState, ProjectListing } from '../types';
+import { MOCK_PROJECTS } from '@/data/mockProjects';
+import { ActivePage, AuthState, ProjectListing } from '@/types';
 
 // Format budget display to single clean number (e.g. Rp1.500.000)
 const formatDisplayBudget = (formatted?: string, budgetMin?: number) => {
@@ -46,7 +49,7 @@ const formatDisplayBudget = (formatted?: string, budgetMin?: number) => {
 interface ProjectBriefsPageProps {
   currentUser?: AuthState['user'];
   onSignOut?: () => void;
-  onNavigate: (page: ActivePage) => void;
+  onNavigate?: (page: ActivePage) => void;
   onViewCreatorProfile?: (creator: any) => void;
   onViewBrief?: (brief: ProjectListing) => void;
 }
@@ -76,12 +79,39 @@ const POPULAR_BRIEF_TAGS = [
 ];
 
 export const ProjectBriefsPage: React.FC<ProjectBriefsPageProps> = ({
-  currentUser,
+  currentUser: propUser,
   onSignOut,
   onNavigate,
   onViewCreatorProfile,
   onViewBrief
 }) => {
+  const router = useRouter();
+  const { user: authUser } = useAuth();
+  const currentUser = propUser !== undefined ? propUser : authUser;
+
+  const navigateTo = (page: ActivePage, path?: string) => {
+    if (onNavigate) {
+      onNavigate(page);
+    } else if (path) {
+      router.push(path);
+    } else {
+      const routeMap: Record<string, string> = {
+        'home': '/',
+        'landing': '/landing',
+        'explore': '/explore',
+        'explore-projects': '/explore/projects',
+        'explore-services': '/explore/services',
+        'chat': '/chat',
+        'collaboration': '/collaboration',
+        'notifications': '/notifications',
+        'briefs': '/briefs',
+        'signin': '/sign-in',
+        'signup': '/sign-up',
+      };
+      router.push(routeMap[page] || '/explore');
+    }
+  };
+
   // Projects data state (so creators can apply and UMKM can add briefs in-session)
   const [projectsList, setProjectsList] = useState<ProjectListing[]>(MOCK_PROJECTS);
   
@@ -326,15 +356,7 @@ export const ProjectBriefsPage: React.FC<ProjectBriefsPageProps> = ({
         </div>
       )}
 
-      {/* Main Navbar */}
-      <NavbarSearch 
-        currentUser={currentUser}
-        onSignOut={onSignOut}
-        onNavigate={onNavigate}
-        activePage="briefs"
-        onSearch={(q) => setSearchQuery(q)}
-        onOpenBriefModal={() => setIsPostBriefModalOpen(true)}
-      />
+      {/* Main App Navbar rendered by (main) layout */}
 
       {/* Main Container */}
       <main className="max-w-[1440px] mx-auto px-6 lg:px-8 py-4 sm:py-6">
@@ -342,7 +364,7 @@ export const ProjectBriefsPage: React.FC<ProjectBriefsPageProps> = ({
         {/* Breadcrumbs Navigation */}
         <div className="flex items-center gap-2 text-xs font-medium text-neutral-400 mb-2.5">
           <button 
-            onClick={() => onNavigate('landing')}
+            onClick={() => navigateTo('landing', '/landing')}
             className="hover:text-neutral-900 transition cursor-pointer"
           >
             Jelajah
@@ -685,7 +707,7 @@ export const ProjectBriefsPage: React.FC<ProjectBriefsPageProps> = ({
                   if (onViewBrief) {
                     onViewBrief(project);
                   } else {
-                    setSelectedBriefForDetail(project);
+                    router.push(`/briefs/${project.id}`);
                   }
                 }}
                 className="group bg-white rounded-2xl sm:rounded-3xl border border-neutral-200/80 hover:border-neutral-300 hover:shadow-lg transition-all duration-200 p-6 sm:p-7 flex flex-col justify-between cursor-pointer text-left relative"
@@ -776,7 +798,7 @@ export const ProjectBriefsPage: React.FC<ProjectBriefsPageProps> = ({
           brief={selectedBriefForDetail}
           currentUser={currentUser}
           onSignOut={onSignOut}
-          onNavigate={onNavigate}
+          onNavigate={navigateTo}
           onClose={() => setSelectedBriefForDetail(null)}
           onViewCreatorProfile={onViewCreatorProfile}
           onEditBrief={(updated) => {
@@ -833,7 +855,7 @@ export const ProjectBriefsPage: React.FC<ProjectBriefsPageProps> = ({
                     <button
                       onClick={() => {
                         setSelectedBriefForApply(null);
-                        onNavigate('chat');
+                        navigateTo('chat', '/chat');
                       }}
                       className="w-full sm:w-auto px-5 py-2.5 rounded-full bg-[#0d0c22] hover:bg-neutral-800 text-white text-xs font-semibold transition cursor-pointer"
                     >

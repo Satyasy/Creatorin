@@ -1,3 +1,5 @@
+'use client';
+
 import React, { useState, useMemo } from 'react';
 import { 
   Building2, 
@@ -42,15 +44,16 @@ import {
   Zap,
   Users
 } from 'lucide-react';
-import { UMKMProfile, AuthState, ActivePage, ProjectListing, UMKMCompletedCollab, UMKMCreatorReview, Creator } from '../types';
-import { Navbar } from './Navbar';
-import { MOCK_PRIMARY_UMKM } from '../data/mockUmkm';
-import { MOCK_CREATORS } from '../data/mockCreators';
+import { useRouter } from 'next/navigation';
+import { useAuth } from '@/providers/AuthProvider';
+import { UMKMProfile, AuthState, ActivePage, ProjectListing, UMKMCompletedCollab, UMKMCreatorReview, Creator } from '@/types';
+import { MOCK_PRIMARY_UMKM } from '@/data/mockUmkm';
+import { MOCK_CREATORS } from '@/data/mockCreators';
 
 interface UmkmProfilePageProps {
   currentUser?: AuthState['user'];
   onSignOut?: () => void;
-  onNavigate: (page: ActivePage) => void;
+  onNavigate?: (page: ActivePage) => void;
   onViewCreatorProfile?: (creator: Creator) => void;
   onViewBrief?: (brief: ProjectListing) => void;
   initialProfile?: UMKMProfile;
@@ -68,13 +71,39 @@ const formatDisplayBudget = (formatted?: string, budgetMin?: number) => {
 };
 
 export const UmkmProfilePage: React.FC<UmkmProfilePageProps> = ({
-  currentUser,
+  currentUser: propUser,
   onSignOut,
   onNavigate,
   onViewCreatorProfile,
   onViewBrief,
   initialProfile = MOCK_PRIMARY_UMKM
 }) => {
+  const router = useRouter();
+  const { user: authUser } = useAuth();
+  const currentUser = propUser !== undefined ? propUser : authUser;
+
+  const navigateTo = (page: ActivePage, path?: string) => {
+    if (onNavigate) {
+      onNavigate(page);
+    } else if (path) {
+      router.push(path);
+    } else {
+      const routeMap: Record<string, string> = {
+        'home': '/',
+        'landing': '/landing',
+        'explore': '/explore',
+        'explore-projects': '/explore/projects',
+        'explore-services': '/explore/services',
+        'chat': '/chat',
+        'collaboration': '/collaboration',
+        'notifications': '/notifications',
+        'briefs': '/briefs',
+        'signin': '/sign-in',
+        'signup': '/sign-up',
+      };
+      router.push(routeMap[page] || '/explore');
+    }
+  };
   const [profile, setProfile] = useState<UMKMProfile>(initialProfile);
   const [activeTab, setActiveTab] = useState<TabKey>('briefs');
   
@@ -413,14 +442,7 @@ export const UmkmProfilePage: React.FC<UmkmProfilePageProps> = ({
         </div>
       )}
 
-      {/* Main App Navbar */}
-      <Navbar
-        currentUser={currentUser}
-        onSignOut={onSignOut}
-        onNavigate={onNavigate}
-        activePage="umkm-profile"
-        onOpenBriefModal={() => setIsPostBriefOpen(true)}
-      />
+      {/* Main App Navbar rendered by root/main layout */}
 
       {/* ==================================================================== */}
       {/* HERO SECTION (Owner Editable Profile View with Customization Controls) */}
@@ -1953,12 +1975,15 @@ export const UmkmProfilePage: React.FC<UmkmProfilePageProps> = ({
                 <button
                   onClick={() => {
                     const found = MOCK_CREATORS.find(c => c.name === selectedCollabDetail.creatorName || c.id === selectedCollabDetail.creatorId);
-                    if (found && onViewCreatorProfile) {
-                      setSelectedCollabDetail(null);
-                      onViewCreatorProfile(found);
+                    setSelectedCollabDetail(null);
+                    if (found) {
+                      if (onViewCreatorProfile) {
+                        onViewCreatorProfile(found);
+                      } else {
+                        router.push(`/creator/${found.id}`);
+                      }
                     } else {
-                      setSelectedCollabDetail(null);
-                      onNavigate('explore');
+                      navigateTo('explore', '/explore');
                     }
                   }}
                   className="px-5 py-2 rounded-full bg-[#0d0c22] hover:bg-neutral-800 text-white text-xs font-semibold transition cursor-pointer"

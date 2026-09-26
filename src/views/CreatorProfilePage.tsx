@@ -1,3 +1,5 @@
+'use client';
+
 import React, { useState, useMemo } from 'react';
 import { 
   Share2, 
@@ -47,23 +49,25 @@ import {
   Instagram,
   Linkedin
 } from 'lucide-react';
-import { Creator, CreatorService, PortfolioItem, AuthState, ActivePage, FeedProject } from '../types';
-import { Navbar } from './Navbar';
-import { CareerScoreBadge } from './CareerScoreBadge';
-import { ProjectBriefModal } from './ProjectBriefModal';
-import { ProjectDetailModal } from './ProjectDetailModal';
-import { ServiceDetailModal } from './ServiceDetailModal';
-import { MOCK_FEED_PROJECTS } from '../data/mockFeedProjects';
-import { ShaderFill } from '../lib/custom-effect-runtime';
-import { setup as setupConcentric, render as renderConcentric, manifest as manifestConcentric } from '../lib/custom-effects/CodeComponentId_c2b302fbdfce8a1ec92a5a80b10a5916ab506ed7_430';
-import { setup as setupWater, render as renderWater, manifest as manifestWater } from '../lib/custom-effects/CodeComponentId_40f03f78407c1c973fc891fbca9ff3d0387485e6_435';
-import { setup as setupWave, render as renderWave, manifest as manifestWave } from '../lib/custom-effects/CodeComponentId_cd43ef0afb2cac168a28e7f79135150678ccfd25_433';
+import { useRouter } from 'next/navigation';
+import { useAuth } from '@/providers/AuthProvider';
+import { MOCK_CREATORS } from '@/data/mockCreators';
+import { Creator, CreatorService, PortfolioItem, AuthState, ActivePage, FeedProject } from '@/types';
+import { CareerScoreBadge } from '@/components/common/CareerScoreBadge';
+import { ProjectBriefModal } from '@/components/modals/ProjectBriefModal';
+import { ProjectDetailModal } from '@/components/modals/ProjectDetailModal';
+import { ServiceDetailModal } from '@/components/modals/ServiceDetailModal';
+import { MOCK_FEED_PROJECTS } from '@/data/mockFeedProjects';
+import { ShaderFill } from '@/lib/custom-effect-runtime';
+import { setup as setupConcentric, render as renderConcentric, manifest as manifestConcentric } from '@/lib/custom-effects/CodeComponentId_c2b302fbdfce8a1ec92a5a80b10a5916ab506ed7_430';
+import { setup as setupWater, render as renderWater, manifest as manifestWater } from '@/lib/custom-effects/CodeComponentId_40f03f78407c1c973fc891fbca9ff3d0387485e6_435';
+import { setup as setupWave, render as renderWave, manifest as manifestWave } from '@/lib/custom-effects/CodeComponentId_cd43ef0afb2cac168a28e7f79135150678ccfd25_433';
 
 interface CreatorProfilePageProps {
-  creator: Creator;
+  creator?: Creator;
   currentUser?: AuthState['user'];
   onSignOut?: () => void;
-  onNavigate: (page: ActivePage) => void;
+  onNavigate?: (page: ActivePage) => void;
   onSelectCreator?: (creator: Creator) => void;
 }
 
@@ -71,12 +75,25 @@ type ProfileTab = 'work' | 'services' | 'reviews' | 'statistics' | 'liked' | 'ab
 type ShotFilter = 'all' | 'recent' | 'popular' | 'views' | 'video' | 'carousel';
 
 export const CreatorProfilePage: React.FC<CreatorProfilePageProps> = ({
-  creator,
-  currentUser,
+  creator = MOCK_CREATORS[0],
+  currentUser: propUser,
   onSignOut,
   onNavigate,
   onSelectCreator
 }) => {
+  const router = useRouter();
+  const { user: authUser } = useAuth();
+  const currentUser = propUser !== undefined ? propUser : authUser;
+
+  const navigateTo = (page: ActivePage, path: string) => {
+    if (onNavigate) onNavigate(page);
+    else router.push(path);
+  };
+
+  const handleSelectCreator = (c: Creator) => {
+    if (onSelectCreator) onSelectCreator(c);
+    else router.push(`/creator/${c.id}`);
+  };
   // Active Tab
   const [activeTab, setActiveTab] = useState<ProfileTab>('work');
   const [shotFilter, setShotFilter] = useState<ShotFilter>('recent');
@@ -181,9 +198,7 @@ export const CreatorProfilePage: React.FC<CreatorProfilePageProps> = ({
       setInquirySentSuccess(false);
       setIsGetInTouchOpen(false);
       setInquiryMessage('');
-      if (onNavigate) {
-        onNavigate('chat');
-      }
+      navigateTo('chat', '/chat');
     }, 1200);
   };
 
@@ -417,15 +432,7 @@ export const CreatorProfilePage: React.FC<CreatorProfilePageProps> = ({
   }, [creatorProjects, shotFilter]);
 
   return (
-    <div className="min-h-screen bg-white text-[#0d0c22] font-sans selection:bg-[#0d0c22] selection:text-white">
-      
-      {/* Top Main Navigation */}
-      <Navbar 
-        currentUser={currentUser}
-        onNavigate={onNavigate}
-        onSignOut={onSignOut}
-        onOpenBriefModal={() => setIsBriefModalOpen(true)}
-      />
+    <div className="w-full bg-white text-[#0d0c22] font-sans selection:bg-[#0d0c22] selection:text-white">
 
       {/* Copy Notification */}
       {copiedLinkSuccess && (
@@ -1756,7 +1763,7 @@ export const CreatorProfilePage: React.FC<CreatorProfilePageProps> = ({
           onClose={() => setSelectedProjectForDetail(null)}
           onSelectProject={(newProj) => setSelectedProjectForDetail(newProj)}
           onViewCreatorProfile={(c) => {
-            if (onSelectCreator) onSelectCreator(c);
+            handleSelectCreator(c);
           }}
           onGetInTouch={(c) => {
             setSelectedProjectForDetail(null);
@@ -1766,7 +1773,25 @@ export const CreatorProfilePage: React.FC<CreatorProfilePageProps> = ({
             setSelectedProjectForDetail(null);
             setIsBriefModalOpen(true);
           }}
-          onNavigate={onNavigate}
+          onNavigate={(page) => {
+            if (onNavigate) onNavigate(page);
+            else {
+              const routeMap: Record<string, string> = {
+                'home': '/',
+                'landing': '/landing',
+                'explore': '/explore',
+                'explore-projects': '/explore/projects',
+                'explore-services': '/explore/services',
+                'chat': '/chat',
+                'collaboration': '/collaboration',
+                'notifications': '/notifications',
+                'briefs': '/briefs',
+                'signin': '/sign-in',
+                'signup': '/sign-up',
+              };
+              router.push(routeMap[page] || '/explore');
+            }
+          }}
           allProjects={MOCK_FEED_PROJECTS}
         />
       )}
@@ -1834,7 +1859,25 @@ export const CreatorProfilePage: React.FC<CreatorProfilePageProps> = ({
             setSelectedServiceForDetail(null);
             setSelectedServiceForOrder(srv);
           }}
-          onNavigate={onNavigate}
+          onNavigate={(page) => {
+            if (onNavigate) onNavigate(page);
+            else {
+              const routeMap: Record<string, string> = {
+                'home': '/',
+                'landing': '/landing',
+                'explore': '/explore',
+                'explore-projects': '/explore/projects',
+                'explore-services': '/explore/services',
+                'chat': '/chat',
+                'collaboration': '/collaboration',
+                'notifications': '/notifications',
+                'briefs': '/briefs',
+                'signin': '/sign-in',
+                'signup': '/sign-up',
+              };
+              router.push(routeMap[page] || '/explore');
+            }
+          }}
           onSelectOtherService={(newSrv) => {
             setSelectedServiceForDetail(newSrv);
           }}

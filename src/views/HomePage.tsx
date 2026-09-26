@@ -1,4 +1,8 @@
+'use client';
+
 import React, { useState, useMemo } from 'react';
+import { useRouter } from 'next/navigation';
+import { useAuth } from '@/providers/AuthProvider';
 import { 
   Sparkles, 
   ArrowRight, 
@@ -41,18 +45,16 @@ import {
   ExternalLink,
   X
 } from 'lucide-react';
-import { Navbar } from './Navbar';
-import { ProjectBriefModal } from './ProjectBriefModal';
-import { Footer } from './Footer';
-import { ProjectDetailModal } from './ProjectDetailModal';
-import { MOCK_CREATORS } from '../data/mockCreators';
-import { MOCK_FEED_PROJECTS } from '../data/mockFeedProjects';
-import { ActivePage, AuthState, Creator, CreatorService, FeedProject } from '../types';
+import { ProjectBriefModal } from '@/components/modals/ProjectBriefModal';
+import { ProjectDetailModal } from '@/components/modals/ProjectDetailModal';
+import { MOCK_CREATORS } from '@/data/mockCreators';
+import { MOCK_FEED_PROJECTS } from '@/data/mockFeedProjects';
+import { ActivePage, AuthState, Creator, CreatorService, FeedProject } from '@/types';
 
 interface HomePageProps {
   currentUser?: AuthState['user'];
   onSignOut?: () => void;
-  onNavigate: (page: ActivePage) => void;
+  onNavigate?: (page: ActivePage) => void;
   onViewCreatorProfile?: (creator: Creator) => void;
 }
 
@@ -145,11 +147,47 @@ const TESTIMONIALS = [
 
 
 export const HomePage: React.FC<HomePageProps> = ({
-  currentUser,
+  currentUser: propUser,
   onSignOut,
   onNavigate,
   onViewCreatorProfile
 }) => {
+  const router = useRouter();
+  const { user: authUser } = useAuth();
+  const currentUser = propUser !== undefined ? propUser : authUser;
+
+  const navigateTo = (page: ActivePage, path?: string) => {
+    if (onNavigate) {
+      onNavigate(page);
+    } else if (path) {
+      router.push(path);
+    } else {
+      const routeMap: Record<string, string> = {
+        'home': '/',
+        'landing': '/landing',
+        'explore': '/explore',
+        'explore-projects': '/explore/projects',
+        'explore-services': '/explore/services',
+        'chat': '/chat',
+        'collaboration': '/collaboration',
+        'collaboration-room': '/collaboration',
+        'notifications': '/notifications',
+        'briefs': '/briefs',
+        'signin': '/sign-in',
+        'signup': '/sign-up',
+      };
+      router.push(routeMap[page] || '/explore');
+    }
+  };
+
+  const handleCreatorClick = (creator: Creator) => {
+    if (onViewCreatorProfile) {
+      onViewCreatorProfile(creator);
+    } else {
+      router.push(`/creator/${creator.id}`);
+    }
+  };
+
   const [isBriefModalOpen, setIsBriefModalOpen] = useState(false);
   const [targetCreatorForBrief, setTargetCreatorForBrief] = useState<Creator | undefined>(undefined);
   
@@ -298,22 +336,7 @@ export const HomePage: React.FC<HomePageProps> = ({
   };
 
   return (
-    <div className="min-h-screen bg-white text-[#0d0c22] font-sans selection:bg-[#0d0c22] selection:text-white">
-      
-      {/* Global Navbar */}
-      <Navbar 
-        currentUser={currentUser}
-        onSignOut={onSignOut}
-        onNavigate={onNavigate}
-        onSearch={(q) => {
-          if (q) onNavigate('projects');
-        }}
-        onOpenBriefModal={() => {
-          setTargetCreatorForBrief(undefined);
-          setIsBriefModalOpen(true);
-        }}
-      />
-
+    <div className="w-full bg-white text-[#0d0c22] font-sans selection:bg-[#0d0c22] selection:text-white">
       <main className="w-full">
         
         {/* ========================================================================= */}
@@ -375,16 +398,16 @@ export const HomePage: React.FC<HomePageProps> = ({
             <div className="flex flex-col sm:flex-row items-center justify-center gap-3.5 pt-2 sm:pt-3">
               <button
                 type="button"
-                onClick={() => onNavigate('landing')}
+                onClick={() => navigateTo('landing', '/landing')}
                 className="w-full sm:w-auto px-7 sm:px-8 py-3.5 sm:py-4 rounded-full bg-[#0d0c22] hover:bg-neutral-800 text-white text-sm sm:text-base font-bold transition-all shadow-xs hover:shadow-md cursor-pointer flex items-center justify-center gap-2 active:scale-[0.99]"
               >
-                <span>Jelajahi Creator</span>
+                <span>Jelajah Creator</span>
                 <ArrowRight className="w-4 h-4" />
               </button>
 
               <button
                 type="button"
-                onClick={() => onNavigate('projects')}
+                onClick={() => navigateTo('projects', '/explore/projects')}
                 className="w-full sm:w-auto px-7 sm:px-8 py-3.5 sm:py-4 rounded-full bg-white hover:bg-neutral-50 text-[#0d0c22] text-sm sm:text-base font-bold transition-all border border-neutral-300 hover:border-neutral-400 shadow-2xs cursor-pointer flex items-center justify-center gap-2 active:scale-[0.99]"
               >
                 <span>Tawarkan Keahlian</span>
@@ -619,8 +642,7 @@ export const HomePage: React.FC<HomePageProps> = ({
                             <div 
                               onClick={(e) => {
                                 e.stopPropagation();
-                                if (onViewCreatorProfile) onViewCreatorProfile(proj.creator);
-                                else onNavigate('projects');
+                                handleCreatorClick(proj.creator);
                               }}
                               className="flex items-center gap-2 group/author cursor-pointer min-w-0"
                             >
@@ -692,7 +714,7 @@ export const HomePage: React.FC<HomePageProps> = ({
                 <div className="mt-8 text-center">
                   <button
                     type="button"
-                    onClick={() => onNavigate('projects')}
+                    onClick={() => navigateTo('projects', '/explore/projects')}
                     className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-[#0d0c22] hover:bg-neutral-800 text-white text-xs font-bold transition shadow-sm cursor-pointer"
                   >
                     <span>Jelajah Semua Karya di Feed Proyek</span>
@@ -772,10 +794,7 @@ export const HomePage: React.FC<HomePageProps> = ({
                       <div
                         key={creator.id}
                         id={`creator-card-${creator.id}`}
-                        onClick={() => {
-                          if (onViewCreatorProfile) onViewCreatorProfile(creator);
-                          else onNavigate('landing');
-                        }}
+                        onClick={() => handleCreatorClick(creator)}
                         className="group bg-white rounded-[24px] border border-[rgba(229,229,229,0.8)] p-6 sm:p-8 transition-all shadow-[0_1px_1px_rgba(0,0,0,0.05)] hover:border-neutral-300 hover:shadow-[0_8px_24px_rgba(0,0,0,0.06)] cursor-pointer text-left"
                       >
                         {/* BARIS 1: Header Profil Kreator, Badges, Rating & Tombol Hubungi */}
@@ -971,7 +990,7 @@ export const HomePage: React.FC<HomePageProps> = ({
                   <div className="mt-8 text-center">
                     <button
                       type="button"
-                      onClick={() => onNavigate('landing')}
+                      onClick={() => navigateTo('landing', '/landing')}
                       className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-[#0d0c22] hover:bg-neutral-800 text-white text-xs font-bold transition shadow-sm cursor-pointer"
                     >
                       <span>Jelajah Semua Creator Terverifikasi</span>
@@ -1003,7 +1022,7 @@ export const HomePage: React.FC<HomePageProps> = ({
                     <div
                       key={srv.id}
                       id={`service-shot-${srv.id}`}
-                      onClick={() => onNavigate('services')}
+                      onClick={() => navigateTo('services', '/explore/services')}
                       className="group flex flex-col text-left cursor-pointer select-none"
                     >
                       {/* Media Cover Image Card (Aspect 4:3 matching screenshot) */}
@@ -1084,7 +1103,7 @@ export const HomePage: React.FC<HomePageProps> = ({
                 <div className="mt-8 text-center">
                   <button
                     type="button"
-                    onClick={() => onNavigate('services')}
+                    onClick={() => navigateTo('services', '/explore/services')}
                     className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-[#0d0c22] hover:bg-neutral-800 text-white text-xs font-bold transition shadow-sm cursor-pointer"
                   >
                     <span>Eksplorasi Katalog Layanan Lengkap</span>
@@ -1136,11 +1155,6 @@ export const HomePage: React.FC<HomePageProps> = ({
 
       </main>
 
-      {/* ========================================================================= */}
-      {/* FOOTER MODERN ROUNDED CONTAINER SESUAI REFERENSI GAMBAR */}
-      {/* ========================================================================= */}
-      <Footer onNavigate={onNavigate} onOpenBrief={() => setIsBriefModalOpen(true)} />
-
       {/* Project Brief Modal */}
       <ProjectBriefModal
         isOpen={isBriefModalOpen}
@@ -1158,7 +1172,7 @@ export const HomePage: React.FC<HomePageProps> = ({
           onClose={() => setSelectedProject(null)}
           onSelectProject={(newProj) => setSelectedProject(newProj)}
           onViewCreatorProfile={(c) => {
-            if (onViewCreatorProfile) onViewCreatorProfile(c);
+            handleCreatorClick(c);
             setSelectedProject(null);
           }}
           onGetInTouch={(c) => {
@@ -1171,7 +1185,7 @@ export const HomePage: React.FC<HomePageProps> = ({
             setTargetCreatorForBrief(c);
             setIsBriefModalOpen(true);
           }}
-          onNavigate={onNavigate}
+          onNavigate={navigateTo}
           allProjects={MOCK_FEED_PROJECTS}
         />
       )}

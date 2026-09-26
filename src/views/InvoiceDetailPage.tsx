@@ -1,3 +1,5 @@
+'use client';
+
 import React, { useState, useEffect } from 'react';
 import {
   ArrowLeft,
@@ -26,14 +28,14 @@ import {
   User,
   FileText
 } from 'lucide-react';
-import { Navbar } from './Navbar';
-import { Footer } from './Footer';
-import { ActivePage, AuthState } from '../types';
+import { useRouter } from 'next/navigation';
+import { useAuth } from '@/providers/AuthProvider';
+import { ActivePage, AuthState } from '@/types';
 
 export interface InvoiceDetailProps {
   currentUser?: AuthState['user'];
   onSignOut?: () => void;
-  onNavigate: (page: ActivePage) => void;
+  onNavigate?: (page: ActivePage) => void;
   invoiceData?: {
     id: string;
     serviceTitle: string;
@@ -55,13 +57,40 @@ export interface InvoiceDetailProps {
 type PaymentMethodType = 'qris' | 'va' | 'ewallet' | 'retail' | 'card';
 
 export const InvoiceDetailPage: React.FC<InvoiceDetailProps> = ({
-  currentUser,
+  currentUser: propUser,
   onSignOut,
   onNavigate,
   invoiceData,
   onPaymentSuccess,
   onClose
 }) => {
+  const router = useRouter();
+  const { user: authUser } = useAuth();
+  const currentUser = propUser !== undefined ? propUser : authUser;
+
+  const navigateTo = (page: ActivePage, path?: string) => {
+    if (onNavigate) {
+      onNavigate(page);
+    } else if (path) {
+      router.push(path);
+    } else {
+      const routeMap: Record<string, string> = {
+        'home': '/',
+        'landing': '/landing',
+        'explore': '/explore',
+        'explore-projects': '/explore/projects',
+        'explore-services': '/explore/services',
+        'chat': '/chat',
+        'collaboration': '/collaboration',
+        'collaboration-room': '/collaboration',
+        'notifications': '/notifications',
+        'briefs': '/briefs',
+        'signin': '/sign-in',
+        'signup': '/sign-up',
+      };
+      router.push(routeMap[page] || '/chat');
+    }
+  };
   // Default fallback data if opened independently or from chat
   const invoice = {
     id: invoiceData?.id || 'INV-882194',
@@ -292,13 +321,7 @@ export const InvoiceDetailPage: React.FC<InvoiceDetailProps> = ({
         </div>
       )}
 
-      {/* Top Navbar */}
-      <Navbar
-        currentUser={currentUser}
-        onSignOut={onSignOut}
-        onNavigate={onNavigate}
-        activePage="chat"
-      />
+      {/* Top Navbar rendered by (main) layout */}
 
       {/* Main Container */}
       <main className="max-w-[1116px] mx-auto px-6 lg:px-8 py-6 sm:py-10 space-y-6">
@@ -309,7 +332,7 @@ export const InvoiceDetailPage: React.FC<InvoiceDetailProps> = ({
             <button
               onClick={() => {
                 if (onClose) onClose();
-                else onNavigate('chat');
+                else navigateTo('chat', '/chat');
               }}
               className="w-10 h-10 rounded-full bg-white hover:bg-neutral-100 border border-neutral-200/80 text-neutral-600 hover:text-black transition-all flex items-center justify-center cursor-pointer shadow-2xs hover:scale-105 active:scale-95"
               title="Kembali ke Percakapan Chat"
@@ -408,7 +431,7 @@ export const InvoiceDetailPage: React.FC<InvoiceDetailProps> = ({
             </div>
 
             <button
-              onClick={() => onNavigate('collaboration-room')}
+              onClick={() => navigateTo('collaboration-room', '/collaboration')}
               className="px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs sm:text-sm font-bold transition shadow-sm cursor-pointer shrink-0 flex items-center gap-2 hover:scale-[1.02] active:scale-[0.98]"
             >
               <span>Buka Collaboration Room</span>
@@ -1197,7 +1220,7 @@ export const InvoiceDetailPage: React.FC<InvoiceDetailProps> = ({
                     type="button"
                     onClick={() => {
                       if (onClose) onClose();
-                      onNavigate('collaboration-room');
+                      navigateTo('collaboration-room', '/collaboration');
                     }}
                     className="w-full py-3.5 px-4 rounded-2xl bg-[#0d0c22] hover:bg-neutral-900 text-white text-sm font-bold transition shadow-sm cursor-pointer flex items-center justify-center gap-2"
                   >
@@ -1209,7 +1232,7 @@ export const InvoiceDetailPage: React.FC<InvoiceDetailProps> = ({
                     type="button"
                     onClick={() => {
                       if (onClose) onClose();
-                      onNavigate('chat');
+                      navigateTo('chat', '/chat');
                     }}
                     className="w-full py-2.5 px-4 rounded-xl border border-neutral-200/80 hover:bg-neutral-50 text-neutral-700 text-xs font-semibold transition cursor-pointer"
                   >
@@ -1244,8 +1267,7 @@ export const InvoiceDetailPage: React.FC<InvoiceDetailProps> = ({
 
       </main>
 
-      {/* Footer */}
-      <Footer onNavigate={onNavigate} />
+      {/* Footer rendered by (main) layout */}
     </div>
   );
 };

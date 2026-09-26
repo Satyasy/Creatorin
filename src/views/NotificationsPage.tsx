@@ -1,3 +1,5 @@
+'use client';
+
 import React, { useState } from 'react';
 import { 
   CheckCheck, 
@@ -13,13 +15,14 @@ import {
   Check,
   Filter
 } from 'lucide-react';
-import { Navbar } from './Navbar';
-import { ActivePage, AuthState, AppNotification, Creator } from '../types';
+import { useRouter } from 'next/navigation';
+import { useAuth } from '@/providers/AuthProvider';
+import { ActivePage, AuthState, AppNotification, Creator } from '@/types';
 
 interface NotificationsPageProps {
   currentUser?: AuthState['user'];
   onSignOut?: () => void;
-  onNavigate: (page: ActivePage) => void;
+  onNavigate?: (page: ActivePage) => void;
   onViewCreatorProfile?: (creator: Creator) => void;
 }
 
@@ -158,10 +161,39 @@ const INITIAL_NOTIFICATIONS: AppNotification[] = [
 ];
 
 export const NotificationsPage: React.FC<NotificationsPageProps> = ({
-  currentUser,
+  currentUser: propUser,
   onSignOut,
   onNavigate
 }) => {
+  const router = useRouter();
+  const { user: authUser } = useAuth();
+  const currentUser = propUser !== undefined ? propUser : authUser;
+
+  const navigateTo = (page: ActivePage, path?: string) => {
+    if (onNavigate) {
+      onNavigate(page);
+    } else if (path) {
+      router.push(path);
+    } else {
+      const routeMap: Record<string, string> = {
+        'home': '/',
+        'landing': '/landing',
+        'explore': '/explore',
+        'explore-projects': '/explore/projects',
+        'explore-services': '/explore/services',
+        'chat': '/chat',
+        'collaboration': '/collaboration',
+        'collaboration-room': '/collaboration',
+        'notifications': '/notifications',
+        'briefs': '/briefs',
+        'signin': '/sign-in',
+        'signup': '/sign-up',
+        'invoice': '/invoice/INV-882194',
+      };
+      router.push(routeMap[page] || '/explore');
+    }
+  };
+
   const [notifications, setNotifications] = useState<AppNotification[]>(INITIAL_NOTIFICATIONS);
   const [activeFilter, setActiveFilter] = useState<NotificationFilter>('all');
 
@@ -183,7 +215,7 @@ export const NotificationsPage: React.FC<NotificationsPageProps> = ({
   const handleItemClick = (item: AppNotification) => {
     markItemAsRead(item.id);
     if (item.targetPage) {
-      onNavigate(item.targetPage);
+      navigateTo(item.targetPage);
     }
   };
 
@@ -320,12 +352,7 @@ export const NotificationsPage: React.FC<NotificationsPageProps> = ({
 
   return (
     <div className="min-h-screen bg-white text-[#0d0c22] font-sans flex flex-col">
-      {/* Navbar Global */}
-      <Navbar
-        currentUser={currentUser}
-        onNavigate={onNavigate}
-        onSignOut={onSignOut}
-      />
+      {/* Navbar rendered by (main) layout */}
 
       {/* Kontainer Notifikasi Minimalis (Satu Halaman Fokus) */}
       <main className="flex-1 w-full max-w-2xl mx-auto px-6 py-6 sm:py-8">

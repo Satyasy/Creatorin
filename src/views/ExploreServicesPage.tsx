@@ -1,4 +1,8 @@
+'use client';
+
 import React, { useState, useMemo } from 'react';
+import { useRouter } from 'next/navigation';
+import { useAuth } from '@/providers/AuthProvider';
 import { 
   Search, 
   Clock, 
@@ -7,31 +11,29 @@ import {
   Sparkles, 
   ChevronRight, 
   CheckCircle2, 
-  ChevronDown,
-  Check,
-  ArrowUpDown,
-  ShoppingBag,
-  User,
-  X,
-  Send,
-  Zap,
-  SlidersHorizontal,
-  Bookmark
+  ChevronDown, 
+  Check, 
+  ArrowUpDown, 
+  ShoppingBag, 
+  User, 
+  X, 
+  Send, 
+  Zap, 
+  SlidersHorizontal, 
+  Bookmark 
 } from 'lucide-react';
-import { Navbar } from './Navbar';
-import { ProfileModal } from './ProfileModal';
-import { ProjectBriefModal } from './ProjectBriefModal';
-import { CareerScoreBadge } from './CareerScoreBadge';
-import { ServiceDetailModal } from './ServiceDetailModal';
-import { ServiceFilterModal, FilterState } from './ServiceFilterModal';
-import { Footer } from './Footer';
-import { MOCK_CREATORS } from '../data/mockCreators';
-import { ActivePage, AuthState, Creator, CreatorService } from '../types';
+import { ProfileModal } from '@/components/modals/ProfileModal';
+import { ProjectBriefModal } from '@/components/modals/ProjectBriefModal';
+import { CareerScoreBadge } from '@/components/common/CareerScoreBadge';
+import { ServiceDetailModal } from '@/components/modals/ServiceDetailModal';
+import { ServiceFilterModal, FilterState } from '@/components/modals/ServiceFilterModal';
+import { MOCK_CREATORS } from '@/data/mockCreators';
+import { ActivePage, AuthState, Creator, CreatorService } from '@/types';
 
 interface ExploreServicesPageProps {
   currentUser?: AuthState['user'];
   onSignOut?: () => void;
-  onNavigate: (page: ActivePage) => void;
+  onNavigate?: (page: ActivePage) => void;
   onViewCreatorProfile?: (creator: Creator) => void;
 }
 
@@ -52,11 +54,43 @@ const POPULAR_SERVICES_TAGS = [
 ];
 
 export const ExploreServicesPage: React.FC<ExploreServicesPageProps> = ({
-  currentUser,
+  currentUser: propUser,
   onSignOut,
   onNavigate,
   onViewCreatorProfile
 }) => {
+  const router = useRouter();
+  const { user: authUser } = useAuth();
+  const currentUser = propUser !== undefined ? propUser : authUser;
+
+  const navigateTo = (page: ActivePage, path?: string) => {
+    if (onNavigate) {
+      onNavigate(page);
+    } else if (path) {
+      router.push(path);
+    } else {
+      const routeMap: Record<string, string> = {
+        'home': '/',
+        'landing': '/landing',
+        'explore': '/explore',
+        'explore-projects': '/explore/projects',
+        'explore-services': '/explore/services',
+        'chat': '/chat',
+        'collaboration': '/collaboration',
+        'collaboration-room': '/collaboration',
+        'notifications': '/notifications',
+        'briefs': '/briefs',
+        'signin': '/sign-in',
+        'signup': '/sign-up',
+      };
+      router.push(routeMap[page] || '/explore');
+    }
+  };
+
+  const handleCreatorClick = (creator: Creator) => {
+    if (onViewCreatorProfile) onViewCreatorProfile(creator);
+    else router.push(`/creator/${creator.id}`);
+  };
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedTag, setSelectedTag] = useState<string | null>(null);
   const [selectedCategory, setSelectedCategory] = useState<string>('Semua');
@@ -270,25 +304,14 @@ export const ExploreServicesPage: React.FC<ExploreServicesPageProps> = ({
   };
 
   return (
-    <div className="min-h-screen bg-[#fafafa] flex flex-col font-sans selection:bg-[#0d0c22] selection:text-white text-[#0d0c22]">
-      
-      {/* Top Main Navigation */}
-      <Navbar
-        currentUser={currentUser}
-        onNavigate={onNavigate}
-        onSignOut={onSignOut}
-        onSearch={(q) => setSearchQuery(q)}
-        onOpenBriefModal={() => setIsBriefModalOpen(true)}
-        onSelectTag={(tag) => setSelectedTag(tag)}
-      />
-
+    <div className="w-full bg-[#fafafa] flex flex-col font-sans selection:bg-[#0d0c22] selection:text-white text-[#0d0c22]">
       {/* Main Content Area */}
       <main className="flex-1 max-w-[1440px] w-full mx-auto px-6 lg:px-8 py-4 sm:py-6">
         
         {/* Breadcrumbs Navigation */}
         <div className="flex items-center gap-2 text-xs font-medium text-neutral-400 mb-2.5">
           <button 
-            onClick={() => onNavigate('landing')}
+            onClick={() => navigateTo('landing', '/landing')}
             className="hover:text-neutral-900 transition cursor-pointer"
           >
             Jelajah
@@ -628,11 +651,7 @@ export const ExploreServicesPage: React.FC<ExploreServicesPageProps> = ({
                         <button
                           onClick={(e) => {
                             e.stopPropagation();
-                            if (onViewCreatorProfile) {
-                              onViewCreatorProfile(item.creator);
-                            } else {
-                              setSelectedCreatorForModal(item.creator);
-                            }
+                            handleCreatorClick(item.creator);
                           }}
                           className="flex items-center gap-1.5 text-neutral-500 hover:text-blue-600 transition group/cr cursor-pointer"
                           title={`Lihat profil ${item.creator.name}`}
@@ -723,9 +742,6 @@ export const ExploreServicesPage: React.FC<ExploreServicesPageProps> = ({
         </div>
 
       </main>
-
-      {/* Footer Modern Rounded Container */}
-      <Footer onNavigate={onNavigate} onOpenBrief={() => setIsBriefModalOpen(true)} />
 
       {/* Direct Service Order / Brief Modal */}
       {orderModalService && (
@@ -869,11 +885,9 @@ export const ExploreServicesPage: React.FC<ExploreServicesPageProps> = ({
           }}
           onViewCreatorProfile={(cr) => {
             setSelectedServiceForDetail(null);
-            if (onViewCreatorProfile) {
-              onViewCreatorProfile(cr);
-            }
+            handleCreatorClick(cr);
           }}
-          onNavigate={onNavigate}
+          onNavigate={navigateTo}
           onSelectOtherService={(newSrv) => {
             setSelectedServiceForDetail({
               ...newSrv,

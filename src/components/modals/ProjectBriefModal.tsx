@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { X, Send, Sparkles, CheckCircle2, ShieldCheck, DollarSign, Calendar, FileText } from 'lucide-react';
-import { Creator } from '../types';
+import { Creator } from '@/types';
 
 interface ProjectBriefModalProps {
   isOpen: boolean;

@@ -1,4 +1,7 @@
+'use client';
+
 import React, { useState, useRef, useEffect } from 'react';
+import { useRouter, usePathname } from 'next/navigation';
 import { 
   Search, 
   ChevronDown, 
@@ -13,11 +16,12 @@ import {
   Briefcase,
   Building2
 } from 'lucide-react';
-import { ActivePage, AuthState } from '../types';
+import { ActivePage, AuthState } from '@/types';
+import { useAuth } from '@/providers/AuthProvider';
 
 interface NavbarProps {
   currentUser?: AuthState['user'];
-  onNavigate: (page: ActivePage) => void;
+  onNavigate?: (page: ActivePage) => void;
   onSignOut?: () => void;
   onSearch?: (query: string) => void;
   onOpenBriefModal?: () => void;
@@ -27,7 +31,7 @@ interface NavbarProps {
 }
 
 export const Navbar: React.FC<NavbarProps> = ({ 
-  currentUser, 
+  currentUser: propUser, 
   onNavigate, 
   onSignOut,
   onSearch,
@@ -35,11 +39,34 @@ export const Navbar: React.FC<NavbarProps> = ({
   activePage,
   showSearch = false
 }) => {
+  const router = useRouter();
+  const pathname = usePathname();
+  const { user: authUser, signOut: authSignOut } = useAuth();
+  const currentUser = propUser !== undefined ? propUser : authUser;
+
+  const navigateTo = (page: ActivePage, path: string) => {
+    if (onNavigate) {
+      onNavigate(page);
+    }
+    router.push(path);
+  };
+
+  const handleSignOutAction = () => {
+    if (onSignOut) {
+      onSignOut();
+    } else {
+      authSignOut();
+      router.push('/');
+    }
+  };
+
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [navSearchInput, setNavSearchInput] = useState('');
   const [userDropdownOpen, setUserDropdownOpen] = useState(false);
   const [exploreDropdownOpen, setExploreDropdownOpen] = useState(false);
   const exploreDropdownRef = useRef<HTMLDivElement>(null);
+
+  const isSearchVisible = showSearch || pathname?.startsWith('/explore') || pathname?.startsWith('/briefs');
 
   // Close dropdown on outside click
   useEffect(() => {
@@ -75,12 +102,12 @@ export const Navbar: React.FC<NavbarProps> = ({
       <div className="max-w-[1440px] mx-auto px-6 lg:px-8 h-20 flex items-center justify-between gap-4">
         
         {/* Sisi Kiri: Logo Brand & Search Bar Dribbble Style */}
-        <div className={`flex items-center gap-6 xl:gap-8 ${showSearch ? 'flex-1 max-w-2xl' : 'shrink-0'}`}>
+        <div className={`flex items-center gap-6 xl:gap-8 ${isSearchVisible ? 'flex-1 max-w-2xl' : 'shrink-0'}`}>
           
           {/* Logo Creatorin */}
           <button
             id="nav-logo-btn"
-            onClick={() => onNavigate('home')}
+            onClick={() => navigateTo('home', '/')}
             className="inline-flex items-center gap-2 shrink-0 group text-left cursor-pointer focus:outline-hidden"
             aria-label="Creatorin"
           >
@@ -95,7 +122,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             </span>
           </button>
 
-          {showSearch && (
+          {isSearchVisible && (
             <form 
               onSubmit={handleSearchSubmit}
               className="hidden md:flex items-center w-full max-w-md bg-neutral-100 hover:bg-neutral-200/70 focus-within:bg-white focus-within:ring-2 focus-within:ring-[#0d0c22] rounded-full p-1.5 pl-5 transition-all border border-transparent focus-within:border-transparent"
@@ -130,8 +157,12 @@ export const Navbar: React.FC<NavbarProps> = ({
           {/* Nav Link Beranda */}
           <button
             id="nav-beranda-link"
-            onClick={() => onNavigate('home')}
-            className="hover:text-blue-600 transition-colors flex items-center gap-1.5 cursor-pointer text-neutral-700 hover:font-bold"
+            onClick={() => navigateTo('home', '/')}
+            className={`transition-colors flex items-center gap-1.5 cursor-pointer ${
+              activePage === 'home' || pathname === '/'
+                ? 'text-blue-600 font-bold'
+                : 'text-neutral-700 hover:text-blue-600'
+            }`}
           >
             <span>Beranda</span>
           </button>
@@ -143,8 +174,10 @@ export const Navbar: React.FC<NavbarProps> = ({
             onMouseLeave={() => setExploreDropdownOpen(false)}
           >
             <button
-              onClick={() => onNavigate('projects')}
-              className="hover:text-blue-600 transition-colors flex items-center gap-1.5 cursor-pointer font-bold text-[#0d0c22] group-hover/explore:text-blue-600"
+              onClick={() => navigateTo('projects', '/explore/projects')}
+              className={`hover:text-blue-600 transition-colors flex items-center gap-1.5 cursor-pointer font-bold ${
+                pathname?.startsWith('/explore') ? 'text-blue-600' : 'text-[#0d0c22]'
+              } group-hover/explore:text-blue-600`}
             >
               <span>Jelajah</span>
               <ChevronDown className="w-3.5 h-3.5 transition-transform duration-300 text-neutral-500 group-hover/explore:rotate-180 group-hover/explore:text-blue-600" />
@@ -166,7 +199,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                 <button
                   onClick={() => {
                     setExploreDropdownOpen(false);
-                    onNavigate('projects');
+                    navigateTo('projects', '/explore/projects');
                   }}
                   className="w-full px-3.5 py-2.5 rounded-xl text-left text-sm font-bold text-[#0d0c22] hover:bg-neutral-50 flex items-center gap-3 transition-colors cursor-pointer group/item"
                 >
@@ -180,7 +213,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                 <button
                   onClick={() => {
                     setExploreDropdownOpen(false);
-                    onNavigate('landing');
+                    navigateTo('landing', '/landing');
                   }}
                   className="w-full px-3.5 py-2.5 rounded-xl text-left text-sm font-bold text-[#0d0c22] hover:bg-neutral-50 flex items-center gap-3 transition-colors cursor-pointer group/item"
                 >
@@ -191,7 +224,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                 <button
                   onClick={() => {
                     setExploreDropdownOpen(false);
-                    onNavigate('umkm-profile');
+                    navigateTo('umkm-profile', '/umkm/umkm-1');
                   }}
                   className="w-full px-3.5 py-2.5 rounded-xl text-left text-sm font-bold text-[#0d0c22] hover:bg-neutral-50 flex items-center gap-3 transition-colors cursor-pointer group/item"
                 >
@@ -205,7 +238,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                 <button
                   onClick={() => {
                     setExploreDropdownOpen(false);
-                    onNavigate('services');
+                    navigateTo('services', '/explore/services');
                   }}
                   className="w-full px-3.5 py-2.5 rounded-xl text-left text-sm font-bold text-[#0d0c22] hover:bg-neutral-50 flex items-center gap-3 transition-colors cursor-pointer group/item"
                 >
@@ -224,7 +257,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                       if (onSelectTag) {
                         onSelectTag(item);
                       }
-                      onNavigate('projects');
+                      navigateTo('projects', '/explore/projects');
                     }}
                     className="w-full px-3.5 py-2 rounded-xl text-left text-[13px] font-semibold text-neutral-700 hover:text-[#0d0c22] hover:bg-neutral-50 flex items-center justify-between transition-colors cursor-pointer"
                   >
@@ -238,21 +271,22 @@ export const Navbar: React.FC<NavbarProps> = ({
 
           <button
             id="nav-collab-room-btn"
-            onClick={() => onNavigate('collaboration-room')}
-            className={`hover:text-blue-600 transition-colors flex items-center gap-1.5 cursor-pointer font-semibold ${
-              activePage === 'collaboration-room' ? 'text-blue-600 font-bold' : 'text-neutral-700'
+            onClick={() => navigateTo('collaboration-room', '/collaboration')}
+            className={`transition-colors flex items-center gap-1.5 cursor-pointer font-semibold relative py-1 ${
+              activePage === 'collaboration-room' || (pathname && pathname.startsWith('/collaboration'))
+                ? 'text-[#1D4ED8] font-bold after:content-[""] after:absolute after:-bottom-5 after:left-0 after:right-0 after:h-[2.5px] after:bg-[#1D4ED8] after:rounded-full'
+                : 'text-neutral-700 hover:text-[#1D4ED8]'
             }`}
           >
             <span>Collaboration Room</span>
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 inline-block"></span>
           </button>
 
           {/* Menu Brief Proyek (Nav Item di samping Collaboration Room) */}
           <button
             id="nav-start-brief-btn"
-            onClick={() => onNavigate('briefs')}
+            onClick={() => navigateTo('briefs', '/briefs')}
             className={`hover:text-blue-600 transition-colors cursor-pointer font-semibold ${
-              activePage === 'briefs' ? 'text-blue-600 font-bold' : 'text-neutral-700'
+              activePage === 'briefs' || (pathname && pathname.startsWith('/briefs')) ? 'text-blue-600 font-bold' : 'text-neutral-700'
             }`}
           >
             <span>Brief Proyek</span>
@@ -264,7 +298,7 @@ export const Navbar: React.FC<NavbarProps> = ({
           {/* Ikon Pesan */}
           <button
             id="nav-chat-btn"
-            onClick={() => onNavigate('chat')}
+            onClick={() => navigateTo('chat', '/chat')}
             className="w-10 h-10 rounded-full hover:bg-neutral-100 flex items-center justify-center text-neutral-600 hover:text-[#0d0c22] transition-colors relative cursor-pointer"
             aria-label="Messages"
             title="Buka Ruang Obrolan & Pesan"
@@ -276,7 +310,7 @@ export const Navbar: React.FC<NavbarProps> = ({
           {/* Ikon Notifikasi */}
           <button
             id="nav-notifications-btn"
-            onClick={() => onNavigate('notifications')}
+            onClick={() => navigateTo('notifications', '/notifications')}
             className="w-10 h-10 rounded-full hover:bg-neutral-100 flex items-center justify-center text-neutral-600 hover:text-[#0d0c22] transition-colors relative cursor-pointer"
             aria-label="Notifications"
             title="Buka Notifikasi"
@@ -290,7 +324,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             <div className="relative">
               <button
                 onClick={() => setUserDropdownOpen(!userDropdownOpen)}
-                className="flex items-center gap-2 p-1 rounded-full hover:bg-neutral-100 transition cursor-pointer"
+                className="flex items-center gap-1.5 p-1 rounded-full hover:bg-neutral-100 transition cursor-pointer"
               >
                 <div className="relative">
                   <img
@@ -298,8 +332,8 @@ export const Navbar: React.FC<NavbarProps> = ({
                     alt={currentUser.name}
                     className="w-9 h-9 rounded-full object-cover ring-2 ring-neutral-200"
                   />
-                  <span className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-emerald-500 rounded-full ring-2 ring-white"></span>
                 </div>
+                <ChevronDown className="w-3.5 h-3.5 text-neutral-500" />
               </button>
 
               {userDropdownOpen && (
@@ -314,7 +348,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                   <button
                     onClick={() => {
                       setUserDropdownOpen(false);
-                      onNavigate('chat');
+                      navigateTo('chat', '/chat');
                     }}
                     className="w-full px-4 py-2 text-left text-xs font-medium text-neutral-700 hover:bg-neutral-50 flex items-center gap-2 cursor-pointer"
                   >
@@ -324,7 +358,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                   <button
                     onClick={() => {
                       setUserDropdownOpen(false);
-                      onNavigate('notifications');
+                      navigateTo('notifications', '/notifications');
                     }}
                     className="w-full px-4 py-2 text-left text-xs font-medium text-neutral-700 hover:bg-neutral-50 flex items-center gap-2 cursor-pointer"
                   >
@@ -335,7 +369,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                     id="nav-user-umkm-profile-btn"
                     onClick={() => {
                       setUserDropdownOpen(false);
-                      onNavigate('umkm-profile');
+                      navigateTo('umkm-profile', '/umkm/umkm-1');
                     }}
                     className="w-full px-4 py-2 text-left text-xs font-medium text-neutral-700 hover:bg-neutral-50 flex items-center gap-2 cursor-pointer"
                   >
@@ -346,7 +380,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                     id="nav-user-creator-profile-btn"
                     onClick={() => {
                       setUserDropdownOpen(false);
-                      onNavigate('creator-profile');
+                      navigateTo('creator-profile', '/creator/cr-1');
                     }}
                     className="w-full px-4 py-2 text-left text-xs font-medium text-neutral-700 hover:bg-neutral-50 flex items-center gap-2 cursor-pointer"
                   >
@@ -356,7 +390,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                   <button
                     onClick={() => {
                       setUserDropdownOpen(false);
-                      if (onSignOut) onSignOut();
+                      handleSignOutAction();
                     }}
                     className="w-full px-4 py-2 text-left text-xs font-medium text-rose-600 hover:bg-rose-50 flex items-center gap-2 cursor-pointer"
                   >
@@ -370,14 +404,14 @@ export const Navbar: React.FC<NavbarProps> = ({
             <div className="flex items-center gap-2">
               <button
                 id="nav-signin-btn"
-                onClick={() => onNavigate('signin')}
+                onClick={() => navigateTo('signin', '/sign-in')}
                 className="px-3.5 py-2 text-xs sm:text-sm font-semibold text-[#0d0c22] hover:text-blue-600 transition-colors cursor-pointer"
               >
                 Masuk
               </button>
               <button
                 id="nav-signup-btn"
-                onClick={() => onNavigate('signup')}
+                onClick={() => navigateTo('signup', '/sign-up')}
                 className="px-4 py-2.5 text-xs sm:text-sm font-semibold text-white bg-[#0d0c22] hover:bg-[#2b2a45] rounded-full transition shadow-xs cursor-pointer"
               >
                 Daftar
@@ -400,7 +434,7 @@ export const Navbar: React.FC<NavbarProps> = ({
       {/* Mobile Drawer Menu */}
       {mobileMenuOpen && (
         <div className="lg:hidden border-t border-neutral-200 bg-white px-6 py-5 space-y-4 shadow-lg animate-in slide-in-from-top duration-200">
-          {showSearch && (
+          {isSearchVisible && (
             <form onSubmit={handleSearchSubmit} className="flex items-center bg-neutral-100 rounded-full p-2 pl-4">
               <input
                 type="text"
@@ -422,7 +456,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             <button
               onClick={() => {
                 setMobileMenuOpen(false);
-                onNavigate('home');
+                navigateTo('home', '/');
               }}
               className="py-2 text-left hover:text-blue-600 text-neutral-800 font-bold"
             >
@@ -445,7 +479,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                       onClick={() => {
                         setMobileMenuOpen(false);
                         setExploreDropdownOpen(false);
-                        onNavigate('landing');
+                        navigateTo('landing', '/landing');
                       }}
                       className="w-full text-left text-xs font-bold py-1.5 flex items-center gap-2 text-neutral-800"
                     >
@@ -456,7 +490,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                       onClick={() => {
                         setMobileMenuOpen(false);
                         setExploreDropdownOpen(false);
-                        onNavigate('umkm-profile');
+                        navigateTo('umkm-profile', '/umkm/umkm-1');
                       }}
                       className="w-full text-left text-xs font-bold py-1.5 flex items-center gap-2 text-neutral-800"
                     >
@@ -467,7 +501,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                       onClick={() => {
                         setMobileMenuOpen(false);
                         setExploreDropdownOpen(false);
-                        onNavigate('projects');
+                        navigateTo('projects', '/explore/projects');
                       }}
                       className="w-full text-left text-xs font-bold py-1.5 flex items-center gap-2 text-neutral-800"
                     >
@@ -478,7 +512,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                       onClick={() => {
                         setMobileMenuOpen(false);
                         setExploreDropdownOpen(false);
-                        onNavigate('services');
+                        navigateTo('services', '/explore/services');
                       }}
                       className="w-full text-left text-xs font-bold py-1.5 flex items-center gap-2 text-neutral-800"
                     >
@@ -494,7 +528,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                         setMobileMenuOpen(false);
                         setExploreDropdownOpen(false);
                         if (onSelectTag) onSelectTag(item);
-                        onNavigate('services');
+                        navigateTo('services', '/explore/services');
                       }}
                       className="w-full text-left text-xs text-neutral-600 hover:text-blue-600 py-1"
                     >
@@ -508,10 +542,10 @@ export const Navbar: React.FC<NavbarProps> = ({
             <button 
               onClick={() => { 
                 setMobileMenuOpen(false); 
-                onNavigate('collaboration-room'); 
+                navigateTo('collaboration-room', '/collaboration'); 
               }} 
               className={`py-2 text-left hover:text-blue-600 font-semibold flex items-center justify-between ${
-                activePage === 'collaboration-room' ? 'text-blue-600 font-bold' : 'text-neutral-700'
+                activePage === 'collaboration-room' || (pathname && pathname.startsWith('/collaboration')) ? 'text-blue-600 font-bold' : 'text-neutral-700'
               }`}
             >
               <span>Collaboration Room</span>
@@ -521,10 +555,10 @@ export const Navbar: React.FC<NavbarProps> = ({
             <button 
               onClick={() => { 
                 setMobileMenuOpen(false); 
-                onNavigate('briefs'); 
+                navigateTo('briefs', '/briefs'); 
               }} 
               className={`py-2 text-left hover:text-blue-600 font-semibold ${
-                activePage === 'briefs' ? 'text-blue-600' : 'text-neutral-700'
+                activePage === 'briefs' || (pathname && pathname.startsWith('/briefs')) ? 'text-blue-600' : 'text-neutral-700'
               }`}
             >
               <span>Brief Proyek</span>
@@ -533,7 +567,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             <button 
               onClick={() => { 
                 setMobileMenuOpen(false); 
-                onNavigate('chat');
+                navigateTo('chat', '/chat');
               }} 
               className="py-2 text-left hover:text-blue-600 text-neutral-700 font-semibold flex items-center justify-between"
             >
@@ -547,7 +581,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             <button 
               onClick={() => { 
                 setMobileMenuOpen(false); 
-                onNavigate('notifications');
+                navigateTo('notifications', '/notifications');
               }} 
               className="py-2 text-left hover:text-blue-600 text-neutral-700 font-semibold flex items-center justify-between"
             >
@@ -562,13 +596,13 @@ export const Navbar: React.FC<NavbarProps> = ({
           {!currentUser && (
             <div className="pt-4 border-t border-neutral-100 grid grid-cols-2 gap-2">
               <button
-                onClick={() => { setMobileMenuOpen(false); onNavigate('signin'); }}
+                onClick={() => { setMobileMenuOpen(false); navigateTo('signin', '/sign-in'); }}
                 className="py-2.5 border border-neutral-200 text-[#0d0c22] text-xs font-semibold rounded-full"
               >
                 Masuk
               </button>
               <button
-                onClick={() => { setMobileMenuOpen(false); onNavigate('signup'); }}
+                onClick={() => { setMobileMenuOpen(false); navigateTo('signup', '/sign-up'); }}
                 className="py-2.5 bg-[#0d0c22] text-white text-xs font-semibold rounded-full"
               >
                 Daftar

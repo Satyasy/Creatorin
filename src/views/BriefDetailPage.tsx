@@ -1,3 +1,5 @@
+'use client';
+
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import {
   ArrowLeft,
@@ -38,13 +40,13 @@ import {
   Phone,
   Instagram
 } from 'lucide-react';
-import { Navbar } from './Navbar';
-import { Footer } from './Footer';
-import { ProjectListing, AuthState, ActivePage, Creator } from '../types';
-import { MOCK_PROJECTS } from '../data/mockProjects';
-import { MOCK_CREATORS } from '../data/mockCreators';
-import { MOCK_BRIEF_APPLICANTS, BriefApplicant } from '../data/mockBriefApplicants';
-import { MOCK_PRIMARY_UMKM, MOCK_ALL_UMKM } from '../data/mockUmkm';
+import { useRouter } from 'next/navigation';
+import { useAuth } from '@/providers/AuthProvider';
+import { ProjectListing, AuthState, ActivePage, Creator } from '@/types';
+import { MOCK_PROJECTS } from '@/data/mockProjects';
+import { MOCK_CREATORS } from '@/data/mockCreators';
+import { MOCK_BRIEF_APPLICANTS, BriefApplicant } from '@/data/mockBriefApplicants';
+import { MOCK_PRIMARY_UMKM, MOCK_ALL_UMKM } from '@/data/mockUmkm';
 
 // Helper to format clean display budget
 const formatDisplayBudget = (formatted?: string, budgetMin?: number) => {
@@ -60,7 +62,7 @@ interface BriefDetailPageProps {
   brief: ProjectListing;
   currentUser?: AuthState['user'];
   onSignOut?: () => void;
-  onNavigate: (page: ActivePage) => void;
+  onNavigate?: (page: ActivePage) => void;
   onClose?: () => void;
   onViewCreatorProfile?: (creator: Creator) => void;
   onEditBrief?: (brief: ProjectListing) => void;
@@ -68,13 +70,41 @@ interface BriefDetailPageProps {
 
 export const BriefDetailPage: React.FC<BriefDetailPageProps> = ({
   brief: initialBrief,
-  currentUser,
+  currentUser: propUser,
   onSignOut,
   onNavigate,
   onClose,
   onViewCreatorProfile,
   onEditBrief
 }) => {
+  const router = useRouter();
+  const { user: authUser } = useAuth();
+  const currentUser = propUser !== undefined ? propUser : authUser;
+
+  const navigateTo = (page: ActivePage, path?: string) => {
+    if (onNavigate) {
+      onNavigate(page);
+    } else if (path) {
+      router.push(path);
+    } else {
+      const routeMap: Record<string, string> = {
+        'home': '/',
+        'landing': '/landing',
+        'explore': '/explore',
+        'explore-projects': '/explore/projects',
+        'explore-services': '/explore/services',
+        'chat': '/chat',
+        'collaboration': '/collaboration',
+        'notifications': '/notifications',
+        'briefs': '/briefs',
+        'signin': '/sign-in',
+        'signup': '/sign-up',
+        'umkm-profile': '/umkm/kopi-kenangan-senja',
+        'creator-profile': '/creator/sarah-azhari',
+      };
+      router.push(routeMap[page] || '/explore');
+    }
+  };
   const [currentBrief, setCurrentBrief] = useState<ProjectListing>(initialBrief);
   const [activeTab, setActiveTab] = useState<'rincian' | 'pelamar' | 'klien'>('rincian');
   const [isSaved, setIsSaved] = useState(false);
@@ -88,7 +118,7 @@ export const BriefDetailPage: React.FC<BriefDetailPageProps> = ({
     if (onClose) {
       onClose();
     } else {
-      onNavigate('briefs');
+      navigateTo('briefs', '/briefs');
     }
   };
 
@@ -352,7 +382,7 @@ export const BriefDetailPage: React.FC<BriefDetailPageProps> = ({
           </button>
 
           <button
-            onClick={() => onNavigate('chat')}
+            onClick={() => navigateTo('chat', '/chat')}
             className="w-10 h-10 rounded-full border border-neutral-200 bg-white hover:bg-neutral-50 text-neutral-600 hover:text-blue-600 flex items-center justify-center transition-colors cursor-pointer shadow-xs"
             title="Diskusikan via Chat"
           >
@@ -367,7 +397,7 @@ export const BriefDetailPage: React.FC<BriefDetailPageProps> = ({
             {/* Left: Avatar & Profile Details */}
             <div className="flex items-start sm:items-center gap-3.5 min-w-0">
               <div 
-                onClick={() => onNavigate('umkm-profile')}
+                onClick={() => navigateTo('umkm-profile', '/umkm/kopi-kenangan-senja')}
                 className="relative cursor-pointer group shrink-0"
               >
                 <div className="w-11 h-11 sm:w-12 sm:h-12 rounded-full p-0.5 bg-linear-to-tr from-blue-600 to-indigo-500 shadow-xs">
@@ -392,7 +422,7 @@ export const BriefDetailPage: React.FC<BriefDetailPageProps> = ({
                 {/* Row 1: Client Name & Category & Status */}
                 <div className="flex flex-wrap items-center gap-2">
                   <span 
-                    onClick={() => onNavigate('umkm-profile')}
+                    onClick={() => navigateTo('umkm-profile', '/umkm/kopi-kenangan-senja')}
                     className="font-bold text-sm sm:text-base text-[#0d0c22] hover:underline cursor-pointer truncate"
                   >
                     {currentBrief.clientName}
@@ -410,7 +440,7 @@ export const BriefDetailPage: React.FC<BriefDetailPageProps> = ({
                 <div className="flex flex-wrap items-center gap-2 text-xs text-neutral-500 font-medium">
                   <span 
                     className="flex items-center gap-1 hover:text-blue-600 transition cursor-pointer"
-                    onClick={() => onNavigate('umkm-profile')}
+                    onClick={() => navigateTo('umkm-profile', '/umkm/kopi-kenangan-senja')}
                   >
                     <Globe className="w-3.5 h-3.5 text-neutral-400" />
                     <span>{clientDomain}</span>
@@ -696,7 +726,7 @@ export const BriefDetailPage: React.FC<BriefDetailPageProps> = ({
                         onClick={() => {
                           const match = MOCK_CREATORS.find(c => c.name === applicant.creatorName) || MOCK_CREATORS[0];
                           if (onViewCreatorProfile) onViewCreatorProfile(match);
-                          else onNavigate('creator-profile');
+                          else router.push(`/creator/${match.id}`);
                         }}
                       >
                         <img
@@ -716,7 +746,7 @@ export const BriefDetailPage: React.FC<BriefDetailPageProps> = ({
                             onClick={() => {
                               const match = MOCK_CREATORS.find(c => c.name === applicant.creatorName) || MOCK_CREATORS[0];
                               if (onViewCreatorProfile) onViewCreatorProfile(match);
-                              else onNavigate('creator-profile');
+                              else router.push(`/creator/${match.id}`);
                             }}
                             className="text-lg sm:text-xl font-bold tracking-tight text-[#0d0c22] hover:text-blue-600 transition-colors cursor-pointer"
                           >
@@ -779,7 +809,7 @@ export const BriefDetailPage: React.FC<BriefDetailPageProps> = ({
                       onClick={() => {
                         const match = MOCK_CREATORS.find(c => c.name === applicant.creatorName) || MOCK_CREATORS[0];
                         if (onViewCreatorProfile) onViewCreatorProfile(match);
-                        else onNavigate('creator-profile');
+                        else router.push(`/creator/${match.id}`);
                       }}
                       className="text-xs font-semibold text-neutral-600 hover:text-[#0d0c22] transition flex items-center gap-1 cursor-pointer"
                     >
@@ -790,7 +820,7 @@ export const BriefDetailPage: React.FC<BriefDetailPageProps> = ({
                     <div className="flex items-center gap-2">
                       <button
                         type="button"
-                        onClick={() => onNavigate('chat')}
+                        onClick={() => navigateTo('chat', '/chat')}
                         aria-label={`Chat dengan ${applicant.creatorName}`}
                         title="Chat"
                         className="w-9 h-9 rounded-full border border-neutral-200/90 hover:border-neutral-300 bg-neutral-50 hover:bg-neutral-100 text-neutral-700 hover:text-[#0d0c22] transition flex items-center justify-center cursor-pointer active:scale-95"
@@ -998,7 +1028,7 @@ export const BriefDetailPage: React.FC<BriefDetailPageProps> = ({
               <div className="pt-2">
                 <button
                   type="button"
-                  onClick={() => onNavigate('umkm-profile')}
+                  onClick={() => navigateTo('umkm-profile', '/umkm/kopi-kenangan-senja')}
                   className="w-full py-2.5 px-4 rounded-xl border border-neutral-300 hover:border-neutral-400 bg-white hover:bg-neutral-50 text-[#0d0c22] text-xs font-semibold transition cursor-pointer flex items-center justify-center gap-2 shadow-2xs"
                 >
                   <span>Buka Halaman Profil Brand</span>
@@ -1022,7 +1052,7 @@ export const BriefDetailPage: React.FC<BriefDetailPageProps> = ({
           {/* Centered Avatar */}
           <div className="relative z-10 inline-block -mt-6">
             <div 
-              onClick={() => onNavigate('umkm-profile')}
+              onClick={() => navigateTo('umkm-profile', '/umkm/kopi-kenangan-senja')}
               className="w-16 h-16 rounded-full p-1 bg-white ring-4 ring-neutral-100 cursor-pointer group mx-auto"
             >
               {currentBrief.clientAvatar ? (
@@ -1042,7 +1072,7 @@ export const BriefDetailPage: React.FC<BriefDetailPageProps> = ({
           {/* Client Details */}
           <div className="mt-4 space-y-2 max-w-xl mx-auto text-center">
             <h2 
-              onClick={() => onNavigate('umkm-profile')}
+              onClick={() => navigateTo('umkm-profile', '/umkm/kopi-kenangan-senja')}
               className="text-lg sm:text-xl font-black text-[#0d0c22] tracking-wider uppercase cursor-pointer hover:underline"
             >
               {currentBrief.clientName}
@@ -1061,13 +1091,13 @@ export const BriefDetailPage: React.FC<BriefDetailPageProps> = ({
 
             <div className="flex items-center justify-center gap-3 pt-3">
               <button
-                onClick={() => onNavigate('chat')}
+                onClick={() => navigateTo('chat', '/chat')}
                 className="px-6 py-2.5 rounded-full bg-[#0d0c22] hover:bg-neutral-800 text-white text-xs font-bold transition cursor-pointer"
               >
                 Kirim Pesan
               </button>
               <button
-                onClick={() => onNavigate('umkm-profile')}
+                onClick={() => navigateTo('umkm-profile', '/umkm/kopi-kenangan-senja')}
                 className="px-6 py-2.5 rounded-full bg-white hover:bg-neutral-50 text-[#0d0c22] border border-neutral-300 text-xs font-bold transition cursor-pointer"
               >
                 Lihat Profil UMKM
@@ -1091,7 +1121,7 @@ export const BriefDetailPage: React.FC<BriefDetailPageProps> = ({
               Brief Proyek Lainnya yang Sedang Aktif
             </h3>
             <button
-              onClick={() => onNavigate('briefs')}
+              onClick={() => navigateTo('briefs', '/briefs')}
               className="text-xs font-semibold text-neutral-500 hover:text-[#0d0c22] transition cursor-pointer"
             >
               Lihat Semua Brief →
@@ -1196,8 +1226,7 @@ export const BriefDetailPage: React.FC<BriefDetailPageProps> = ({
 
       </main>
 
-      {/* Footer inside scrollable container */}
-      <Footer onNavigate={onNavigate} />
+      {/* Footer rendered by (main) layout */}
     </div>
 
       {/* =============================================================== */}

@@ -1,5 +1,9 @@
+'use client';
+
 import React, { useState } from 'react';
-import { AuthState, ActivePage } from '../types';
+import { useRouter } from 'next/navigation';
+import { useAuth } from '@/providers/AuthProvider';
+import { AuthState, ActivePage } from '@/types';
 import { 
   ShieldCheck, 
   AlertCircle, 
@@ -10,11 +14,13 @@ import {
 } from 'lucide-react';
 
 interface SignInPageProps {
-  onNavigate: (page: ActivePage) => void;
-  onLoginSuccess: (user: NonNullable<AuthState['user']>) => void;
+  onNavigate?: (page: ActivePage) => void;
+  onLoginSuccess?: (user: NonNullable<AuthState['user']>) => void;
 }
 
 export const SignInPage: React.FC<SignInPageProps> = ({ onNavigate, onLoginSuccess }) => {
+  const router = useRouter();
+  const { login } = useAuth();
   const [emailOrUsername, setEmailOrUsername] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -40,8 +46,10 @@ export const SignInPage: React.FC<SignInPageProps> = ({ onNavigate, onLoginSucce
         : 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=240&auto=format&fit=crop&q=80'
     };
 
-    onLoginSuccess(mockUser);
-    onNavigate('explore');
+    login(mockUser);
+    if (onLoginSuccess) onLoginSuccess(mockUser);
+    if (onNavigate) onNavigate('explore');
+    else router.push('/explore');
   };
 
   const handleGoogleQuickAuth = () => {
@@ -51,8 +59,10 @@ export const SignInPage: React.FC<SignInPageProps> = ({ onNavigate, onLoginSucce
       role: 'umkm',
       avatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=240&auto=format&fit=crop&q=80'
     };
-    onLoginSuccess(mockUser);
-    onNavigate('explore');
+    login(mockUser);
+    if (onLoginSuccess) onLoginSuccess(mockUser);
+    if (onNavigate) onNavigate('explore');
+    else router.push('/explore');
   };
 
   return (
@@ -236,7 +246,10 @@ export const SignInPage: React.FC<SignInPageProps> = ({ onNavigate, onLoginSucce
             <p className="text-xs text-neutral-500">
               Belum punya akun?{' '}
               <button
-                onClick={() => onNavigate('signup')}
+                onClick={() => {
+                  if (onNavigate) onNavigate('signup');
+                  else router.push('/sign-up');
+                }}
                 className="text-[#0d0c22] font-semibold hover:underline cursor-pointer ml-0.5"
               >
                 Daftar

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { Creator, PortfolioItem } from '../types';
-import { CareerScoreBadge } from './CareerScoreBadge';
+import { Creator, PortfolioItem } from '@/types';
+import { CareerScoreBadge } from '@/components/common/CareerScoreBadge';
 import { 
   X, 
   ShieldCheck, 

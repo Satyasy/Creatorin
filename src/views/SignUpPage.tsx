@@ -1,5 +1,9 @@
+'use client';
+
 import React, { useState } from 'react';
-import { UserRole, AuthState, ActivePage } from '../types';
+import { useRouter } from 'next/navigation';
+import { useAuth } from '@/providers/AuthProvider';
+import { UserRole, AuthState, ActivePage } from '@/types';
 import { 
   Building2, 
   Sparkles, 
@@ -9,11 +13,13 @@ import {
 } from 'lucide-react';
 
 interface SignUpPageProps {
-  onNavigate: (page: ActivePage) => void;
-  onLoginSuccess: (user: NonNullable<AuthState['user']>) => void;
+  onNavigate?: (page: ActivePage) => void;
+  onLoginSuccess?: (user: NonNullable<AuthState['user']>) => void;
 }
 
 export const SignUpPage: React.FC<SignUpPageProps> = ({ onNavigate, onLoginSuccess }) => {
+  const router = useRouter();
+  const { login } = useAuth();
   const [selectedRole, setSelectedRole] = useState<UserRole>('umkm');
   
   // Form fields
@@ -42,8 +48,10 @@ export const SignUpPage: React.FC<SignUpPageProps> = ({ onNavigate, onLoginSucce
         : 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=240&auto=format&fit=crop&q=80',
     };
 
-    onLoginSuccess(newUser);
-    onNavigate('explore');
+    login(newUser);
+    if (onLoginSuccess) onLoginSuccess(newUser);
+    if (onNavigate) onNavigate('explore');
+    else router.push('/explore');
   };
 
   const handleGoogleQuickAuth = () => {
@@ -55,8 +63,10 @@ export const SignUpPage: React.FC<SignUpPageProps> = ({ onNavigate, onLoginSucce
         ? 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=240&auto=format&fit=crop&q=80'
         : 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=240&auto=format&fit=crop&q=80',
     };
-    onLoginSuccess(mockUser);
-    onNavigate('explore');
+    login(mockUser);
+    if (onLoginSuccess) onLoginSuccess(mockUser);
+    if (onNavigate) onNavigate('explore');
+    else router.push('/explore');
   };
 
   return (
@@ -242,7 +252,10 @@ export const SignUpPage: React.FC<SignUpPageProps> = ({ onNavigate, onLoginSucce
             <p className="text-xs text-neutral-500">
               Sudah punya akun?{' '}
               <button
-                onClick={() => onNavigate('signin')}
+                onClick={() => {
+                  if (onNavigate) onNavigate('signin');
+                  else router.push('/sign-in');
+                }}
                 className="text-[#0d0c22] font-semibold hover:underline cursor-pointer ml-0.5"
               >
                 Masuk

@@ -1,10 +1,12 @@
+'use client';
+
 import React, { useState, useMemo } from 'react';
-import { Navbar } from './Navbar';
-import { MOCK_CREATORS } from '../data/mockCreators';
-import { Creator, CreatorCategory, AuthState, ActivePage } from '../types';
-import { ProfileModal } from './ProfileModal';
-import { ProjectBriefModal } from './ProjectBriefModal';
-import { Footer } from './Footer';
+import { useRouter } from 'next/navigation';
+import { useAuth } from '@/providers/AuthProvider';
+import { MOCK_CREATORS } from '@/data/mockCreators';
+import { Creator, CreatorCategory, AuthState, ActivePage } from '@/types';
+import { ProfileModal } from '@/components/modals/ProfileModal';
+import { ProjectBriefModal } from '@/components/modals/ProjectBriefModal';
 import { 
   ShieldCheck, 
   Star, 
@@ -30,7 +32,7 @@ import {
 interface LandingPageProps {
   currentUser?: AuthState['user'];
   onSignOut?: () => void;
-  onNavigate: (page: ActivePage) => void;
+  onNavigate?: (page: ActivePage) => void;
   onViewCreatorProfile?: (creator: Creator) => void;
 }
 
@@ -46,7 +48,20 @@ const POPULAR_TAGS = [
   '#BannerPromo'
 ];
 
-export const LandingPage: React.FC<LandingPageProps> = ({ currentUser, onSignOut, onNavigate, onViewCreatorProfile }) => {
+export const LandingPage: React.FC<LandingPageProps> = ({ currentUser: propUser, onSignOut, onNavigate, onViewCreatorProfile }) => {
+  const router = useRouter();
+  const { user: authUser } = useAuth();
+  const currentUser = propUser !== undefined ? propUser : authUser;
+
+  const navigateTo = (page: ActivePage, path: string) => {
+    if (onNavigate) onNavigate(page);
+    else router.push(path);
+  };
+
+  const handleCreatorClick = (creator: Creator) => {
+    if (onViewCreatorProfile) onViewCreatorProfile(creator);
+    else router.push(`/creator/${creator.id}`);
+  };
   // Filter States
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedTag, setSelectedTag] = useState<string | null>(null);
@@ -170,25 +185,14 @@ export const LandingPage: React.FC<LandingPageProps> = ({ currentUser, onSignOut
   }, [searchQuery, selectedTag, selectedCategory, selectedBudget, selectedLocation, selectedScore]);
 
   return (
-    <div className="min-h-screen bg-[#fafafa] flex flex-col font-sans selection:bg-[#0d0c22] selection:text-white text-[#0d0c22]">
-      
-      {/* Top Navbar Dribbble Style */}
-      <Navbar
-        currentUser={currentUser}
-        onNavigate={onNavigate}
-        onSignOut={onSignOut}
-        onSearch={(q) => setSearchQuery(q)}
-        onOpenBriefModal={() => handleOpenBrief()}
-        onSelectTag={(tag) => setSelectedTag(tag)}
-      />
-
+    <div className="w-full bg-[#fafafa] flex flex-col font-sans selection:bg-[#0d0c22] selection:text-white text-[#0d0c22]">
       {/* Main Content Area */}
       <main className="flex-1 max-w-[1440px] w-full mx-auto px-6 lg:px-8 py-4 sm:py-6">
         
         {/* Breadcrumbs Navigation */}
         <div className="flex items-center gap-2 text-xs font-medium text-neutral-400 mb-2.5">
           <button 
-            onClick={() => onNavigate('landing')}
+            onClick={() => navigateTo('landing', '/landing')}
             className="hover:text-neutral-900 transition cursor-pointer"
           >
             Jelajah
@@ -464,11 +468,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ currentUser, onSignOut
                   key={creator.id}
                   id={`creator-card-${creator.id}`}
                   onClick={() => {
-                    if (onViewCreatorProfile) {
-                      onViewCreatorProfile(creator);
-                    } else {
-                      setSelectedCreatorForModal(creator);
-                    }
+                    handleCreatorClick(creator);
                   }}
                   className="group bg-white rounded-2xl sm:rounded-3xl border border-neutral-200/80 hover:border-neutral-300 p-6 sm:p-8 transition-all shadow-xs hover:shadow-md cursor-pointer text-left"
                 >
@@ -718,9 +718,6 @@ export const LandingPage: React.FC<LandingPageProps> = ({ currentUser, onSignOut
         </div>
 
       </main>
-
-      {/* Modern Rounded Footer Sesuai Referensi Gambar */}
-      <Footer onNavigate={onNavigate} onOpenBrief={() => setIsBriefModalOpen(true)} />
 
       {/* Modal Profile Detail Kreator */}
       <ProfileModal

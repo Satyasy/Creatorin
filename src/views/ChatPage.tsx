@@ -1,4 +1,8 @@
+'use client';
+
 import React, { useState, useRef, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import { useAuth } from '@/providers/AuthProvider';
 import { 
   Search, 
   ArrowLeft, 
@@ -15,15 +19,14 @@ import {
   MessageSquare,
   QrCode
 } from 'lucide-react';
-import { Navbar } from './Navbar';
 import { InvoiceDetailPage } from './InvoiceDetailPage';
-import { ActivePage, AuthState, ChatConversation, ChatInvoice, ChatMessage, Creator, CreatorService } from '../types';
-import { MOCK_CREATORS } from '../data/mockCreators';
+import { ActivePage, AuthState, ChatConversation, ChatInvoice, ChatMessage, Creator, CreatorService } from '@/types';
+import { MOCK_CREATORS } from '@/data/mockCreators';
 
 interface ChatPageProps {
   currentUser?: AuthState['user'];
   onSignOut?: () => void;
-  onNavigate: (page: ActivePage) => void;
+  onNavigate?: (page: ActivePage) => void;
   onViewCreatorProfile?: (creator: Creator) => void;
 }
 
@@ -263,11 +266,24 @@ const INITIAL_CONVERSATIONS: ChatConversation[] = [
 ];
 
 export const ChatPage: React.FC<ChatPageProps> = ({
-  currentUser,
+  currentUser: propUser,
   onSignOut,
   onNavigate,
   onViewCreatorProfile
 }) => {
+  const router = useRouter();
+  const { user: authUser } = useAuth();
+  const currentUser = propUser !== undefined ? propUser : authUser;
+
+  const navigateTo = (page: ActivePage, path: string) => {
+    if (onNavigate) onNavigate(page);
+    else router.push(path);
+  };
+
+  const handleCreatorClick = (creator: Creator) => {
+    if (onViewCreatorProfile) onViewCreatorProfile(creator);
+    else router.push(`/creator/${creator.id}`);
+  };
   const [conversations, setConversations] = useState<ChatConversation[]>(INITIAL_CONVERSATIONS);
   const [activeChatId, setActiveChatId] = useState<string | null>(null);
   const [inputText, setInputText] = useState('');
@@ -514,14 +530,7 @@ export const ChatPage: React.FC<ChatPageProps> = ({
   const totalUnreadCount = conversations.reduce((acc, c) => acc + c.unreadCount, 0);
 
   return (
-    <div className="h-screen flex flex-col bg-white text-[#0d0c22] font-sans overflow-hidden">
-      {/* Navbar Global */}
-      <Navbar
-        currentUser={currentUser}
-        onNavigate={onNavigate}
-        onSignOut={onSignOut}
-      />
-
+    <div className="flex-1 w-full flex flex-col min-h-0 bg-white text-[#0d0c22] font-sans overflow-hidden h-[calc(100vh-80px)]">
       {/* Kontainer 3 Kolom Terstruktur */}
       <div className="flex-1 min-h-0 w-full flex overflow-hidden">
         
@@ -684,9 +693,7 @@ export const ChatPage: React.FC<ChatPageProps> = ({
 
               <div 
                 onClick={() => {
-                  if (onViewCreatorProfile) {
-                    onViewCreatorProfile(activeCreator);
-                  }
+                  handleCreatorClick(activeCreator);
                 }}
                 className="flex items-center gap-3 cursor-pointer group min-w-0"
               >
@@ -729,9 +736,7 @@ export const ChatPage: React.FC<ChatPageProps> = ({
 
               <button
                 onClick={() => {
-                  if (onViewCreatorProfile) {
-                    onViewCreatorProfile(activeCreator);
-                  }
+                  handleCreatorClick(activeCreator);
                 }}
                 className="text-xs font-medium text-neutral-700 hover:text-blue-600 px-3 py-1.5 rounded-md hover:bg-neutral-100 border border-neutral-200 transition-colors cursor-pointer"
               >
@@ -906,7 +911,7 @@ export const ChatPage: React.FC<ChatPageProps> = ({
                                 <span>Rincian Tagihan</span>
                               </button>
                               <button
-                                onClick={() => onNavigate('collaboration-room')}
+                                onClick={() => navigateTo('collaboration-room', '/collaboration')}
                                 className="w-full py-2 px-2.5 rounded-lg text-xs font-semibold text-white bg-[#0d0c22] hover:bg-neutral-900 transition-colors cursor-pointer flex items-center justify-center gap-1.5 shadow-2xs"
                               >
                                 <span>Masuk Room</span>
@@ -1211,7 +1216,7 @@ export const ChatPage: React.FC<ChatPageProps> = ({
               <button
                 onClick={() => {
                   setCollaborationNotice(null);
-                  onNavigate('collaboration-room');
+                  navigateTo('collaboration-room', '/collaboration');
                 }}
                 className="flex-1 py-2 text-xs font-semibold text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors cursor-pointer"
               >
@@ -1232,7 +1237,7 @@ export const ChatPage: React.FC<ChatPageProps> = ({
             onSignOut={onSignOut}
             onNavigate={(page) => {
               setActiveInvoiceDetail(null);
-              onNavigate(page);
+              navigateTo(page, page === 'collaboration-room' ? '/collaboration' : `/${page}`);
             }}
             invoiceData={{
               id: activeInvoiceDetail.invoice.id,

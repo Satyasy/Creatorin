@@ -269,6 +269,7 @@ export interface CollaborationItem {
   
   // Published Portfolio Link when completed
   publishedPortfolioId?: string;
+  thumbnail?: string;
 }
 
 export interface UMKMCompletedCollab {
