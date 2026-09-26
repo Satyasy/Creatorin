@@ -532,7 +532,7 @@ export const ExplorePage: React.FC<ExplorePageProps> = ({ currentUser, onSignOut
                       <img
                         src={creator.avatar}
                         alt={creator.name}
-                        className="w-14 h-14 rounded-full object-cover border-2 border-indigo-100 ring-2 ring-indigo-500/10 shrink-0 group-hover:scale-105 transition-transform"
+                        className="w-14 h-14 rounded-full object-cover border-2 border-indigo-100 ring-2 ring-indigo-500/10 shrink-0 "
                       />
                       <div className="min-w-0 flex-1">
                         <div className="flex items-center justify-between gap-1">

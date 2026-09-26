@@ -183,7 +183,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ currentUser, onSignOut
       />
 
       {/* Main Content Area */}
-      <main className="flex-1 max-w-[1600px] w-full mx-auto px-6 lg:px-8 py-4 sm:py-6">
+      <main className="flex-1 max-w-[1440px] w-full mx-auto px-6 lg:px-8 py-4 sm:py-6">
         
         {/* Breadcrumbs Navigation */}
         <div className="flex items-center gap-2 text-xs font-medium text-neutral-400 mb-2.5">
@@ -651,10 +651,9 @@ export const LandingPage: React.FC<LandingPageProps> = ({ currentUser, onSignOut
                                   <img
                                     src={imageSrc}
                                     alt={service.title}
-                                    className="w-full h-full object-cover group-hover/srv:scale-[1.04] transition-transform duration-500 ease-out"
+                                    className="w-full h-full object-cover "
                                     loading="lazy"
                                   />
-                                  <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent opacity-0 group-hover/srv:opacity-100 transition-opacity duration-300" />
                                   
                                   {service.tag && (
                                     <div className="absolute top-2.5 left-2.5 bg-black/60 backdrop-blur-md text-white text-[10px] font-semibold px-2.5 py-0.5 rounded-full tracking-wide">

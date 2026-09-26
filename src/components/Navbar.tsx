@@ -72,7 +72,7 @@ export const Navbar: React.FC<NavbarProps> = ({
 
   return (
     <header id="main-header" className="sticky top-0 z-40 w-full bg-white border-b border-neutral-200/80 transition-all font-sans">
-      <div className="max-w-[1600px] mx-auto px-6 lg:px-8 h-20 flex items-center justify-between gap-4">
+      <div className="max-w-[1440px] mx-auto px-6 lg:px-8 h-20 flex items-center justify-between gap-4">
         
         {/* Sisi Kiri: Logo Brand & Search Bar Dribbble Style */}
         <div className={`flex items-center gap-6 xl:gap-8 ${showSearch ? 'flex-1 max-w-2xl' : 'shrink-0'}`}>

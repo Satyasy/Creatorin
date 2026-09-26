@@ -6,6 +6,7 @@
 
 @layer base {
   :root {
+    font-size: 90%;
     --primary: #4f46e5;
     --primary-hover: #4338ca;
     --career-score: #f59e0b;

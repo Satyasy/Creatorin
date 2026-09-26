@@ -283,7 +283,7 @@ export const ExploreServicesPage: React.FC<ExploreServicesPageProps> = ({
       />
 
       {/* Main Content Area */}
-      <main className="flex-1 max-w-[1600px] w-full mx-auto px-6 lg:px-8 py-4 sm:py-6">
+      <main className="flex-1 max-w-[1440px] w-full mx-auto px-6 lg:px-8 py-4 sm:py-6">
         
         {/* Breadcrumbs Navigation */}
         <div className="flex items-center gap-2 text-xs font-medium text-neutral-400 mb-2.5">
@@ -607,7 +607,7 @@ export const ExploreServicesPage: React.FC<ExploreServicesPageProps> = ({
                         <img
                           src={coverImage}
                           alt={item.title}
-                          className="w-full h-full object-cover group-hover:scale-102 transition-transform duration-500"
+                          className="w-full h-full object-cover "
                           loading="lazy"
                           referrerPolicy="no-referrer"
                         />

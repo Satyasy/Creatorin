@@ -425,7 +425,7 @@ export const UmkmProfilePage: React.FC<UmkmProfilePageProps> = ({
       {/* ==================================================================== */}
       {/* HERO SECTION (Owner Editable Profile View with Customization Controls) */}
       {/* ==================================================================== */}
-      <section className="max-w-[1440px] mx-auto px-6 lg:px-8 pt-4 sm:pt-6 pb-6">
+      <section className="max-w-[1296px] mx-auto px-6 lg:px-8 pt-4 sm:pt-6 pb-6">
         
         {/* Hidden File Inputs for Banner & Logo Upload */}
         <input 
@@ -621,7 +621,7 @@ export const UmkmProfilePage: React.FC<UmkmProfilePageProps> = ({
       {/* TAB NAVIGATION BAR (Sticky, Exact Match to Creator Profile Style) */}
       {/* ==================================================================== */}
       <div className="sticky top-20 z-30 bg-white/95 backdrop-blur-md border-b border-neutral-200/80">
-        <div className="max-w-[1440px] mx-auto px-6 lg:px-8 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 py-3">
+        <div className="max-w-[1296px] mx-auto px-6 lg:px-8 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 py-3">
           
           {/* Tabs Group */}
           <div className="flex items-center gap-1.5 sm:gap-2 overflow-x-auto no-scrollbar py-0.5">
@@ -742,7 +742,7 @@ export const UmkmProfilePage: React.FC<UmkmProfilePageProps> = ({
       {/* ==================================================================== */}
       {/* TAB CONTENT AREA */}
       {/* ==================================================================== */}
-      <main className="max-w-[1440px] mx-auto px-6 lg:px-8 py-8 sm:py-12">
+      <main className="max-w-[1296px] mx-auto px-6 lg:px-8 py-8 sm:py-12">
         
         {/* ----------------- TAB 1: BRIEF DIBUKA (MATCHING SERVICES / SHOTS CARD CLEAN DESIGN) ----------------- */}
         {activeTab === 'briefs' && (
@@ -903,7 +903,7 @@ export const UmkmProfilePage: React.FC<UmkmProfilePageProps> = ({
                         src={collab.deliverableMedia}
                         alt={collab.title}
                         referrerPolicy="no-referrer"
-                        className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-500 ease-out"
+                        className="w-full h-full object-cover object-center "
                       />
 
                       {/* Top Right Media Badge: Circular dark translucent button with icon */}

@@ -400,7 +400,7 @@ export const HomePage: React.FC<HomePageProps> = ({
         {/* SECTION 2: EKSPLORASI DENGAN FILTER AKTIF (Proyek, Creator, Layanan) */}
         {/* Desain Bersih & Elegan Sesuai Referensi (Shots / Designers / Services) */}
         {/* ========================================================================= */}
-        <section className="max-w-[1600px] mx-auto px-6 lg:px-8 pt-6 sm:pt-8 pb-10 sm:pb-14">
+        <section className="max-w-[1440px] mx-auto px-6 lg:px-8 pt-6 sm:pt-8 pb-10 sm:pb-14">
           
           {/* Baris 1: Segmented Pill Tabs (Creator, Layanan, Proyek) */}
           <div className="flex items-center gap-1.5 sm:gap-2 mb-4">
@@ -584,7 +584,7 @@ export const HomePage: React.FC<HomePageProps> = ({
                           src={proj.coverImage}
                           alt={proj.title}
                           referrerPolicy="no-referrer"
-                          className="w-full h-full object-cover object-center group-hover:scale-[1.03] transition-transform duration-300 ease-out"
+                          className="w-full h-full object-cover object-center "
                           loading="lazy"
                         />
 
@@ -776,78 +776,78 @@ export const HomePage: React.FC<HomePageProps> = ({
                           if (onViewCreatorProfile) onViewCreatorProfile(creator);
                           else onNavigate('landing');
                         }}
-                        className="group bg-white rounded-2xl sm:rounded-3xl border border-neutral-200/80 hover:border-neutral-300 p-6 sm:p-8 transition-all shadow-xs hover:shadow-md cursor-pointer text-left"
+                        className="group bg-white rounded-[24px] border border-[rgba(229,229,229,0.8)] p-6 sm:p-8 transition-all shadow-[0_1px_1px_rgba(0,0,0,0.05)] hover:border-neutral-300 hover:shadow-[0_8px_24px_rgba(0,0,0,0.06)] cursor-pointer text-left"
                       >
                         {/* BARIS 1: Header Profil Kreator, Badges, Rating & Tombol Hubungi */}
-                        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+                        <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-5">
                           
                           {/* Identitas Kreator */}
-                          <div className="flex items-start sm:items-center gap-4">
+                          <div className="flex items-center gap-4 min-w-0">
                             {/* Avatar Kreator dengan Badge */}
                             <div className="relative shrink-0">
                               <img
                                 src={creator.avatar}
                                 alt={creator.name}
-                                className="w-14 h-14 sm:w-16 sm:h-16 rounded-full object-cover ring-2 ring-neutral-100"
+                                className="w-16 h-16 rounded-full object-cover ring-2 ring-[#f5f5f5]"
                               />
                               {creator.careerScore.overall >= 95 && (
-                                <div className="absolute -bottom-1 -right-1 bg-[#0d0c22] text-white p-1 rounded-full ring-2 ring-white">
-                                  <ShieldCheck className="w-3 h-3 text-amber-400" />
+                                <div className="absolute left-12 top-12 bg-[#0d0c22] text-white p-1 rounded-full">
+                                  <ShieldCheck className="w-3 h-3 text-white" />
                                 </div>
                               )}
                             </div>
 
                             {/* Detail Nama & Status Promoted */}
-                            <div>
+                            <div className="min-w-0">
                               <div className="flex flex-wrap items-center gap-2">
-                                <h3 className="text-lg sm:text-xl font-bold tracking-tight text-[#0d0c22] group-hover:text-blue-600 transition-colors">
+                                <h3 className="text-[20px] font-bold leading-7 tracking-[-0.95px] text-[#0d0c22] group-hover:text-blue-600 transition-colors truncate">
                                   {creator.name}
                                 </h3>
 
                                 {creator.proBadge && (
-                                  <span className="text-[9px] sm:text-[10px] font-black uppercase px-2 py-0.5 rounded-sm bg-[#0d0c22] text-white tracking-wider">
+                                  <span className="text-[10px] font-black uppercase px-2 py-0.5 rounded bg-[#0d0c22] text-white tracking-[0.62px] leading-[15px]">
                                     PRO+
                                   </span>
                                 )}
 
                                 {creator.selectBadge && (
-                                  <span className="text-[9px] sm:text-[10px] font-black uppercase px-2 py-0.5 rounded-sm bg-[#2b2a45] text-neutral-200 tracking-wider">
+                                  <span className="text-[10px] font-black uppercase px-2 py-0.5 rounded bg-[#2b2a45] text-white tracking-[0.62px] leading-[15px]">
                                     SELECT
                                   </span>
                                 )}
 
-                                <div className="flex items-center gap-1 text-xs font-bold text-neutral-800">
+                                <div className="flex items-center gap-1 text-[12px] leading-4 font-bold text-[#262626]">
                                   <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
                                   <span>{creator.careerScore.clientRating}</span>
-                                  <span className="text-neutral-400 font-normal">({creator.careerScore.completedProjects})</span>
+                                  <span className="text-[#a1a1a1] font-normal">({creator.careerScore.completedProjects})</span>
                                 </div>
 
-                                <div className="flex items-center gap-1 text-xs font-semibold text-neutral-700 ml-1">
+                                <div className="flex items-center gap-1 pl-1 text-[12px] leading-4 font-semibold text-[#404040]">
                                   <Check className="w-3.5 h-3.5 text-neutral-900 stroke-[3]" />
                                   <span>{creator.careerScore.completedProjects} proyek selesai</span>
                                 </div>
 
                                 {creator.isPromoted && (
-                                  <span className="text-[11px] font-medium text-neutral-400 ml-1">
+                                  <span className="pl-1 text-[11px] leading-[16.5px] font-medium text-[#a1a1a1] tracking-[0.06px]">
                                     Promoted
                                   </span>
                                 )}
                               </div>
 
-                              {/* Sub-info Row (Harga, Lokasi, Respon, Layanan) */}
-                              <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-neutral-500 mt-2">
-                                <span className="font-semibold text-neutral-800">
+                              {/* Sub-info Row (Harga, Lokasi, Skor, Layanan) */}
+                              <div className="flex flex-wrap items-center gap-x-4 gap-y-1 mt-2 text-[12px] leading-4 text-[#737373]">
+                                <span className="font-semibold text-[#262626]">
                                   Mulai {creator.formattedRate}
                                 </span>
                                 <span>•</span>
                                 <span className="flex items-center gap-1">
-                                  <MapPin className="w-3 h-3 text-neutral-400" />
+                                  <MapPin className="w-3 h-3 text-[#0d0c22]" />
                                   {creator.location}
                                 </span>
                                 <span>•</span>
-                                <span className="flex items-center gap-1">
-                                  <Clock className="w-3 h-3 text-neutral-400" />
-                                  {creator.responseTime || 'Merespons cepat'}
+                                <span>
+                                  <strong className="font-semibold text-[#0d0c22]">{creator.careerScore.overall}%</strong>{' '}
+                                  <span className="font-medium">Skor Karir</span>
                                 </span>
                                 <span>•</span>
                                 <span>{creator.servicesAvailableCount || 8} Layanan tersedia</span>
@@ -856,7 +856,7 @@ export const HomePage: React.FC<HomePageProps> = ({
                           </div>
 
                           {/* Sisi Kanan: Bookmark & Tombol "Hubungi" */}
-                          <div className="flex items-center gap-2.5 self-end lg:self-center shrink-0">
+                          <div className="flex items-center gap-2.5 self-end xl:self-center shrink-0">
                             {/* Save Button */}
                             <button
                               onClick={(e) => {
@@ -883,7 +883,7 @@ export const HomePage: React.FC<HomePageProps> = ({
                                 setTargetCreatorForBrief(creator);
                                 setIsBriefModalOpen(true);
                               }}
-                              className="px-5 sm:px-6 py-2.5 rounded-full bg-[#0d0c22] hover:bg-[#2b2a45] text-white text-xs sm:text-sm font-semibold transition-all shadow-2xs hover:shadow-xs cursor-pointer flex items-center gap-2"
+                              className="px-6 py-2.5 rounded-full bg-[#0d0c22] hover:bg-[#2b2a45] text-white text-[14px] leading-5 font-semibold tracking-[-0.15px] transition-all shadow-[0_1px_0_rgba(0,0,0,0.05)] cursor-pointer flex items-center gap-2"
                             >
                               <span>Hubungi</span>
                             </button>
@@ -891,8 +891,8 @@ export const HomePage: React.FC<HomePageProps> = ({
                         </div>
 
                         {/* BARIS 2: Card Layanan Kreator (4 Card Layanan) */}
-                        <div className="mt-5 pt-4 border-t border-neutral-100">
-                          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-3.5 lg:gap-4">
+                        <div className="mt-5 pt-4 border-t border-[#f5f5f5]">
+                          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                             {servicesList.map((service, srvIdx) => {
                               const imageSrc = service.coverImage || 
                                 creator.portfolioSamples?.[srvIdx % (creator.portfolioSamples?.length || 1)]?.thumbnail ||
@@ -910,40 +910,31 @@ export const HomePage: React.FC<HomePageProps> = ({
                                   className="group/srv flex flex-col cursor-pointer text-left select-none"
                                 >
                                   {/* Cover Image Preview (Clean Rounded) */}
-                                  <div className="aspect-[4/3] w-full rounded-2xl overflow-hidden bg-neutral-900 relative shadow-2xs group-hover/srv:shadow-md transition-all duration-300">
+                                  <div className="aspect-[4/3] w-full rounded-2xl overflow-hidden bg-[#171717] relative shadow-[0_1px_0_rgba(0,0,0,0.05)] group-hover/srv:shadow-md transition-all duration-300">
                                     <img
                                       src={imageSrc}
                                       alt={service.title}
-                                      className="w-full h-full object-cover group-hover/srv:scale-[1.04] transition-transform duration-500 ease-out"
+                                      className="w-full h-full object-cover "
                                       loading="lazy"
                                     />
-                                    <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent opacity-0 group-hover/srv:opacity-100 transition-opacity duration-300" />
-                                    
                                     {service.tag && (
-                                      <div className="absolute top-2.5 left-2.5 bg-black/60 backdrop-blur-md text-white text-[10px] font-semibold px-2.5 py-0.5 rounded-full tracking-wide">
+                                      <div className="absolute top-2.5 left-2.5 bg-black/60 backdrop-blur-md text-white text-[10px] font-semibold leading-[15px] px-2.5 py-0.5 rounded-full tracking-[0.37px]">
                                         {service.tag}
                                       </div>
                                     )}
-
-                                    <div className="absolute bottom-2.5 right-2.5 opacity-0 group-hover/srv:opacity-100 transition-all duration-300 transform translate-y-1 group-hover/srv:translate-y-0">
-                                      <span className="bg-white text-[#0d0c22] text-[11px] font-bold px-3 py-1 rounded-full shadow-md flex items-center gap-1">
-                                        <span>Order</span>
-                                        <span className="text-blue-600 font-bold">→</span>
-                                      </span>
-                                    </div>
                                   </div>
 
                                   {/* Clean Title & Price Below Image */}
-                                  <div className="pt-3 px-0.5 space-y-1">
-                                    <h4 className="text-[13px] sm:text-[14px] font-bold text-[#0d0c22] group-hover/srv:text-blue-600 transition-colors line-clamp-1 leading-snug">
+                                  <div className="pt-3 px-0.5">
+                                    <h4 className="text-[14px] font-bold leading-[19.25px] tracking-[-0.15px] text-[#0d0c22] group-hover/srv:text-blue-600 transition-colors line-clamp-1">
                                       {service.title}
                                     </h4>
 
-                                    <div className="flex items-center justify-between pt-0.5">
-                                      <span className="text-[13px] sm:text-[14px] font-black text-[#0d0c22] tracking-tight">
+                                    <div className="flex items-center justify-between gap-3 pt-1.5">
+                                      <span className="text-[14px] font-black leading-[21px] text-[#0d0c22] tracking-[-0.5px]">
                                         {service.formattedPrice}
                                       </span>
-                                      <span className="text-[11px] text-neutral-400 font-medium">
+                                      <span className="text-[11px] leading-[16.5px] text-[#a1a1a1] font-medium tracking-[0.06px] whitespace-nowrap">
                                         {service.deliveryDays || '2-3 Hari'}
                                       </span>
                                     </div>
@@ -951,6 +942,24 @@ export const HomePage: React.FC<HomePageProps> = ({
                                 </div>
                               );
                             })}
+                          </div>
+                        </div>
+
+                        <div className="mt-5 pt-4 border-t border-[#f5f5f5]">
+                          <div className="flex flex-wrap items-center gap-2">
+                            {creator.skills.slice(0, 5).map((skill) => (
+                              <span
+                                key={skill}
+                                className="rounded-full bg-[#f5f5f5] px-3 py-1 font-sans text-[12px] font-medium leading-4 text-[#404040]"
+                              >
+                                {skill}
+                              </span>
+                            ))}
+                            {creator.skills.length > 5 && (
+                              <span className="font-sans text-[12px] font-medium leading-4 text-[#a1a1a1]">
+                                +{creator.skills.length - 5} keahlian lainnya
+                              </span>
+                            )}
                           </div>
                         </div>
 
@@ -1002,7 +1011,7 @@ export const HomePage: React.FC<HomePageProps> = ({
                         <img
                           src={srv.coverImage || 'https://images.unsplash.com/photo-1507238691740-187a5b1d37b8?w=800&auto=format&fit=crop&q=80'}
                           alt={srv.title}
-                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                          className="w-full h-full object-cover "
                           loading="lazy"
                           referrerPolicy="no-referrer"
                         />

@@ -375,7 +375,7 @@ export const BriefDetailPage: React.FC<BriefDetailPageProps> = ({
                     <img
                       src={currentBrief.clientAvatar}
                       alt={currentBrief.clientName}
-                      className="w-full h-full rounded-full object-cover group-hover:scale-105 transition duration-200"
+                      className="w-full h-full rounded-full object-cover "
                     />
                   ) : (
                     <div className="w-full h-full rounded-full bg-neutral-100 flex items-center justify-center text-neutral-600">
@@ -702,7 +702,7 @@ export const BriefDetailPage: React.FC<BriefDetailPageProps> = ({
                         <img
                           src={applicant.creatorAvatar}
                           alt={applicant.creatorName}
-                          className="w-14 h-14 sm:w-16 sm:h-16 rounded-full object-cover ring-2 ring-neutral-100 group-hover:scale-105 transition"
+                          className="w-14 h-14 sm:w-16 sm:h-16 rounded-full object-cover ring-2 ring-neutral-100 "
                         />
                         <div className="absolute -bottom-1 -right-1 bg-[#0d0c22] text-white p-1 rounded-full ring-2 ring-white">
                           <ShieldCheck className="w-3 h-3 text-amber-400" />
@@ -1029,7 +1029,7 @@ export const BriefDetailPage: React.FC<BriefDetailPageProps> = ({
                 <img
                   src={currentBrief.clientAvatar}
                   alt={currentBrief.clientName}
-                  className="w-full h-full rounded-full object-cover group-hover:scale-105 transition duration-200"
+                  className="w-full h-full rounded-full object-cover "
                 />
               ) : (
                 <div className="w-full h-full rounded-full bg-neutral-100 flex items-center justify-center text-neutral-600">

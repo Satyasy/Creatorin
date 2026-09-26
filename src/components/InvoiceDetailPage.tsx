@@ -301,7 +301,7 @@ export const InvoiceDetailPage: React.FC<InvoiceDetailProps> = ({
       />
 
       {/* Main Container */}
-      <main className="max-w-[1240px] mx-auto px-6 lg:px-8 py-6 sm:py-10 space-y-6">
+      <main className="max-w-[1116px] mx-auto px-6 lg:px-8 py-6 sm:py-10 space-y-6">
         
         {/* Navigation & Actions Top Bar */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-1 print:hidden">

@@ -245,7 +245,7 @@ export const ExploreProjectsPage: React.FC<ExploreProjectsPageProps> = ({
       />
 
       {/* Main Container */}
-      <main className="max-w-[1600px] mx-auto px-6 lg:px-8 py-4 sm:py-6">
+      <main className="max-w-[1440px] mx-auto px-6 lg:px-8 py-4 sm:py-6">
         
         {/* Breadcrumbs Navigation */}
         <div className="flex items-center gap-2 text-xs font-medium text-neutral-400 mb-2.5">
@@ -567,7 +567,7 @@ export const ExploreProjectsPage: React.FC<ExploreProjectsPageProps> = ({
                     src={project.coverImage}
                     alt={project.title}
                     referrerPolicy="no-referrer"
-                    className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-500 ease-out"
+                    className="w-full h-full object-cover object-center "
                   />
 
                   {/* Top-Right Media Badge (Circular translucent badge with play icon matching screenshot) */}

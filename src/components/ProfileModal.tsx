@@ -198,7 +198,7 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({ creator, isOpen = tr
                       <img
                         src={item.thumbnail}
                         alt={item.title}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                        className="w-full h-full object-cover "
                       />
                     </div>
                     <div className="p-2.5 text-center bg-white">
@@ -240,7 +240,7 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({ creator, isOpen = tr
                         <img
                           src={imageSrc}
                           alt={srv.title}
-                          className="w-full h-full object-cover group-hover/modalsrv:scale-[1.04] transition-transform duration-500"
+                          className="w-full h-full object-cover "
                         />
                         <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent opacity-0 group-hover/modalsrv:opacity-100 transition-opacity duration-300" />
                         {srv.tag && (

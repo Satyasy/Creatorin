@@ -326,7 +326,7 @@ export const ServiceDetailModal: React.FC<ServiceDetailModalProps> = ({
                   <img
                     src={creator.avatar}
                     alt={creator.name}
-                    className="w-full h-full rounded-full object-cover group-hover:scale-105 transition duration-200"
+                    className="w-full h-full rounded-full object-cover "
                   />
                 </div>
                 <div className="absolute -bottom-0.5 -right-0.5 bg-[#0d0c22] text-white p-0.5 rounded-full ring-2 ring-white">
@@ -494,7 +494,7 @@ export const ServiceDetailModal: React.FC<ServiceDetailModalProps> = ({
                         <img
                           src={imgUrl}
                           alt={`Thumbnail preview ${idx + 1}`}
-                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                          className="w-full h-full object-cover "
                         />
                         {isFifthSlot && remainingExtra > 0 && !isActive && (
                           <div className="absolute inset-0 bg-black/55 backdrop-blur-2xs flex items-center justify-center text-white text-xs sm:text-sm font-bold">
@@ -733,7 +733,7 @@ export const ServiceDetailModal: React.FC<ServiceDetailModalProps> = ({
                               <img
                                 src={srv.coverImage}
                                 alt={srv.title}
-                                className="w-full h-full object-cover group-hover:scale-102 transition-transform duration-500"
+                                className="w-full h-full object-cover "
                                 loading="lazy"
                               />
                             </div>
