@@ -32,7 +32,7 @@ export const MOCK_CREATORS: Creator[] = [
         formattedPrice: 'Rp1.500.000',
         deliveryDays: '2 Hari Kerja',
         tag: 'Figma Template',
-        coverImage: 'https://images.unsplash.com/photo-1507238691740-187a5b1d37b8?w=800&auto=format&fit=crop&q=80'
+        coverImage: '/creatorin/service-pattern-1.png'
       },
       {
         id: 'srv-1-2',
@@ -41,7 +41,7 @@ export const MOCK_CREATORS: Creator[] = [
         formattedPrice: 'Rp3.800.000',
         deliveryDays: '4 Hari Kerja',
         tag: 'Framer Site',
-        coverImage: 'https://images.unsplash.com/photo-1554080353-a576cf803bda?w=800&auto=format&fit=crop&q=80'
+        coverImage: '/creatorin/service-pattern-2.png'
       },
       {
         id: 'srv-1-3',
@@ -50,7 +50,7 @@ export const MOCK_CREATORS: Creator[] = [
         formattedPrice: 'Rp2.200.000',
         deliveryDays: '3 Hari Kerja',
         tag: 'Design System',
-        coverImage: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=800&auto=format&fit=crop&q=80'
+        coverImage: '/creatorin/service-pattern-3.png'
       },
       {
         id: 'srv-1-4',
@@ -59,7 +59,7 @@ export const MOCK_CREATORS: Creator[] = [
         formattedPrice: 'Rp1.500.000',
         deliveryDays: '2 Hari Kerja',
         tag: 'TikTok UGC',
-        coverImage: 'https://images.unsplash.com/photo-1574717024653-61fd2cf4d44d?w=800&auto=format&fit=crop&q=80'
+        coverImage: '/creatorin/service-pattern-4.png'
       }
     ],
     careerScore: {
@@ -144,7 +144,7 @@ export const MOCK_CREATORS: Creator[] = [
         formattedPrice: 'Rp1.200.000',
         deliveryDays: '3 Hari Kerja',
         tag: 'Brand Identity',
-        coverImage: 'https://images.unsplash.com/photo-1626785774573-4b799315345d?w=800&auto=format&fit=crop&q=80'
+        coverImage: '/creatorin/service-pattern-1.png'
       },
       {
         id: 'srv-2-2',
@@ -153,7 +153,7 @@ export const MOCK_CREATORS: Creator[] = [
         formattedPrice: 'Rp850.000',
         deliveryDays: '2 Hari Kerja',
         tag: 'Feed Instagram',
-        coverImage: 'https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?w=800&auto=format&fit=crop&q=80'
+        coverImage: '/creatorin/service-pattern-2.png'
       },
       {
         id: 'srv-2-3',
@@ -162,7 +162,7 @@ export const MOCK_CREATORS: Creator[] = [
         formattedPrice: 'Rp750.000',
         deliveryDays: '3 Hari Kerja',
         tag: 'Kemasan',
-        coverImage: 'https://images.unsplash.com/photo-1581291518857-4e27b48ff24e?w=800&auto=format&fit=crop&q=80'
+        coverImage: '/creatorin/service-pattern-3.png'
       },
       {
         id: 'srv-2-4',
@@ -171,7 +171,7 @@ export const MOCK_CREATORS: Creator[] = [
         formattedPrice: 'Rp400.000',
         deliveryDays: '1 Hari Kerja',
         tag: 'Banner',
-        coverImage: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&auto=format&fit=crop&q=80'
+        coverImage: '/creatorin/service-pattern-4.png'
       }
     ],
     careerScore: {
@@ -258,7 +258,7 @@ export const MOCK_CREATORS: Creator[] = [
         formattedPrice: 'Rp450.000',
         deliveryDays: '2 Hari Kerja',
         tag: 'UGC Video',
-        coverImage: 'https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=800&auto=format&fit=crop&q=80'
+        coverImage: '/creatorin/service-pattern-1.png'
       },
       {
         id: 'srv-3-2',
@@ -267,7 +267,7 @@ export const MOCK_CREATORS: Creator[] = [
         formattedPrice: 'Rp550.000',
         deliveryDays: '2 Hari Kerja',
         tag: 'Tutorial',
-        coverImage: 'https://images.unsplash.com/photo-1596462502278-27bfdc403348?w=800&auto=format&fit=crop&q=80'
+        coverImage: '/creatorin/service-pattern-2.png'
       },
       {
         id: 'srv-3-3',
@@ -276,7 +276,7 @@ export const MOCK_CREATORS: Creator[] = [
         formattedPrice: 'Rp1.100.000',
         deliveryDays: '4 Hari Kerja',
         tag: 'Bundle Paket',
-        coverImage: 'https://images.unsplash.com/photo-1556228720-195a672e8a03?w=800&auto=format&fit=crop&q=80'
+        coverImage: '/creatorin/service-pattern-3.png'
       },
       {
         id: 'srv-3-4',
@@ -285,7 +285,7 @@ export const MOCK_CREATORS: Creator[] = [
         formattedPrice: 'Rp400.000',
         deliveryDays: '2 Hari Kerja',
         tag: 'Unboxing',
-        coverImage: 'https://images.unsplash.com/photo-1512496015851-a90fb38ba796?w=800&auto=format&fit=crop&q=80'
+        coverImage: '/creatorin/service-pattern-4.png'
       }
     ],
     careerScore: {
@@ -361,7 +361,7 @@ export const MOCK_CREATORS: Creator[] = [
         formattedPrice: 'Rp350.000',
         deliveryDays: '1-2 Hari',
         tag: 'ASMR Video',
-        coverImage: 'https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?w=800&auto=format&fit=crop&q=80'
+        coverImage: '/creatorin/service-pattern-1.png'
       },
       {
         id: 'srv-4-2',
@@ -370,7 +370,7 @@ export const MOCK_CREATORS: Creator[] = [
         formattedPrice: 'Rp450.000',
         deliveryDays: '2 Hari Kerja',
         tag: 'Review FnB',
-        coverImage: 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=800&auto=format&fit=crop&q=80'
+        coverImage: '/creatorin/service-pattern-2.png'
       },
       {
         id: 'srv-4-3',
@@ -379,7 +379,7 @@ export const MOCK_CREATORS: Creator[] = [
         formattedPrice: 'Rp400.000',
         deliveryDays: '2 Hari Kerja',
         tag: 'Promo',
-        coverImage: 'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=800&auto=format&fit=crop&q=80'
+        coverImage: '/creatorin/service-pattern-3.png'
       },
       {
         id: 'srv-4-4',
@@ -388,7 +388,7 @@ export const MOCK_CREATORS: Creator[] = [
         formattedPrice: 'Rp950.000',
         deliveryDays: '3 Hari Kerja',
         tag: 'Paket Hemat',
-        coverImage: 'https://images.unsplash.com/photo-1498837167922-ddd27525d352?w=800&auto=format&fit=crop&q=80'
+        coverImage: '/creatorin/service-pattern-4.png'
       }
     ],
     careerScore: {
@@ -464,7 +464,7 @@ export const MOCK_CREATORS: Creator[] = [
         formattedPrice: 'Rp250.000',
         deliveryDays: '2 Hari Kerja',
         tag: 'Studio',
-        coverImage: 'https://images.unsplash.com/photo-1603006905003-be475563bc59?w=800&auto=format&fit=crop&q=80'
+        coverImage: '/creatorin/service-pattern-1.png'
       },
       {
         id: 'srv-5-2',
@@ -473,7 +473,7 @@ export const MOCK_CREATORS: Creator[] = [
         formattedPrice: 'Rp450.000',
         deliveryDays: '3 Hari Kerja',
         tag: 'Flatlay Styling',
-        coverImage: 'https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=800&auto=format&fit=crop&q=80'
+        coverImage: '/creatorin/service-pattern-2.png'
       },
       {
         id: 'srv-5-3',
@@ -482,7 +482,7 @@ export const MOCK_CREATORS: Creator[] = [
         formattedPrice: 'Rp700.000',
         deliveryDays: '4 Hari Kerja',
         tag: 'Lookbook',
-        coverImage: 'https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=800&auto=format&fit=crop&q=80'
+        coverImage: '/creatorin/service-pattern-3.png'
       },
       {
         id: 'srv-5-4',
@@ -491,7 +491,7 @@ export const MOCK_CREATORS: Creator[] = [
         formattedPrice: 'Rp350.000',
         deliveryDays: '2 Hari Kerja',
         tag: 'Aksesoris',
-        coverImage: 'https://images.unsplash.com/photo-1610701596007-11502861dcfa?w=800&auto=format&fit=crop&q=80'
+        coverImage: '/creatorin/service-pattern-4.png'
       }
     ],
     careerScore: {
@@ -567,7 +567,7 @@ export const MOCK_CREATORS: Creator[] = [
         formattedPrice: 'Rp500.000',
         deliveryDays: '2 Hari Kerja',
         tag: 'Review Tech',
-        coverImage: 'https://images.unsplash.com/photo-1590658268037-6bf12165a8df?w=800&auto=format&fit=crop&q=80'
+        coverImage: '/creatorin/service-pattern-1.png'
       },
       {
         id: 'srv-6-2',
@@ -576,7 +576,7 @@ export const MOCK_CREATORS: Creator[] = [
         formattedPrice: 'Rp750.000',
         deliveryDays: '3 Hari Kerja',
         tag: 'Komparasi',
-        coverImage: 'https://images.unsplash.com/photo-1527864550417-7fd91fc51a46?w=800&auto=format&fit=crop&q=80'
+        coverImage: '/creatorin/service-pattern-2.png'
       },
       {
         id: 'srv-6-3',
@@ -585,7 +585,7 @@ export const MOCK_CREATORS: Creator[] = [
         formattedPrice: 'Rp1.300.000',
         deliveryDays: '4 Hari Kerja',
         tag: 'Short Reels',
-        coverImage: 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=800&auto=format&fit=crop&q=80'
+        coverImage: '/creatorin/service-pattern-3.png'
       },
       {
         id: 'srv-6-4',
@@ -594,7 +594,7 @@ export const MOCK_CREATORS: Creator[] = [
         formattedPrice: 'Rp600.000',
         deliveryDays: '2 Hari Kerja',
         tag: 'Macro Showcase',
-        coverImage: 'https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=800&auto=format&fit=crop&q=80'
+        coverImage: '/creatorin/service-pattern-4.png'
       }
     ],
     careerScore: {

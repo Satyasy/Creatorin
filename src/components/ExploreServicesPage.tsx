@@ -587,7 +587,7 @@ export const ExploreServicesPage: React.FC<ExploreServicesPageProps> = ({
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5 sm:gap-6">
               {filteredServices.map((item) => {
-                const coverImage = item.coverImage || 'https://images.unsplash.com/photo-1507238691740-187a5b1d37b8?w=800&auto=format&fit=crop&q=80';
+                const coverImage = item.coverImage || '/creatorin/service-pattern-1.png';
                 const formattedDelivery = item.deliveryDays
                   ? (item.deliveryDays.toLowerCase().includes('hari') ? item.deliveryDays : `${item.deliveryDays} Hari Kerja`)
                   : '2-3 Hari Kerja';

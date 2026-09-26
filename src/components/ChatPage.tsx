@@ -58,7 +58,7 @@ const INITIAL_CONVERSATIONS: ChatConversation[] = [
           formattedPrice: 'Rp1.500.000',
           deliveryDays: '2 Hari Kerja',
           tag: 'Figma Template',
-          coverImage: 'https://images.unsplash.com/photo-1507238691740-187a5b1d37b8?w=800&auto=format&fit=crop&q=80',
+          coverImage: '/creatorin/service-pattern-1.png',
           description: 'Desain antarmuka landing page SaaS modern 20+ komponen responsif, auto-layout rapi, dan panduan variabel warna token.'
         }
       },
@@ -147,7 +147,7 @@ const INITIAL_CONVERSATIONS: ChatConversation[] = [
           formattedPrice: 'Rp450.000',
           deliveryDays: '2 Hari Kerja',
           tag: 'UGC Video',
-          coverImage: 'https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=800&auto=format&fit=crop&q=80'
+          coverImage: '/creatorin/service-pattern-4.png'
         }
       },
       {

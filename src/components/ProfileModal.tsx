@@ -225,7 +225,7 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({ creator, isOpen = tr
                 {creator.services.map((srv, idx) => {
                   const imageSrc = srv.coverImage || 
                     creator.portfolioSamples?.[idx % (creator.portfolioSamples?.length || 1)]?.thumbnail ||
-                    'https://images.unsplash.com/photo-1507238691740-187a5b1d37b8?w=800&auto=format&fit=crop&q=80';
+                    '/creatorin/service-pattern-1.png';
 
                   return (
                     <div

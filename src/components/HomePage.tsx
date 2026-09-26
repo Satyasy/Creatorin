@@ -729,7 +729,7 @@ export const HomePage: React.FC<HomePageProps> = ({
                         title: `1x Layanan Konten ${creator.category === 'Video' ? 'Reels & TikTok UGC' : 'Feed & Desain Visual'}`,
                         formattedPrice: creator.formattedRate.replace('/proyek', '').replace('/video', '').replace('/sesi', ''),
                         price: creator.startingRate,
-                        coverImage: creator.portfolioSamples?.[0]?.thumbnail || 'https://images.unsplash.com/photo-1507238691740-187a5b1d37b8?w=800&auto=format&fit=crop&q=80',
+                        coverImage: creator.portfolioSamples?.[0]?.thumbnail || '/creatorin/service-pattern-1.png',
                         tag: creator.category === 'Video' ? 'UGC Video' : 'Design',
                         deliveryDays: '2 Hari Kerja'
                       },
@@ -896,7 +896,7 @@ export const HomePage: React.FC<HomePageProps> = ({
                             {servicesList.map((service, srvIdx) => {
                               const imageSrc = service.coverImage || 
                                 creator.portfolioSamples?.[srvIdx % (creator.portfolioSamples?.length || 1)]?.thumbnail ||
-                                'https://images.unsplash.com/photo-1507238691740-187a5b1d37b8?w=800&auto=format&fit=crop&q=80';
+                                '/creatorin/service-pattern-1.png';
 
                               return (
                                 <div
@@ -1009,7 +1009,7 @@ export const HomePage: React.FC<HomePageProps> = ({
                       {/* Media Cover Image Card (Aspect 4:3 matching screenshot) */}
                       <div className="relative aspect-[4/3] rounded-2xl overflow-hidden bg-neutral-100 shadow-2xs group-hover:shadow-md transition-all duration-300">
                         <img
-                          src={srv.coverImage || 'https://images.unsplash.com/photo-1507238691740-187a5b1d37b8?w=800&auto=format&fit=crop&q=80'}
+                          src={srv.coverImage || '/creatorin/service-pattern-1.png'}
                           alt={srv.title}
                           className="w-full h-full object-cover "
                           loading="lazy"
