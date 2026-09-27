@@ -432,11 +432,11 @@ export const UmkmProfilePage: React.FC<UmkmProfilePageProps> = ({
   }, [profile.creatorReviews, reviewFilter]);
 
   return (
-    <div className="min-h-screen bg-white text-[#0d0c22] font-sans selection:bg-[#0d0c22] selection:text-white">
+    <div className="min-h-screen bg-white text-[#171717] font-sans selection:bg-[#0B1F3A] selection:text-white">
       
       {/* Toast Notification */}
       {toastMessage && (
-        <div className="fixed bottom-6 right-6 z-50 bg-[#0d0c22] text-white px-5 py-3 rounded-2xl shadow-2xl flex items-center gap-2.5 text-sm font-bold animate-in fade-in slide-in-from-bottom-3">
+        <div className="fixed bottom-6 right-6 z-50 bg-[#0B1F3A] text-white px-5 py-3 rounded-2xl shadow-2xl flex items-center gap-2.5 text-sm font-bold animate-in fade-in slide-in-from-bottom-3">
           <Check className="w-4 h-4 text-emerald-400" />
           <span>{toastMessage}</span>
         </div>
@@ -447,7 +447,7 @@ export const UmkmProfilePage: React.FC<UmkmProfilePageProps> = ({
       {/* ==================================================================== */}
       {/* HERO SECTION (Owner Editable Profile View with Customization Controls) */}
       {/* ==================================================================== */}
-      <section className="max-w-[1296px] mx-auto px-6 lg:px-8 pt-4 sm:pt-6 pb-6">
+      <section className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 pt-4 sm:pt-6 pb-6">
         
         {/* Hidden File Inputs for Banner & Logo Upload */}
         <input 
@@ -490,7 +490,7 @@ export const UmkmProfilePage: React.FC<UmkmProfilePageProps> = ({
             {/* Escrow Badge */}
             {profile.verified && (
               <div 
-                className="absolute bottom-0 right-0 sm:bottom-1 sm:right-1 bg-[#0d0c22] text-white p-1.5 rounded-full ring-3 ring-white shadow-xs" 
+                className="absolute bottom-0 right-0 sm:bottom-1 sm:right-1 bg-[#0B1F3A] text-white p-1.5 rounded-full ring-3 ring-white shadow-xs" 
                 title="UMKM Terverifikasi Escrow"
               >
                 <ShieldCheck className="w-3.5 h-3.5 text-blue-400" />
@@ -573,7 +573,7 @@ export const UmkmProfilePage: React.FC<UmkmProfilePageProps> = ({
             <button
               id="btn-edit-profile"
               onClick={openEditModal}
-              className="px-5 py-2 sm:py-2.5 rounded-full border border-neutral-300 bg-white hover:bg-neutral-50 text-[#0d0c22] text-xs sm:text-sm font-semibold transition cursor-pointer"
+              className="px-5 py-2 sm:py-2.5 rounded-xl border border-[#E2E8F0] bg-white hover:bg-neutral-50 text-[#171717] text-xs sm:text-sm font-semibold transition cursor-pointer"
             >
               Edit Profil
             </button>
@@ -582,7 +582,7 @@ export const UmkmProfilePage: React.FC<UmkmProfilePageProps> = ({
             <button
               id="btn-share-profile"
               onClick={handleCopyLink}
-              className="px-5 sm:px-6 py-2 sm:py-2.5 rounded-full bg-[#0d0c22] hover:bg-neutral-900 text-white text-xs sm:text-sm font-bold transition shadow-xs hover:shadow-sm cursor-pointer flex items-center gap-2"
+              className="px-5 sm:px-6 py-2 sm:py-2.5 rounded-xl bg-[#0B1F3A] hover:bg-[#123B8C] text-white text-xs sm:text-sm font-semibold transition shadow-xs hover:shadow-sm cursor-pointer flex items-center gap-2"
             >
               <Share2 className="w-3.5 h-3.5" />
               <span>Bagikan</span>
@@ -597,7 +597,7 @@ export const UmkmProfilePage: React.FC<UmkmProfilePageProps> = ({
           
           {/* Name & Badges */}
           <div className="flex items-center gap-2.5">
-            <h1 className="text-2xl sm:text-3xl lg:text-[32px] font-black text-[#0d0c22] tracking-tight">
+            <h1 className="text-2xl sm:text-3xl lg:text-[32px] font-bold text-[#171717] tracking-tight">
               {profile.brandName}
             </h1>
             {profile.verified && (
@@ -613,19 +613,19 @@ export const UmkmProfilePage: React.FC<UmkmProfilePageProps> = ({
           {/* Inline Stats Row (Exact Match to Creator Profile Style in Reference Image) */}
           <div className="flex flex-wrap items-center gap-x-5 gap-y-1.5 text-xs sm:text-sm text-neutral-500 mt-2.5 font-medium">
             <span>
-              <strong className="text-[#0d0c22] font-black">
+              <strong className="text-[#171717] font-bold">
                 {profile.stats.completedProjects}
               </strong>{' '}
               Proyek Selesai
             </span>
             <span>
-              <strong className="text-[#0d0c22] font-black">
+              <strong className="text-[#171717] font-bold">
                 {profile.stats.ratingFromCreators.toFixed(1)} ★
               </strong>{' '}
               ({profile.stats.reviewCount} Ulasan)
             </span>
             <span>
-              <strong className="text-[#0d0c22] font-black">
+              <strong className="text-[#171717] font-bold">
                 {profile.stats.activeBriefs}
               </strong>{' '}
               Brief Terbuka
@@ -643,7 +643,7 @@ export const UmkmProfilePage: React.FC<UmkmProfilePageProps> = ({
       {/* TAB NAVIGATION BAR (Sticky, Exact Match to Creator Profile Style) */}
       {/* ==================================================================== */}
       <div className="sticky top-20 z-30 bg-white/95 backdrop-blur-md border-b border-neutral-200/80">
-        <div className="max-w-[1296px] mx-auto px-6 lg:px-8 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 py-3">
+        <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 py-3">
           
           {/* Tabs Group */}
           <div className="flex items-center gap-1.5 sm:gap-2 overflow-x-auto no-scrollbar py-0.5">
@@ -653,8 +653,8 @@ export const UmkmProfilePage: React.FC<UmkmProfilePageProps> = ({
               onClick={() => setActiveTab('briefs')}
               className={`px-4 py-2 rounded-full text-xs sm:text-sm transition whitespace-nowrap cursor-pointer flex items-center gap-1.5 ${
                 activeTab === 'briefs'
-                  ? 'bg-[#f3f3f4] font-semibold text-[#0d0c22]'
-                  : 'text-neutral-700 font-medium hover:text-[#0d0c22] hover:bg-neutral-50'
+                  ? 'bg-[#f3f3f4] font-semibold text-[#171717]'
+                  : 'text-neutral-700 font-medium hover:text-[#171717] hover:bg-neutral-50'
               }`}
             >
               <Briefcase className="w-3.5 h-3.5" />
@@ -669,8 +669,8 @@ export const UmkmProfilePage: React.FC<UmkmProfilePageProps> = ({
               onClick={() => setActiveTab('collabs')}
               className={`px-4 py-2 rounded-full text-xs sm:text-sm transition whitespace-nowrap cursor-pointer flex items-center gap-1.5 ${
                 activeTab === 'collabs'
-                  ? 'bg-[#f3f3f4] font-semibold text-[#0d0c22]'
-                  : 'text-neutral-700 font-medium hover:text-[#0d0c22] hover:bg-neutral-50'
+                  ? 'bg-[#f3f3f4] font-semibold text-[#171717]'
+                  : 'text-neutral-700 font-medium hover:text-[#171717] hover:bg-neutral-50'
               }`}
             >
               <Layers className="w-3.5 h-3.5" />
@@ -686,8 +686,8 @@ export const UmkmProfilePage: React.FC<UmkmProfilePageProps> = ({
               onClick={() => setActiveTab('reviews')}
               className={`px-4 py-2 rounded-full text-xs sm:text-sm transition whitespace-nowrap cursor-pointer flex items-center gap-1.5 ${
                 activeTab === 'reviews'
-                  ? 'bg-[#f3f3f4] font-semibold text-[#0d0c22]'
-                  : 'text-neutral-700 font-medium hover:text-[#0d0c22] hover:bg-neutral-50'
+                  ? 'bg-[#f3f3f4] font-semibold text-[#171717]'
+                  : 'text-neutral-700 font-medium hover:text-[#171717] hover:bg-neutral-50'
               }`}
             >
               <span>Ulasan Kreator</span>
@@ -701,8 +701,8 @@ export const UmkmProfilePage: React.FC<UmkmProfilePageProps> = ({
               onClick={() => setActiveTab('about')}
               className={`px-4 py-2 rounded-full text-xs sm:text-sm transition whitespace-nowrap cursor-pointer ${
                 activeTab === 'about'
-                  ? 'bg-[#f3f3f4] font-semibold text-[#0d0c22]'
-                  : 'text-neutral-700 font-medium hover:text-[#0d0c22] hover:bg-neutral-50'
+                  ? 'bg-[#f3f3f4] font-semibold text-[#171717]'
+                  : 'text-neutral-700 font-medium hover:text-[#171717] hover:bg-neutral-50'
               }`}
             >
               Tentang Brand
@@ -715,7 +715,7 @@ export const UmkmProfilePage: React.FC<UmkmProfilePageProps> = ({
             <div className="relative self-end sm:self-center">
               <button
                 onClick={() => setIsFilterDropdownOpen(!isFilterDropdownOpen)}
-                className="px-4 py-2 rounded-xl border border-neutral-200 hover:border-neutral-300 bg-white text-xs sm:text-sm font-bold text-[#0d0c22] flex items-center gap-2 transition cursor-pointer shadow-2xs"
+                className="px-4 py-2 rounded-xl border border-neutral-200 hover:border-neutral-300 bg-white text-xs sm:text-sm font-bold text-[#171717] flex items-center gap-2 transition cursor-pointer shadow-2xs"
               >
                 <SlidersHorizontal className="w-3.5 h-3.5 text-neutral-400" />
                 <span>
@@ -764,14 +764,14 @@ export const UmkmProfilePage: React.FC<UmkmProfilePageProps> = ({
       {/* ==================================================================== */}
       {/* TAB CONTENT AREA */}
       {/* ==================================================================== */}
-      <main className="max-w-[1296px] mx-auto px-6 lg:px-8 py-8 sm:py-12">
+      <main className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
         
         {/* ----------------- TAB 1: BRIEF DIBUKA (MATCHING SERVICES / SHOTS CARD CLEAN DESIGN) ----------------- */}
         {activeTab === 'briefs' && (
           <div>
-            <div className="flex flex-col sm:flex-row sm:items-baseline justify-between gap-4 pb-6 border-b border-neutral-200/80 mb-6">
+            <div className="flex flex-col sm:flex-row sm:items-baseline justify-between gap-4 pb-6 border-b border-[#E2E8F0] mb-6">
               <div>
-                <h3 className="text-xl sm:text-2xl font-bold text-[#0d0c22] tracking-tight">
+                <h3 className="text-xl sm:text-2xl font-bold text-[#171717] tracking-tight">
                   Brief Proyek yang Sedang Dibuka
                 </h3>
                 <p className="text-xs sm:text-sm text-neutral-500 mt-1 font-normal">
@@ -781,7 +781,7 @@ export const UmkmProfilePage: React.FC<UmkmProfilePageProps> = ({
 
               <button
                 onClick={() => setIsPostBriefOpen(true)}
-                className="px-5 py-2.5 rounded-full bg-[#0d0c22] hover:bg-neutral-800 text-white text-xs font-bold transition shadow-xs flex items-center gap-2 cursor-pointer self-start sm:self-auto shrink-0"
+                className="px-5 py-2.5 rounded-xl bg-[#0B1F3A] hover:bg-[#123B8C] text-white text-xs font-semibold transition shadow-xs flex items-center gap-2 cursor-pointer self-start sm:self-auto shrink-0"
               >
                 <PlusCircle className="w-4 h-4 text-blue-400" />
                 <span>+ Buat Brief Baru</span>
@@ -789,15 +789,15 @@ export const UmkmProfilePage: React.FC<UmkmProfilePageProps> = ({
             </div>
 
             {filteredBriefs.length === 0 ? (
-              <div className="text-center py-20 bg-neutral-50 rounded-3xl border border-neutral-100">
+              <div className="text-center py-20 bg-neutral-50 rounded-3xl border border-[#E2E8F0]">
                 <Briefcase className="w-12 h-12 mx-auto text-neutral-300 mb-3" />
-                <h3 className="text-base font-bold text-[#0d0c22]">Tidak Ada Brief Sesuai Filter</h3>
+                <h3 className="text-base font-bold text-[#171717]">Tidak Ada Brief Sesuai Filter</h3>
                 <p className="text-xs text-neutral-500 mt-1 max-w-sm mx-auto">
                   Belum ada brief proyek yang cocok dengan filter yang dipilih. Coba ganti filter atau buat brief baru.
                 </p>
                 <button
                   onClick={() => setBriefFilter('all')}
-                  className="mt-4 px-4 py-2 bg-[#0d0c22] text-white text-xs font-bold rounded-full hover:bg-neutral-800 transition cursor-pointer"
+                  className="mt-4 px-4 py-2 bg-[#0B1F3A] hover:bg-[#123B8C] text-white text-xs font-semibold rounded-xl transition cursor-pointer"
                 >
                   Tampilkan Semua Brief
                 </button>
@@ -819,7 +819,7 @@ export const UmkmProfilePage: React.FC<UmkmProfilePageProps> = ({
                     <div>
                       {/* Top Meta: Category Badge & Time */}
                       <div className="flex items-center justify-between gap-3 mb-3.5">
-                        <span className="px-3 py-1 rounded-full bg-[#f3f3f4] text-[#0d0c22] text-xs font-semibold">
+                        <span className="px-3 py-1 rounded-full bg-[#f3f3f4] text-[#171717] text-xs font-semibold">
                           {brief.category}
                         </span>
                         <div className="flex items-center gap-1.5 text-xs text-neutral-400 font-medium">
@@ -829,7 +829,7 @@ export const UmkmProfilePage: React.FC<UmkmProfilePageProps> = ({
                       </div>
 
                       {/* Title */}
-                      <h4 className="text-base sm:text-[17px] font-bold text-[#0d0c22] group-hover:text-blue-600 transition-colors line-clamp-2 leading-snug mb-2">
+                      <h4 className="text-base sm:text-[17px] font-bold text-[#171717] group-hover:text-blue-600 transition-colors line-clamp-2 leading-snug mb-2">
                         {brief.title}
                       </h4>
 
@@ -864,7 +864,7 @@ export const UmkmProfilePage: React.FC<UmkmProfilePageProps> = ({
                     <div className="pt-4 mt-6 border-t border-neutral-100 flex items-center justify-between gap-3">
                       <div>
                         <span className="text-[11px] text-neutral-400 font-medium block">Estimasi Anggaran</span>
-                        <span className="text-base sm:text-lg font-black text-[#0d0c22] tracking-tight block">
+                        <span className="text-base sm:text-lg font-bold text-[#171717] tracking-tight block">
                           {formatDisplayBudget(brief.formattedBudget, brief.budgetMin)}
                         </span>
                       </div>
@@ -873,7 +873,7 @@ export const UmkmProfilePage: React.FC<UmkmProfilePageProps> = ({
                         <button
                           type="button"
                           onClick={() => handleOpenEditBrief(brief)}
-                          className="px-4 py-1.5 sm:py-2 rounded-full border border-neutral-200 hover:border-neutral-300 bg-white hover:bg-neutral-50 text-[#0d0c22] text-xs font-semibold transition cursor-pointer flex items-center gap-1.5 shadow-2xs"
+                          className="px-4 py-1.5 sm:py-2 rounded-xl border border-[#E2E8F0] hover:border-neutral-300 bg-white hover:bg-neutral-50 text-[#171717] text-xs font-semibold transition cursor-pointer flex items-center gap-1.5 shadow-2xs"
                         >
                           <Edit3 className="w-3.5 h-3.5 text-neutral-600" />
                           <span>Edit brief</span>
@@ -892,7 +892,7 @@ export const UmkmProfilePage: React.FC<UmkmProfilePageProps> = ({
           <div>
             <div className="flex flex-col sm:flex-row sm:items-baseline justify-between gap-4 pb-6 border-b border-neutral-200/80 mb-6">
               <div>
-                <h3 className="text-xl sm:text-2xl font-bold text-[#0d0c22] tracking-tight">
+                <h3 className="text-xl sm:text-2xl font-bold text-[#171717] tracking-tight">
                   Galeri Karya Kolaborasi Kreator
                 </h3>
                 <p className="text-xs sm:text-sm text-neutral-500 mt-1 font-normal">
@@ -904,7 +904,7 @@ export const UmkmProfilePage: React.FC<UmkmProfilePageProps> = ({
             {(!profile.completedCollaborations || profile.completedCollaborations.length === 0) ? (
               <div className="text-center py-20 bg-neutral-50 rounded-3xl border border-neutral-100">
                 <Layers className="w-12 h-12 mx-auto text-neutral-300 mb-3" />
-                <h3 className="text-base font-bold text-[#0d0c22]">Belum Ada Karya Kolaborasi</h3>
+                <h3 className="text-base font-bold text-[#171717]">Belum Ada Karya Kolaborasi</h3>
                 <p className="text-xs text-neutral-500 mt-1 max-w-sm mx-auto">
                   Karya yang telah diselesaikan oleh kreator untuk brand ini akan muncul di sini.
                 </p>
@@ -992,7 +992,7 @@ export const UmkmProfilePage: React.FC<UmkmProfilePageProps> = ({
             {/* Header Ulasan Bersih */}
             <div className="flex flex-col sm:flex-row sm:items-baseline justify-between gap-4 pb-6 border-b border-neutral-200/80">
               <div>
-                <h3 className="text-xl sm:text-2xl font-bold text-[#0d0c22] tracking-tight">
+                <h3 className="text-xl sm:text-2xl font-bold text-[#171717] tracking-tight">
                   Ulasan dari Kreator
                 </h3>
                 <p className="text-xs sm:text-sm text-neutral-500 mt-1 font-normal">
@@ -1006,8 +1006,8 @@ export const UmkmProfilePage: React.FC<UmkmProfilePageProps> = ({
                   onClick={() => setReviewFilter('recent')}
                   className={`px-3 py-1.5 rounded-lg transition-colors cursor-pointer ${
                     reviewFilter === 'recent'
-                      ? 'bg-white text-[#0d0c22] shadow-xs font-semibold'
-                      : 'text-neutral-600 hover:text-[#0d0c22]'
+                      ? 'bg-white text-[#171717] shadow-xs font-semibold'
+                      : 'text-neutral-600 hover:text-[#171717]'
                   }`}
                 >
                   Terbaru
@@ -1016,8 +1016,8 @@ export const UmkmProfilePage: React.FC<UmkmProfilePageProps> = ({
                   onClick={() => setReviewFilter('highest')}
                   className={`px-3 py-1.5 rounded-lg transition-colors cursor-pointer ${
                     reviewFilter === 'highest'
-                      ? 'bg-white text-[#0d0c22] shadow-xs font-semibold'
-                      : 'text-neutral-600 hover:text-[#0d0c22]'
+                      ? 'bg-white text-[#171717] shadow-xs font-semibold'
+                      : 'text-neutral-600 hover:text-[#171717]'
                   }`}
                 >
                   Rating Tertinggi
@@ -1044,7 +1044,7 @@ export const UmkmProfilePage: React.FC<UmkmProfilePageProps> = ({
                         />
                         <div>
                           <div className="flex items-center gap-2">
-                            <h4 className="text-sm font-bold text-[#0d0c22]">
+                            <h4 className="text-sm font-bold text-[#171717]">
                               {rev.creatorName}
                             </h4>
                             <span className="text-xs text-neutral-400 font-normal">
@@ -1058,7 +1058,7 @@ export const UmkmProfilePage: React.FC<UmkmProfilePageProps> = ({
                       </div>
 
                       {/* Skor Bintang Sederhana */}
-                      <div className="flex items-center gap-1 font-semibold text-xs text-[#0d0c22] shrink-0 bg-[#f3f3f4] px-2.5 py-1 rounded-full">
+                      <div className="flex items-center gap-1 font-semibold text-xs text-[#171717] shrink-0 bg-[#f3f3f4] px-2.5 py-1 rounded-full">
                         <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
                         <span>{rev.rating.toFixed(1)}</span>
                       </div>
@@ -1102,7 +1102,7 @@ export const UmkmProfilePage: React.FC<UmkmProfilePageProps> = ({
               
               {/* Kisah & Bio Brand */}
               <div>
-                <h3 className="text-base sm:text-lg font-bold text-[#0d0c22] mb-3.5">
+                <h3 className="text-base sm:text-lg font-bold text-[#171717] mb-3.5">
                   Kisah Brand & Filosofi
                 </h3>
                 <div className="space-y-4 text-sm sm:text-[15px] text-neutral-800 leading-relaxed font-normal">
@@ -1118,7 +1118,7 @@ export const UmkmProfilePage: React.FC<UmkmProfilePageProps> = ({
               {/* Brand Values / Nilai Brand (Pills style) */}
               {profile.brandGuide?.brandValues && (
                 <div>
-                  <h3 className="text-base sm:text-lg font-bold text-[#0d0c22] mb-3">
+                  <h3 className="text-base sm:text-lg font-bold text-[#171717] mb-3">
                     Nilai & Karakter Brand
                   </h3>
                   <div className="flex flex-wrap gap-2">
@@ -1136,7 +1136,7 @@ export const UmkmProfilePage: React.FC<UmkmProfilePageProps> = ({
 
               {/* Target Audiens */}
               <div>
-                <h3 className="text-base sm:text-lg font-bold text-[#0d0c22] mb-3">
+                <h3 className="text-base sm:text-lg font-bold text-[#171717] mb-3">
                   Target Audiens Produk
                 </h3>
                 <p className="text-sm text-neutral-700 leading-relaxed font-normal">
@@ -1147,7 +1147,7 @@ export const UmkmProfilePage: React.FC<UmkmProfilePageProps> = ({
               {/* Kebijakan Kirim Sampel Produk Fisik */}
               {profile.brandGuide?.sampleShippingPolicy && (
                 <div>
-                  <h3 className="text-base sm:text-lg font-bold text-[#0d0c22] mb-3 flex items-center gap-2">
+                  <h3 className="text-base sm:text-lg font-bold text-[#171717] mb-3 flex items-center gap-2">
                     <Package className="w-4 h-4 text-neutral-600" />
                     <span>Kebijakan Pengiriman Sampel Produk Fisik</span>
                   </h3>
@@ -1159,7 +1159,7 @@ export const UmkmProfilePage: React.FC<UmkmProfilePageProps> = ({
 
               {/* Palet Warna Brand */}
               <div>
-                <h3 className="text-base sm:text-lg font-bold text-[#0d0c22] mb-3">
+                <h3 className="text-base sm:text-lg font-bold text-[#171717] mb-3">
                   Palet Warna Brand
                 </h3>
                 <div className="flex items-center gap-4">
@@ -1169,7 +1169,7 @@ export const UmkmProfilePage: React.FC<UmkmProfilePageProps> = ({
                       style={{ backgroundColor: profile.brandGuide?.primaryColor || '#78350f' }}
                     />
                     <div>
-                      <div className="text-xs font-bold text-[#0d0c22]">Warna Primer</div>
+                      <div className="text-xs font-bold text-[#171717]">Warna Primer</div>
                       <div className="text-[11px] font-mono text-neutral-500">{profile.brandGuide?.primaryColor || '#78350f'}</div>
                     </div>
                   </div>
@@ -1180,7 +1180,7 @@ export const UmkmProfilePage: React.FC<UmkmProfilePageProps> = ({
                       style={{ backgroundColor: profile.brandGuide?.secondaryColor || '#fef3c7' }}
                     />
                     <div>
-                      <div className="text-xs font-bold text-[#0d0c22]">Warna Sekunder</div>
+                      <div className="text-xs font-bold text-[#171717]">Warna Sekunder</div>
                       <div className="text-[11px] font-mono text-neutral-500">{profile.brandGuide?.secondaryColor || '#fef3c7'}</div>
                     </div>
                   </div>
@@ -1193,13 +1193,13 @@ export const UmkmProfilePage: React.FC<UmkmProfilePageProps> = ({
               {/* Follower / Community Stats Row */}
               <div className="flex flex-wrap items-center gap-6 sm:gap-8 text-sm text-neutral-600 font-normal">
                 <span>
-                  <strong className="text-[#0d0c22] font-semibold">{followersCount.toLocaleString()}</strong> pengikut brand
+                  <strong className="text-[#171717] font-semibold">{followersCount.toLocaleString()}</strong> pengikut brand
                 </span>
                 <span>
-                  <strong className="text-[#0d0c22] font-semibold">{profile.stats.completedProjects}</strong> kolaborasi kreator
+                  <strong className="text-[#171717] font-semibold">{profile.stats.completedProjects}</strong> kolaborasi kreator
                 </span>
                 <span>
-                  <strong className="text-[#0d0c22] font-semibold">100%</strong> escrow aman
+                  <strong className="text-[#171717] font-semibold">100%</strong> escrow aman
                 </span>
               </div>
 
@@ -1230,16 +1230,16 @@ export const UmkmProfilePage: React.FC<UmkmProfilePageProps> = ({
 
               {/* Contact Info */}
               <div className="pt-2">
-                <h4 className="text-sm font-bold text-[#0d0c22] mb-3">Kontak & Website</h4>
+                <h4 className="text-sm font-bold text-[#171717] mb-3">Kontak & Website</h4>
                 <div className="space-y-2.5 text-sm text-neutral-700">
                   {profile.website && (
                     <a
                       href={profile.website}
                       target="_blank"
                       rel="noreferrer"
-                      className="flex items-center gap-2.5 hover:text-[#0d0c22] transition group"
+                      className="flex items-center gap-2.5 hover:text-[#171717] transition group"
                     >
-                      <Globe className="w-4 h-4 text-neutral-500 group-hover:text-[#0d0c22]" />
+                      <Globe className="w-4 h-4 text-neutral-500 group-hover:text-[#171717]" />
                       <span>{profile.website.replace('https://', '')}</span>
                     </a>
                   )}
@@ -1248,7 +1248,7 @@ export const UmkmProfilePage: React.FC<UmkmProfilePageProps> = ({
                       href={`https://wa.me/${profile.whatsapp.replace(/\D/g, '')}`}
                       target="_blank"
                       rel="noreferrer"
-                      className="flex items-center gap-2.5 hover:text-[#0d0c22] transition group"
+                      className="flex items-center gap-2.5 hover:text-[#171717] transition group"
                     >
                       <Phone className="w-4 h-4 text-emerald-500" />
                       <span>WhatsApp ({profile.whatsapp})</span>
@@ -1259,7 +1259,7 @@ export const UmkmProfilePage: React.FC<UmkmProfilePageProps> = ({
                       href={`https://instagram.com/${profile.instagram.replace('@', '')}`}
                       target="_blank"
                       rel="noreferrer"
-                      className="flex items-center gap-2.5 hover:text-[#0d0c22] transition group"
+                      className="flex items-center gap-2.5 hover:text-[#171717] transition group"
                     >
                       <Instagram className="w-4 h-4 text-rose-500" />
                       <span>{profile.instagram}</span>
@@ -1271,12 +1271,12 @@ export const UmkmProfilePage: React.FC<UmkmProfilePageProps> = ({
               {/* Official Store Links */}
               {profile.marketplaceUrl && (
                 <div className="pt-2">
-                  <h4 className="text-sm font-bold text-[#0d0c22] mb-3">Official Online Store</h4>
+                  <h4 className="text-sm font-bold text-[#171717] mb-3">Official Online Store</h4>
                   <a
                     href={profile.marketplaceUrl}
                     target="_blank"
                     rel="noreferrer"
-                    className="flex items-center gap-2.5 text-sm text-neutral-700 hover:text-[#0d0c22] transition group p-3 rounded-2xl bg-[#fafafa] border border-neutral-100"
+                    className="flex items-center gap-2.5 text-sm text-neutral-700 hover:text-[#171717] transition group p-3 rounded-2xl bg-[#fafafa] border border-neutral-100"
                   >
                     <ShoppingBag className="w-4 h-4 text-amber-600 shrink-0" />
                     <span className="truncate font-medium">Buka Toko Resmi</span>
@@ -1300,11 +1300,11 @@ export const UmkmProfilePage: React.FC<UmkmProfilePageProps> = ({
           <div className="bg-white rounded-3xl max-w-xl w-full p-6 sm:p-8 space-y-5 shadow-2xl relative animate-in fade-in zoom-in-95 my-8">
             <div className="flex items-center justify-between pb-3 border-b border-neutral-100">
               <div className="flex items-center gap-2.5">
-                <div className="w-9 h-9 rounded-xl bg-[#f3f3f4] text-[#0d0c22] flex items-center justify-center">
+                <div className="w-9 h-9 rounded-xl bg-[#f3f3f4] text-[#171717] flex items-center justify-center">
                   <Edit3 className="w-5 h-5" />
                 </div>
                 <div>
-                  <h3 className="text-base font-bold text-[#0d0c22]">Edit Profil UMKM / Brand</h3>
+                  <h3 className="text-base font-bold text-[#171717]">Edit Profil UMKM / Brand</h3>
                   <p className="text-xs text-neutral-500">Perbarui identitas brand, kontak, dan kebijakan sampel</p>
                 </div>
               </div>
@@ -1432,13 +1432,13 @@ export const UmkmProfilePage: React.FC<UmkmProfilePageProps> = ({
                 <button
                   type="button"
                   onClick={() => setIsEditModalOpen(false)}
-                  className="px-4 py-2 rounded-full border border-neutral-200 text-neutral-700 font-semibold hover:bg-neutral-50 transition cursor-pointer"
+                  className="px-4 py-2 rounded-xl border border-[#E2E8F0] text-neutral-700 font-semibold hover:bg-neutral-50 transition cursor-pointer"
                 >
                   Batal
                 </button>
                 <button
                   type="submit"
-                  className="px-5 py-2 rounded-full bg-[#0d0c22] hover:bg-neutral-800 text-white font-semibold transition cursor-pointer shadow-xs"
+                  className="px-5 py-2 rounded-xl bg-[#0B1F3A] hover:bg-[#123B8C] text-white font-semibold transition cursor-pointer shadow-xs"
                 >
                   Simpan Perubahan
                 </button>
@@ -1456,11 +1456,11 @@ export const UmkmProfilePage: React.FC<UmkmProfilePageProps> = ({
           <div className="bg-white rounded-3xl max-w-xl w-full p-6 sm:p-8 space-y-5 shadow-2xl relative animate-in fade-in zoom-in-95 my-8">
             <div className="flex items-center justify-between pb-3 border-b border-neutral-100">
               <div className="flex items-center gap-2.5">
-                <div className="w-9 h-9 rounded-xl bg-[#f3f3f4] text-[#0d0c22] flex items-center justify-center">
+                <div className="w-9 h-9 rounded-xl bg-[#f3f3f4] text-[#171717] flex items-center justify-center">
                   <PlusCircle className="w-5 h-5 text-blue-600" />
                 </div>
                 <div>
-                  <h3 className="text-base font-bold text-[#0d0c22]">Pasang Brief Proyek Baru</h3>
+                  <h3 className="text-base font-bold text-[#171717]">Pasang Brief Proyek Baru</h3>
                   <p className="text-xs text-neutral-500">Kreator akan melihat dan mengajukan proposal langsung ke brief ini</p>
                 </div>
               </div>
@@ -1574,13 +1574,13 @@ export const UmkmProfilePage: React.FC<UmkmProfilePageProps> = ({
                 <button
                   type="button"
                   onClick={() => setIsPostBriefOpen(false)}
-                  className="px-4 py-2 rounded-full border border-neutral-200 text-neutral-700 font-semibold hover:bg-neutral-50 transition cursor-pointer"
+                  className="px-4 py-2 rounded-xl border border-[#E2E8F0] text-neutral-700 font-semibold hover:bg-neutral-50 transition cursor-pointer"
                 >
                   Batal
                 </button>
                 <button
                   type="submit"
-                  className="px-5 py-2 rounded-full bg-[#0d0c22] hover:bg-neutral-800 text-white font-semibold transition cursor-pointer shadow-xs"
+                  className="px-5 py-2 rounded-xl bg-[#0B1F3A] hover:bg-[#123B8C] text-white font-semibold transition cursor-pointer shadow-xs"
                 >
                   Publikasikan Brief
                 </button>
@@ -1598,11 +1598,11 @@ export const UmkmProfilePage: React.FC<UmkmProfilePageProps> = ({
           <div className="bg-white rounded-3xl max-w-xl w-full p-6 sm:p-8 space-y-5 shadow-2xl relative animate-in fade-in zoom-in-95 my-8">
             <div className="flex items-center justify-between pb-3 border-b border-neutral-100">
               <div className="flex items-center gap-2.5">
-                <div className="w-9 h-9 rounded-xl bg-[#f3f3f4] text-[#0d0c22] flex items-center justify-center">
+                <div className="w-9 h-9 rounded-xl bg-[#f3f3f4] text-[#171717] flex items-center justify-center">
                   <Edit3 className="w-5 h-5 text-blue-600" />
                 </div>
                 <div>
-                  <h3 className="text-base font-bold text-[#0d0c22]">Edit Brief Proyek</h3>
+                  <h3 className="text-base font-bold text-[#171717]">Edit Brief Proyek</h3>
                   <p className="text-xs text-neutral-500">Perbarui rincian kebutuhan dan kriteria kolaborasi brief</p>
                 </div>
               </div>
@@ -1716,13 +1716,13 @@ export const UmkmProfilePage: React.FC<UmkmProfilePageProps> = ({
                 <button
                   type="button"
                   onClick={() => setEditingBrief(null)}
-                  className="px-4 py-2 rounded-full border border-neutral-200 text-neutral-700 font-semibold hover:bg-neutral-50 transition cursor-pointer"
+                  className="px-4 py-2 rounded-xl border border-[#E2E8F0] text-neutral-700 font-semibold hover:bg-neutral-50 transition cursor-pointer"
                 >
                   Batal
                 </button>
                 <button
                   type="submit"
-                  className="px-5 py-2 rounded-full bg-[#0d0c22] hover:bg-neutral-800 text-white font-semibold transition cursor-pointer shadow-xs"
+                  className="px-5 py-2 rounded-xl bg-[#0B1F3A] hover:bg-[#123B8C] text-white font-semibold transition cursor-pointer shadow-xs"
                 >
                   Simpan Perubahan
                 </button>
@@ -1740,10 +1740,10 @@ export const UmkmProfilePage: React.FC<UmkmProfilePageProps> = ({
           <div className="bg-white rounded-3xl max-w-lg w-full p-6 sm:p-7 space-y-4 shadow-2xl relative animate-in fade-in zoom-in-95 my-8">
             <div className="flex items-start justify-between gap-3 pb-3 border-b border-neutral-100">
               <div>
-                <span className="px-2.5 py-0.5 rounded-full bg-[#f3f3f4] text-[#0d0c22] text-xs font-semibold">
+                <span className="px-2.5 py-0.5 rounded-full bg-[#f3f3f4] text-[#171717] text-xs font-semibold">
                   {selectedBriefDetail.category}
                 </span>
-                <h3 className="text-base font-bold text-[#0d0c22] mt-2">
+                <h3 className="text-base font-bold text-[#171717] mt-2">
                   {selectedBriefDetail.title}
                 </h3>
               </div>
@@ -1759,7 +1759,7 @@ export const UmkmProfilePage: React.FC<UmkmProfilePageProps> = ({
               <div className="flex items-center justify-between p-3.5 rounded-2xl bg-[#fafafa] border border-neutral-100">
                 <div>
                   <div className="text-[11px] text-neutral-500">Anggaran Proyek</div>
-                  <div className="font-extrabold text-[#0d0c22] text-sm">
+                  <div className="font-extrabold text-[#171717] text-sm">
                     {formatDisplayBudget(selectedBriefDetail.formattedBudget, selectedBriefDetail.budgetMin)}
                   </div>
                 </div>
@@ -1790,7 +1790,7 @@ export const UmkmProfilePage: React.FC<UmkmProfilePageProps> = ({
             <div className="flex items-center justify-end gap-2 pt-3 border-t border-neutral-100">
               <button
                 onClick={() => setSelectedBriefDetail(null)}
-                className="px-4 py-2 rounded-full border border-neutral-200 text-neutral-700 text-xs font-semibold cursor-pointer"
+                className="px-4 py-2 rounded-xl border border-[#E2E8F0] text-neutral-700 text-xs font-semibold cursor-pointer"
               >
                 Tutup
               </button>
@@ -1800,7 +1800,7 @@ export const UmkmProfilePage: React.FC<UmkmProfilePageProps> = ({
                   setSelectedBriefDetail(null);
                   handleOpenEditBrief(b);
                 }}
-                className="px-5 py-2 rounded-full bg-[#0d0c22] hover:bg-neutral-800 text-white text-xs font-semibold cursor-pointer shadow-xs flex items-center gap-1.5"
+                className="px-5 py-2 rounded-xl bg-[#0B1F3A] hover:bg-[#123B8C] text-white text-xs font-semibold cursor-pointer shadow-xs flex items-center gap-1.5"
               >
                 <Edit3 className="w-3.5 h-3.5" />
                 <span>Edit brief</span>
@@ -1821,7 +1821,7 @@ export const UmkmProfilePage: React.FC<UmkmProfilePageProps> = ({
                 <span className="px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 text-[11px] font-semibold border border-emerald-100">
                   Kirim Lamaran ke {profile.brandName}
                 </span>
-                <h3 className="text-base font-bold text-[#0d0c22] mt-1.5 line-clamp-1">
+                <h3 className="text-base font-bold text-[#171717] mt-1.5 line-clamp-1">
                   {selectedApplyBrief.title}
                 </h3>
               </div>
@@ -1893,14 +1893,14 @@ export const UmkmProfilePage: React.FC<UmkmProfilePageProps> = ({
                 <button
                   type="button"
                   onClick={() => setSelectedApplyBrief(null)}
-                  className="px-4 py-2 rounded-full border border-neutral-200 text-neutral-700 font-semibold cursor-pointer"
+                  className="px-4 py-2 rounded-xl border border-[#E2E8F0] text-neutral-700 font-semibold cursor-pointer"
                 >
                   Batal
                 </button>
                 <button
                   type="submit"
                   disabled={isSubmittingProposal}
-                  className="px-5 py-2 rounded-full bg-[#0d0c22] hover:bg-neutral-800 text-white font-semibold transition cursor-pointer shadow-xs flex items-center gap-2"
+                  className="px-5 py-2 rounded-xl bg-[#0B1F3A] hover:bg-[#123B8C] text-white font-semibold transition cursor-pointer shadow-xs flex items-center gap-2"
                 >
                   {isSubmittingProposal ? (
                     <span>Mengirim...</span>
@@ -1940,10 +1940,10 @@ export const UmkmProfilePage: React.FC<UmkmProfilePageProps> = ({
             <div className="p-6 space-y-4">
               <div className="flex items-start justify-between gap-4">
                 <div>
-                  <span className="px-2.5 py-0.5 rounded-full bg-[#f3f3f4] text-[#0d0c22] text-xs font-semibold">
+                  <span className="px-2.5 py-0.5 rounded-full bg-[#f3f3f4] text-[#171717] text-xs font-semibold">
                     {selectedCollabDetail.category}
                   </span>
-                  <h3 className="text-lg font-bold text-[#0d0c22] mt-1.5">
+                  <h3 className="text-lg font-bold text-[#171717] mt-1.5">
                     {selectedCollabDetail.title}
                   </h3>
                 </div>
@@ -1986,7 +1986,7 @@ export const UmkmProfilePage: React.FC<UmkmProfilePageProps> = ({
                       navigateTo('explore', '/explore');
                     }
                   }}
-                  className="px-5 py-2 rounded-full bg-[#0d0c22] hover:bg-neutral-800 text-white text-xs font-semibold transition cursor-pointer"
+                  className="px-5 py-2 rounded-xl bg-[#0B1F3A] hover:bg-[#123B8C] text-white text-xs font-semibold transition cursor-pointer"
                 >
                   Lihat Profil Kreator
                 </button>

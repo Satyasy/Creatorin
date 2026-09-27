@@ -12,7 +12,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
   const isWorkspace = pathname?.startsWith('/chat') || pathname?.startsWith('/collaboration');
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#fafafa] text-[#0d0c22] font-sans selection:bg-[#0d0c22] selection:text-white">
+    <div className="min-h-screen flex flex-col bg-[#F8FAFC] text-[#171717] font-sans selection:bg-[#0B1F3A] selection:text-white">
       <Navbar />
       <main className="flex-1 w-full flex flex-col">
         {children}

@@ -291,7 +291,7 @@ export const CollaborationRoomPage: React.FC<CollaborationRoomPageProps> = ({
       )}
 
       {/* Main Container - Desktop SaaS Layout matching reference */}
-      <main className="max-w-[1440px] mx-auto px-6 sm:px-8 lg:px-12 py-7 sm:py-9 space-y-7">
+      <main className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-6">
         
         {/* ============================================================== */}
         {/* SECTION B: HERO / PAGE HEADER (MATCHING REFERENCE SCREENSHOT) */}

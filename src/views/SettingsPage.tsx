@@ -90,7 +90,7 @@ export const SettingsPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#fafafa] text-[#0d0c22] font-sans pt-8 pb-16">
+    <div className="min-h-screen bg-[#F8FAFC] text-[#171717] font-sans pt-8 pb-16">
       <div className="max-w-4xl mx-auto px-6">
         
         {/* Top Back / Header */}
@@ -98,13 +98,13 @@ export const SettingsPage: React.FC = () => {
           <div className="flex items-center gap-3">
             <button
               onClick={() => router.back()}
-              className="p-2 rounded-full hover:bg-neutral-200/60 transition cursor-pointer text-neutral-600"
+              className="p-2 rounded-xl hover:bg-neutral-200/60 transition cursor-pointer text-neutral-600"
               title="Kembali"
             >
               <ArrowLeft className="w-5 h-5" />
             </button>
             <div>
-              <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-[#0d0c22]">
+              <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-[#171717]">
                 Pengaturan Akun
               </h1>
               <p className="text-xs sm:text-sm text-neutral-500 mt-0.5">
@@ -115,12 +115,12 @@ export const SettingsPage: React.FC = () => {
         </div>
 
         {/* Tab Navigation */}
-        <div className="flex items-center gap-2 border-b border-neutral-200 mb-8 overflow-x-auto">
+        <div className="flex items-center gap-2 border-b border-[#E2E8F0] mb-8 overflow-x-auto">
           <button
             onClick={() => setActiveTab('profile')}
             className={`px-4 py-2.5 text-xs sm:text-sm font-semibold border-b-2 transition cursor-pointer flex items-center gap-2 ${
               activeTab === 'profile'
-                ? 'border-[#0d0c22] text-[#0d0c22]'
+                ? 'border-[#0B1F3A] text-[#0B1F3A]'
                 : 'border-transparent text-neutral-500 hover:text-neutral-800'
             }`}
           >
@@ -131,7 +131,7 @@ export const SettingsPage: React.FC = () => {
             onClick={() => setActiveTab('preferences')}
             className={`px-4 py-2.5 text-xs sm:text-sm font-semibold border-b-2 transition cursor-pointer flex items-center gap-2 ${
               activeTab === 'preferences'
-                ? 'border-[#0d0c22] text-[#0d0c22]'
+                ? 'border-[#0B1F3A] text-[#0B1F3A]'
                 : 'border-transparent text-neutral-500 hover:text-neutral-800'
             }`}
           >
@@ -142,7 +142,7 @@ export const SettingsPage: React.FC = () => {
             onClick={() => setActiveTab('security')}
             className={`px-4 py-2.5 text-xs sm:text-sm font-semibold border-b-2 transition cursor-pointer flex items-center gap-2 ${
               activeTab === 'security'
-                ? 'border-[#0d0c22] text-[#0d0c22]'
+                ? 'border-[#0B1F3A] text-[#0B1F3A]'
                 : 'border-transparent text-neutral-500 hover:text-neutral-800'
             }`}
           >
@@ -156,24 +156,24 @@ export const SettingsPage: React.FC = () => {
           
           {/* TAB 1: PROFIL UTAMA */}
           {activeTab === 'profile' && (
-            <div className="bg-white rounded-2xl border border-neutral-200/80 p-6 sm:p-8 space-y-6 shadow-2xs">
+            <div className="bg-white rounded-2xl border border-[#E2E8F0] p-6 sm:p-8 space-y-6 shadow-2xs">
               
               {/* Avatar Section */}
-              <div className="flex items-center gap-5 pb-6 border-b border-neutral-100">
+              <div className="flex items-center gap-5 pb-6 border-b border-[#E2E8F0]">
                 <div className="relative">
                   <img
                     src={user?.avatar || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=160&auto=format&fit=crop&q=80'}
                     alt={fullName}
                     className="w-20 h-20 rounded-full object-cover ring-4 ring-neutral-100"
                   />
-                  <div className="absolute bottom-0 right-0 p-1.5 rounded-full bg-[#0d0c22] text-white shadow-xs">
+                  <div className="absolute bottom-0 right-0 p-1.5 rounded-full bg-[#0B1F3A] text-white shadow-xs">
                     <Camera className="w-3.5 h-3.5" />
                   </div>
                 </div>
                 <div>
-                  <h3 className="text-sm font-bold text-[#0d0c22]">{fullName}</h3>
+                  <h3 className="text-sm font-bold text-[#171717]">{fullName}</h3>
                   <p className="text-xs text-neutral-500 mt-0.5">{user?.role === 'creator' ? 'Kreator Terverifikasi' : 'Brand / UMKM'}</p>
-                  <span className="inline-block mt-2 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-neutral-100 text-neutral-700">
+                  <span className="inline-block mt-2 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-[#F3F3F4] text-neutral-700">
                     Format JPG, PNG maks 2MB
                   </span>
                 </div>
@@ -192,7 +192,7 @@ export const SettingsPage: React.FC = () => {
                       value={fullName}
                       onChange={(e) => setFullName(e.target.value)}
                       required
-                      className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-neutral-200 text-xs sm:text-sm font-medium focus:outline-none focus:border-[#0d0c22] transition-colors"
+                      className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-[#E2E8F0] text-xs sm:text-sm font-medium focus:outline-none focus:border-[#0B1F3A] text-[#171717] transition-colors"
                     />
                   </div>
                 </div>
@@ -208,7 +208,7 @@ export const SettingsPage: React.FC = () => {
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       required
-                      className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-neutral-200 text-xs sm:text-sm font-medium focus:outline-none focus:border-[#0d0c22] transition-colors"
+                      className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-[#E2E8F0] text-xs sm:text-sm font-medium focus:outline-none focus:border-[#0B1F3A] text-[#171717] transition-colors"
                     />
                   </div>
                 </div>
@@ -223,7 +223,7 @@ export const SettingsPage: React.FC = () => {
                       type="text"
                       value={location}
                       onChange={(e) => setLocation(e.target.value)}
-                      className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-neutral-200 text-xs sm:text-sm font-medium focus:outline-none focus:border-[#0d0c22] transition-colors"
+                      className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-[#E2E8F0] text-xs sm:text-sm font-medium focus:outline-none focus:border-[#0B1F3A] text-[#171717] transition-colors"
                     />
                   </div>
                 </div>
@@ -238,7 +238,7 @@ export const SettingsPage: React.FC = () => {
                       type="text"
                       value={phone}
                       onChange={(e) => setPhone(e.target.value)}
-                      className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-neutral-200 text-xs sm:text-sm font-medium focus:outline-none focus:border-[#0d0c22] transition-colors"
+                      className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-[#E2E8F0] text-xs sm:text-sm font-medium focus:outline-none focus:border-[#0B1F3A] text-[#171717] transition-colors"
                     />
                   </div>
                 </div>
@@ -252,7 +252,7 @@ export const SettingsPage: React.FC = () => {
                   rows={3}
                   value={bio}
                   onChange={(e) => setBio(e.target.value)}
-                  className="w-full px-4 py-2.5 rounded-xl border border-neutral-200 text-xs sm:text-sm font-medium focus:outline-none focus:border-[#0d0c22] transition-colors resize-none"
+                  className="w-full px-4 py-2.5 rounded-xl border border-[#E2E8F0] text-xs sm:text-sm font-medium focus:outline-none focus:border-[#0B1F3A] text-[#171717] transition-colors resize-none"
                 />
               </div>
 
@@ -261,38 +261,38 @@ export const SettingsPage: React.FC = () => {
 
           {/* TAB 2: NOTIFIKASI & BAHASA */}
           {activeTab === 'preferences' && (
-            <div className="bg-white rounded-2xl border border-neutral-200/80 p-6 sm:p-8 space-y-6 shadow-2xs">
-              <h3 className="text-sm font-bold text-[#0d0c22]">Preferensi Notifikasi</h3>
+            <div className="bg-white rounded-2xl border border-[#E2E8F0] p-6 sm:p-8 space-y-6 shadow-2xs">
+              <h3 className="text-sm font-bold text-[#171717]">Preferensi Notifikasi</h3>
               
               <div className="space-y-4">
-                <div className="flex items-center justify-between p-4 rounded-xl border border-neutral-100 bg-neutral-50/50">
+                <div className="flex items-center justify-between p-4 rounded-xl border border-[#E2E8F0] bg-neutral-50/50">
                   <div>
-                    <h4 className="text-xs sm:text-sm font-semibold text-[#0d0c22]">Notifikasi Email</h4>
+                    <h4 className="text-xs sm:text-sm font-semibold text-[#171717]">Notifikasi Email</h4>
                     <p className="text-xs text-neutral-500 mt-0.5">Terima pembaruan brief, pembayaran escrow, dan pesan baru via email.</p>
                   </div>
                   <input
                     type="checkbox"
                     checked={notifyEmail}
                     onChange={(e) => setNotifyEmail(e.target.checked)}
-                    className="w-5 h-5 accent-[#0d0c22] cursor-pointer"
+                    className="w-5 h-5 accent-[#0B1F3A] cursor-pointer"
                   />
                 </div>
 
-                <div className="flex items-center justify-between p-4 rounded-xl border border-neutral-100 bg-neutral-50/50">
+                <div className="flex items-center justify-between p-4 rounded-xl border border-[#E2E8F0] bg-neutral-50/50">
                   <div>
-                    <h4 className="text-xs sm:text-sm font-semibold text-[#0d0c22]">Notifikasi Push & Browser</h4>
+                    <h4 className="text-xs sm:text-sm font-semibold text-[#171717]">Notifikasi Push & Browser</h4>
                     <p className="text-xs text-neutral-500 mt-0.5">Dapatkan pemberitahuan seketika saat ada kiriman revisi atau persetujuan proyek.</p>
                   </div>
                   <input
                     type="checkbox"
                     checked={notifyPush}
                     onChange={(e) => setNotifyPush(e.target.checked)}
-                    className="w-5 h-5 accent-[#0d0c22] cursor-pointer"
+                    className="w-5 h-5 accent-[#0B1F3A] cursor-pointer"
                   />
                 </div>
               </div>
 
-              <div className="pt-4 border-t border-neutral-100">
+              <div className="pt-4 border-t border-[#E2E8F0]">
                 <label className="block text-xs font-bold text-neutral-700 mb-2">
                   Bahasa Antarmuka
                 </label>
@@ -302,8 +302,8 @@ export const SettingsPage: React.FC = () => {
                     onClick={() => setLanguage('id')}
                     className={`px-4 py-2 rounded-xl text-xs font-semibold border transition cursor-pointer ${
                       language === 'id' 
-                        ? 'border-[#0d0c22] bg-[#0d0c22] text-white' 
-                        : 'border-neutral-200 text-neutral-600 hover:bg-neutral-50'
+                        ? 'border-[#0B1F3A] bg-[#0B1F3A] text-white' 
+                        : 'border-[#E2E8F0] text-neutral-600 hover:bg-neutral-50'
                     }`}
                   >
                     Bahasa Indonesia
@@ -313,8 +313,8 @@ export const SettingsPage: React.FC = () => {
                     onClick={() => setLanguage('en')}
                     className={`px-4 py-2 rounded-xl text-xs font-semibold border transition cursor-pointer ${
                       language === 'en' 
-                        ? 'border-[#0d0c22] bg-[#0d0c22] text-white' 
-                        : 'border-neutral-200 text-neutral-600 hover:bg-neutral-50'
+                        ? 'border-[#0B1F3A] bg-[#0B1F3A] text-white' 
+                        : 'border-[#E2E8F0] text-neutral-600 hover:bg-neutral-50'
                     }`}
                   >
                     English
@@ -327,8 +327,8 @@ export const SettingsPage: React.FC = () => {
 
           {/* TAB 3: KEAMANAN & SANDI */}
           {activeTab === 'security' && (
-            <div className="bg-white rounded-2xl border border-neutral-200/80 p-6 sm:p-8 space-y-6 shadow-2xs">
-              <h3 className="text-sm font-bold text-[#0d0c22]">Ubah Kata Sandi</h3>
+            <div className="bg-white rounded-2xl border border-[#E2E8F0] p-6 sm:p-8 space-y-6 shadow-2xs">
+              <h3 className="text-sm font-bold text-[#171717]">Ubah Kata Sandi</h3>
               
               <div className="space-y-4 max-w-md">
                 <div>
@@ -340,7 +340,7 @@ export const SettingsPage: React.FC = () => {
                     value={oldPassword}
                     onChange={(e) => setOldPassword(e.target.value)}
                     placeholder="••••••••"
-                    className="w-full px-4 py-2.5 rounded-xl border border-neutral-200 text-xs sm:text-sm font-medium focus:outline-none focus:border-[#0d0c22] transition-colors"
+                    className="w-full px-4 py-2.5 rounded-xl border border-[#E2E8F0] text-xs sm:text-sm font-medium focus:outline-none focus:border-[#0B1F3A] text-[#171717] transition-colors"
                   />
                 </div>
 
@@ -353,7 +353,7 @@ export const SettingsPage: React.FC = () => {
                     value={newPassword}
                     onChange={(e) => setNewPassword(e.target.value)}
                     placeholder="Minimal 8 karakter"
-                    className="w-full px-4 py-2.5 rounded-xl border border-neutral-200 text-xs sm:text-sm font-medium focus:outline-none focus:border-[#0d0c22] transition-colors"
+                    className="w-full px-4 py-2.5 rounded-xl border border-[#E2E8F0] text-xs sm:text-sm font-medium focus:outline-none focus:border-[#0B1F3A] text-[#171717] transition-colors"
                   />
                 </div>
 
@@ -366,7 +366,7 @@ export const SettingsPage: React.FC = () => {
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
                     placeholder="Minimal 8 karakter"
-                    className="w-full px-4 py-2.5 rounded-xl border border-neutral-200 text-xs sm:text-sm font-medium focus:outline-none focus:border-[#0d0c22] transition-colors"
+                    className="w-full px-4 py-2.5 rounded-xl border border-[#E2E8F0] text-xs sm:text-sm font-medium focus:outline-none focus:border-[#0B1F3A] text-[#171717] transition-colors"
                   />
                 </div>
               </div>
@@ -395,7 +395,7 @@ export const SettingsPage: React.FC = () => {
             <button
               type="submit"
               disabled={isSaving}
-              className="inline-flex items-center gap-2 px-6 py-2.5 rounded-full bg-[#0d0c22] hover:bg-neutral-800 active:scale-95 text-white text-xs sm:text-sm font-bold transition shadow-xs cursor-pointer disabled:opacity-50"
+              className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl bg-[#0B1F3A] hover:bg-[#123B8C] active:scale-95 text-white text-xs sm:text-sm font-semibold transition shadow-xs cursor-pointer disabled:opacity-50"
             >
               <Save className="w-4 h-4" />
               <span>{isSaving ? 'Menyimpan...' : 'Simpan Perubahan'}</span>

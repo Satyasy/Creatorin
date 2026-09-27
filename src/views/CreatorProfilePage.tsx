@@ -445,11 +445,11 @@ export const CreatorProfilePage: React.FC<CreatorProfilePageProps> = ({
       {/* ==================================================================== */}
       {/* HERO SECTION (Style Exactly Matching The Uploaded Screenshot) */}
       {/* ==================================================================== */}
-      <section className="max-w-[1440px] mx-auto px-6 lg:px-8 py-6">
-        {/* Rounded Top Banner Card */}
-        <div className="relative h-[220px] sm:h-[260px] lg:h-[288px] w-full overflow-hidden rounded-[32px] bg-[#0063b4]">
+      <section className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        {/* Rounded Top Banner Card (Large panel radius 24px according to design.md §7) */}
+        <div className="relative h-[220px] sm:h-[260px] lg:h-[288px] w-full overflow-hidden rounded-3xl bg-[#0063b4]">
           <ShaderFill
-            className="absolute inset-0 rounded-[32px]"
+            className="absolute inset-0 rounded-3xl"
             shader={{
               setup: setupConcentric,
               render: renderConcentric,
@@ -566,24 +566,24 @@ export const CreatorProfilePage: React.FC<CreatorProfilePageProps> = ({
               )}
             </div>
 
-            {/* Button 2: Follow Toggle Button */}
+            {/* Button 2: Follow Toggle Button (rounded-xl 10-12px according to design.md §7) */}
             <button
               id="btn-follow-toggle"
               onClick={toggleFollow}
-              className={`rounded-full border px-5 py-2.5 text-[14px] font-semibold leading-5 tracking-[-0.15px] transition cursor-pointer ${
+              className={`h-10 px-5 rounded-xl border text-sm font-semibold transition-colors cursor-pointer ${
                 isFollowing
-                  ? 'border-neutral-300 bg-white text-[#0d0c22] hover:bg-neutral-50'
-                  : 'border-[#0d0c22] bg-[#0d0c22] text-white hover:bg-neutral-800'
+                  ? 'border-[#E2E8F0] bg-white text-[#171717] hover:bg-[#F8FAFC]'
+                  : 'border-[#0B1F3A] bg-[#0B1F3A] text-white hover:bg-[#123B8C]'
               }`}
             >
               {isFollowing ? 'Following' : 'Follow'}
             </button>
 
-            {/* Button 3: Primary Solid Black CTA Button (Kirim Pesan) */}
+            {/* Button 3: Primary Transactional CTA Button (Dark Navy #0B1F3A, rounded-xl 12px) */}
             <button
               id="btn-send-message-primary"
               onClick={() => setIsGetInTouchOpen(true)}
-              className="flex items-center gap-2 rounded-full bg-[#0d0c22] px-6 py-2.5 text-[14px] font-bold leading-5 tracking-[-0.15px] text-white shadow-xs transition hover:bg-neutral-900 cursor-pointer"
+              className="flex items-center gap-2 h-10 px-5 rounded-xl bg-[#0B1F3A] hover:bg-[#123B8C] text-sm font-semibold text-white shadow-xs transition-colors cursor-pointer"
             >
               <Mail className="w-3.5 h-3.5" />
               <span>Kirim Pesan</span>
@@ -598,46 +598,46 @@ export const CreatorProfilePage: React.FC<CreatorProfilePageProps> = ({
           
           {/* Name & Badges */}
           <div className="flex items-center gap-2.5">
-            <h1 className="text-[32px] font-black leading-[38.4px] tracking-[-0.39px] text-[#0d0c22]">
+            <h1 className="text-2xl sm:text-3xl lg:text-[40px] font-bold leading-tight lg:leading-[48px] tracking-tight text-[#0F172A]">
               {creator.name}
             </h1>
             {creator.verified && (
-              <CheckCircle2 className="w-5 h-5 sm:w-6 sm:h-6 text-blue-600 fill-blue-600 text-white" />
+              <CheckCircle2 className="w-5 h-5 sm:w-6 sm:h-6 text-[#1D4ED8] fill-[#1D4ED8] text-white" />
             )}
             {creator.careerScore?.overall >= 95 && (
-              <span className="px-2 py-0.5 rounded text-[10px] font-black uppercase bg-[#0d0c22] text-white">
+              <span className="px-2 py-0.5 rounded-md text-[10px] font-bold uppercase bg-[#0B1F3A] text-white">
                 PRO+
               </span>
             )}
           </div>
 
-          {/* Tagline / Headline (Directly Below Name, Clean & Concise) */}
-          <p className="mt-1 max-w-2xl text-[16px] font-normal leading-[26px] tracking-[-0.31px] text-[#525252]">
+          {/* Tagline / Headline */}
+          <p className="mt-2 max-w-2xl text-base font-normal leading-6 text-[#64748B]">
             {creator.roleTitle || creator.heroHeadline || 'Design in business. Business in design.'}
           </p>
 
-          {/* Inline Stats Row (Matching Style: 12.234 Students 293 Online 13 Admins) */}
-          <div className="mt-2.5 flex flex-wrap items-center gap-x-5 gap-y-1.5 text-[14px] font-medium leading-5 tracking-[-0.15px] text-[#737373]">
+          {/* Inline Stats Row (Standardized scale spacing gap-x-6 gap-y-2) */}
+          <div className="mt-3 flex flex-wrap items-center gap-x-6 gap-y-2 text-sm font-normal text-[#64748B]">
             <span>
-              <strong className="text-[#0d0c22] font-semibold">
+              <strong className="text-[#0F172A] font-semibold">
                 {creator.stats?.completedProjects || '142+'}
               </strong>{' '}
               Proyek Selesai
             </span>
             <span>
-              <strong className="text-[#0d0c22] font-semibold">
+              <strong className="text-[#0F172A] font-semibold">
                 {creator.rating || '4.9'} ★
               </strong>{' '}
               ({creator.reviewCount || 98} Ulasan)
             </span>
             <span>
-              <strong className="text-[#0d0c22] font-semibold">
+              <strong className="text-[#0F172A] font-semibold">
                 {followersCount.toLocaleString()}
               </strong>{' '}
               Pengikut
             </span>
             <span>
-              <strong className="text-[#0d0c22] font-semibold">
+              <strong className="text-[#0F172A] font-semibold">
                 {creator.careerScore?.overall || 98}%
               </strong>{' '}
               Skor Karir
@@ -659,7 +659,7 @@ export const CreatorProfilePage: React.FC<CreatorProfilePageProps> = ({
       {/* TAB NAVIGATION BAR (Work, Services, Reviews, Collections, Liked Shots, About) */}
       {/* ==================================================================== */}
       <div className="sticky top-20 z-30 border-b border-[#eaeaea] bg-white/95 backdrop-blur-md">
-        <div className="mx-auto flex max-w-[1440px] flex-col items-stretch justify-between gap-4 px-6 py-3 sm:flex-row sm:items-center lg:px-8">
+        <div className="mx-auto flex max-w-[1440px] flex-col items-stretch justify-between gap-4 px-4 sm:px-6 lg:px-8 py-3 sm:flex-row sm:items-center">
           
           {/* Tabs Group */}
           <div className="flex h-10 items-center gap-2 overflow-x-auto no-scrollbar py-0.5">
@@ -813,7 +813,7 @@ export const CreatorProfilePage: React.FC<CreatorProfilePageProps> = ({
       {/* ==================================================================== */}
       {/* TAB CONTENT AREA */}
       {/* ==================================================================== */}
-      <main className="max-w-[1440px] mx-auto px-6 lg:px-8 py-8 sm:py-12">
+      <main className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
         
         {/* ----------------- TAB 1: PROYEK (EXPLORE PROJECTS CARD DESIGN) ----------------- */}
         {activeTab === 'work' && (

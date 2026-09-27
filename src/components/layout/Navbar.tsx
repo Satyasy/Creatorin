@@ -104,7 +104,7 @@ export const Navbar: React.FC<NavbarProps> = ({
 
   return (
     <header id="main-header" className="sticky top-0 z-40 w-full bg-white border-b border-neutral-200/80 transition-all font-sans">
-      <div className="max-w-[1440px] mx-auto px-6 lg:px-8 h-20 flex items-center justify-between gap-4">
+      <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between gap-4">
         
         {/* Sisi Kiri: Logo Brand & Search Bar Dribbble Style */}
         <div className={`flex items-center gap-6 xl:gap-8 ${isSearchVisible ? 'flex-1 max-w-2xl' : 'shrink-0'}`}>
@@ -130,7 +130,7 @@ export const Navbar: React.FC<NavbarProps> = ({
           {isSearchVisible && (
             <form 
               onSubmit={handleSearchSubmit}
-              className="hidden md:flex items-center w-full max-w-md bg-neutral-100 hover:bg-neutral-200/70 focus-within:bg-white focus-within:ring-2 focus-within:ring-[#0d0c22] rounded-full p-1.5 pl-5 transition-all border border-transparent focus-within:border-transparent"
+              className="hidden md:flex items-center w-full max-w-md bg-[#F3F3F4] hover:bg-neutral-200/70 focus-within:bg-white focus-within:ring-2 focus-within:ring-[#0B1F3A] rounded-xl p-1 pl-4 transition-all border border-[#E2E8F0] focus-within:border-transparent"
             >
               <input
                 type="text"
@@ -141,13 +141,13 @@ export const Navbar: React.FC<NavbarProps> = ({
                   if (onSearch) onSearch(e.target.value);
                 }}
                 placeholder="Cari kreator, keahlian, atau video UGC..."
-                className="w-full bg-transparent text-xs sm:text-sm text-[#0d0c22] placeholder:text-neutral-400 focus:outline-hidden"
+                className="w-full bg-transparent text-xs sm:text-sm text-[#171717] placeholder:text-[#9F9F9F] focus:outline-hidden"
               />
               
-              {/* Blue Search Button */}
+              {/* Brand Blue Search Button */}
               <button
                 type="submit"
-                className="w-8 h-8 rounded-full bg-blue-600 hover:bg-blue-700 text-white flex items-center justify-center shrink-0 transition shadow-2xs cursor-pointer ml-2"
+                className="w-8 h-8 rounded-lg bg-[#1D4ED8] hover:bg-[#1e40af] text-white flex items-center justify-center shrink-0 transition shadow-2xs cursor-pointer ml-2"
               >
                 <Search className="w-4 h-4" />
               </button>
@@ -156,8 +156,8 @@ export const Navbar: React.FC<NavbarProps> = ({
 
         </div>
 
-        {/* Tengah: Nav Link (Beranda, Jelajah & Collaboration Room) */}
-        <nav className="hidden lg:flex items-center gap-7 text-sm font-semibold text-[#0d0c22]">
+        {/* Tengah: Nav Link (Beranda, Jelajah & Collaboration Room) — Gap 32px according to design.md §11 */}
+        <nav className="hidden lg:flex items-center gap-8 xl:gap-9 text-sm font-semibold text-[#171717]">
           
           {/* Nav Link Beranda */}
           <button
@@ -165,8 +165,8 @@ export const Navbar: React.FC<NavbarProps> = ({
             onClick={() => navigateTo('home', '/')}
             className={`transition-colors flex items-center gap-1.5 cursor-pointer ${
               activePage === 'home' || pathname === '/'
-                ? 'text-blue-600 font-bold'
-                : 'text-neutral-700 hover:text-blue-600'
+                ? 'text-[#1D4ED8] font-bold'
+                : 'text-[#64748B] hover:text-[#1D4ED8]'
             }`}
           >
             <span>Beranda</span>
@@ -387,14 +387,14 @@ export const Navbar: React.FC<NavbarProps> = ({
               <button
                 id="nav-signin-btn"
                 onClick={() => navigateTo('signin', '/sign-in')}
-                className="px-3.5 py-2 text-xs sm:text-sm font-semibold text-[#0d0c22] hover:text-blue-600 transition-colors cursor-pointer"
+                className="px-3.5 py-2 text-xs sm:text-sm font-semibold text-[#171717] hover:text-[#1D4ED8] transition-colors cursor-pointer"
               >
                 Masuk
               </button>
               <button
                 id="nav-signup-btn"
                 onClick={() => navigateTo('signup', '/sign-up')}
-                className="px-4 py-2.5 text-xs sm:text-sm font-semibold text-white bg-[#0d0c22] hover:bg-[#2b2a45] rounded-full transition shadow-xs cursor-pointer"
+                className="h-10 px-4 text-xs sm:text-sm font-semibold text-white bg-[#0B1F3A] hover:bg-[#123B8C] rounded-xl transition-colors shadow-xs cursor-pointer"
               >
                 Daftar
               </button>

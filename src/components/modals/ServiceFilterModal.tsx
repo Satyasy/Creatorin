@@ -113,19 +113,19 @@ export const ServiceFilterModal: React.FC<ServiceFilterModalProps> = ({
     >
       <div 
         id="service-filter-modal-card"
-        className="relative w-full max-w-[490px] bg-white rounded-[28px] sm:rounded-[32px] shadow-2xl overflow-hidden flex flex-col max-h-[88vh] border border-neutral-100 animate-in zoom-in-95 duration-200 text-left"
+        className="relative w-full max-w-[490px] bg-white rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[88vh] border border-[#E2E8F0] animate-in zoom-in-95 duration-200 text-left"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header (Exact match to uploaded image) */}
-        <div className="relative px-6 py-4.5 border-b border-neutral-200/80 flex items-center justify-center">
-          <h2 className="text-base sm:text-lg font-bold text-[#0d0c22]">
+        <div className="relative px-6 py-4.5 border-b border-[#E2E8F0] flex items-center justify-center">
+          <h2 className="text-base sm:text-lg font-bold text-[#171717]">
             Filters
           </h2>
           <button
             id="close-filter-modal-btn"
             type="button"
             onClick={onClose}
-            className="absolute right-5 top-1/2 -translate-y-1/2 p-1.5 rounded-full hover:bg-neutral-100 text-neutral-600 hover:text-black transition cursor-pointer"
+            className="absolute right-5 top-1/2 -translate-y-1/2 p-1.5 rounded-xl hover:bg-neutral-100 text-neutral-600 hover:text-black transition cursor-pointer"
             aria-label="Tutup filter"
           >
             <X className="w-5 h-5" />
@@ -133,11 +133,11 @@ export const ServiceFilterModal: React.FC<ServiceFilterModalProps> = ({
         </div>
 
         {/* Scrollable Content Body */}
-        <div className="overflow-y-auto flex-1 divide-y divide-neutral-100">
+        <div className="overflow-y-auto flex-1 divide-y divide-[#E2E8F0]">
           
           {/* Section 1: Categories */}
           <div className="px-6 py-5 sm:py-6">
-            <h3 className="text-base font-bold text-[#0d0c22] mb-3.5">
+            <h3 className="text-base font-bold text-[#171717] mb-3.5">
               Categories
             </h3>
             <div className="grid grid-cols-2 gap-2.5">
@@ -150,8 +150,8 @@ export const ServiceFilterModal: React.FC<ServiceFilterModalProps> = ({
                     onClick={() => setCategory(isSelected ? 'Semua' : cat)}
                     className={`w-full py-2.5 px-3 rounded-full border text-xs sm:text-sm font-medium transition-all cursor-pointer text-center truncate ${
                       isSelected
-                        ? 'bg-[#0d0c22] text-white border-[#0d0c22] font-semibold shadow-2xs'
-                        : 'bg-white text-neutral-800 border-neutral-200/90 hover:border-neutral-400 hover:bg-neutral-50'
+                        ? 'bg-[#0B1F3A] text-white border-[#0B1F3A] font-semibold shadow-2xs'
+                        : 'bg-white text-neutral-800 border-[#E2E8F0] hover:border-neutral-400 hover:bg-neutral-50'
                     }`}
                   >
                     {cat}
@@ -163,7 +163,7 @@ export const ServiceFilterModal: React.FC<ServiceFilterModalProps> = ({
 
           {/* Section 2: Budget */}
           <div className="px-6 py-5 sm:py-6">
-            <h3 className="text-base font-bold text-[#0d0c22] mb-3.5">
+            <h3 className="text-base font-bold text-[#171717] mb-3.5">
               Budget
             </h3>
 
@@ -228,7 +228,7 @@ export const ServiceFilterModal: React.FC<ServiceFilterModalProps> = ({
                   <label className="text-xs text-neutral-500 font-medium block mb-1.5">
                     Minimum
                   </label>
-                  <div className="rounded-xl border border-neutral-200 px-3 py-2.5 text-center text-sm font-semibold text-neutral-800 bg-white">
+                  <div className="rounded-xl border border-[#E2E8F0] px-3 py-2.5 text-center text-sm font-semibold text-neutral-800 bg-white">
                     {formatIDR(minPrice)}
                   </div>
                 </div>
@@ -237,7 +237,7 @@ export const ServiceFilterModal: React.FC<ServiceFilterModalProps> = ({
                   <label className="text-xs text-neutral-500 font-medium block mb-1.5">
                     Maximum
                   </label>
-                  <div className="rounded-xl border border-neutral-200 px-3 py-2.5 text-center text-sm font-semibold text-neutral-800 bg-white">
+                  <div className="rounded-xl border border-[#E2E8F0] px-3 py-2.5 text-center text-sm font-semibold text-neutral-800 bg-white">
                     {formatIDR(maxPrice)}
                   </div>
                 </div>
@@ -247,7 +247,7 @@ export const ServiceFilterModal: React.FC<ServiceFilterModalProps> = ({
 
           {/* Section 3: Location */}
           <div className="px-6 py-5 sm:py-6">
-            <h3 className="text-base font-bold text-[#0d0c22] mb-3.5">
+            <h3 className="text-base font-bold text-[#171717] mb-3.5">
               Location
             </h3>
             <div className="relative">
@@ -258,14 +258,14 @@ export const ServiceFilterModal: React.FC<ServiceFilterModalProps> = ({
                 value={location}
                 onChange={(e) => setLocation(e.target.value)}
                 placeholder="Enter Location"
-                className="w-full pl-11 pr-4 py-3 rounded-xl border border-neutral-200 text-sm text-[#0d0c22] placeholder:text-neutral-400 focus:outline-hidden focus:border-[#0d0c22] focus:ring-1 focus:ring-[#0d0c22] transition bg-white"
+                className="w-full pl-11 pr-4 py-3 rounded-xl border border-[#E2E8F0] text-sm text-[#171717] placeholder:text-neutral-400 focus:outline-hidden focus:border-[#0B1F3A] focus:ring-1 focus:ring-[#0B1F3A] transition bg-white"
               />
             </div>
           </div>
 
           {/* Section 4: Rating */}
           <div className="px-6 py-5 sm:py-6">
-            <h3 className="text-base font-bold text-[#0d0c22] mb-3.5">
+            <h3 className="text-base font-bold text-[#171717] mb-3.5">
               Rating
             </h3>
             <div className="space-y-3">
@@ -318,7 +318,7 @@ export const ServiceFilterModal: React.FC<ServiceFilterModalProps> = ({
 
           {/* Section 5: Other Filters */}
           <div className="px-6 py-5 sm:py-6">
-            <h3 className="text-base font-bold text-[#0d0c22] mb-3.5">
+            <h3 className="text-base font-bold text-[#171717] mb-3.5">
               Other Filters
             </h3>
             
@@ -412,12 +412,12 @@ export const ServiceFilterModal: React.FC<ServiceFilterModalProps> = ({
         </div>
 
         {/* Footer with Apply Button (Exact match to screenshot) */}
-        <div className="p-5 sm:p-6 border-t border-neutral-100 bg-white">
+        <div className="p-5 sm:p-6 border-t border-[#E2E8F0] bg-white">
           <button
             id="apply-filters-btn"
             type="button"
             onClick={handleApplyClick}
-            className="w-full py-4 rounded-full bg-[#0d0c22] hover:bg-neutral-800 text-white font-bold text-sm sm:text-base transition-all shadow-md active:scale-[0.99] cursor-pointer text-center"
+            className="w-full py-3.5 rounded-xl bg-[#0B1F3A] hover:bg-[#123B8C] text-white font-semibold text-sm sm:text-base transition-all shadow-md active:scale-[0.99] cursor-pointer text-center"
           >
             Apply
           </button>

@@ -351,7 +351,7 @@ export const NotificationsPage: React.FC<NotificationsPageProps> = ({
   };
 
   return (
-    <div className="min-h-screen bg-white text-[#0d0c22] font-sans flex flex-col">
+    <div className="min-h-screen bg-white text-[#171717] font-sans flex flex-col">
       {/* Navbar rendered by (main) layout */}
 
       {/* Kontainer Notifikasi Minimalis (Satu Halaman Fokus) */}
@@ -360,7 +360,7 @@ export const NotificationsPage: React.FC<NotificationsPageProps> = ({
         {/* ========================================================== */}
         {/* HEADER NOTIFIKASI (CLEAN, MINIMAL, SEJAJAR DENGAN AKSI)    */}
         {/* ========================================================== */}
-        <header className="pb-4 border-b border-neutral-100 flex items-center justify-between">
+        <header className="pb-4 border-b border-[#E2E8F0] flex items-center justify-between">
           <div className="flex items-center gap-2.5">
             <h1 className="text-lg sm:text-xl font-semibold text-neutral-900 tracking-tight">
               Notifikasi
@@ -391,12 +391,12 @@ export const NotificationsPage: React.FC<NotificationsPageProps> = ({
         {/* ========================================================== */}
         {/* FILTER RINGAN (NOTION / INSTAGRAM PILL TABS)               */}
         {/* ========================================================== */}
-        <div className="flex items-center gap-1.5 py-3 border-b border-neutral-100 overflow-x-auto no-scrollbar">
+        <div className="flex items-center gap-1.5 py-3 border-b border-[#E2E8F0] overflow-x-auto no-scrollbar">
           <button
             onClick={() => setActiveFilter('all')}
             className={`text-xs px-3 py-1.5 rounded-lg transition-colors cursor-pointer shrink-0 ${
               activeFilter === 'all'
-                ? 'bg-neutral-900 text-white font-medium'
+                ? 'bg-[#0B1F3A] text-white font-medium'
                 : 'text-neutral-600 hover:text-neutral-900 hover:bg-neutral-100'
             }`}
           >
@@ -407,14 +407,14 @@ export const NotificationsPage: React.FC<NotificationsPageProps> = ({
             onClick={() => setActiveFilter('unread')}
             className={`text-xs px-3 py-1.5 rounded-lg transition-colors cursor-pointer shrink-0 flex items-center gap-1.5 ${
               activeFilter === 'unread'
-                ? 'bg-neutral-900 text-white font-medium'
+                ? 'bg-[#0B1F3A] text-white font-medium'
                 : 'text-neutral-600 hover:text-neutral-900 hover:bg-neutral-100'
             }`}
           >
             <span>Belum Dibaca</span>
             {unreadCount > 0 && (
               <span className={`text-[10px] px-1.5 py-0.2 rounded-full font-medium ${
-                activeFilter === 'unread' ? 'bg-neutral-700 text-white' : 'bg-blue-50 text-blue-600'
+                activeFilter === 'unread' ? 'bg-[#123B8C] text-white' : 'bg-blue-50 text-blue-600'
               }`}>
                 {unreadCount}
               </span>
@@ -425,7 +425,7 @@ export const NotificationsPage: React.FC<NotificationsPageProps> = ({
             onClick={() => setActiveFilter('collaboration')}
             className={`text-xs px-3 py-1.5 rounded-lg transition-colors cursor-pointer shrink-0 ${
               activeFilter === 'collaboration'
-                ? 'bg-neutral-900 text-white font-medium'
+                ? 'bg-[#0B1F3A] text-white font-medium'
                 : 'text-neutral-600 hover:text-neutral-900 hover:bg-neutral-100'
             }`}
           >
@@ -436,7 +436,7 @@ export const NotificationsPage: React.FC<NotificationsPageProps> = ({
             onClick={() => setActiveFilter('messages')}
             className={`text-xs px-3 py-1.5 rounded-lg transition-colors cursor-pointer shrink-0 ${
               activeFilter === 'messages'
-                ? 'bg-neutral-900 text-white font-medium'
+                ? 'bg-[#0B1F3A] text-white font-medium'
                 : 'text-neutral-600 hover:text-neutral-900 hover:bg-neutral-100'
             }`}
           >
@@ -447,7 +447,7 @@ export const NotificationsPage: React.FC<NotificationsPageProps> = ({
             onClick={() => setActiveFilter('transactions')}
             className={`text-xs px-3 py-1.5 rounded-lg transition-colors cursor-pointer shrink-0 ${
               activeFilter === 'transactions'
-                ? 'bg-neutral-900 text-white font-medium'
+                ? 'bg-[#0B1F3A] text-white font-medium'
                 : 'text-neutral-600 hover:text-neutral-900 hover:bg-neutral-100'
             }`}
           >

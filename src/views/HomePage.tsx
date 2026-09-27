@@ -337,7 +337,7 @@ export const HomePage: React.FC<HomePageProps> = ({
   };
 
   return (
-    <div className="w-full bg-white text-[#0d0c22] font-sans selection:bg-[#0d0c22] selection:text-white">
+    <div className="w-full bg-white text-[#171717] font-sans selection:bg-[#0B1F3A] selection:text-white">
       <main className="w-full">
         
         {/* ========================================================================= */}
@@ -363,7 +363,7 @@ export const HomePage: React.FC<HomePageProps> = ({
           </div>
           
           {/* Centered Hero Header Block */}
-          <div className="relative z-10 max-w-5xl mx-auto text-center space-y-6 sm:space-y-8 px-6 lg:px-8">
+          <div className="relative z-10 max-w-5xl mx-auto text-center space-y-6 sm:space-y-8 px-4 sm:px-6 lg:px-8">
             
             {/* Sleek, Modern Hero Badge */}
             <div className="inline-flex items-center gap-2 sm:gap-2.5 px-3.5 sm:px-4 py-1.5 rounded-full bg-white border border-neutral-200/80 shadow-2xs hover:border-neutral-300 transition-all">
@@ -379,28 +379,28 @@ export const HomePage: React.FC<HomePageProps> = ({
               </span>
             </div>
 
-            {/* Focal Point Large Headline */}
-            <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-[70px] text-[#0d0c22] tracking-tight leading-[1.12] sm:leading-[1.14]">
-              <span className="font-extrabold">Temukan</span>{' '}
-              <span className="font-medium text-neutral-800">Talenta Kreatif</span>,{' '}
+            {/* Focal Point Display Headline (Display 64/72 according to design.md §3) */}
+            <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-[64px] text-[#0F172A] tracking-tight leading-[1.125] lg:leading-[72px]">
+              <span className="font-bold">Temukan</span>{' '}
+              <span className="font-medium text-[#171717]">Talenta Kreatif</span>,{' '}
               <br className="hidden sm:inline" />
-              <span className="font-medium text-neutral-800">Wujudkan</span>{' '}
-              <span className="bg-gradient-to-r from-blue-700 via-blue-600 to-cyan-500 bg-clip-text text-transparent font-extrabold">
+              <span className="font-medium text-[#171717]">Wujudkan</span>{' '}
+              <span className="bg-gradient-to-r from-[#155DFC] to-[#05A4FD] bg-clip-text text-transparent font-bold">
                 Ide Digital
               </span>.
             </h1>
 
             {/* Concise Value Proposition Description */}
-            <p className="text-base sm:text-lg md:text-xl text-neutral-600 max-w-2xl mx-auto leading-relaxed font-normal">
+            <p className="text-base sm:text-lg text-[#64748B] max-w-2xl mx-auto leading-relaxed font-normal">
               Temukan creator berbakat untuk kebutuhan digitalmu, atau tampilkan keahlianmu dan dapatkan project yang tepat.
             </p>
 
-            {/* Dual CTA Buttons (Jelajahi Creator & Tawarkan Keahlian) */}
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-3.5 pt-2 sm:pt-3">
+            {/* Dual CTA Buttons (Height 48px, rounded-xl 12px according to design.md §7, §8) */}
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-3.5 pt-3">
               <button
                 type="button"
                 onClick={() => navigateTo('landing', '/landing')}
-                className="w-full sm:w-auto px-7 sm:px-8 py-3.5 sm:py-4 rounded-full bg-[#0d0c22] hover:bg-neutral-800 text-white text-sm sm:text-base font-bold transition-all shadow-xs hover:shadow-md cursor-pointer flex items-center justify-center gap-2 active:scale-[0.99]"
+                className="w-full sm:w-auto h-12 px-7 sm:px-8 rounded-xl bg-[#0B1F3A] hover:bg-[#123B8C] text-white text-base font-semibold transition-colors shadow-xs flex items-center justify-center gap-2 cursor-pointer"
               >
                 <span>Jelajah Creator</span>
                 <ArrowRight className="w-4 h-4" />
@@ -409,7 +409,7 @@ export const HomePage: React.FC<HomePageProps> = ({
               <button
                 type="button"
                 onClick={() => navigateTo('projects', '/explore/projects')}
-                className="w-full sm:w-auto px-7 sm:px-8 py-3.5 sm:py-4 rounded-full bg-white hover:bg-neutral-50 text-[#0d0c22] text-sm sm:text-base font-bold transition-all border border-neutral-300 hover:border-neutral-400 shadow-2xs cursor-pointer flex items-center justify-center gap-2 active:scale-[0.99]"
+                className="w-full sm:w-auto h-12 px-7 sm:px-8 rounded-xl bg-white hover:bg-[#F8FAFC] text-[#0F172A] text-base font-semibold transition-colors border border-[#E2E8F0] hover:border-[#64748B] shadow-2xs flex items-center justify-center gap-2 cursor-pointer"
               >
                 <span>Tawarkan Keahlian</span>
               </button>
@@ -424,17 +424,17 @@ export const HomePage: React.FC<HomePageProps> = ({
         {/* SECTION 2: EKSPLORASI DENGAN FILTER AKTIF (Proyek, Creator, Layanan) */}
         {/* Desain Bersih & Elegan Sesuai Referensi (Shots / Designers / Services) */}
         {/* ========================================================================= */}
-        <section className="max-w-[1440px] mx-auto px-6 lg:px-8 pt-6 sm:pt-8 pb-10 sm:pb-14">
+        <section className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 pt-8 pb-16">
           
-          {/* Baris 1: Segmented Pill Tabs (Creator, Layanan, Proyek) */}
-          <div className="flex items-center gap-1.5 sm:gap-2 mb-4">
+          {/* Baris 1: Segmented Tabs (Creator, Layanan, Proyek) */}
+          <div className="flex items-center gap-2 mb-5">
             <button
               type="button"
               onClick={() => setActiveExploreTab('creator')}
-              className={`flex items-center gap-2 px-4 sm:px-5 py-2.5 rounded-full text-xs sm:text-sm font-semibold transition-colors cursor-pointer ${
+              className={`flex items-center gap-2 px-4 sm:px-5 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-colors cursor-pointer ${
                 activeExploreTab === 'creator'
-                  ? 'bg-[#f3f3f4] text-[#0d0c22] font-bold'
-                  : 'text-neutral-600 hover:text-neutral-900 hover:bg-neutral-100/70 font-medium'
+                  ? 'bg-[#F3F3F4] text-[#0F172A] font-semibold'
+                  : 'text-[#64748B] hover:text-[#0F172A] hover:bg-[#F8FAFC] font-medium'
               }`}
             >
               <Users className="w-4 h-4" />
@@ -444,10 +444,10 @@ export const HomePage: React.FC<HomePageProps> = ({
             <button
               type="button"
               onClick={() => setActiveExploreTab('layanan')}
-              className={`flex items-center gap-2 px-4 sm:px-5 py-2.5 rounded-full text-xs sm:text-sm font-semibold transition-colors cursor-pointer ${
+              className={`flex items-center gap-2 px-4 sm:px-5 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-colors cursor-pointer ${
                 activeExploreTab === 'layanan'
-                  ? 'bg-[#f3f3f4] text-[#0d0c22] font-bold'
-                  : 'text-neutral-600 hover:text-neutral-900 hover:bg-neutral-100/70 font-medium'
+                  ? 'bg-[#F3F3F4] text-[#0F172A] font-semibold'
+                  : 'text-[#64748B] hover:text-[#0F172A] hover:bg-[#F8FAFC] font-medium'
               }`}
             >
               <Briefcase className="w-4 h-4" />
@@ -457,10 +457,10 @@ export const HomePage: React.FC<HomePageProps> = ({
             <button
               type="button"
               onClick={() => setActiveExploreTab('proyek')}
-              className={`flex items-center gap-2 px-4 sm:px-5 py-2.5 rounded-full text-xs sm:text-sm font-semibold transition-colors cursor-pointer ${
+              className={`flex items-center gap-2 px-4 sm:px-5 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-colors cursor-pointer ${
                 activeExploreTab === 'proyek'
-                  ? 'bg-[#f3f3f4] text-[#0d0c22] font-bold'
-                  : 'text-neutral-600 hover:text-neutral-900 hover:bg-neutral-100/70 font-medium'
+                  ? 'bg-[#F3F3F4] text-[#0F172A] font-semibold'
+                  : 'text-[#64748B] hover:text-[#0F172A] hover:bg-[#F8FAFC] font-medium'
               }`}
             >
               <Layers className="w-4 h-4" />
@@ -601,7 +601,7 @@ export const HomePage: React.FC<HomePageProps> = ({
                           setCurrentCarouselIndex(0);
                           setIsVideoPlaying(true);
                         }}
-                        className="group relative aspect-[4/5] rounded-[4px] sm:rounded-[6px] overflow-hidden bg-neutral-900 cursor-pointer select-none transition-all duration-200 shadow-2xs hover:shadow-lg"
+                        className="group relative aspect-[4/5] rounded-xl overflow-hidden bg-neutral-900 cursor-pointer select-none transition-transform duration-200 shadow-2xs"
                       >
                         {/* Media Cover Image (Edge to Edge, Uniform 4:5) */}
                         <img
@@ -995,7 +995,7 @@ export const HomePage: React.FC<HomePageProps> = ({
                     <button
                       type="button"
                       onClick={() => navigateTo('landing', '/landing')}
-                      className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-[#0d0c22] hover:bg-neutral-800 text-white text-xs font-bold transition shadow-sm cursor-pointer"
+                      className="inline-flex items-center gap-2 h-11 px-6 rounded-xl bg-[#0B1F3A] hover:bg-[#123B8C] text-white text-sm font-semibold transition-colors shadow-xs cursor-pointer"
                     >
                       <span>Jelajah Semua Creator Terverifikasi</span>
                       <ArrowRight className="w-4 h-4" />
@@ -1139,7 +1139,7 @@ export const HomePage: React.FC<HomePageProps> = ({
                     setTargetCreatorForBrief(undefined);
                     setIsBriefModalOpen(true);
                   }}
-                  className="px-4 py-1.5 rounded-full bg-[#0d0c22] hover:bg-neutral-800 text-white text-xs font-bold transition shadow-xs cursor-pointer"
+                  className="h-8 px-3.5 rounded-xl bg-[#0B1F3A] hover:bg-[#123B8C] text-white text-xs font-semibold transition-colors shadow-xs cursor-pointer"
                 >
                   Get Started
                 </button>

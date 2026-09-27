@@ -312,10 +312,10 @@ export const InvoiceDetailPage: React.FC<InvoiceDetailProps> = ({
   const currentVa = vaAccounts[selectedVaBank];
 
   return (
-    <div className="min-h-screen bg-[#f8f9fa] text-[#0d0c22] font-sans">
+    <div className="min-h-screen bg-[#F8FAFC] text-[#171717] font-sans selection:bg-[#0B1F3A] selection:text-white">
       {/* Toast Notification */}
       {toastMessage && (
-        <div className="fixed bottom-6 right-6 z-50 px-4 py-3 bg-[#0d0c22] text-white rounded-2xl shadow-xl flex items-center gap-2.5 text-xs sm:text-sm font-semibold animate-in slide-in-from-bottom-3 duration-200">
+        <div className="fixed bottom-6 right-6 z-50 px-4 py-3 bg-[#0B1F3A] text-white rounded-2xl shadow-xl flex items-center gap-2.5 text-xs sm:text-sm font-semibold animate-in slide-in-from-bottom-3 duration-200">
           <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
           <span>{toastMessage}</span>
         </div>
@@ -324,7 +324,7 @@ export const InvoiceDetailPage: React.FC<InvoiceDetailProps> = ({
       {/* Top Navbar rendered by (main) layout */}
 
       {/* Main Container */}
-      <main className="max-w-[1116px] mx-auto px-6 lg:px-8 py-6 sm:py-10 space-y-6">
+      <main className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-6">
         
         {/* Navigation & Actions Top Bar */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-1 print:hidden">
@@ -349,7 +349,7 @@ export const InvoiceDetailPage: React.FC<InvoiceDetailProps> = ({
                   {invoice.invoiceNumber}
                 </span>
               </div>
-              <h1 className="text-xl sm:text-2xl font-extrabold text-[#0d0c22] tracking-tight">
+              <h1 className="text-xl sm:text-2xl font-extrabold text-[#171717] tracking-tight">
                 Detail Pembayaran & Invoice
               </h1>
             </div>
@@ -690,7 +690,7 @@ export const InvoiceDetailPage: React.FC<InvoiceDetailProps> = ({
                   onClick={() => setSelectedMethod('retail')}
                   className={`py-1.5 px-3 rounded-xl text-xs font-medium transition cursor-pointer flex items-center justify-center gap-1.5 border ${
                     selectedMethod === 'retail'
-                      ? 'bg-[#0d0c22] text-white border-[#0d0c22]'
+                      ? 'bg-[#0B1F3A] text-white border-[#0B1F3A]'
                       : 'bg-white hover:bg-neutral-50 text-neutral-600 border-neutral-200/80'
                   }`}
                 >
@@ -703,7 +703,7 @@ export const InvoiceDetailPage: React.FC<InvoiceDetailProps> = ({
                   onClick={() => setSelectedMethod('card')}
                   className={`py-1.5 px-3 rounded-xl text-xs font-medium transition cursor-pointer flex items-center justify-center gap-1.5 border ${
                     selectedMethod === 'card'
-                      ? 'bg-[#0d0c22] text-white border-[#0d0c22]'
+                      ? 'bg-[#0B1F3A] text-white border-[#0B1F3A]'
                       : 'bg-white hover:bg-neutral-50 text-neutral-600 border-neutral-200/80'
                   }`}
                 >
@@ -1195,7 +1195,7 @@ export const InvoiceDetailPage: React.FC<InvoiceDetailProps> = ({
                     type="button"
                     disabled={isVerifying}
                     onClick={handleVerifyPayment}
-                    className="w-full py-3.5 px-4 rounded-2xl bg-blue-600 hover:bg-blue-700 active:scale-[0.99] text-white text-sm font-bold transition shadow-sm cursor-pointer flex items-center justify-center gap-2 disabled:opacity-75"
+                    className="w-full h-12 px-6 rounded-xl bg-[#0B1F3A] hover:bg-[#123B8C] active:scale-[0.99] text-white text-sm font-bold transition shadow-sm cursor-pointer flex items-center justify-center gap-2 disabled:opacity-75"
                   >
                     {isVerifying ? (
                       <>
@@ -1222,7 +1222,7 @@ export const InvoiceDetailPage: React.FC<InvoiceDetailProps> = ({
                       if (onClose) onClose();
                       navigateTo('collaboration-room', '/collaboration');
                     }}
-                    className="w-full py-3.5 px-4 rounded-2xl bg-[#0d0c22] hover:bg-neutral-900 text-white text-sm font-bold transition shadow-sm cursor-pointer flex items-center justify-center gap-2"
+                    className="w-full h-12 px-6 rounded-xl bg-[#0B1F3A] hover:bg-[#123B8C] text-white text-sm font-bold transition shadow-sm cursor-pointer flex items-center justify-center gap-2"
                   >
                     <ExternalLink className="w-4 h-4" />
                     <span>Masuk ke Collaboration Room</span>

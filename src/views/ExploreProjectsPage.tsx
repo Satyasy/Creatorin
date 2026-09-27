@@ -267,7 +267,7 @@ export const ExploreProjectsPage: React.FC<ExploreProjectsPageProps> = ({
       )}
 
       {/* Main Container */}
-      <main className="max-w-[1440px] mx-auto px-6 lg:px-8 py-4 sm:py-6">
+      <main className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10">
         
         {/* Breadcrumbs Navigation */}
         <div className="flex items-center gap-2 text-xs font-medium text-neutral-400 mb-2.5">
@@ -281,20 +281,20 @@ export const ExploreProjectsPage: React.FC<ExploreProjectsPageProps> = ({
           <span className="text-neutral-800 font-semibold">Proyek Kreator</span>
         </div>
 
-        {/* Page Title & Subtitle Header (Matching LandingPage & ExploreServicesPage) */}
-        <div className="mb-5 space-y-2.5">
+        {/* Page Title & Subtitle Header */}
+        <div className="mb-6 space-y-2">
           <div>
-            <h1 className="text-2xl sm:text-3xl lg:text-[34px] font-extrabold text-[#0d0c22] tracking-tight leading-tight">
+            <h1 className="text-2xl sm:text-3xl lg:text-[40px] font-bold text-[#0F172A] tracking-tight leading-tight lg:leading-[48px]">
               Jelajah Proyek & Portofolio Kreator
             </h1>
-            <p className="text-xs sm:text-sm text-neutral-500 mt-1 max-w-2xl leading-relaxed">
+            <p className="text-sm sm:text-base text-[#64748B] mt-2 max-w-2xl leading-normal font-normal">
               Temukan portofolio nyata, video Reels, konten TikTok, dan sistem desain yang telah diproduksi oleh kreator top terverifikasi Creatorin.
             </p>
           </div>
 
-          {/* Popular Tag Pills (Identical to other pages) */}
-          <div className="pt-1.5 flex flex-wrap items-center gap-1.5">
-            <span className="text-xs font-semibold text-neutral-500 mr-1 flex items-center gap-1">
+          {/* Popular Tag Pills */}
+          <div className="pt-3 flex flex-wrap items-center gap-1.5">
+            <span className="text-xs font-semibold text-[#64748B] mr-1 flex items-center gap-1">
               <span>Tagar Populer:</span>
             </span>
             {POPULAR_PROJECT_TAGS.map((tag) => {
@@ -305,8 +305,8 @@ export const ExploreProjectsPage: React.FC<ExploreProjectsPageProps> = ({
                   onClick={() => setSelectedTag(isSelected ? null : tag)}
                   className={`px-3 py-1 rounded-full text-xs font-medium border transition-all cursor-pointer ${
                     isSelected 
-                      ? 'bg-[#0d0c22] text-white border-[#0d0c22] shadow-2xs font-semibold' 
-                      : 'bg-white text-neutral-600 border-neutral-200/90 hover:border-neutral-400 hover:text-[#0d0c22] hover:bg-neutral-50'
+                      ? 'bg-[#0B1F3A] text-white border-[#0B1F3A] shadow-2xs font-semibold' 
+                      : 'bg-white text-[#64748B] border-[#E2E8F0] hover:border-[#64748B] hover:text-[#0F172A] hover:bg-[#F8FAFC]'
                   }`}
                 >
                   {tag}
@@ -316,7 +316,7 @@ export const ExploreProjectsPage: React.FC<ExploreProjectsPageProps> = ({
             {selectedTag && (
               <button
                 onClick={() => setSelectedTag(null)}
-                className="text-xs text-blue-600 font-semibold hover:underline ml-1.5 cursor-pointer"
+                className="text-xs text-[#1D4ED8] font-semibold hover:underline ml-1.5 cursor-pointer"
               >
                 Reset Tagar
               </button>
@@ -324,11 +324,11 @@ export const ExploreProjectsPage: React.FC<ExploreProjectsPageProps> = ({
           </div>
         </div>
 
-        {/* Section Heading & Filter Toolbar (Identical to LandingPage & ExploreServicesPage) */}
-        <section className="pt-4 pb-4 border-t border-neutral-200/80 mb-6 relative">
+        {/* Section Heading & Filter Toolbar */}
+        <section className="pt-4 pb-4 border-t border-[#E2E8F0] mb-6 relative">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
             
-            <h2 className="text-base sm:text-lg font-bold text-[#0d0c22]">
+            <h2 className="text-base sm:text-lg font-semibold text-[#0F172A]">
               Cari Proyek berdasarkan Kategori
             </h2>
 
@@ -566,13 +566,13 @@ export const ExploreProjectsPage: React.FC<ExploreProjectsPageProps> = ({
                 setSelectedSort('popular');
                 setSelectedTag(null);
               }}
-              className="px-6 py-2.5 rounded-full bg-[#0d0c22] text-white text-xs font-bold hover:bg-neutral-800 transition cursor-pointer"
+              className="h-11 px-6 rounded-xl bg-[#0B1F3A] text-white text-sm font-semibold hover:bg-[#123B8C] transition cursor-pointer"
             >
               Reset Semua Filter
             </button>
           </div>
         ) : (
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-5 md:gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
             {filteredProjects.map((project) => {
               const isLiked = likedPosts[project.id];
               const isSaved = savedPosts[project.id];

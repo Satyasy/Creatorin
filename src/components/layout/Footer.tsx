@@ -23,7 +23,7 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, onOpenBrief }) => {
 
   return (
     <footer className="w-full bg-white border-t border-neutral-200/80 pt-12 sm:pt-16 pb-10 sm:pb-14 font-sans text-[#0d0c22]">
-      <div className="max-w-[1440px] mx-auto px-6 lg:px-8">
+      <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Top Bar: Brand Logo di Kiri & Social Media di Kanan */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 pb-8 border-b border-neutral-200/80">
