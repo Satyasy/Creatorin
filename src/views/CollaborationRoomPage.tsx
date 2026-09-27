@@ -26,6 +26,7 @@ import {
 } from 'lucide-react';
 import { ActivePage, AuthState, CollaborationItem, CollabStage, Creator } from '@/types';
 import { MOCK_COLLABORATIONS } from '@/data/mockCollaborations';
+import { collabService } from '@/services/collabService';
 
 interface CollaborationRoomPageProps {
   currentUser?: AuthState['user'];
@@ -218,6 +219,11 @@ export const CollaborationRoomPage: React.FC<CollaborationRoomPageProps> = ({
       })
     );
 
+    // If connected to a real database room, trigger backend approval
+    if (activeCollab.id.length > 20 && !activeCollab.id.startsWith('collab-')) {
+      collabService.approveCollab(activeCollab.id).catch(() => {});
+    }
+
     setIsApproveConfirmModalOpen(false);
     setIsRatingModalOpen(true);
     showToast('Proyek disetujui. Dana dicairkan dan karya otomatis terbit ke profil.');
@@ -258,6 +264,17 @@ export const CollaborationRoomPage: React.FC<CollaborationRoomPageProps> = ({
         return c;
       })
     );
+
+    // If connected to a real database creator, persist review
+    if (activeCollab.creatorId.length > 20 && !activeCollab.creatorId.startsWith('cr-')) {
+      collabService.submitReview({
+        creatorId: activeCollab.creatorId,
+        roomId: activeCollab.id,
+        projectTitle: activeCollab.projectTitle,
+        rating: ratingScore,
+        comment: reviewComment || 'Kolaborasi berjalan dengan baik.',
+      }).catch(() => {});
+    }
 
     setIsRatingModalOpen(false);
     showToast('Rating dan ulasan berhasil dipublikasikan.');

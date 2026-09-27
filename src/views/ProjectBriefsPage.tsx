@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { 
   Search, 
   Clock, 
@@ -35,6 +35,7 @@ import { ProjectBriefModal } from '@/components/modals/ProjectBriefModal';
 import { BriefDetailPage } from './BriefDetailPage';
 import { MOCK_PROJECTS } from '@/data/mockProjects';
 import { ActivePage, AuthState, ProjectListing } from '@/types';
+import { briefService } from '@/services/briefService';
 
 // Format budget display to single clean number (e.g. Rp1.500.000)
 const formatDisplayBudget = (formatted?: string, budgetMin?: number) => {
@@ -114,6 +115,18 @@ export const ProjectBriefsPage: React.FC<ProjectBriefsPageProps> = ({
 
   // Projects data state (so creators can apply and UMKM can add briefs in-session)
   const [projectsList, setProjectsList] = useState<ProjectListing[]>(MOCK_PROJECTS);
+
+  useEffect(() => {
+    briefService.getBriefs().then((briefs) => {
+      if (briefs && briefs.length > 0) {
+        setProjectsList(prev => {
+          const existingIds = new Set(prev.map(p => p.id));
+          const newFromDb = briefs.filter(b => !existingIds.has(b.id));
+          return [...newFromDb, ...prev];
+        });
+      }
+    });
+  }, []);
   
   // Filter & Search states
   const [searchQuery, setSearchQuery] = useState('');
@@ -254,6 +267,15 @@ export const ProjectBriefsPage: React.FC<ProjectBriefsPageProps> = ({
           timeline: proposalTimeline
         }
       }));
+
+      // If connected to a real database brief, submit proposal to backend
+      if (selectedBriefForApply.id.length > 20 && !selectedBriefForApply.id.startsWith('proj-')) {
+        briefService.applyToBrief(
+          selectedBriefForApply.id,
+          proposalPitch || 'Saya siap mengerjakan brief proyek ini sesuai spesifikasi.',
+          proposalRate || selectedBriefForApply.formattedBudget
+        ).catch(() => {});
+      }
 
       showToast('Proposal Anda berhasil diajukan ke klien!');
     }, 600);

@@ -18,6 +18,7 @@ import {
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/providers/AuthProvider';
 import { ActivePage, AuthState, AppNotification, Creator } from '@/types';
+import { notificationService } from '@/services/notificationService';
 
 interface NotificationsPageProps {
   currentUser?: AuthState['user'];
@@ -197,6 +198,18 @@ export const NotificationsPage: React.FC<NotificationsPageProps> = ({
   const [notifications, setNotifications] = useState<AppNotification[]>(INITIAL_NOTIFICATIONS);
   const [activeFilter, setActiveFilter] = useState<NotificationFilter>('all');
 
+  React.useEffect(() => {
+    notificationService.getNotifications().then((dbNotifs) => {
+      if (dbNotifs && dbNotifs.length > 0) {
+        setNotifications(prev => {
+          const existingIds = new Set(prev.map(p => p.id));
+          const newFromDb = dbNotifs.filter(d => !existingIds.has(d.id));
+          return [...newFromDb, ...prev];
+        });
+      }
+    });
+  }, []);
+
   const unreadCount = notifications.filter(n => !n.read).length;
 
   const markAllAsRead = () => {
@@ -205,6 +218,9 @@ export const NotificationsPage: React.FC<NotificationsPageProps> = ({
 
   const markItemAsRead = (id: string) => {
     setNotifications(prev => prev.map(n => n.id === id ? { ...n, read: true } : n));
+    if (id.length > 20 && !id.startsWith('notif-')) {
+      notificationService.markAsRead(id).catch(() => {});
+    }
   };
 
   const deleteNotification = (id: string, e: React.MouseEvent) => {

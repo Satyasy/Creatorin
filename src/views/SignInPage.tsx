@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/providers/AuthProvider';
 import { AuthState, ActivePage } from '@/types';
+import { authService } from '@/services/authService';
 import { 
   ShieldCheck, 
   AlertCircle, 
@@ -27,15 +28,34 @@ export const SignInPage: React.FC<SignInPageProps> = ({ onNavigate, onLoginSucce
   const [errorMessage, setErrorMessage] = useState('');
   const [isForgotPassword, setIsForgotPassword] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!emailOrUsername.trim()) {
       setErrorMessage('Silakan masukkan email atau nama pengguna.');
       return;
     }
 
+    setIsLoading(true);
+    setErrorMessage('');
+
+    // Try live server authentication first
+    const emailToTry = emailOrUsername.includes('@') ? emailOrUsername : `${emailOrUsername.toLowerCase()}@creatorin.id`;
+    const res = await authService.signIn(emailToTry, password || 'Creatorin2026!');
+
+    if (res.success && res.user) {
+      login(res.user);
+      if (onLoginSuccess) onLoginSuccess(res.user);
+      if (onNavigate) onNavigate('explore');
+      else router.push('/explore');
+      setIsLoading(false);
+      return;
+    }
+
+    // Graceful fallback for demo accounts
     const inputLower = emailOrUsername.toLowerCase();
-    const isCreator = inputLower.includes('creator') || inputLower.includes('maya');
+    const isCreator = inputLower.includes('creator') || inputLower.includes('maya') || inputLower.includes('munir');
     const mockUser: NonNullable<AuthState['user']> = {
       name: isCreator ? 'Maya Angelina' : (emailOrUsername.includes('@') ? emailOrUsername.split('@')[0] : 'Qaysar Aqeel'),
       email: emailOrUsername.includes('@') ? emailOrUsername : `${emailOrUsername}@creatorin.id`,
@@ -50,6 +70,7 @@ export const SignInPage: React.FC<SignInPageProps> = ({ onNavigate, onLoginSucce
     if (onLoginSuccess) onLoginSuccess(mockUser);
     if (onNavigate) onNavigate('explore');
     else router.push('/explore');
+    setIsLoading(false);
   };
 
   const handleGoogleQuickAuth = () => {

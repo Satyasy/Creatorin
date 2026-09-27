@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/providers/AuthProvider';
 import { UserRole, AuthState, ActivePage } from '@/types';
+import { authService } from '@/services/authService';
 import { 
   Building2, 
   Sparkles, 
@@ -29,7 +30,9 @@ export const SignUpPage: React.FC<SignUpPageProps> = ({ onNavigate, onLoginSucce
   const [showPassword, setShowPassword] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMessage('');
 
@@ -38,7 +41,25 @@ export const SignUpPage: React.FC<SignUpPageProps> = ({ onNavigate, onLoginSucce
       return;
     }
 
-    // Save and log in user
+    setIsLoading(true);
+
+    const res = await authService.signUp({
+      fullName: fullName.trim(),
+      email: email.trim(),
+      password,
+      role: selectedRole,
+    });
+
+    if (res.success && res.user) {
+      login(res.user);
+      if (onLoginSuccess) onLoginSuccess(res.user);
+      if (onNavigate) onNavigate('explore');
+      else router.push('/explore');
+      setIsLoading(false);
+      return;
+    }
+
+    // Fallback save and log in user
     const newUser: NonNullable<AuthState['user']> = {
       name: fullName.trim(),
       email: email.trim(),
@@ -52,6 +73,7 @@ export const SignUpPage: React.FC<SignUpPageProps> = ({ onNavigate, onLoginSucce
     if (onLoginSuccess) onLoginSuccess(newUser);
     if (onNavigate) onNavigate('explore');
     else router.push('/explore');
+    setIsLoading(false);
   };
 
   const handleGoogleQuickAuth = () => {
