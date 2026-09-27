@@ -70,7 +70,7 @@ export const SignUpPage: React.FC<SignUpPageProps> = ({ onNavigate, onLoginSucce
   };
 
   return (
-    <div className="min-h-screen w-full flex bg-white text-[#0d0c22] font-sans antialiased selection:bg-[#0d0c22] selection:text-white">
+    <div className="min-h-screen w-full flex bg-white text-[#171717] font-sans antialiased selection:bg-[#0B1F3A] selection:text-white">
       
       {/* SISI KIRI: Form Pendaftaran Minimalis Dribbble Style */}
       <div className="w-full lg:w-[68%] xl:w-[72%] min-h-screen flex flex-col items-center justify-center p-8 sm:p-12 lg:p-16 xl:p-20 overflow-y-auto">
@@ -91,7 +91,7 @@ export const SignUpPage: React.FC<SignUpPageProps> = ({ onNavigate, onLoginSucce
           </div>
 
           {/* Heading */}
-          <h1 className="text-2xl sm:text-[28px] font-bold text-[#0d0c22] tracking-tight mb-7">
+          <h1 className="text-2xl sm:text-[28px] font-bold text-[#171717] tracking-tight mb-7">
             Daftar ke Creatorin
           </h1>
 
@@ -107,16 +107,16 @@ export const SignUpPage: React.FC<SignUpPageProps> = ({ onNavigate, onLoginSucce
           <button
             type="button"
             onClick={handleGoogleQuickAuth}
-            className="w-full p-2.5 px-4 rounded-full border border-neutral-200 hover:border-neutral-300 bg-white hover:bg-neutral-50/80 transition-all flex items-center justify-between shadow-2xs group cursor-pointer mb-5 text-left"
+            className="w-full p-2.5 px-4 rounded-xl border border-[#E2E8F0] hover:border-neutral-300 bg-white hover:bg-neutral-50/80 transition-all flex items-center justify-between shadow-2xs group cursor-pointer mb-5 text-left"
           >
             <div className="flex items-center gap-3">
               <img
                 src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100&auto=format&fit=crop&q=80"
                 alt="Avatar"
-                className="w-8 h-8 rounded-full object-cover ring-1 ring-neutral-200"
+                className="w-8 h-8 rounded-full object-cover ring-1 ring-[#E2E8F0]"
               />
               <div className="leading-tight">
-                <div className="text-xs font-semibold text-[#0d0c22]">Lanjutkan sebagai Qaysar</div>
+                <div className="text-xs font-semibold text-[#171717]">Lanjutkan sebagai Qaysar</div>
                 <div className="text-[11px] text-neutral-400 font-normal">qaysaraqeel71@gmail.com</div>
               </div>
             </div>
@@ -156,29 +156,29 @@ export const SignUpPage: React.FC<SignUpPageProps> = ({ onNavigate, onLoginSucce
               <label className="text-[11px] font-semibold text-neutral-400 uppercase tracking-wider block px-1">
                 Daftar sebagai
               </label>
-              <div className="grid grid-cols-2 p-1 bg-neutral-100/80 rounded-2xl border border-neutral-200/70 gap-1">
+              <div className="grid grid-cols-2 p-1 bg-neutral-100/80 rounded-xl border border-[#E2E8F0] gap-1">
                 <button
                   type="button"
                   onClick={() => setSelectedRole('umkm')}
-                  className={`py-2.5 px-3 rounded-xl text-xs font-medium transition-all duration-200 flex items-center justify-center gap-2 cursor-pointer ${
+                  className={`py-2 px-3 rounded-lg text-xs font-medium transition-all duration-200 flex items-center justify-center gap-2 cursor-pointer ${
                     selectedRole === 'umkm'
-                      ? 'bg-white text-[#0d0c22] shadow-xs font-semibold border border-neutral-200/80'
-                      : 'text-neutral-500 hover:text-[#0d0c22] hover:bg-neutral-200/40 border border-transparent'
+                      ? 'bg-white text-[#171717] shadow-xs font-semibold border border-[#E2E8F0]'
+                      : 'text-neutral-500 hover:text-[#171717] hover:bg-neutral-200/40 border border-transparent'
                   }`}
                 >
-                  <Building2 className={`w-4 h-4 transition-colors ${selectedRole === 'umkm' ? 'text-[#0d0c22]' : 'text-neutral-400'}`} />
+                  <Building2 className={`w-4 h-4 transition-colors ${selectedRole === 'umkm' ? 'text-[#0B1F3A]' : 'text-neutral-400'}`} />
                   <span>UMKM / Brand</span>
                 </button>
                 <button
                   type="button"
                   onClick={() => setSelectedRole('creator')}
-                  className={`py-2.5 px-3 rounded-xl text-xs font-medium transition-all duration-200 flex items-center justify-center gap-2 cursor-pointer ${
+                  className={`py-2 px-3 rounded-lg text-xs font-medium transition-all duration-200 flex items-center justify-center gap-2 cursor-pointer ${
                     selectedRole === 'creator'
-                      ? 'bg-white text-[#0d0c22] shadow-xs font-semibold border border-neutral-200/80'
-                      : 'text-neutral-500 hover:text-[#0d0c22] hover:bg-neutral-200/40 border border-transparent'
+                      ? 'bg-white text-[#171717] shadow-xs font-semibold border border-[#E2E8F0]'
+                      : 'text-neutral-500 hover:text-[#171717] hover:bg-neutral-200/40 border border-transparent'
                   }`}
                 >
-                  <Sparkles className={`w-4 h-4 transition-colors ${selectedRole === 'creator' ? 'text-blue-600' : 'text-neutral-400'}`} />
+                  <Sparkles className={`w-4 h-4 transition-colors ${selectedRole === 'creator' ? 'text-[#1D4ED8]' : 'text-neutral-400'}`} />
                   <span>Content Creator</span>
                 </button>
               </div>
@@ -193,7 +193,7 @@ export const SignUpPage: React.FC<SignUpPageProps> = ({ onNavigate, onLoginSucce
                 onChange={(e) => setFullName(e.target.value)}
                 placeholder={selectedRole === 'umkm' ? 'Nama Brand atau Bisnis' : 'Nama Lengkap'}
                 required
-                className="w-full px-4 py-3 text-sm bg-white border border-neutral-200 rounded-2xl focus:outline-hidden focus:border-[#0d0c22] focus:ring-1 focus:ring-[#0d0c22] transition-all placeholder:text-neutral-400 text-[#0d0c22]"
+                className="w-full px-4 py-3 text-sm bg-white border border-[#E2E8F0] rounded-xl focus:outline-hidden focus:border-[#0B1F3A] focus:ring-1 focus:ring-[#0B1F3A] transition-all placeholder:text-neutral-400 text-[#171717]"
               />
             </div>
 
@@ -206,7 +206,7 @@ export const SignUpPage: React.FC<SignUpPageProps> = ({ onNavigate, onLoginSucce
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="Alamat email"
                 required
-                className="w-full px-4 py-3 text-sm bg-white border border-neutral-200 rounded-2xl focus:outline-hidden focus:border-[#0d0c22] focus:ring-1 focus:ring-[#0d0c22] transition-all placeholder:text-neutral-400 text-[#0d0c22]"
+                className="w-full px-4 py-3 text-sm bg-white border border-[#E2E8F0] rounded-xl focus:outline-hidden focus:border-[#0B1F3A] focus:ring-1 focus:ring-[#0B1F3A] transition-all placeholder:text-neutral-400 text-[#171717]"
               />
             </div>
 
@@ -219,7 +219,7 @@ export const SignUpPage: React.FC<SignUpPageProps> = ({ onNavigate, onLoginSucce
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="Buat kata sandi (min. 6 karakter)"
                 required
-                className="w-full px-4 pr-11 py-3 text-sm bg-white border border-neutral-200 rounded-2xl focus:outline-hidden focus:border-[#0d0c22] focus:ring-1 focus:ring-[#0d0c22] transition-all placeholder:text-neutral-400 text-[#0d0c22]"
+                className="w-full px-4 pr-11 py-3 text-sm bg-white border border-[#E2E8F0] rounded-xl focus:outline-hidden focus:border-[#0B1F3A] focus:ring-1 focus:ring-[#0B1F3A] transition-all placeholder:text-neutral-400 text-[#171717]"
               />
               <button
                 type="button"
@@ -234,7 +234,7 @@ export const SignUpPage: React.FC<SignUpPageProps> = ({ onNavigate, onLoginSucce
             <button
               type="submit"
               id="signup-submit-btn"
-              className="w-full mt-2 py-3.5 bg-[#0d0c22] hover:bg-[#2b2a45] text-white text-sm font-medium rounded-full transition duration-150 flex items-center justify-center gap-2 cursor-pointer shadow-xs"
+              className="w-full mt-2 h-11 bg-[#0B1F3A] hover:bg-[#123B8C] text-white text-sm font-semibold rounded-xl transition duration-150 flex items-center justify-center gap-2 cursor-pointer shadow-xs"
             >
               <span>Buat Akun</span>
             </button>
@@ -243,8 +243,8 @@ export const SignUpPage: React.FC<SignUpPageProps> = ({ onNavigate, onLoginSucce
           {/* Persetujuan Ketentuan Layanan */}
           <p className="text-[11px] text-neutral-400 mt-6 leading-relaxed">
             Dengan mendaftar, Anda menyetujui{' '}
-            <a href="#" className="underline hover:text-[#0d0c22]">Ketentuan Layanan</a> dan{' '}
-            <a href="#" className="underline hover:text-[#0d0c22]">Kebijakan Privasi</a> kami.
+            <a href="#" className="underline hover:text-[#0B1F3A]">Ketentuan Layanan</a> dan{' '}
+            <a href="#" className="underline hover:text-[#0B1F3A]">Kebijakan Privasi</a> kami.
           </p>
 
           {/* Link Masuk */}
@@ -256,7 +256,7 @@ export const SignUpPage: React.FC<SignUpPageProps> = ({ onNavigate, onLoginSucce
                   if (onNavigate) onNavigate('signin');
                   else router.push('/sign-in');
                 }}
-                className="text-[#0d0c22] font-semibold hover:underline cursor-pointer ml-0.5"
+                className="text-[#0B1F3A] font-semibold hover:underline cursor-pointer ml-0.5"
               >
                 Masuk
               </button>

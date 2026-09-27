@@ -66,7 +66,7 @@ export const SignInPage: React.FC<SignInPageProps> = ({ onNavigate, onLoginSucce
   };
 
   return (
-    <div className="min-h-screen w-full flex bg-white text-[#0d0c22] font-sans antialiased selection:bg-[#0d0c22] selection:text-white">
+    <div className="min-h-screen w-full flex bg-white text-[#171717] font-sans antialiased selection:bg-[#0B1F3A] selection:text-white">
       
       {/* SISI KIRI: Form Bersih & Minimalis Ala Dribbble */}
       <div className="w-full lg:w-[68%] xl:w-[72%] min-h-screen flex flex-col items-center justify-center p-8 sm:p-12 lg:p-16 xl:p-20 overflow-y-auto">
@@ -87,7 +87,7 @@ export const SignInPage: React.FC<SignInPageProps> = ({ onNavigate, onLoginSucce
           </div>
 
           {/* Heading */}
-          <h1 className="text-2xl sm:text-[28px] font-bold text-[#0d0c22] tracking-tight mb-7">
+          <h1 className="text-2xl sm:text-[28px] font-bold text-[#171717] tracking-tight mb-7">
             Selamat datang kembali
           </h1>
 
@@ -103,7 +103,7 @@ export const SignInPage: React.FC<SignInPageProps> = ({ onNavigate, onLoginSucce
           <button
             type="button"
             onClick={handleGoogleQuickAuth}
-            className="w-full p-2.5 px-4 rounded-full border border-neutral-200 hover:border-neutral-300 bg-white hover:bg-neutral-50/80 transition-all flex items-center justify-between shadow-2xs group cursor-pointer mb-5 text-left"
+            className="w-full p-2.5 px-4 rounded-xl border border-[#E2E8F0] hover:border-neutral-300 bg-white hover:bg-neutral-50/80 transition-all flex items-center justify-between shadow-2xs group cursor-pointer mb-5 text-left"
           >
             <div className="flex items-center gap-3">
               <img
@@ -112,7 +112,7 @@ export const SignInPage: React.FC<SignInPageProps> = ({ onNavigate, onLoginSucce
                 className="w-8 h-8 rounded-full object-cover ring-1 ring-neutral-200"
               />
               <div className="leading-tight">
-                <div className="text-xs font-semibold text-[#0d0c22]">Lanjutkan sebagai Qaysar</div>
+                <div className="text-xs font-semibold text-[#171717]">Lanjutkan sebagai Qaysar</div>
                 <div className="text-[11px] text-neutral-400 font-normal">qaysaraqeel71@gmail.com</div>
               </div>
             </div>
@@ -156,7 +156,7 @@ export const SignInPage: React.FC<SignInPageProps> = ({ onNavigate, onLoginSucce
                   value={emailOrUsername}
                   onChange={(e) => setEmailOrUsername(e.target.value)}
                   placeholder="Masukkan email Anda"
-                  className="w-full px-4 py-3 text-sm bg-white border border-neutral-200 rounded-2xl focus:outline-hidden focus:border-[#0d0c22] focus:ring-1 focus:ring-[#0d0c22] transition-all placeholder:text-neutral-400 text-[#0d0c22]"
+                  className="w-full px-4 py-3 text-sm bg-white border border-[#E2E8F0] rounded-xl focus:outline-hidden focus:border-[#0B1F3A] focus:ring-1 focus:ring-[#0B1F3A] transition-all placeholder:text-[#9F9F9F] text-[#171717]"
                 />
               </div>
               <button
@@ -165,14 +165,14 @@ export const SignInPage: React.FC<SignInPageProps> = ({ onNavigate, onLoginSucce
                   alert('Tautan reset kata sandi telah dikirim ke ' + (emailOrUsername || 'email Anda'));
                   setIsForgotPassword(false);
                 }}
-                className="w-full py-3.5 bg-[#0d0c22] hover:bg-[#2e2d4d] text-white text-sm font-medium rounded-full cursor-pointer transition shadow-xs"
+                className="w-full h-11 bg-[#0B1F3A] hover:bg-[#123B8C] text-white text-sm font-semibold rounded-xl cursor-pointer transition shadow-xs"
               >
                 Kirim Tautan Reset
               </button>
               <button
                 type="button"
                 onClick={() => setIsForgotPassword(false)}
-                className="w-full text-center text-xs text-neutral-500 hover:text-[#0d0c22] cursor-pointer"
+                className="w-full text-center text-xs text-neutral-500 hover:text-[#0B1F3A] cursor-pointer"
               >
                 Kembali ke halaman masuk
               </button>
@@ -188,7 +188,7 @@ export const SignInPage: React.FC<SignInPageProps> = ({ onNavigate, onLoginSucce
                   onChange={(e) => setEmailOrUsername(e.target.value)}
                   placeholder="Masukkan email atau nama pengguna"
                   required
-                  className="w-full px-4 py-3 text-sm bg-white border border-neutral-200 rounded-2xl focus:outline-hidden focus:border-[#0d0c22] focus:ring-1 focus:ring-[#0d0c22] transition-all placeholder:text-neutral-400 text-[#0d0c22]"
+                  className="w-full px-4 py-3 text-sm bg-white border border-[#E2E8F0] rounded-xl focus:outline-hidden focus:border-[#0B1F3A] focus:ring-1 focus:ring-[#0B1F3A] transition-all placeholder:text-[#9F9F9F] text-[#171717]"
                 />
               </div>
 
@@ -201,7 +201,7 @@ export const SignInPage: React.FC<SignInPageProps> = ({ onNavigate, onLoginSucce
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="Masukkan kata sandi"
                   required
-                  className="w-full px-4 pr-11 py-3 text-sm bg-white border border-neutral-200 rounded-2xl focus:outline-hidden focus:border-[#0d0c22] focus:ring-1 focus:ring-[#0d0c22] transition-all placeholder:text-neutral-400 text-[#0d0c22]"
+                  className="w-full px-4 pr-11 py-3 text-sm bg-white border border-[#E2E8F0] rounded-xl focus:outline-hidden focus:border-[#0B1F3A] focus:ring-1 focus:ring-[#0B1F3A] transition-all placeholder:text-[#9F9F9F] text-[#171717]"
                 />
                 <button
                   type="button"
@@ -217,17 +217,17 @@ export const SignInPage: React.FC<SignInPageProps> = ({ onNavigate, onLoginSucce
                 <button
                   type="button"
                   onClick={() => setIsForgotPassword(true)}
-                  className="text-[11px] text-neutral-400 hover:text-[#0d0c22] transition-colors"
+                  className="text-[11px] text-[#64748B] hover:text-[#0B1F3A] transition-colors"
                 >
                   Lupa kata sandi?
                 </button>
               </div>
 
-              {/* Tombol Lanjutkan */}
+              {/* Tombol Lanjutkan (CTA #0B1F3A, rounded-xl 12px) */}
               <button
                 type="submit"
                 id="signin-submit-btn"
-                className="w-full mt-2 py-3.5 bg-[#0d0c22] hover:bg-[#2b2a45] text-white text-sm font-medium rounded-full transition duration-150 flex items-center justify-center gap-2 cursor-pointer shadow-xs"
+                className="w-full mt-2 h-11 bg-[#0B1F3A] hover:bg-[#123B8C] text-white text-sm font-semibold rounded-xl transition duration-150 flex items-center justify-center gap-2 cursor-pointer shadow-xs"
               >
                 <span>Lanjutkan</span>
               </button>
@@ -237,8 +237,8 @@ export const SignInPage: React.FC<SignInPageProps> = ({ onNavigate, onLoginSucce
           {/* Persetujuan Ketentuan Layanan */}
           <p className="text-[11px] text-neutral-400 mt-6 leading-relaxed">
             Dengan melanjutkan, Anda menyetujui{' '}
-            <a href="#" className="underline hover:text-[#0d0c22]">Ketentuan</a> dan{' '}
-            <a href="#" className="underline hover:text-[#0d0c22]">Kebijakan Privasi</a> kami.
+            <a href="#" className="underline hover:text-[#0B1F3A]">Ketentuan</a> dan{' '}
+            <a href="#" className="underline hover:text-[#0B1F3A]">Kebijakan Privasi</a> kami.
           </p>
 
           {/* Link Daftar */}
@@ -250,7 +250,7 @@ export const SignInPage: React.FC<SignInPageProps> = ({ onNavigate, onLoginSucce
                   if (onNavigate) onNavigate('signup');
                   else router.push('/sign-up');
                 }}
-                className="text-[#0d0c22] font-semibold hover:underline cursor-pointer ml-0.5"
+                className="text-[#0B1F3A] font-semibold hover:underline cursor-pointer ml-0.5"
               >
                 Daftar
               </button>

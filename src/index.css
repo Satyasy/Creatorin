@@ -2,31 +2,118 @@
 
 @theme {
   --font-sans: "SF Pro Text", "SF Pro Display", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+
+  /* Color Tokens according to design.md */
+  --color-brand: #1D4ED8;
+  --color-gradient-start: #155DFC;
+  --color-gradient-end: #05A4FD;
+  --color-action-primary: #0B1F3A;
+  --color-ink-alt: #0D0C22;
+  --color-text-strong: #0F172A;
+  --color-text-primary: #171717;
+  --color-text-secondary: #64748B;
+  --color-text-muted: #9F9F9F;
+  --color-surface-primary: #FFFFFF;
+  --color-surface-secondary: #FAFAFA;
+  --color-surface-app: #F8FAFC;
+  --color-surface-selected: #F9FBFF;
+  --color-surface-muted: #F3F3F4;
+  --color-border: #E2E8F0;
+
+  /* Radius Tokens according to design.md */
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
+  --radius-full: 9999px;
 }
 
 @layer base {
   :root {
-    font-size: 90%;
-    --primary: #4f46e5;
-    --primary-hover: #4338ca;
+    /* Color Tokens */
+    --color-brand: #1D4ED8;
+    --color-gradient-start: #155DFC;
+    --color-gradient-end: #05A4FD;
+    --color-action-primary: #0B1F3A;
+    --color-ink-alt: #0D0C22;
+    --color-text-strong: #0F172A;
+    --color-text-primary: #171717;
+    --color-text-secondary: #64748B;
+    --color-text-muted: #9F9F9F;
+    --color-surface-primary: #FFFFFF;
+    --color-surface-secondary: #FAFAFA;
+    --color-surface-app: #F8FAFC;
+    --color-surface-selected: #F9FBFF;
+    --color-surface-muted: #F3F3F4;
+    --color-border: #E2E8F0;
+
+    /* Spacing Tokens */
+    --space-1: 4px;
+    --space-2: 8px;
+    --space-3: 12px;
+    --space-4: 16px;
+    --space-6: 24px;
+    --space-8: 32px;
+    --space-12: 48px;
+    --space-16: 64px;
+    --space-20: 80px;
+    --space-24: 96px;
+
+    /* Radius Tokens */
+    --radius-sm: 8px;
+    --radius-md: 12px;
+    --radius-lg: 16px;
+    --radius-xl: 24px;
+    --radius-full: 9999px;
+
+    /* Container Token */
+    --container-max-width: 1440px;
+
+    /* Backward compatibility mappings */
+    --primary: var(--color-brand);
+    --primary-hover: #1e40af;
     --career-score: #f59e0b;
     --career-score-bg: #fef3c7;
     --career-score-text: #92400e;
-    --bg: #f9fafb;
-    --text-primary: #111827;
-    --text-secondary: #4b5563;
-    --text-muted: #6b7280;
-    --card-border: #e5e7eb;
-    --radius-card: 12px;
-    --radius-btn: 8px;
+    --bg: var(--color-surface-app);
+    --text-primary: var(--color-text-primary);
+    --text-secondary: var(--color-text-secondary);
+    --text-muted: var(--color-text-muted);
+    --card-border: var(--color-border);
+    --radius-card: var(--radius-lg);
+    --radius-btn: var(--radius-md);
   }
 
   body {
-    background-color: var(--bg);
-    color: var(--text-primary);
+    background-color: var(--color-surface-app);
+    color: var(--color-text-primary);
     font-family: "SF Pro Text", "SF Pro Display", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+  }
+}
+
+/* Global Container Standard matching design.md §1 */
+.container-creatorin {
+  width: 100%;
+  max-width: var(--container-max-width, 1440px);
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 16px;
+  padding-right: 16px;
+}
+
+@media (min-width: 640px) {
+  .container-creatorin {
+    padding-left: 24px;
+    padding-right: 24px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .container-creatorin {
+    padding-left: 32px;
+    padding-right: 32px;
   }
 }
 
@@ -38,7 +125,7 @@
   background-color: #fef3c7;
   color: #92400e;
   border: 1px solid #fde68a;
-  border-radius: 9999px;
+  border-radius: var(--radius-full);
   padding: 0.25rem 0.75rem;
   font-size: 0.75rem;
   font-weight: 700;
@@ -46,10 +133,10 @@
 }
 
 .utility-card {
-  background-color: #ffffff;
-  border: 1px solid #e5e7eb;
-  border-radius: 12px;
-  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  background-color: var(--color-surface-primary);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.04);
 }
 
 .utility-card-hover {
@@ -57,8 +144,8 @@
 }
 
 .utility-card-hover:hover {
-  border-color: #d1d5db;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.06), 0 2px 4px -1px rgba(0, 0, 0, 0.04);
+  border-color: #cbd5e1;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
 }
 
 /* Vertical smooth infinite marquee animations for Hero Section */

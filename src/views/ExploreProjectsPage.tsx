@@ -33,6 +33,7 @@ import {
 } from 'lucide-react';
 import { ProjectBriefModal } from '@/components/modals/ProjectBriefModal';
 import { ProjectDetailModal } from '@/components/modals/ProjectDetailModal';
+import { ProjectCard } from '@/components/common/ProjectCard';
 import { MOCK_FEED_PROJECTS } from '@/data/mockFeedProjects';
 import { ActivePage, AuthState, FeedProject, Creator } from '@/types';
 
@@ -267,7 +268,7 @@ export const ExploreProjectsPage: React.FC<ExploreProjectsPageProps> = ({
       )}
 
       {/* Main Container */}
-      <main className="max-w-[1440px] mx-auto px-6 lg:px-8 py-4 sm:py-6">
+      <main className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10">
         
         {/* Breadcrumbs Navigation */}
         <div className="flex items-center gap-2 text-xs font-medium text-neutral-400 mb-2.5">
@@ -281,20 +282,20 @@ export const ExploreProjectsPage: React.FC<ExploreProjectsPageProps> = ({
           <span className="text-neutral-800 font-semibold">Proyek Kreator</span>
         </div>
 
-        {/* Page Title & Subtitle Header (Matching LandingPage & ExploreServicesPage) */}
-        <div className="mb-5 space-y-2.5">
+        {/* Page Title & Subtitle Header */}
+        <div className="mb-6 space-y-2">
           <div>
-            <h1 className="text-2xl sm:text-3xl lg:text-[34px] font-extrabold text-[#0d0c22] tracking-tight leading-tight">
+            <h1 className="text-2xl sm:text-3xl lg:text-[40px] font-bold text-[#0F172A] tracking-tight leading-tight lg:leading-[48px]">
               Jelajah Proyek & Portofolio Kreator
             </h1>
-            <p className="text-xs sm:text-sm text-neutral-500 mt-1 max-w-2xl leading-relaxed">
+            <p className="text-sm sm:text-base text-[#64748B] mt-2 max-w-2xl leading-normal font-normal">
               Temukan portofolio nyata, video Reels, konten TikTok, dan sistem desain yang telah diproduksi oleh kreator top terverifikasi Creatorin.
             </p>
           </div>
 
-          {/* Popular Tag Pills (Identical to other pages) */}
-          <div className="pt-1.5 flex flex-wrap items-center gap-1.5">
-            <span className="text-xs font-semibold text-neutral-500 mr-1 flex items-center gap-1">
+          {/* Popular Tag Pills */}
+          <div className="pt-3 flex flex-wrap items-center gap-1.5">
+            <span className="text-xs font-semibold text-[#64748B] mr-1 flex items-center gap-1">
               <span>Tagar Populer:</span>
             </span>
             {POPULAR_PROJECT_TAGS.map((tag) => {
@@ -305,8 +306,8 @@ export const ExploreProjectsPage: React.FC<ExploreProjectsPageProps> = ({
                   onClick={() => setSelectedTag(isSelected ? null : tag)}
                   className={`px-3 py-1 rounded-full text-xs font-medium border transition-all cursor-pointer ${
                     isSelected 
-                      ? 'bg-[#0d0c22] text-white border-[#0d0c22] shadow-2xs font-semibold' 
-                      : 'bg-white text-neutral-600 border-neutral-200/90 hover:border-neutral-400 hover:text-[#0d0c22] hover:bg-neutral-50'
+                      ? 'bg-[#0B1F3A] text-white border-[#0B1F3A] shadow-2xs font-semibold' 
+                      : 'bg-white text-[#64748B] border-[#E2E8F0] hover:border-[#64748B] hover:text-[#0F172A] hover:bg-[#F8FAFC]'
                   }`}
                 >
                   {tag}
@@ -316,7 +317,7 @@ export const ExploreProjectsPage: React.FC<ExploreProjectsPageProps> = ({
             {selectedTag && (
               <button
                 onClick={() => setSelectedTag(null)}
-                className="text-xs text-blue-600 font-semibold hover:underline ml-1.5 cursor-pointer"
+                className="text-xs text-[#1D4ED8] font-semibold hover:underline ml-1.5 cursor-pointer"
               >
                 Reset Tagar
               </button>
@@ -324,11 +325,11 @@ export const ExploreProjectsPage: React.FC<ExploreProjectsPageProps> = ({
           </div>
         </div>
 
-        {/* Section Heading & Filter Toolbar (Identical to LandingPage & ExploreServicesPage) */}
-        <section className="pt-4 pb-4 border-t border-neutral-200/80 mb-6 relative">
+        {/* Section Heading & Filter Toolbar */}
+        <section className="pt-4 pb-4 border-t border-[#E2E8F0] mb-6 relative">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
             
-            <h2 className="text-base sm:text-lg font-bold text-[#0d0c22]">
+            <h2 className="text-base sm:text-lg font-semibold text-[#0F172A]">
               Cari Proyek berdasarkan Kategori
             </h2>
 
@@ -566,79 +567,23 @@ export const ExploreProjectsPage: React.FC<ExploreProjectsPageProps> = ({
                 setSelectedSort('popular');
                 setSelectedTag(null);
               }}
-              className="px-6 py-2.5 rounded-full bg-[#0d0c22] text-white text-xs font-bold hover:bg-neutral-800 transition cursor-pointer"
+              className="h-11 px-6 rounded-xl bg-[#0B1F3A] text-white text-sm font-semibold hover:bg-[#123B8C] transition cursor-pointer"
             >
               Reset Semua Filter
             </button>
           </div>
         ) : (
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-5 md:gap-6">
-            {filteredProjects.map((project) => {
-              const isLiked = likedPosts[project.id];
-              const isSaved = savedPosts[project.id];
-
-              return (
-                <div
-                  key={project.id}
-                  id={`feed-card-${project.id}`}
-                  onClick={() => handleOpenProjectModal(project)}
-                  className="group relative aspect-[4/5] rounded-2xl sm:rounded-[22px] overflow-hidden bg-neutral-900 cursor-pointer select-none transition-all duration-300 shadow-2xs hover:shadow-xl border border-neutral-200/40 hover:border-neutral-300/80"
-                >
-                  {/* Media Cover Image (Edge to Edge, Uniform 4:5) */}
-                  <img
-                    src={project.coverImage}
-                    alt={project.title}
-                    referrerPolicy="no-referrer"
-                    className="w-full h-full object-cover object-center "
-                  />
-
-                  {/* Top-Right Media Badge (Circular translucent badge with play icon matching screenshot) */}
-                  <div className="absolute top-3.5 right-3.5 z-10 pointer-events-none">
-                    {project.mediaType === 'video' ? (
-                      <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-black/55 backdrop-blur-md flex items-center justify-center text-white shadow-sm border border-white/10">
-                        <Play className="w-3.5 h-3.5 sm:w-4 sm:h-4 fill-white text-white translate-x-[1px]" />
-                      </div>
-                    ) : project.mediaType === 'carousel' ? (
-                      <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-black/55 backdrop-blur-md flex items-center justify-center text-white shadow-sm border border-white/10">
-                        <Layers className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-white" />
-                      </div>
-                    ) : null}
-                  </div>
-
-                  {/* Quick Save Bookmark on hover */}
-                  <div className="absolute top-3.5 left-3.5 z-20 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleToggleSave(project.id, e);
-                      }}
-                      className={`w-8 h-8 sm:w-9 sm:h-9 rounded-full flex items-center justify-center backdrop-blur-md transition-all duration-200 cursor-pointer ${
-                        isSaved ? 'bg-amber-500 text-white shadow-md' : 'bg-black/50 hover:bg-black/80 text-white border border-white/15'
-                      }`}
-                      title={isSaved ? "Tersimpan" : "Simpan Proyek"}
-                    >
-                      <Bookmark className={`w-3.5 h-3.5 sm:w-4 sm:h-4 ${isSaved ? 'fill-white' : ''}`} />
-                    </button>
-                  </div>
-
-                  {/* Bottom Static Title & Creator Vignette (Permanent, clean, matching uploaded screenshot) */}
-                  <div className="absolute inset-x-0 bottom-0 pt-16 pb-3.5 sm:pb-4 px-3.5 sm:px-4 bg-gradient-to-t from-black/90 via-black/45 to-transparent pointer-events-none z-10 flex flex-col justify-end">
-                    <p className="text-white text-[13px] sm:text-[14px] font-bold line-clamp-2 leading-snug drop-shadow-sm mb-1.5">
-                      {project.title}
-                    </p>
-                    <div className="flex items-center justify-between text-white/80 text-[11px] sm:text-xs font-normal">
-                      <span className="truncate max-w-[68%] font-medium">
-                        {project.socialHandle || project.creator.name}
-                      </span>
-                      <span className="shrink-0 font-medium tracking-tight">
-                        {project.viewsCount}
-                      </span>
-                    </div>
-                  </div>
-
-                </div>
-              );
-            })}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {filteredProjects.map((project) => (
+              <ProjectCard
+                key={project.id}
+                id={`feed-card-${project.id}`}
+                project={project}
+                isSaved={Boolean(savedPosts[project.id])}
+                onToggleSave={(id, e) => handleToggleSave(id, e)}
+                onClick={() => handleOpenProjectModal(project)}
+              />
+            ))}
           </div>
         )}
 

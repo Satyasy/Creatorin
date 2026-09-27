@@ -54,6 +54,7 @@ import { useAuth } from '@/providers/AuthProvider';
 import { MOCK_CREATORS } from '@/data/mockCreators';
 import { Creator, CreatorService, PortfolioItem, AuthState, ActivePage, FeedProject } from '@/types';
 import { CareerScoreBadge } from '@/components/common/CareerScoreBadge';
+import { ProjectCard } from '@/components/common/ProjectCard';
 import { ProjectBriefModal } from '@/components/modals/ProjectBriefModal';
 import { ProjectDetailModal } from '@/components/modals/ProjectDetailModal';
 import { ServiceDetailModal } from '@/components/modals/ServiceDetailModal';
@@ -445,11 +446,11 @@ export const CreatorProfilePage: React.FC<CreatorProfilePageProps> = ({
       {/* ==================================================================== */}
       {/* HERO SECTION (Style Exactly Matching The Uploaded Screenshot) */}
       {/* ==================================================================== */}
-      <section className="max-w-[1440px] mx-auto px-6 lg:px-8 py-6">
-        {/* Rounded Top Banner Card */}
-        <div className="relative h-[220px] sm:h-[260px] lg:h-[288px] w-full overflow-hidden rounded-[32px] bg-[#0063b4]">
+      <section className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        {/* Rounded Top Banner Card (Large panel radius 24px according to design.md §7) */}
+        <div className="relative h-[220px] sm:h-[260px] lg:h-[288px] w-full overflow-hidden rounded-3xl bg-[#0063b4]">
           <ShaderFill
-            className="absolute inset-0 rounded-[32px]"
+            className="absolute inset-0 rounded-3xl"
             shader={{
               setup: setupConcentric,
               render: renderConcentric,
@@ -566,24 +567,24 @@ export const CreatorProfilePage: React.FC<CreatorProfilePageProps> = ({
               )}
             </div>
 
-            {/* Button 2: Follow Toggle Button */}
+            {/* Button 2: Follow Toggle Button (rounded-xl 10-12px according to design.md §7) */}
             <button
               id="btn-follow-toggle"
               onClick={toggleFollow}
-              className={`rounded-full border px-5 py-2.5 text-[14px] font-semibold leading-5 tracking-[-0.15px] transition cursor-pointer ${
+              className={`h-10 px-5 rounded-xl border text-sm font-semibold transition-colors cursor-pointer ${
                 isFollowing
-                  ? 'border-neutral-300 bg-white text-[#0d0c22] hover:bg-neutral-50'
-                  : 'border-[#0d0c22] bg-[#0d0c22] text-white hover:bg-neutral-800'
+                  ? 'border-[#E2E8F0] bg-white text-[#171717] hover:bg-[#F8FAFC]'
+                  : 'border-[#0B1F3A] bg-[#0B1F3A] text-white hover:bg-[#123B8C]'
               }`}
             >
               {isFollowing ? 'Following' : 'Follow'}
             </button>
 
-            {/* Button 3: Primary Solid Black CTA Button (Kirim Pesan) */}
+            {/* Button 3: Primary Transactional CTA Button (Dark Navy #0B1F3A, rounded-xl 12px) */}
             <button
               id="btn-send-message-primary"
               onClick={() => setIsGetInTouchOpen(true)}
-              className="flex items-center gap-2 rounded-full bg-[#0d0c22] px-6 py-2.5 text-[14px] font-bold leading-5 tracking-[-0.15px] text-white shadow-xs transition hover:bg-neutral-900 cursor-pointer"
+              className="flex items-center gap-2 h-10 px-5 rounded-xl bg-[#0B1F3A] hover:bg-[#123B8C] text-sm font-semibold text-white shadow-xs transition-colors cursor-pointer"
             >
               <Mail className="w-3.5 h-3.5" />
               <span>Kirim Pesan</span>
@@ -598,46 +599,46 @@ export const CreatorProfilePage: React.FC<CreatorProfilePageProps> = ({
           
           {/* Name & Badges */}
           <div className="flex items-center gap-2.5">
-            <h1 className="text-[32px] font-black leading-[38.4px] tracking-[-0.39px] text-[#0d0c22]">
+            <h1 className="text-2xl sm:text-3xl lg:text-[40px] font-bold leading-tight lg:leading-[48px] tracking-tight text-[#0F172A]">
               {creator.name}
             </h1>
             {creator.verified && (
-              <CheckCircle2 className="w-5 h-5 sm:w-6 sm:h-6 text-blue-600 fill-blue-600 text-white" />
+              <CheckCircle2 className="w-5 h-5 sm:w-6 sm:h-6 text-[#1D4ED8] fill-[#1D4ED8] text-white" />
             )}
             {creator.careerScore?.overall >= 95 && (
-              <span className="px-2 py-0.5 rounded text-[10px] font-black uppercase bg-[#0d0c22] text-white">
+              <span className="px-2 py-0.5 rounded-md text-[10px] font-bold uppercase bg-[#0B1F3A] text-white">
                 PRO+
               </span>
             )}
           </div>
 
-          {/* Tagline / Headline (Directly Below Name, Clean & Concise) */}
-          <p className="mt-1 max-w-2xl text-[16px] font-normal leading-[26px] tracking-[-0.31px] text-[#525252]">
+          {/* Tagline / Headline */}
+          <p className="mt-2 max-w-2xl text-base font-normal leading-6 text-[#64748B]">
             {creator.roleTitle || creator.heroHeadline || 'Design in business. Business in design.'}
           </p>
 
-          {/* Inline Stats Row (Matching Style: 12.234 Students 293 Online 13 Admins) */}
-          <div className="mt-2.5 flex flex-wrap items-center gap-x-5 gap-y-1.5 text-[14px] font-medium leading-5 tracking-[-0.15px] text-[#737373]">
+          {/* Inline Stats Row (Standardized scale spacing gap-x-6 gap-y-2) */}
+          <div className="mt-3 flex flex-wrap items-center gap-x-6 gap-y-2 text-sm font-normal text-[#64748B]">
             <span>
-              <strong className="text-[#0d0c22] font-semibold">
+              <strong className="text-[#0F172A] font-semibold">
                 {creator.stats?.completedProjects || '142+'}
               </strong>{' '}
               Proyek Selesai
             </span>
             <span>
-              <strong className="text-[#0d0c22] font-semibold">
+              <strong className="text-[#0F172A] font-semibold">
                 {creator.rating || '4.9'} ★
               </strong>{' '}
               ({creator.reviewCount || 98} Ulasan)
             </span>
             <span>
-              <strong className="text-[#0d0c22] font-semibold">
+              <strong className="text-[#0F172A] font-semibold">
                 {followersCount.toLocaleString()}
               </strong>{' '}
               Pengikut
             </span>
             <span>
-              <strong className="text-[#0d0c22] font-semibold">
+              <strong className="text-[#0F172A] font-semibold">
                 {creator.careerScore?.overall || 98}%
               </strong>{' '}
               Skor Karir
@@ -659,7 +660,7 @@ export const CreatorProfilePage: React.FC<CreatorProfilePageProps> = ({
       {/* TAB NAVIGATION BAR (Work, Services, Reviews, Collections, Liked Shots, About) */}
       {/* ==================================================================== */}
       <div className="sticky top-20 z-30 border-b border-[#eaeaea] bg-white/95 backdrop-blur-md">
-        <div className="mx-auto flex max-w-[1440px] flex-col items-stretch justify-between gap-4 px-6 py-3 sm:flex-row sm:items-center lg:px-8">
+        <div className="mx-auto flex max-w-[1440px] flex-col items-stretch justify-between gap-4 px-4 sm:px-6 lg:px-8 py-3 sm:flex-row sm:items-center">
           
           {/* Tabs Group */}
           <div className="flex h-10 items-center gap-2 overflow-x-auto no-scrollbar py-0.5">
@@ -813,7 +814,7 @@ export const CreatorProfilePage: React.FC<CreatorProfilePageProps> = ({
       {/* ==================================================================== */}
       {/* TAB CONTENT AREA */}
       {/* ==================================================================== */}
-      <main className="max-w-[1440px] mx-auto px-6 lg:px-8 py-8 sm:py-12">
+      <main className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
         
         {/* ----------------- TAB 1: PROYEK (EXPLORE PROJECTS CARD DESIGN) ----------------- */}
         {activeTab === 'work' && (
@@ -845,86 +846,20 @@ export const CreatorProfilePage: React.FC<CreatorProfilePageProps> = ({
                     Show off your best work. Get feedback, likes and be a part of a growing community.
                   </span>
                 </button>
-                {filteredProjects.map((project) => {
-                  const isLiked = likedShots.has(project.id);
-                  const isSaved = savedProjectIds.has(project.id);
-                  const currentMediaIdx = activeMediaIndexes[project.id] || 0;
-                  const displayMedia = project.mediaType === 'carousel' && project.additionalMedia
-                    ? project.additionalMedia[currentMediaIdx] || project.mediaUrl
-                    : project.mediaUrl;
-
-                  const handleText = project.socialHandle || (project.creator?.handle?.startsWith('@') 
-                    ? project.creator.handle 
-                    : `@${project.creator?.handle || creator.username || creator.name.toLowerCase().replace(/\s+/g, '')}`);
-
-                  const viewsFormatted = project.viewsCount || `${Math.round((project.stats?.views || 85400) / 1000)}K`;
-
-                  return (
-                    <div
-                      key={project.id}
-                      onClick={() => {
-                        setSelectedProjectForDetail(project);
-                        setDetailMediaIndex(0);
-                      }}
-                      className="group relative aspect-[326/407.5] overflow-hidden rounded-md border border-[#e5e5e5] bg-[#171717] shadow-[0_1px_0_rgba(0,0,0,0.05)] transition-all duration-300 hover:shadow-xl cursor-pointer select-none"
-                    >
-                      {/* Full-bleed Media Cover (Edge-to-Edge) */}
-                      <img
-                        src={displayMedia}
-                        alt={project.title}
-                        referrerPolicy="no-referrer"
-                        className="w-full h-full object-cover object-center "
-                      />
-
-                      {/* Top Right Media Badge: Circular dark translucent button with icon (matching screenshot) */}
-                      <div className="absolute right-3.5 top-3.5 z-10 pointer-events-none">
-                        {project.mediaType === 'video' ? (
-                          <div className="flex size-9 items-center justify-center rounded-full border border-white/10 bg-black/55 text-white shadow-sm backdrop-blur-md">
-                            <Play className="size-4 translate-x-[1px] fill-white text-white" />
-                          </div>
-                        ) : project.mediaType === 'carousel' ? (
-                          <div className="flex size-9 items-center justify-center rounded-full border border-white/10 bg-black/55 text-white shadow-sm backdrop-blur-md">
-                            <Layers className="size-4 text-white" />
-                          </div>
-                        ) : null}
-                      </div>
-
-                      {/* Quick Save Bookmark button on hover */}
-                      <div className="absolute top-3.5 left-3.5 z-20 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            toggleSaveProject(project.id, e);
-                          }}
-                          className={`w-8 h-8 sm:w-9 sm:h-9 rounded-full flex items-center justify-center backdrop-blur-md transition-all duration-200 cursor-pointer ${
-                            isSaved 
-                              ? 'bg-amber-500 text-white shadow-md' 
-                              : 'bg-black/50 hover:bg-black/80 text-white border border-white/15'
-                          }`}
-                          title={isSaved ? 'Hapus Simpan' : 'Simpan Proyek'}
-                        >
-                          <Bookmark className={`w-3.5 h-3.5 sm:w-4 sm:h-4 ${isSaved ? 'fill-white' : ''}`} />
-                        </button>
-                      </div>
-
-                      {/* Bottom Static Overlay: 2-line title + creator handle + views (Always visible matching screenshot) */}
-                      <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10 flex flex-col justify-end bg-gradient-to-t from-black/90 via-black/45 to-transparent px-4 pb-4 pt-16">
-                        <p className="mb-1.5 line-clamp-2 text-[14px] font-bold leading-[19.25px] tracking-[-0.15px] text-white drop-shadow-sm">
-                          {project.title}
-                        </p>
-                        <div className="flex items-center justify-between text-[12px] font-medium leading-4 text-white/80">
-                          <span className="truncate max-w-[68%] font-medium">
-                            {handleText}
-                          </span>
-                          <span className="shrink-0 font-medium tracking-tight">
-                            {viewsFormatted}
-                          </span>
-                        </div>
-                      </div>
-
-                    </div>
-                  );
-                })}
+                {filteredProjects.map((project) => (
+                  <ProjectCard
+                    key={project.id}
+                    id={`feed-card-${project.id}`}
+                    project={project}
+                    isSaved={savedProjectIds.has(project.id)}
+                    onToggleSave={(id, e) => toggleSaveProject(id, e)}
+                    onClick={() => {
+                      setSelectedProjectForDetail(project);
+                      setDetailMediaIndex(0);
+                    }}
+                    activeMediaIndex={activeMediaIndexes[project.id] || 0}
+                  />
+                ))}
               </div>
             )}
           </div>
@@ -1439,22 +1374,19 @@ export const CreatorProfilePage: React.FC<CreatorProfilePageProps> = ({
         {activeTab === 'liked' && (
           <div className="text-left">
             <h3 className="text-lg font-bold text-[#0d0c22] mb-4">Shots Disukai Oleh {creator.name}</h3>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              {creatorProjects.slice(0, 3).map((project) => (
-                <div 
-                  key={project.id} 
-                  className="group cursor-pointer" 
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+              {creatorProjects.slice(0, 4).map((project) => (
+                <ProjectCard
+                  key={project.id}
+                  id={`liked-card-${project.id}`}
+                  project={project}
+                  isSaved={savedProjectIds.has(project.id)}
+                  onToggleSave={(id, e) => toggleSaveProject(id, e)}
                   onClick={() => {
                     setSelectedProjectForDetail(project);
                     setDetailMediaIndex(0);
                   }}
-                >
-                  <div className="aspect-4/3 rounded-2xl overflow-hidden bg-neutral-100 border border-neutral-200">
-                    <img src={project.coverImage} alt={project.title} className="w-full h-full object-cover " />
-                  </div>
-                  <h4 className="text-sm font-bold text-[#0d0c22] mt-2 truncate">{project.title}</h4>
-                  <span className="text-xs text-neutral-400">{project.category}</span>
-                </div>
+                />
               ))}
             </div>
           </div>

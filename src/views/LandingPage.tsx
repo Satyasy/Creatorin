@@ -185,9 +185,9 @@ export const LandingPage: React.FC<LandingPageProps> = ({ currentUser: propUser,
   }, [searchQuery, selectedTag, selectedCategory, selectedBudget, selectedLocation, selectedScore]);
 
   return (
-    <div className="w-full bg-[#fafafa] flex flex-col font-sans selection:bg-[#0d0c22] selection:text-white text-[#0d0c22]">
+    <div className="w-full bg-[#F8FAFC] flex flex-col font-sans selection:bg-[#0B1F3A] selection:text-white text-[#171717]">
       {/* Main Content Area */}
-      <main className="flex-1 max-w-[1440px] w-full mx-auto px-6 lg:px-8 py-4 sm:py-6">
+      <main className="flex-1 max-w-[1440px] w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10">
         
         {/* Breadcrumbs Navigation */}
         <div className="flex items-center gap-2 text-xs font-medium text-neutral-400 mb-2.5">
@@ -201,20 +201,20 @@ export const LandingPage: React.FC<LandingPageProps> = ({ currentUser: propUser,
           <span className="text-neutral-800 font-semibold">Profil Kreator</span>
         </div>
 
-        {/* Page Title & Subtitle Header (Clean, Compact, Above-The-Fold Hero) */}
-        <div className="mb-5 space-y-2.5">
+        {/* Page Title & Subtitle Header */}
+        <div className="mb-6 space-y-3">
           <div>
-            <h1 className="text-2xl sm:text-3xl lg:text-[34px] font-extrabold text-[#0d0c22] tracking-tight leading-tight">
+            <h1 className="text-2xl sm:text-3xl lg:text-[40px] font-bold text-[#0F172A] tracking-tight leading-tight lg:leading-[48px]">
               Jelajah Profil Kreator & Talenta Terverifikasi
             </h1>
-            <p className="text-xs sm:text-sm text-neutral-500 mt-1 max-w-2xl leading-relaxed">
+            <p className="text-sm sm:text-base text-[#64748B] mt-2 max-w-2xl leading-normal font-normal">
               Telusuri portofolio karya asli, bandingkan Career Score & performa nyata kreator, dan hubungi langsung.
             </p>
           </div>
 
-          {/* Popular Tag Pills (Compact & Refined) */}
-          <div className="pt-1.5 flex flex-wrap items-center gap-1.5">
-            <span className="text-xs font-semibold text-neutral-500 mr-1 flex items-center gap-1">
+          {/* Popular Tag Pills */}
+          <div className="pt-2 flex flex-wrap items-center gap-1.5">
+            <span className="text-xs font-semibold text-[#64748B] mr-1 flex items-center gap-1">
               <span>Tagar Populer:</span>
             </span>
             {POPULAR_TAGS.map((tag) => {
@@ -225,8 +225,8 @@ export const LandingPage: React.FC<LandingPageProps> = ({ currentUser: propUser,
                   onClick={() => setSelectedTag(isSelected ? null : tag)}
                   className={`px-3 py-1 rounded-full text-xs font-medium border transition-all cursor-pointer ${
                     isSelected 
-                      ? 'bg-[#0d0c22] text-white border-[#0d0c22] shadow-2xs font-semibold' 
-                      : 'bg-white text-neutral-600 border-neutral-200/90 hover:border-neutral-400 hover:text-[#0d0c22] hover:bg-neutral-50'
+                      ? 'bg-[#0B1F3A] text-white border-[#0B1F3A] shadow-2xs font-semibold' 
+                      : 'bg-white text-[#64748B] border-[#E2E8F0] hover:border-[#64748B] hover:text-[#0F172A] hover:bg-[#F8FAFC]'
                   }`}
                 >
                   {tag}
@@ -236,7 +236,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ currentUser: propUser,
             {selectedTag && (
               <button
                 onClick={() => setSelectedTag(null)}
-                className="text-xs text-blue-600 font-semibold hover:underline ml-1.5 cursor-pointer"
+                className="text-xs text-[#1D4ED8] font-semibold hover:underline ml-1.5 cursor-pointer"
               >
                 Reset Tagar
               </button>
@@ -245,10 +245,10 @@ export const LandingPage: React.FC<LandingPageProps> = ({ currentUser: propUser,
         </div>
 
         {/* Section Heading: Cari Talenta Berdasarkan Kategori & Filter Toolbar */}
-        <div className="pt-4 pb-4 border-t border-neutral-200/80">
+        <div className="pt-4 pb-4 border-t border-[#E2E8F0]">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
             
-            <h2 className="text-base sm:text-lg font-bold text-[#0d0c22]">
+            <h2 className="text-base sm:text-lg font-semibold text-[#0F172A]">
               Cari Talenta berdasarkan Kategori
             </h2>
 
@@ -276,7 +276,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ currentUser: propUser,
                 <button
                   onClick={() => setOpenDropdown(openDropdown === 'kategori' ? null : 'kategori')}
                   className={`px-3.5 py-2 rounded-xl border text-xs font-semibold flex items-center gap-2 bg-white transition cursor-pointer ${
-                    selectedCategory !== 'Semua' ? 'border-[#0d0c22] text-[#0d0c22] bg-neutral-50' : 'border-neutral-200 text-neutral-700 hover:border-neutral-300'
+                    selectedCategory !== 'Semua' ? 'border-[#0B1F3A] text-[#0B1F3A] bg-neutral-50' : 'border-neutral-200 text-neutral-700 hover:border-neutral-300'
                   }`}
                 >
                   <span>{selectedCategory === 'Semua' ? 'Kategori' : selectedCategory}</span>
@@ -303,11 +303,11 @@ export const LandingPage: React.FC<LandingPageProps> = ({ currentUser: propUser,
                           setOpenDropdown(null);
                         }}
                         className={`w-full px-4 py-2 text-left text-xs font-medium hover:bg-neutral-50 flex items-center justify-between cursor-pointer ${
-                          selectedCategory === cat ? 'font-bold text-[#0d0c22]' : 'text-neutral-600'
+                          selectedCategory === cat ? 'font-bold text-[#0B1F3A]' : 'text-neutral-600'
                         }`}
                       >
                         <span>{cat}</span>
-                        {selectedCategory === cat && <Check className="w-3.5 h-3.5 text-[#0d0c22]" />}
+                        {selectedCategory === cat && <Check className="w-3.5 h-3.5 text-[#0B1F3A]" />}
                       </button>
                     ))}
                   </div>
@@ -319,7 +319,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ currentUser: propUser,
                 <button
                   onClick={() => setOpenDropdown(openDropdown === 'budget' ? null : 'budget')}
                   className={`px-3.5 py-2 rounded-xl border text-xs font-semibold flex items-center gap-2 bg-white transition cursor-pointer ${
-                    selectedBudget !== 'Semua' ? 'border-[#0d0c22] text-[#0d0c22] bg-neutral-50' : 'border-neutral-200 text-neutral-700 hover:border-neutral-300'
+                    selectedBudget !== 'Semua' ? 'border-[#0B1F3A] text-[#0B1F3A] bg-neutral-50' : 'border-neutral-200 text-neutral-700 hover:border-neutral-300'
                   }`}
                 >
                   <span>
@@ -343,11 +343,11 @@ export const LandingPage: React.FC<LandingPageProps> = ({ currentUser: propUser,
                           setOpenDropdown(null);
                         }}
                         className={`w-full px-4 py-2 text-left text-xs font-medium hover:bg-neutral-50 flex items-center justify-between cursor-pointer ${
-                          selectedBudget === b.val ? 'font-bold text-[#0d0c22]' : 'text-neutral-600'
+                          selectedBudget === b.val ? 'font-bold text-[#0B1F3A]' : 'text-neutral-600'
                         }`}
                       >
                         <span>{b.label}</span>
-                        {selectedBudget === b.val && <Check className="w-3.5 h-3.5 text-[#0d0c22]" />}
+                        {selectedBudget === b.val && <Check className="w-3.5 h-3.5 text-[#0B1F3A]" />}
                       </button>
                     ))}
                   </div>
@@ -359,7 +359,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ currentUser: propUser,
                 <button
                   onClick={() => setOpenDropdown(openDropdown === 'lokasi' ? null : 'lokasi')}
                   className={`px-3.5 py-2 rounded-xl border text-xs font-semibold flex items-center gap-2 bg-white transition cursor-pointer ${
-                    selectedLocation !== 'Semua' ? 'border-[#0d0c22] text-[#0d0c22] bg-neutral-50' : 'border-neutral-200 text-neutral-700 hover:border-neutral-300'
+                    selectedLocation !== 'Semua' ? 'border-[#0B1F3A] text-[#0B1F3A] bg-neutral-50' : 'border-neutral-200 text-neutral-700 hover:border-neutral-300'
                   }`}
                 >
                   <span>{selectedLocation === 'Semua' ? 'Lokasi' : selectedLocation}</span>
@@ -376,11 +376,11 @@ export const LandingPage: React.FC<LandingPageProps> = ({ currentUser: propUser,
                           setOpenDropdown(null);
                         }}
                         className={`w-full px-4 py-2 text-left text-xs font-medium hover:bg-neutral-50 flex items-center justify-between cursor-pointer ${
-                          selectedLocation === loc ? 'font-bold text-[#0d0c22]' : 'text-neutral-600'
+                          selectedLocation === loc ? 'font-bold text-[#0B1F3A]' : 'text-neutral-600'
                         }`}
                       >
                         <span>{loc}</span>
-                        {selectedLocation === loc && <Check className="w-3.5 h-3.5 text-[#0d0c22]" />}
+                        {selectedLocation === loc && <Check className="w-3.5 h-3.5 text-[#0B1F3A]" />}
                       </button>
                     ))}
                   </div>
@@ -392,7 +392,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ currentUser: propUser,
                 <button
                   onClick={() => setOpenDropdown(openDropdown === 'rating' ? null : 'rating')}
                   className={`px-3.5 py-2 rounded-xl border text-xs font-semibold flex items-center gap-2 bg-white transition cursor-pointer ${
-                    selectedScore !== 'Semua' ? 'border-[#0d0c22] text-[#0d0c22] bg-neutral-50' : 'border-neutral-200 text-neutral-700 hover:border-neutral-300'
+                    selectedScore !== 'Semua' ? 'border-[#0B1F3A] text-[#0B1F3A] bg-neutral-50' : 'border-neutral-200 text-neutral-700 hover:border-neutral-300'
                   }`}
                 >
                   <span>{selectedScore === 'Semua' ? 'Rating / Score' : `Score ${selectedScore}`}</span>
@@ -413,11 +413,11 @@ export const LandingPage: React.FC<LandingPageProps> = ({ currentUser: propUser,
                           setOpenDropdown(null);
                         }}
                         className={`w-full px-4 py-2 text-left text-xs font-medium hover:bg-neutral-50 flex items-center justify-between cursor-pointer ${
-                          selectedScore === s.val ? 'font-bold text-[#0d0c22]' : 'text-neutral-600'
+                          selectedScore === s.val ? 'font-bold text-[#0B1F3A]' : 'text-neutral-600'
                         }`}
                       >
                         <span>{s.label}</span>
-                        {selectedScore === s.val && <Check className="w-3.5 h-3.5 text-[#0d0c22]" />}
+                        {selectedScore === s.val && <Check className="w-3.5 h-3.5 text-[#0B1F3A]" />}
                       </button>
                     ))}
                   </div>
@@ -501,14 +501,17 @@ export const LandingPage: React.FC<LandingPageProps> = ({ currentUser: propUser,
                           </h3>
 
                           {creator.proBadge && (
-                            <span className="text-[9px] sm:text-[10px] font-black uppercase px-2 py-0.5 rounded-sm bg-[#0d0c22] text-white tracking-wider">
-                              PRO+
-                            </span>
-                          )}
-
-                          {creator.selectBadge && (
-                            <span className="text-[9px] sm:text-[10px] font-black uppercase px-2 py-0.5 rounded-sm bg-[#2b2a45] text-neutral-200 tracking-wider">
-                              SELECT
+                            <span
+                              className="uppercase px-2 py-0.5 rounded bg-[#0d0c22] tracking-[0.62px] leading-[15px]"
+                              style={{
+                                color: '#FFF',
+                                fontFamily: '"SF Pro", -apple-system, BlinkMacSystemFont, sans-serif',
+                                fontSize: '10px',
+                                fontStyle: 'normal',
+                                fontWeight: 900,
+                              }}
+                            >
+                              PRO
                             </span>
                           )}
 
@@ -569,10 +572,10 @@ export const LandingPage: React.FC<LandingPageProps> = ({ currentUser: propUser,
                         <Bookmark className={`w-4 h-4 ${isSaved ? 'fill-blue-600' : ''}`} />
                       </button>
 
-                      {/* Tombol Get in touch (Hitam pekat ala Dribbble) */}
+                      {/* Tombol Get in touch */}
                       <button
                         onClick={(e) => handleOpenBrief(creator, e)}
-                        className="px-5 sm:px-6 py-2.5 rounded-full bg-[#0d0c22] hover:bg-[#2b2a45] text-white text-xs sm:text-sm font-semibold transition-all shadow-2xs hover:shadow-xs cursor-pointer flex items-center gap-2"
+                        className="h-10 px-5 sm:px-6 rounded-xl bg-[#0B1F3A] hover:bg-[#123B8C] text-white text-xs sm:text-sm font-semibold transition-all shadow-2xs hover:shadow-xs cursor-pointer flex items-center gap-2"
                       >
                         <span>Hubungi</span>
                       </button>
@@ -662,7 +665,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ currentUser: propUser,
                                   )}
 
                                   <div className="absolute bottom-2.5 right-2.5 opacity-0 group-hover/srv:opacity-100 transition-all duration-300 transform translate-y-1 group-hover/srv:translate-y-0">
-                                    <span className="bg-white text-[#0d0c22] text-[11px] font-bold px-3 py-1 rounded-full shadow-md flex items-center gap-1">
+                                    <span className="bg-white text-[#171717] text-[11px] font-bold px-3 py-1 rounded-full shadow-md flex items-center gap-1">
                                       <span>Order</span>
                                       <span className="text-blue-600 font-bold">→</span>
                                     </span>
@@ -671,12 +674,12 @@ export const LandingPage: React.FC<LandingPageProps> = ({ currentUser: propUser,
 
                                 {/* Clean Title & Price Below Image */}
                                 <div className="pt-3 px-0.5 space-y-1">
-                                  <h4 className="text-[13px] sm:text-[14px] font-bold text-[#0d0c22] group-hover/srv:text-blue-600 transition-colors line-clamp-1 leading-snug">
+                                  <h4 className="text-[13px] sm:text-[14px] font-bold text-[#171717] group-hover/srv:text-blue-600 transition-colors line-clamp-1 leading-snug">
                                     {service.title}
                                   </h4>
 
                                   <div className="flex items-center justify-between pt-0.5">
-                                    <span className="text-[13px] sm:text-[14px] font-black text-[#0d0c22] tracking-tight">
+                                    <span className="text-[13px] sm:text-[14px] font-black text-[#171717] tracking-tight">
                                       {service.formattedPrice}
                                     </span>
                                     {service.deliveryDays && (

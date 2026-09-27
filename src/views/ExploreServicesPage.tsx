@@ -306,7 +306,7 @@ export const ExploreServicesPage: React.FC<ExploreServicesPageProps> = ({
   return (
     <div className="w-full bg-[#fafafa] flex flex-col font-sans selection:bg-[#0d0c22] selection:text-white text-[#0d0c22]">
       {/* Main Content Area */}
-      <main className="flex-1 max-w-[1440px] w-full mx-auto px-6 lg:px-8 py-4 sm:py-6">
+      <main className="flex-1 max-w-[1440px] w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10">
         
         {/* Breadcrumbs Navigation */}
         <div className="flex items-center gap-2 text-xs font-medium text-neutral-400 mb-2.5">
@@ -320,30 +320,30 @@ export const ExploreServicesPage: React.FC<ExploreServicesPageProps> = ({
           <span className="text-neutral-800 font-semibold">Katalog Layanan</span>
         </div>
 
-        {/* Page Title & Subtitle Header (Clean, Compact Hero style matching Screenshot) */}
-        <div className="mb-5 space-y-2.5">
+        {/* Page Title & Subtitle Header */}
+        <div className="mb-6 space-y-3">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
-              <h1 className="text-2xl sm:text-3xl lg:text-[34px] font-extrabold text-[#0d0c22] tracking-tight leading-tight">
+              <h1 className="text-2xl sm:text-3xl lg:text-[40px] font-bold text-[#0F172A] tracking-tight leading-tight lg:leading-[48px]">
                 Jelajah Katalog Layanan & Jasa Kreator
               </h1>
-              <p className="text-xs sm:text-sm text-neutral-500 mt-1 max-w-2xl leading-relaxed">
+              <p className="text-sm sm:text-base text-[#64748B] mt-2 max-w-2xl leading-normal font-normal">
                 Pilih paket layanan konten instan mulai dari video UGC, desain feed, hingga branding dengan harga transparan dan garansi pengerjaan tepat waktu.
               </p>
             </div>
 
             <button
               onClick={() => setIsBriefModalOpen(true)}
-              className="self-start sm:self-auto px-5 py-2.5 rounded-full border border-neutral-200 bg-white hover:bg-neutral-50 text-[#0d0c22] text-xs font-bold shadow-2xs transition cursor-pointer flex items-center gap-2"
+              className="self-start sm:self-auto h-11 px-4 rounded-xl border border-[#E2E8F0] bg-white hover:bg-[#F8FAFC] text-[#0F172A] text-sm font-semibold shadow-2xs transition-colors cursor-pointer flex items-center gap-2"
             >
-              <Sparkles className="w-3.5 h-3.5 text-blue-600" />
+              <Sparkles className="w-3.5 h-3.5 text-[#1D4ED8]" />
               <span>Request Custom Brief</span>
             </button>
           </div>
 
-          {/* Popular Tag Pills (Identical to Screenshot) */}
-          <div className="pt-1.5 flex flex-wrap items-center gap-1.5">
-            <span className="text-xs font-semibold text-neutral-500 mr-1 flex items-center gap-1">
+          {/* Popular Tag Pills */}
+          <div className="pt-2 flex flex-wrap items-center gap-1.5">
+            <span className="text-xs font-semibold text-[#64748B] mr-1 flex items-center gap-1">
               <span>Tagar Populer:</span>
             </span>
             {POPULAR_SERVICES_TAGS.map((tag) => {
@@ -354,8 +354,8 @@ export const ExploreServicesPage: React.FC<ExploreServicesPageProps> = ({
                   onClick={() => setSelectedTag(isSelected ? null : tag)}
                   className={`px-3 py-1 rounded-full text-xs font-medium border transition-all cursor-pointer ${
                     isSelected 
-                      ? 'bg-[#0d0c22] text-white border-[#0d0c22] shadow-2xs font-semibold' 
-                      : 'bg-white text-neutral-600 border-neutral-200/90 hover:border-neutral-400 hover:text-[#0d0c22] hover:bg-neutral-50'
+                      ? 'bg-[#0B1F3A] text-white border-[#0B1F3A] shadow-2xs font-semibold' 
+                      : 'bg-white text-[#64748B] border-[#E2E8F0] hover:border-[#64748B] hover:text-[#0F172A] hover:bg-[#F8FAFC]'
                   }`}
                 >
                   {tag}
@@ -365,7 +365,7 @@ export const ExploreServicesPage: React.FC<ExploreServicesPageProps> = ({
             {selectedTag && (
               <button
                 onClick={() => setSelectedTag(null)}
-                className="text-xs text-blue-600 font-semibold hover:underline ml-1.5 cursor-pointer"
+                className="text-xs text-[#1D4ED8] font-semibold hover:underline ml-1.5 cursor-pointer"
               >
                 Reset Tagar
               </button>
@@ -618,19 +618,19 @@ export const ExploreServicesPage: React.FC<ExploreServicesPageProps> = ({
                 return (
                   <div
                     key={item.id}
-                    className="bg-white rounded-2xl sm:rounded-3xl border border-neutral-200/90 hover:border-neutral-300 hover:shadow-lg transition-all p-4 sm:p-5 flex flex-col justify-between text-left group"
+                    className="bg-white rounded-2xl border border-[#E2E8F0] hover:border-[#64748B] transition-colors p-5 flex flex-col justify-between text-left group shadow-2xs"
                   >
                     <div>
                       {/* Cover Thumbnail Image inside card padding */}
                       <div 
                         onClick={() => setSelectedServiceForDetail(item)}
-                        className="aspect-[16/10] rounded-xl sm:rounded-2xl overflow-hidden bg-neutral-100 mb-4 cursor-pointer"
+                        className="aspect-[16/10] rounded-xl overflow-hidden bg-[#F3F3F4] mb-4 cursor-pointer"
                         title="Klik untuk melihat detail layanan"
                       >
                         <img
                           src={coverImage}
                           alt={item.title}
-                          className="w-full h-full object-cover "
+                          className="w-full h-full object-cover"
                           loading="lazy"
                           referrerPolicy="no-referrer"
                         />
@@ -638,28 +638,22 @@ export const ExploreServicesPage: React.FC<ExploreServicesPageProps> = ({
 
                       {/* Tag & Creator Attribution Header */}
                       <div className="flex items-center justify-between gap-2 mb-2.5">
-                        {item.tag ? (
-                          <span className="px-2.5 py-1 rounded-md bg-neutral-100 text-neutral-600 text-[10px] font-bold uppercase tracking-wider inline-block">
-                            {item.tag}
-                          </span>
-                        ) : (
-                          <span className="px-2.5 py-1 rounded-md bg-neutral-100 text-neutral-600 text-[10px] font-bold uppercase tracking-wider inline-block">
-                            Layanan
-                          </span>
-                        )}
+                        <span className="px-2.5 py-0.5 rounded-full bg-[#F3F3F4] text-[#171717] text-[11px] font-medium inline-block">
+                          {item.tag || 'Layanan'}
+                        </span>
 
                         <button
                           onClick={(e) => {
                             e.stopPropagation();
                             handleCreatorClick(item.creator);
                           }}
-                          className="flex items-center gap-1.5 text-neutral-500 hover:text-blue-600 transition group/cr cursor-pointer"
+                          className="flex items-center gap-1.5 text-[#64748B] hover:text-[#1D4ED8] transition-colors group/cr cursor-pointer"
                           title={`Lihat profil ${item.creator.name}`}
                         >
                           <img
                             src={item.creator.avatar}
                             alt={item.creator.name}
-                            className="w-4 h-4 rounded-full object-cover ring-1 ring-neutral-200"
+                            className="w-4 h-4 rounded-full object-cover ring-1 ring-[#E2E8F0]"
                           />
                           <span className="text-[11px] font-medium truncate max-w-[120px] group-hover/cr:underline">
                             {item.creator.name}
@@ -670,7 +664,7 @@ export const ExploreServicesPage: React.FC<ExploreServicesPageProps> = ({
                       {/* Service Title */}
                       <h3 
                         onClick={() => setSelectedServiceForDetail(item)}
-                        className="text-base sm:text-[17px] font-bold text-[#0d0c22] mb-1.5 leading-snug cursor-pointer group-hover:text-blue-600 transition-colors"
+                        className="text-base font-semibold text-[#0F172A] mb-1.5 leading-snug cursor-pointer group-hover:text-[#1D4ED8] transition-colors"
                         title="Klik untuk melihat detail layanan"
                       >
                         {item.title}
@@ -679,7 +673,7 @@ export const ExploreServicesPage: React.FC<ExploreServicesPageProps> = ({
                       {/* Service Description (1-2 lines) */}
                       <p 
                         onClick={() => setSelectedServiceForDetail(item)}
-                        className="text-xs text-neutral-500 line-clamp-2 leading-relaxed mb-4 cursor-pointer"
+                        className="text-xs text-[#64748B] line-clamp-2 leading-relaxed mb-4 cursor-pointer font-normal"
                       >
                         {item.description || 'Pengerjaan profesional dengan jaminan kepatuhan brief dan revisi cepat.'}
                       </p>
@@ -687,20 +681,20 @@ export const ExploreServicesPage: React.FC<ExploreServicesPageProps> = ({
                       {/* Estimasi Durasi Pengerjaan */}
                       <div 
                         onClick={() => setSelectedServiceForDetail(item)}
-                        className="flex items-center gap-1.5 text-xs text-neutral-500 mb-6 cursor-pointer"
+                        className="flex items-center gap-1.5 text-xs text-[#64748B] mb-6 cursor-pointer"
                       >
-                        <Clock className="w-3.5 h-3.5 text-neutral-400 stroke-[1.75]" />
+                        <Clock className="w-3.5 h-3.5 text-[#9F9F9F] stroke-[1.75]" />
                         <span>Estimasi: {formattedDelivery}</span>
                       </div>
                     </div>
 
                     {/* Bottom Row / Card Footer: HARGA + Pesan Layanan */}
-                    <div className="flex items-center justify-between pt-2 gap-2">
+                    <div className="flex items-center justify-between pt-2 gap-2 border-t border-[#E2E8F0]">
                       <div onClick={() => setSelectedServiceForDetail(item)} className="cursor-pointer min-w-0">
-                        <span className="text-[10px] text-neutral-400 font-bold uppercase tracking-wider block mb-0.5">
+                        <span className="text-[10px] text-[#64748B] font-semibold uppercase tracking-wider block mb-0.5">
                           HARGA
                         </span>
-                        <span className="text-sm sm:text-base font-black text-[#0d0c22] truncate block">
+                        <span className="text-sm sm:text-base font-bold text-[#0F172A] truncate block">
                           {item.formattedPrice}
                         </span>
                       </div>
@@ -716,7 +710,7 @@ export const ExploreServicesPage: React.FC<ExploreServicesPageProps> = ({
                           className={`w-8 h-8 sm:w-9 sm:h-9 rounded-full border transition cursor-pointer flex items-center justify-center ${
                             savedServiceIds.includes(item.id)
                               ? 'border-amber-300 bg-amber-50 text-amber-600'
-                              : 'border-neutral-200 hover:border-neutral-300 hover:bg-neutral-100 text-neutral-600'
+                              : 'border-[#E2E8F0] hover:border-[#64748B] hover:bg-[#F8FAFC] text-[#64748B]'
                           }`}
                           title={savedServiceIds.includes(item.id) ? "Tersimpan" : "Simpan layanan"}
                           aria-label="Simpan layanan"
@@ -724,11 +718,11 @@ export const ExploreServicesPage: React.FC<ExploreServicesPageProps> = ({
                           <Bookmark className={`w-3.5 h-3.5 sm:w-4 sm:h-4 ${savedServiceIds.includes(item.id) ? 'fill-amber-500 text-amber-500' : 'stroke-[1.75]'}`} />
                         </button>
 
-                        {/* Tombol Diskusikan */}
+                        {/* Tombol Diskusikan (CTA transaksional #0B1F3A, rounded-xl 12px) */}
                         <button
                           type="button"
                           onClick={() => handleOpenOrder(item)}
-                          className="px-3 sm:px-4 py-1.5 sm:py-2 rounded-full bg-[#0d0c22] hover:bg-neutral-800 text-white text-xs font-bold transition shadow-xs hover:shadow-sm cursor-pointer"
+                          className="h-9 px-4 rounded-xl bg-[#0B1F3A] hover:bg-[#123B8C] text-white text-xs sm:text-sm font-semibold transition-colors shadow-xs cursor-pointer"
                         >
                           Diskusikan
                         </button>

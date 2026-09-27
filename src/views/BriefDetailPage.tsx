@@ -341,11 +341,11 @@ export const BriefDetailPage: React.FC<BriefDetailPageProps> = ({
       {/* Floating Modal Pop-up Sheet */}
       <div
         onClick={(e) => e.stopPropagation()}
-        className="flex-1 min-h-0 bg-white text-[#0d0c22] font-sans selection:bg-[#0d0c22] selection:text-white rounded-t-2xl sm:rounded-t-3xl shadow-2xl flex flex-col overflow-hidden relative"
+        className="flex-1 min-h-0 bg-white text-[#171717] font-sans selection:bg-[#0B1F3A] selection:text-white rounded-t-2xl sm:rounded-t-3xl shadow-2xl flex flex-col overflow-hidden relative"
       >
         {/* Toast Notification */}
         {toastMessage && (
-          <div className="fixed top-20 right-6 z-50 bg-[#0d0c22] text-white px-5 py-3 rounded-full flex items-center gap-2.5 text-xs sm:text-sm animate-in fade-in slide-in-from-top-3 duration-200">
+          <div className="fixed top-20 right-6 z-50 bg-[#0B1F3A] text-white px-5 py-3 rounded-full flex items-center gap-2.5 text-xs sm:text-sm animate-in fade-in slide-in-from-top-3 duration-200">
             <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
             <span className="font-medium">{toastMessage}</span>
           </div>
@@ -353,7 +353,7 @@ export const BriefDetailPage: React.FC<BriefDetailPageProps> = ({
 
         {/* Copied Link Toast */}
         {copiedToast && (
-          <div className="fixed bottom-8 left-1/2 -translate-x-1/2 z-50 flex items-center gap-2 px-4 py-2.5 rounded-full bg-[#0d0c22] text-white text-xs font-semibold animate-in fade-in slide-in-from-bottom-3 duration-200">
+          <div className="fixed bottom-8 left-1/2 -translate-x-1/2 z-50 flex items-center gap-2 px-4 py-2.5 rounded-full bg-[#0B1F3A] text-white text-xs font-semibold animate-in fade-in slide-in-from-bottom-3 duration-200">
             <Check className="w-4 h-4 text-emerald-400 stroke-[2]" />
             <span>Tautan brief berhasil disalin ke clipboard!</span>
           </div>
@@ -363,7 +363,7 @@ export const BriefDetailPage: React.FC<BriefDetailPageProps> = ({
         <div className="fixed top-1/2 -translate-y-1/2 right-4 sm:right-6 z-40 hidden md:flex flex-col items-center gap-2.5">
           <button
             onClick={handleShare}
-            className="w-10 h-10 rounded-full border border-neutral-200 bg-white hover:bg-neutral-50 text-neutral-600 hover:text-black flex items-center justify-center transition-colors cursor-pointer shadow-xs"
+            className="w-10 h-10 rounded-full border border-[#E2E8F0] bg-white hover:bg-neutral-50 text-neutral-600 hover:text-black flex items-center justify-center transition-colors cursor-pointer shadow-xs"
             title="Salin Tautan Brief"
           >
             <Copy className="w-4 h-4 stroke-[1.75]" />
@@ -373,8 +373,8 @@ export const BriefDetailPage: React.FC<BriefDetailPageProps> = ({
             onClick={handleToggleSave}
             className={`w-10 h-10 rounded-full border transition-colors cursor-pointer flex items-center justify-center shadow-xs ${
               isSaved
-                ? 'border-[#0d0c22] bg-[#0d0c22] text-amber-400'
-                : 'border-neutral-200 bg-white text-neutral-600 hover:text-black hover:bg-neutral-50'
+                ? 'border-[#0B1F3A] bg-[#0B1F3A] text-amber-400'
+                : 'border-[#E2E8F0] bg-white text-neutral-600 hover:text-black hover:bg-neutral-50'
             }`}
             title="Simpan Brief"
           >
@@ -383,7 +383,7 @@ export const BriefDetailPage: React.FC<BriefDetailPageProps> = ({
 
           <button
             onClick={() => navigateTo('chat', '/chat')}
-            className="w-10 h-10 rounded-full border border-neutral-200 bg-white hover:bg-neutral-50 text-neutral-600 hover:text-blue-600 flex items-center justify-center transition-colors cursor-pointer shadow-xs"
+            className="w-10 h-10 rounded-full border border-[#E2E8F0] bg-white hover:bg-neutral-50 text-neutral-600 hover:text-blue-600 flex items-center justify-center transition-colors cursor-pointer shadow-xs"
             title="Diskusikan via Chat"
           >
             <MessageCircle className="w-4 h-4 stroke-[1.75]" />
@@ -391,7 +391,7 @@ export const BriefDetailPage: React.FC<BriefDetailPageProps> = ({
         </div>
 
         {/* FIXED SUB-HEADER: Client Profile Bar (Matching Screenshot) */}
-        <header className="border-b border-neutral-100 bg-white/95 backdrop-blur-xs sticky top-0 z-30 shrink-0">
+        <header className="border-b border-[#E2E8F0] bg-white/95 backdrop-blur-xs sticky top-0 z-30 shrink-0">
           <div className="w-full max-w-5xl mx-auto px-6 lg:px-8 py-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             
             {/* Left: Avatar & Profile Details */}
@@ -413,7 +413,7 @@ export const BriefDetailPage: React.FC<BriefDetailPageProps> = ({
                     </div>
                   )}
                 </div>
-                <div className="absolute -bottom-0.5 -right-0.5 bg-[#0d0c22] text-white p-0.5 rounded-full ring-2 ring-white">
+                <div className="absolute -bottom-0.5 -right-0.5 bg-[#0B1F3A] text-white p-0.5 rounded-full ring-2 ring-white">
                   <ShieldCheck className="w-3 h-3 text-amber-400" />
                 </div>
               </div>
@@ -423,7 +423,7 @@ export const BriefDetailPage: React.FC<BriefDetailPageProps> = ({
                 <div className="flex flex-wrap items-center gap-2">
                   <span 
                     onClick={() => navigateTo('umkm-profile', '/umkm/kopi-kenangan-senja')}
-                    className="font-bold text-sm sm:text-base text-[#0d0c22] hover:underline cursor-pointer truncate"
+                    className="font-bold text-sm sm:text-base text-[#171717] hover:underline cursor-pointer truncate"
                   >
                     {currentBrief.clientName}
                   </span>
@@ -475,10 +475,10 @@ export const BriefDetailPage: React.FC<BriefDetailPageProps> = ({
 
               <button
                 onClick={handleToggleSave}
-                className={`w-9 h-9 sm:w-10 sm:h-10 rounded-full border flex items-center justify-center transition cursor-pointer md:hidden shadow-2xs ${
+                className={`w-9 h-9 sm:w-10 sm:h-10 rounded-xl border flex items-center justify-center transition cursor-pointer md:hidden shadow-2xs ${
                   isSaved
-                    ? 'border-[#0d0c22] bg-[#0d0c22] text-amber-400'
-                    : 'border-neutral-200 bg-white text-neutral-700 hover:bg-neutral-50'
+                    ? 'border-[#0B1F3A] bg-[#0B1F3A] text-amber-400'
+                    : 'border-[#E2E8F0] bg-white text-neutral-700 hover:bg-neutral-50'
                 }`}
                 title="Simpan Brief"
               >
@@ -488,14 +488,14 @@ export const BriefDetailPage: React.FC<BriefDetailPageProps> = ({
               <button
                 type="button"
                 onClick={() => setIsEditModalOpen(true)}
-                className="px-3.5 py-2 rounded-full border border-neutral-200 hover:border-neutral-300 text-neutral-700 hover:text-black font-semibold text-xs transition cursor-pointer flex items-center gap-1.5 shadow-2xs"
+                className="px-3.5 py-2 rounded-xl border border-[#E2E8F0] hover:border-neutral-300 text-neutral-700 hover:text-black font-semibold text-xs transition cursor-pointer flex items-center gap-1.5 shadow-2xs"
               >
                 <Edit3 className="w-3.5 h-3.5 text-neutral-500" />
                 <span>Edit</span>
               </button>
 
               {hasApplied ? (
-                <div className="px-4 py-2 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 text-xs font-bold flex items-center gap-1.5 shadow-2xs">
+                <div className="px-4 py-2 rounded-xl bg-emerald-50 text-emerald-700 border border-emerald-200 text-xs font-semibold flex items-center gap-1.5 shadow-2xs">
                   <Check className="w-3.5 h-3.5 stroke-[2.5]" />
                   <span>Lamaran Terkirim</span>
                 </div>
@@ -503,7 +503,7 @@ export const BriefDetailPage: React.FC<BriefDetailPageProps> = ({
                 <button
                   type="button"
                   onClick={() => setIsApplyModalOpen(true)}
-                  className="px-5 py-2 sm:py-2.5 rounded-full bg-[#0d0c22] hover:bg-neutral-800 text-white font-bold text-xs sm:text-sm transition cursor-pointer whitespace-nowrap flex items-center gap-1.5 shadow-xs"
+                  className="px-5 py-2 sm:py-2.5 rounded-xl bg-[#0B1F3A] hover:bg-[#123B8C] text-white font-semibold text-xs sm:text-sm transition cursor-pointer whitespace-nowrap flex items-center gap-1.5 shadow-xs"
                 >
                   <Briefcase className="w-3.5 h-3.5" />
                   <span>Lamar</span>
@@ -525,7 +525,7 @@ export const BriefDetailPage: React.FC<BriefDetailPageProps> = ({
             </span>
           </div>
 
-          <h1 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-[#0d0c22] tracking-tight leading-snug">
+          <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-[#171717] tracking-tight leading-snug">
             {currentBrief.title}
           </h1>
         </div>
@@ -534,7 +534,7 @@ export const BriefDetailPage: React.FC<BriefDetailPageProps> = ({
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
           
           {/* Metric 1: Anggaran Proyek */}
-          <div className="p-4 sm:p-5 rounded-2xl border border-neutral-200/90 bg-white flex flex-col justify-between gap-3">
+          <div className="p-4 sm:p-5 rounded-2xl border border-[#E2E8F0] bg-white flex flex-col justify-between gap-3">
             <div className="flex items-center justify-between">
               <span className="text-[11px] font-bold text-neutral-400 uppercase tracking-wider">
                 Anggaran Proyek
@@ -544,7 +544,7 @@ export const BriefDetailPage: React.FC<BriefDetailPageProps> = ({
               </div>
             </div>
             <div>
-              <div className="text-lg sm:text-2xl font-black text-[#0d0c22] tracking-tight">
+              <div className="text-lg sm:text-2xl font-bold text-[#171717] tracking-tight">
                 {formatDisplayBudget(currentBrief.formattedBudget, currentBrief.budgetMin)}
               </div>
               <span className="text-xs text-emerald-700 font-medium flex items-center gap-1 mt-0.5">
@@ -555,7 +555,7 @@ export const BriefDetailPage: React.FC<BriefDetailPageProps> = ({
           </div>
 
           {/* Metric 2: Waktu Pengerjaan */}
-          <div className="p-4 sm:p-5 rounded-2xl border border-neutral-200/90 bg-white flex flex-col justify-between gap-3">
+          <div className="p-4 sm:p-5 rounded-2xl border border-[#E2E8F0] bg-white flex flex-col justify-between gap-3">
             <div className="flex items-center justify-between">
               <span className="text-[11px] font-bold text-neutral-400 uppercase tracking-wider">
                 Waktu Pengerjaan
@@ -565,7 +565,7 @@ export const BriefDetailPage: React.FC<BriefDetailPageProps> = ({
               </div>
             </div>
             <div>
-              <div className="text-lg sm:text-2xl font-black text-[#0d0c22] tracking-tight">
+              <div className="text-lg sm:text-2xl font-bold text-[#171717] tracking-tight">
                 {currentBrief.deadline}
               </div>
               <span className="text-xs text-neutral-500 font-normal">
@@ -575,7 +575,7 @@ export const BriefDetailPage: React.FC<BriefDetailPageProps> = ({
           </div>
 
           {/* Metric 3: Pelamar Terdaftar */}
-          <div className="p-4 sm:p-5 rounded-2xl border border-neutral-200/90 bg-white flex flex-col justify-between gap-3">
+          <div className="p-4 sm:p-5 rounded-2xl border border-[#E2E8F0] bg-white flex flex-col justify-between gap-3">
             <div className="flex items-center justify-between">
               <span className="text-[11px] font-bold text-neutral-400 uppercase tracking-wider">
                 Pelamar Terdaftar
@@ -585,7 +585,7 @@ export const BriefDetailPage: React.FC<BriefDetailPageProps> = ({
               </div>
             </div>
             <div>
-              <div className="text-lg sm:text-2xl font-black text-blue-600 tracking-tight">
+              <div className="text-lg sm:text-2xl font-bold text-[#1D4ED8] tracking-tight">
                 {applicants.length} Kreator
               </div>
               <span className="text-xs text-neutral-500 font-normal">
@@ -597,15 +597,15 @@ export const BriefDetailPage: React.FC<BriefDetailPageProps> = ({
         </div>
 
         {/* 3. SECTION TABS (Styled matching profile tabs from screenshot) */}
-        <div className="border-b border-neutral-200/80 pb-3">
+        <div className="border-b border-[#E2E8F0] pb-3">
           <div className="flex items-center gap-1.5 sm:gap-2 overflow-x-auto no-scrollbar py-0.5">
             <button
               type="button"
               onClick={() => setActiveTab('rincian')}
               className={`px-4 py-2 rounded-full text-xs sm:text-sm transition whitespace-nowrap cursor-pointer flex items-center gap-1.5 ${
                 activeTab === 'rincian'
-                  ? 'bg-[#f3f3f4] font-semibold text-[#0d0c22]'
-                  : 'text-neutral-600 font-medium hover:text-[#0d0c22] hover:bg-neutral-50'
+                  ? 'bg-[#F3F3F4] font-semibold text-[#171717]'
+                  : 'text-neutral-600 font-medium hover:text-[#171717] hover:bg-neutral-50'
               }`}
             >
               <span>Rincian Brief</span>
@@ -616,8 +616,8 @@ export const BriefDetailPage: React.FC<BriefDetailPageProps> = ({
               onClick={() => setActiveTab('pelamar')}
               className={`px-4 py-2 rounded-full text-xs sm:text-sm transition whitespace-nowrap cursor-pointer flex items-center gap-1.5 ${
                 activeTab === 'pelamar'
-                  ? 'bg-[#f3f3f4] font-semibold text-[#0d0c22]'
-                  : 'text-neutral-600 font-medium hover:text-[#0d0c22] hover:bg-neutral-50'
+                  ? 'bg-[#F3F3F4] font-semibold text-[#171717]'
+                  : 'text-neutral-600 font-medium hover:text-[#171717] hover:bg-neutral-50'
               }`}
             >
               <span>Pelamar</span>
@@ -631,8 +631,8 @@ export const BriefDetailPage: React.FC<BriefDetailPageProps> = ({
               onClick={() => setActiveTab('klien')}
               className={`px-4 py-2 rounded-full text-xs sm:text-sm transition whitespace-nowrap cursor-pointer flex items-center gap-1.5 ${
                 activeTab === 'klien'
-                  ? 'bg-[#f3f3f4] font-semibold text-[#0d0c22]'
-                  : 'text-neutral-600 font-medium hover:text-[#0d0c22] hover:bg-neutral-50'
+                  ? 'bg-[#F3F3F4] font-semibold text-[#171717]'
+                  : 'text-neutral-600 font-medium hover:text-[#171717] hover:bg-neutral-50'
               }`}
             >
               <span>Tentang UMKM</span>
@@ -715,7 +715,7 @@ export const BriefDetailPage: React.FC<BriefDetailPageProps> = ({
               {filteredApplicants.map((applicant) => (
                 <div
                   key={applicant.id}
-                  className="border border-neutral-200/80 rounded-2xl sm:rounded-3xl p-6 sm:p-7 bg-white space-y-5 text-left transition hover:border-neutral-300"
+                  className="border border-[#E2E8F0] rounded-2xl sm:rounded-3xl p-6 sm:p-7 bg-white space-y-5 text-left transition hover:border-neutral-300"
                 >
                   {/* Top: Profil Kreator (Matching exact profile style from screenshot) */}
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -734,7 +734,7 @@ export const BriefDetailPage: React.FC<BriefDetailPageProps> = ({
                           alt={applicant.creatorName}
                           className="w-14 h-14 sm:w-16 sm:h-16 rounded-full object-cover ring-2 ring-neutral-100 "
                         />
-                        <div className="absolute -bottom-1 -right-1 bg-[#0d0c22] text-white p-1 rounded-full ring-2 ring-white">
+                        <div className="absolute -bottom-1 -right-1 bg-[#0B1F3A] text-white p-1 rounded-full ring-2 ring-white">
                           <ShieldCheck className="w-3 h-3 text-amber-400" />
                         </div>
                       </div>
@@ -748,13 +748,13 @@ export const BriefDetailPage: React.FC<BriefDetailPageProps> = ({
                               if (onViewCreatorProfile) onViewCreatorProfile(match);
                               else router.push(`/creator/${match.id}`);
                             }}
-                            className="text-lg sm:text-xl font-bold tracking-tight text-[#0d0c22] hover:text-blue-600 transition-colors cursor-pointer"
+                            className="text-lg sm:text-xl font-bold tracking-tight text-[#171717] hover:text-blue-600 transition-colors cursor-pointer"
                           >
                             {applicant.creatorName}
                           </h3>
 
                           {applicant.isPro && (
-                            <span className="text-[10px] font-black uppercase px-2 py-0.5 rounded-sm bg-[#0d0c22] text-white tracking-wider">
+                            <span className="text-[10px] font-bold uppercase px-2 py-0.5 rounded-sm bg-[#0B1F3A] text-white tracking-wider">
                               PRO+
                             </span>
                           )}
@@ -811,7 +811,7 @@ export const BriefDetailPage: React.FC<BriefDetailPageProps> = ({
                         if (onViewCreatorProfile) onViewCreatorProfile(match);
                         else router.push(`/creator/${match.id}`);
                       }}
-                      className="text-xs font-semibold text-neutral-600 hover:text-[#0d0c22] transition flex items-center gap-1 cursor-pointer"
+                      className="text-xs font-semibold text-neutral-600 hover:text-[#171717] transition flex items-center gap-1 cursor-pointer"
                     >
                       <span>Lihat Portofolio Lengkap</span>
                       <ChevronRight className="w-3.5 h-3.5" />
@@ -823,7 +823,7 @@ export const BriefDetailPage: React.FC<BriefDetailPageProps> = ({
                         onClick={() => navigateTo('chat', '/chat')}
                         aria-label={`Chat dengan ${applicant.creatorName}`}
                         title="Chat"
-                        className="w-9 h-9 rounded-full border border-neutral-200/90 hover:border-neutral-300 bg-neutral-50 hover:bg-neutral-100 text-neutral-700 hover:text-[#0d0c22] transition flex items-center justify-center cursor-pointer active:scale-95"
+                        className="w-9 h-9 rounded-xl border border-[#E2E8F0] hover:border-neutral-300 bg-neutral-50 hover:bg-neutral-100 text-neutral-700 hover:text-[#171717] transition flex items-center justify-center cursor-pointer active:scale-95"
                       >
                         <MessageCircle className="w-4 h-4" />
                       </button>
@@ -831,7 +831,7 @@ export const BriefDetailPage: React.FC<BriefDetailPageProps> = ({
                       <button
                         type="button"
                         onClick={() => handleAcceptProposal(applicant)}
-                        className="px-4 py-2 rounded-full bg-[#0d0c22] hover:bg-neutral-800 text-white text-xs font-bold transition cursor-pointer flex items-center gap-1.5 shadow-2xs hover:shadow-xs active:scale-95"
+                        className="px-4 py-2 rounded-xl bg-[#0B1F3A] hover:bg-[#123B8C] text-white text-xs font-semibold transition cursor-pointer flex items-center gap-1.5 shadow-2xs hover:shadow-xs active:scale-95"
                       >
                         <Check className="w-3.5 h-3.5 stroke-[2.5]" />
                         <span>Pilih Creator</span>
@@ -1323,13 +1323,13 @@ export const BriefDetailPage: React.FC<BriefDetailPageProps> = ({
                 <button
                   type="button"
                   onClick={() => setIsApplyModalOpen(false)}
-                  className="px-4 py-2.5 rounded-full border border-neutral-200 text-xs font-bold text-neutral-700 hover:bg-neutral-50 transition cursor-pointer"
+                  className="px-4 py-2.5 rounded-xl border border-[#E2E8F0] text-xs font-semibold text-neutral-700 hover:bg-neutral-50 transition cursor-pointer"
                 >
                   Batal
                 </button>
                 <button
                   type="submit"
-                  className="px-6 py-2.5 rounded-full bg-[#0d0c22] hover:bg-neutral-800 text-white text-xs font-bold transition cursor-pointer flex items-center gap-1.5"
+                  className="px-6 py-2.5 rounded-xl bg-[#0B1F3A] hover:bg-[#123B8C] text-white text-xs font-semibold transition cursor-pointer flex items-center gap-1.5"
                 >
                   <Briefcase className="w-3.5 h-3.5" />
                   <span>Kirim Lamaran Sekarang</span>
@@ -1350,18 +1350,18 @@ export const BriefDetailPage: React.FC<BriefDetailPageProps> = ({
         >
           <div 
             onClick={(e) => e.stopPropagation()}
-            className="w-full max-w-xl bg-white rounded-3xl border border-neutral-200 p-6 sm:p-7 space-y-4 text-left max-h-[90vh] overflow-y-auto"
+            className="w-full max-w-xl bg-white rounded-3xl border border-[#E2E8F0] p-6 sm:p-7 space-y-4 text-left max-h-[90vh] overflow-y-auto"
           >
-            <div className="flex items-center justify-between pb-3 border-b border-neutral-100">
+            <div className="flex items-center justify-between pb-3 border-b border-[#E2E8F0]">
               <div className="flex items-center gap-2">
                 <Edit3 className="w-5 h-5 text-neutral-700" />
-                <h3 className="text-base sm:text-lg font-bold text-[#0d0c22]">
+                <h3 className="text-base sm:text-lg font-bold text-[#171717]">
                   Edit Rincian Brief Proyek
                 </h3>
               </div>
               <button
                 onClick={() => setIsEditModalOpen(false)}
-                className="w-8 h-8 rounded-full hover:bg-neutral-100 text-neutral-500 hover:text-black flex items-center justify-center transition cursor-pointer"
+                className="w-8 h-8 rounded-xl hover:bg-neutral-100 text-neutral-500 hover:text-black flex items-center justify-center transition cursor-pointer"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -1377,7 +1377,7 @@ export const BriefDetailPage: React.FC<BriefDetailPageProps> = ({
                   value={editForm.title}
                   onChange={(e) => setEditForm({ ...editForm, title: e.target.value })}
                   required
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-neutral-200 text-xs sm:text-sm font-semibold text-[#0d0c22] focus:outline-none focus:border-[#0d0c22]"
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-[#E2E8F0] text-xs sm:text-sm font-semibold text-[#171717] focus:outline-none focus:border-[#0B1F3A]"
                 />
               </div>
 
@@ -1391,7 +1391,7 @@ export const BriefDetailPage: React.FC<BriefDetailPageProps> = ({
                     value={editForm.category}
                     onChange={(e) => setEditForm({ ...editForm, category: e.target.value })}
                     required
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-neutral-200 text-xs sm:text-sm text-[#0d0c22] focus:outline-none focus:border-[#0d0c22]"
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-[#E2E8F0] text-xs sm:text-sm text-[#171717] focus:outline-none focus:border-[#0B1F3A]"
                   />
                 </div>
 
@@ -1404,7 +1404,7 @@ export const BriefDetailPage: React.FC<BriefDetailPageProps> = ({
                     value={editForm.budgetMin}
                     onChange={(e) => setEditForm({ ...editForm, budgetMin: e.target.value })}
                     required
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-neutral-200 text-xs sm:text-sm font-semibold text-[#0d0c22] focus:outline-none focus:border-[#0d0c22]"
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-[#E2E8F0] text-xs sm:text-sm font-semibold text-[#171717] focus:outline-none focus:border-[#0B1F3A]"
                   />
                 </div>
               </div>
@@ -1418,7 +1418,7 @@ export const BriefDetailPage: React.FC<BriefDetailPageProps> = ({
                   value={editForm.deadline}
                   onChange={(e) => setEditForm({ ...editForm, deadline: e.target.value })}
                   required
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-neutral-200 text-xs sm:text-sm text-[#0d0c22] focus:outline-none focus:border-[#0d0c22]"
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-[#E2E8F0] text-xs sm:text-sm text-[#171717] focus:outline-none focus:border-[#0B1F3A]"
                   placeholder="3-5 Hari Kerja"
                 />
               </div>
@@ -1432,7 +1432,7 @@ export const BriefDetailPage: React.FC<BriefDetailPageProps> = ({
                   value={editForm.description}
                   onChange={(e) => setEditForm({ ...editForm, description: e.target.value })}
                   required
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-neutral-200 text-xs sm:text-sm text-neutral-800 focus:outline-none focus:border-[#0d0c22]"
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-[#E2E8F0] text-xs sm:text-sm text-neutral-800 focus:outline-none focus:border-[#0B1F3A]"
                 />
               </div>
 
@@ -1444,7 +1444,7 @@ export const BriefDetailPage: React.FC<BriefDetailPageProps> = ({
                   rows={3}
                   value={editForm.deliverables}
                   onChange={(e) => setEditForm({ ...editForm, deliverables: e.target.value })}
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-neutral-200 text-xs sm:text-sm text-neutral-800 focus:outline-none focus:border-[#0d0c22]"
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-[#E2E8F0] text-xs sm:text-sm text-neutral-800 focus:outline-none focus:border-[#0B1F3A]"
                 />
               </div>
 
@@ -1452,13 +1452,13 @@ export const BriefDetailPage: React.FC<BriefDetailPageProps> = ({
                 <button
                   type="button"
                   onClick={() => setIsEditModalOpen(false)}
-                  className="px-4 py-2.5 rounded-full border border-neutral-200 text-xs font-bold text-neutral-700 hover:bg-neutral-50 transition cursor-pointer"
+                  className="px-4 py-2.5 rounded-xl border border-[#E2E8F0] text-xs font-semibold text-neutral-700 hover:bg-neutral-50 transition cursor-pointer"
                 >
                   Batal
                 </button>
                 <button
                   type="submit"
-                  className="px-6 py-2.5 rounded-full bg-[#0d0c22] hover:bg-neutral-800 text-white text-xs font-bold transition cursor-pointer"
+                  className="px-6 py-2.5 rounded-xl bg-[#0B1F3A] hover:bg-[#123B8C] text-white text-xs font-semibold transition cursor-pointer"
                 >
                   Simpan Perubahan
                 </button>

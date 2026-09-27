@@ -47,6 +47,7 @@ import {
 } from 'lucide-react';
 import { ProjectBriefModal } from '@/components/modals/ProjectBriefModal';
 import { ProjectDetailModal } from '@/components/modals/ProjectDetailModal';
+import { ProjectCard } from '@/components/common/ProjectCard';
 import { MOCK_CREATORS } from '@/data/mockCreators';
 import { MOCK_FEED_PROJECTS } from '@/data/mockFeedProjects';
 import { ActivePage, AuthState, Creator, CreatorService, FeedProject } from '@/types';
@@ -175,6 +176,7 @@ export const HomePage: React.FC<HomePageProps> = ({
         'briefs': '/briefs',
         'signin': '/sign-in',
         'signup': '/sign-up',
+        'settings': '/settings',
       };
       router.push(routeMap[page] || '/explore');
     }
@@ -336,7 +338,7 @@ export const HomePage: React.FC<HomePageProps> = ({
   };
 
   return (
-    <div className="w-full bg-white text-[#0d0c22] font-sans selection:bg-[#0d0c22] selection:text-white">
+    <div className="w-full bg-white text-[#171717] font-sans selection:bg-[#0B1F3A] selection:text-white">
       <main className="w-full">
         
         {/* ========================================================================= */}
@@ -362,7 +364,7 @@ export const HomePage: React.FC<HomePageProps> = ({
           </div>
           
           {/* Centered Hero Header Block */}
-          <div className="relative z-10 max-w-5xl mx-auto text-center space-y-6 sm:space-y-8 px-6 lg:px-8">
+          <div className="relative z-10 max-w-5xl mx-auto text-center space-y-6 sm:space-y-8 px-4 sm:px-6 lg:px-8">
             
             {/* Sleek, Modern Hero Badge */}
             <div className="inline-flex items-center gap-2 sm:gap-2.5 px-3.5 sm:px-4 py-1.5 rounded-full bg-white border border-neutral-200/80 shadow-2xs hover:border-neutral-300 transition-all">
@@ -378,28 +380,28 @@ export const HomePage: React.FC<HomePageProps> = ({
               </span>
             </div>
 
-            {/* Focal Point Large Headline */}
-            <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-[70px] text-[#0d0c22] tracking-tight leading-[1.12] sm:leading-[1.14]">
-              <span className="font-extrabold">Temukan</span>{' '}
-              <span className="font-medium text-neutral-800">Talenta Kreatif</span>,{' '}
+            {/* Focal Point Display Headline (Display 64/72 according to design.md §3) */}
+            <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-[64px] text-[#0F172A] tracking-tight leading-[1.125] lg:leading-[72px]">
+              <span className="font-bold">Temukan</span>{' '}
+              <span className="font-medium text-[#171717]">Talenta Kreatif</span>,{' '}
               <br className="hidden sm:inline" />
-              <span className="font-medium text-neutral-800">Wujudkan</span>{' '}
-              <span className="bg-gradient-to-r from-blue-700 via-blue-600 to-cyan-500 bg-clip-text text-transparent font-extrabold">
+              <span className="font-medium text-[#171717]">Wujudkan</span>{' '}
+              <span className="bg-gradient-to-r from-[#155DFC] to-[#05A4FD] bg-clip-text text-transparent font-bold">
                 Ide Digital
               </span>.
             </h1>
 
             {/* Concise Value Proposition Description */}
-            <p className="text-base sm:text-lg md:text-xl text-neutral-600 max-w-2xl mx-auto leading-relaxed font-normal">
+            <p className="text-base sm:text-lg text-[#64748B] max-w-2xl mx-auto leading-relaxed font-normal">
               Temukan creator berbakat untuk kebutuhan digitalmu, atau tampilkan keahlianmu dan dapatkan project yang tepat.
             </p>
 
-            {/* Dual CTA Buttons (Jelajahi Creator & Tawarkan Keahlian) */}
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-3.5 pt-2 sm:pt-3">
+            {/* Dual CTA Buttons (Height 48px, rounded-xl 12px according to design.md §7, §8) */}
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-3.5 pt-3">
               <button
                 type="button"
                 onClick={() => navigateTo('landing', '/landing')}
-                className="w-full sm:w-auto px-7 sm:px-8 py-3.5 sm:py-4 rounded-full bg-[#0d0c22] hover:bg-neutral-800 text-white text-sm sm:text-base font-bold transition-all shadow-xs hover:shadow-md cursor-pointer flex items-center justify-center gap-2 active:scale-[0.99]"
+                className="w-full sm:w-auto h-12 px-7 sm:px-8 rounded-xl bg-[#0B1F3A] hover:bg-[#123B8C] text-white text-base font-semibold transition-colors shadow-xs flex items-center justify-center gap-2 cursor-pointer"
               >
                 <span>Jelajah Creator</span>
                 <ArrowRight className="w-4 h-4" />
@@ -408,7 +410,7 @@ export const HomePage: React.FC<HomePageProps> = ({
               <button
                 type="button"
                 onClick={() => navigateTo('projects', '/explore/projects')}
-                className="w-full sm:w-auto px-7 sm:px-8 py-3.5 sm:py-4 rounded-full bg-white hover:bg-neutral-50 text-[#0d0c22] text-sm sm:text-base font-bold transition-all border border-neutral-300 hover:border-neutral-400 shadow-2xs cursor-pointer flex items-center justify-center gap-2 active:scale-[0.99]"
+                className="w-full sm:w-auto h-12 px-7 sm:px-8 rounded-xl bg-white hover:bg-[#F8FAFC] text-[#0F172A] text-base font-semibold transition-colors border border-[#E2E8F0] hover:border-[#64748B] shadow-2xs flex items-center justify-center gap-2 cursor-pointer"
               >
                 <span>Tawarkan Keahlian</span>
               </button>
@@ -423,17 +425,17 @@ export const HomePage: React.FC<HomePageProps> = ({
         {/* SECTION 2: EKSPLORASI DENGAN FILTER AKTIF (Proyek, Creator, Layanan) */}
         {/* Desain Bersih & Elegan Sesuai Referensi (Shots / Designers / Services) */}
         {/* ========================================================================= */}
-        <section className="max-w-[1440px] mx-auto px-6 lg:px-8 pt-6 sm:pt-8 pb-10 sm:pb-14">
+        <section className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 pt-8 pb-16">
           
-          {/* Baris 1: Segmented Pill Tabs (Creator, Layanan, Proyek) */}
-          <div className="flex items-center gap-1.5 sm:gap-2 mb-4">
+          {/* Baris 1: Segmented Tabs (Creator, Layanan, Proyek) */}
+          <div className="flex items-center gap-2 mb-5">
             <button
               type="button"
               onClick={() => setActiveExploreTab('creator')}
-              className={`flex items-center gap-2 px-4 sm:px-5 py-2.5 rounded-full text-xs sm:text-sm font-semibold transition-colors cursor-pointer ${
+              className={`flex items-center gap-2 px-4 sm:px-5 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-colors cursor-pointer ${
                 activeExploreTab === 'creator'
-                  ? 'bg-[#f3f3f4] text-[#0d0c22] font-bold'
-                  : 'text-neutral-600 hover:text-neutral-900 hover:bg-neutral-100/70 font-medium'
+                  ? 'bg-[#F3F3F4] text-[#0F172A] font-semibold'
+                  : 'text-[#64748B] hover:text-[#0F172A] hover:bg-[#F8FAFC] font-medium'
               }`}
             >
               <Users className="w-4 h-4" />
@@ -443,10 +445,10 @@ export const HomePage: React.FC<HomePageProps> = ({
             <button
               type="button"
               onClick={() => setActiveExploreTab('layanan')}
-              className={`flex items-center gap-2 px-4 sm:px-5 py-2.5 rounded-full text-xs sm:text-sm font-semibold transition-colors cursor-pointer ${
+              className={`flex items-center gap-2 px-4 sm:px-5 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-colors cursor-pointer ${
                 activeExploreTab === 'layanan'
-                  ? 'bg-[#f3f3f4] text-[#0d0c22] font-bold'
-                  : 'text-neutral-600 hover:text-neutral-900 hover:bg-neutral-100/70 font-medium'
+                  ? 'bg-[#F3F3F4] text-[#0F172A] font-semibold'
+                  : 'text-[#64748B] hover:text-[#0F172A] hover:bg-[#F8FAFC] font-medium'
               }`}
             >
               <Briefcase className="w-4 h-4" />
@@ -456,10 +458,10 @@ export const HomePage: React.FC<HomePageProps> = ({
             <button
               type="button"
               onClick={() => setActiveExploreTab('proyek')}
-              className={`flex items-center gap-2 px-4 sm:px-5 py-2.5 rounded-full text-xs sm:text-sm font-semibold transition-colors cursor-pointer ${
+              className={`flex items-center gap-2 px-4 sm:px-5 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-colors cursor-pointer ${
                 activeExploreTab === 'proyek'
-                  ? 'bg-[#f3f3f4] text-[#0d0c22] font-bold'
-                  : 'text-neutral-600 hover:text-neutral-900 hover:bg-neutral-100/70 font-medium'
+                  ? 'bg-[#F3F3F4] text-[#0F172A] font-semibold'
+                  : 'text-[#64748B] hover:text-[#0F172A] hover:bg-[#F8FAFC] font-medium'
               }`}
             >
               <Layers className="w-4 h-4" />
@@ -586,129 +588,22 @@ export const HomePage: React.FC<HomePageProps> = ({
                 </div>
               ) : (
                 <>
-                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-1 sm:gap-1.5 md:gap-2 animate-in fade-in duration-200">
-                  {displayProjects.map((proj) => {
-                    const isLiked = likedProjects[proj.id];
-                    const isSaved = savedProjects[proj.id];
-
-                    return (
-                      <div
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 animate-in fade-in duration-200">
+                    {displayProjects.map((proj) => (
+                      <ProjectCard
                         key={proj.id}
                         id={`feed-card-${proj.id}`}
+                        project={proj}
+                        isSaved={Boolean(savedProjects[proj.id])}
+                        onToggleSave={(id, e) => toggleSaveProject(id, e)}
                         onClick={() => {
                           setSelectedProject(proj);
                           setCurrentCarouselIndex(0);
                           setIsVideoPlaying(true);
                         }}
-                        className="group relative aspect-[4/5] rounded-[4px] sm:rounded-[6px] overflow-hidden bg-neutral-900 cursor-pointer select-none transition-all duration-200 shadow-2xs hover:shadow-lg"
-                      >
-                        {/* Media Cover Image (Edge to Edge, Uniform 4:5) */}
-                        <img
-                          src={proj.coverImage}
-                          alt={proj.title}
-                          referrerPolicy="no-referrer"
-                          className="w-full h-full object-cover object-center "
-                          loading="lazy"
-                        />
-
-                        {/* Top-Right Media Badge (Play for Video, Stacked Cards for Carousel - matching screenshot) */}
-                        <div className="absolute top-2 right-2 sm:top-2.5 sm:right-2.5 z-10 pointer-events-none">
-                          {proj.mediaType === 'video' ? (
-                            <div className="w-6 h-6 sm:w-7 sm:h-7 rounded-lg bg-black/45 backdrop-blur-md flex items-center justify-center text-white shadow-xs border border-white/15">
-                              <Play className="w-3 h-3 fill-white text-white translate-x-[0.5px]" />
-                            </div>
-                          ) : proj.mediaType === 'carousel' ? (
-                            <div className="w-6 h-6 sm:w-7 sm:h-7 rounded-lg bg-black/45 backdrop-blur-md flex items-center justify-center text-white shadow-xs border border-white/15">
-                              <Layers className="w-3 h-3 text-white" />
-                            </div>
-                          ) : null}
-                        </div>
-
-                        {/* Bottom Static Title & Creator Vignette (Clean and Unobtrusive - matching screenshot) */}
-                        <div className="absolute inset-x-0 bottom-0 p-2.5 sm:p-3 bg-gradient-to-t from-black/85 via-black/35 to-transparent pointer-events-none group-hover:opacity-0 transition-opacity duration-200">
-                          <p className="text-white text-xs sm:text-[13px] font-bold line-clamp-2 leading-snug drop-shadow-md">
-                            {proj.title}
-                          </p>
-                          <div className="flex items-center justify-between mt-1 text-white/80 text-[10px] sm:text-[11px]">
-                            <span className="font-semibold truncate max-w-[130px]">{proj.socialHandle || proj.creator.name}</span>
-                            <span className="shrink-0 opacity-80">{proj.viewsCount}</span>
-                          </div>
-                        </div>
-
-                        {/* Hover Overlay (Instagram Explore Interactive Peek - matching ExploreProjectsPage) */}
-                        <div className="absolute inset-0 bg-black/70 backdrop-blur-[1.5px] opacity-0 group-hover:opacity-100 transition-opacity duration-200 p-3 sm:p-4 flex flex-col justify-between text-white z-20">
-                          {/* Top Creator Header */}
-                          <div className="flex items-center justify-between">
-                            <div 
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleCreatorClick(proj.creator);
-                              }}
-                              className="flex items-center gap-2 group/author cursor-pointer min-w-0"
-                            >
-                              <img
-                                src={proj.creator.avatar}
-                                alt={proj.creator.name}
-                                className="w-7 h-7 rounded-full object-cover border border-white/50 shrink-0"
-                              />
-                              <div className="text-left min-w-0">
-                                <p className="text-xs font-bold group-hover/author:underline leading-tight truncate">
-                                  {proj.creator.name}
-                                </p>
-                                <p className="text-[10px] text-neutral-300 font-mono truncate">
-                                  {proj.socialHandle}
-                                </p>
-                              </div>
-                            </div>
-
-                            {/* Quick Save Bookmark */}
-                            <button
-                              onClick={(e) => toggleSaveProject(proj.id, e)}
-                              className={`p-1.5 rounded-full backdrop-blur-md transition-transform active:scale-90 cursor-pointer ${
-                                isSaved ? 'bg-white text-black' : 'bg-white/25 text-white hover:bg-white/35'
-                              }`}
-                              title={isSaved ? "Tersimpan" : "Simpan Proyek"}
-                            >
-                              <Bookmark className={`w-3.5 h-3.5 ${isSaved ? 'fill-black text-black' : 'text-white'}`} />
-                            </button>
-                          </div>
-
-                          {/* Center Title & Category Tag */}
-                          <div className="my-auto text-center px-1">
-                            <span className="inline-block px-2.5 py-0.5 rounded-full bg-white/20 backdrop-blur-sm text-[9px] sm:text-[10px] font-bold uppercase tracking-wider mb-1.5 border border-white/10">
-                              {proj.category}
-                            </span>
-                            <h4 className="text-xs sm:text-sm font-extrabold line-clamp-3 leading-snug">
-                              {proj.title}
-                            </h4>
-                          </div>
-
-                          {/* Bottom Stats & Engagement (Likes, Comments, Views) */}
-                          <div className="flex items-center justify-between text-xs font-bold pt-2 border-t border-white/20">
-                            <div className="flex items-center gap-3">
-                              <button 
-                                onClick={(e) => toggleLikeProject(proj.id, e)}
-                                className="flex items-center gap-1.5 hover:text-rose-400 transition cursor-pointer"
-                              >
-                                <Heart className={`w-3.5 h-3.5 ${isLiked ? 'fill-rose-500 text-rose-500' : 'text-white'}`} />
-                                <span>{proj.likesCount + (isLiked ? 1 : 0)}</span>
-                              </button>
-                              <div className="flex items-center gap-1 text-white/90">
-                                <MessageCircle className="w-3.5 h-3.5" />
-                                <span>{proj.commentsCount}</span>
-                              </div>
-                            </div>
-
-                            <span className="text-[10px] sm:text-[11px] font-medium text-neutral-300">
-                              {proj.viewsCount} views
-                            </span>
-                          </div>
-                        </div>
-
-                      </div>
-                    );
-                  })}
-                </div>
+                      />
+                    ))}
+                  </div>
 
                 {/* Tombol Aksi Lihat Semua Proyek */}
                 <div className="mt-8 text-center">
@@ -824,14 +719,17 @@ export const HomePage: React.FC<HomePageProps> = ({
                                 </h3>
 
                                 {creator.proBadge && (
-                                  <span className="text-[10px] font-black uppercase px-2 py-0.5 rounded bg-[#0d0c22] text-white tracking-[0.62px] leading-[15px]">
-                                    PRO+
-                                  </span>
-                                )}
-
-                                {creator.selectBadge && (
-                                  <span className="text-[10px] font-black uppercase px-2 py-0.5 rounded bg-[#2b2a45] text-white tracking-[0.62px] leading-[15px]">
-                                    SELECT
+                                  <span
+                                    className="uppercase px-2 py-0.5 rounded bg-[#0d0c22] tracking-[0.62px] leading-[15px]"
+                                    style={{
+                                      color: '#FFF',
+                                      fontFamily: '"SF Pro", -apple-system, BlinkMacSystemFont, sans-serif',
+                                      fontSize: '10px',
+                                      fontStyle: 'normal',
+                                      fontWeight: 900,
+                                    }}
+                                  >
+                                    PRO
                                   </span>
                                 )}
 
@@ -991,7 +889,7 @@ export const HomePage: React.FC<HomePageProps> = ({
                     <button
                       type="button"
                       onClick={() => navigateTo('landing', '/landing')}
-                      className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-[#0d0c22] hover:bg-neutral-800 text-white text-xs font-bold transition shadow-sm cursor-pointer"
+                      className="inline-flex items-center gap-2 h-11 px-6 rounded-xl bg-[#0B1F3A] hover:bg-[#123B8C] text-white text-sm font-semibold transition-colors shadow-xs cursor-pointer"
                     >
                       <span>Jelajah Semua Creator Terverifikasi</span>
                       <ArrowRight className="w-4 h-4" />
@@ -1135,7 +1033,7 @@ export const HomePage: React.FC<HomePageProps> = ({
                     setTargetCreatorForBrief(undefined);
                     setIsBriefModalOpen(true);
                   }}
-                  className="px-4 py-1.5 rounded-full bg-[#0d0c22] hover:bg-neutral-800 text-white text-xs font-bold transition shadow-xs cursor-pointer"
+                  className="h-8 px-3.5 rounded-xl bg-[#0B1F3A] hover:bg-[#123B8C] text-white text-xs font-semibold transition-colors shadow-xs cursor-pointer"
                 >
                   Get Started
                 </button>

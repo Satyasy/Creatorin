@@ -347,10 +347,10 @@ export const ProjectBriefsPage: React.FC<ProjectBriefsPageProps> = ({
   };
 
   return (
-    <div className="min-h-screen bg-[#fafafa] text-[#0d0c22] font-sans selection:bg-[#0d0c22] selection:text-white">
+    <div className="min-h-screen bg-[#fafafa] text-[#171717] font-sans selection:bg-[#0B1F3A] selection:text-white">
       {/* Toast Notification */}
       {toastMessage && (
-        <div className="fixed bottom-6 right-6 z-50 bg-[#0d0c22] text-white px-5 py-3 rounded-2xl shadow-xl text-sm font-medium flex items-center gap-2 animate-in fade-in slide-in-from-bottom-3 duration-200">
+        <div className="fixed bottom-6 right-6 z-50 bg-[#0B1F3A] text-white px-5 py-3 rounded-2xl shadow-xl text-sm font-medium flex items-center gap-2 animate-in fade-in slide-in-from-bottom-3 duration-200">
           <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
           <span>{toastMessage}</span>
         </div>
@@ -359,7 +359,7 @@ export const ProjectBriefsPage: React.FC<ProjectBriefsPageProps> = ({
       {/* Main App Navbar rendered by (main) layout */}
 
       {/* Main Container */}
-      <main className="max-w-[1440px] mx-auto px-6 lg:px-8 py-4 sm:py-6">
+      <main className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10">
         
         {/* Breadcrumbs Navigation */}
         <div className="flex items-center gap-2 text-xs font-medium text-neutral-400 mb-2.5">
@@ -374,22 +374,22 @@ export const ProjectBriefsPage: React.FC<ProjectBriefsPageProps> = ({
         </div>
 
         {/* Header Hero Section */}
-        <div className="mb-6 space-y-3">
+        <div className="mb-8 space-y-3">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div>
-              <h1 className="text-2xl sm:text-3xl lg:text-[34px] font-extrabold text-[#0d0c22] tracking-tight leading-tight">
+              <h1 className="text-2xl sm:text-3xl lg:text-[40px] font-bold text-[#0F172A] tracking-tight leading-tight lg:leading-[48px]">
                 Papan Brief Proyek & Kebutuhan UMKM
               </h1>
-              <p className="text-xs sm:text-sm text-neutral-500 mt-1 max-w-3xl leading-relaxed">
+              <p className="text-sm sm:text-base text-[#64748B] mt-2 max-w-3xl leading-relaxed font-normal">
                 Temukan peluang proyek langsung dari pelaku bisnis, UMKM, dan brand lokal di seluruh Indonesia. Pelajari brief kebutuhan konten, ajukan proposal Anda, dan mulai berkolaborasi dengan jaminan pembayaran aman.
               </p>
             </div>
 
-            {/* Tombol Pasang Brief Baru (untuk bisnis/UMKM) */}
+            {/* Tombol Pasang Brief Baru (CTA transaksional utama #0B1F3A) */}
             <div className="shrink-0 flex items-center gap-2.5">
               <button
                 onClick={() => setIsPostBriefModalOpen(true)}
-                className="px-5 py-2.5 rounded-full bg-[#0d0c22] hover:bg-neutral-800 text-white text-xs sm:text-sm font-semibold transition-all shadow-2xs flex items-center gap-2 cursor-pointer"
+                className="h-11 px-5 rounded-xl bg-[#0B1F3A] hover:bg-[#123B8C] text-white text-sm font-semibold transition-colors shadow-xs flex items-center gap-2 cursor-pointer"
               >
                 <Plus className="w-4 h-4" />
                 <span>Pasang Brief Baru</span>
@@ -397,9 +397,9 @@ export const ProjectBriefsPage: React.FC<ProjectBriefsPageProps> = ({
             </div>
           </div>
 
-          {/* Popular Tag Pills (Identical to Jelajah UI) */}
-          <div className="pt-1.5 flex flex-wrap items-center gap-1.5">
-            <span className="text-xs font-semibold text-neutral-500 mr-1 flex items-center gap-1">
+          {/* Popular Tag Pills */}
+          <div className="pt-2 flex flex-wrap items-center gap-1.5">
+            <span className="text-xs font-semibold text-[#64748B] mr-1 flex items-center gap-1">
               <span>Tagar Populer:</span>
             </span>
             {POPULAR_BRIEF_TAGS.map((tag) => {
@@ -410,8 +410,8 @@ export const ProjectBriefsPage: React.FC<ProjectBriefsPageProps> = ({
                   onClick={() => setSelectedTag(isSelected ? null : tag)}
                   className={`px-3 py-1 rounded-full text-xs font-medium border transition-all cursor-pointer ${
                     isSelected
-                      ? 'bg-[#0d0c22] text-white border-[#0d0c22] shadow-2xs font-semibold'
-                      : 'bg-white text-neutral-600 border-neutral-200/90 hover:border-neutral-400 hover:text-[#0d0c22] hover:bg-neutral-50'
+                      ? 'bg-[#0B1F3A] text-white border-[#0B1F3A] shadow-2xs font-semibold'
+                      : 'bg-white text-[#64748B] border-[#E2E8F0] hover:border-[#64748B] hover:text-[#0F172A] hover:bg-[#F8FAFC]'
                   }`}
                 >
                   {tag}
@@ -421,7 +421,7 @@ export const ProjectBriefsPage: React.FC<ProjectBriefsPageProps> = ({
             {selectedTag && (
               <button
                 onClick={() => setSelectedTag(null)}
-                className="text-xs text-blue-600 font-semibold hover:underline ml-1.5 cursor-pointer"
+                className="text-xs text-[#1D4ED8] font-semibold hover:underline ml-1.5 cursor-pointer"
               >
                 Reset Tagar
               </button>
@@ -458,7 +458,7 @@ export const ProjectBriefsPage: React.FC<ProjectBriefsPageProps> = ({
                 onClick={resetAllFilters}
                 className={`p-2 rounded-xl border transition cursor-pointer ${
                   activeFilterCount > 0
-                    ? 'border-[#0d0c22] bg-[#0d0c22] text-white shadow-2xs'
+                    ? 'border-[#0B1F3A] bg-[#0B1F3A] text-white shadow-2xs'
                     : 'border-neutral-200 bg-white hover:bg-neutral-50 text-neutral-600'
                 }`}
                 title="Reset Semua Filter"
@@ -471,7 +471,7 @@ export const ProjectBriefsPage: React.FC<ProjectBriefsPageProps> = ({
                 <button
                   onClick={() => setOpenDropdown(openDropdown === 'kategori' ? null : 'kategori')}
                   className={`px-3.5 py-2 rounded-xl border text-xs font-semibold flex items-center gap-2 bg-white transition cursor-pointer ${
-                    selectedCategory !== 'Semua' ? 'border-[#0d0c22] text-[#0d0c22] bg-neutral-50' : 'border-neutral-200 text-neutral-700 hover:border-neutral-300'
+                    selectedCategory !== 'Semua' ? 'border-[#0B1F3A] text-[#0B1F3A] bg-neutral-50' : 'border-neutral-200 text-neutral-700 hover:border-neutral-300'
                   }`}
                 >
                   <span>{selectedCategory === 'Semua' ? 'Kategori' : selectedCategory}</span>
@@ -488,11 +488,11 @@ export const ProjectBriefsPage: React.FC<ProjectBriefsPageProps> = ({
                           setOpenDropdown(null);
                         }}
                         className={`w-full px-4 py-2 text-left text-xs font-medium hover:bg-neutral-50 flex items-center justify-between cursor-pointer ${
-                          selectedCategory === cat ? 'font-bold text-[#0d0c22]' : 'text-neutral-600'
+                          selectedCategory === cat ? 'font-bold text-[#0B1F3A]' : 'text-neutral-600'
                         }`}
                       >
                         <span>{cat}</span>
-                        {selectedCategory === cat && <Check className="w-3.5 h-3.5 text-[#0d0c22]" />}
+                        {selectedCategory === cat && <Check className="w-3.5 h-3.5 text-[#0B1F3A]" />}
                       </button>
                     ))}
                   </div>
@@ -504,7 +504,7 @@ export const ProjectBriefsPage: React.FC<ProjectBriefsPageProps> = ({
                 <button
                   onClick={() => setOpenDropdown(openDropdown === 'budget' ? null : 'budget')}
                   className={`px-3.5 py-2 rounded-xl border text-xs font-semibold flex items-center gap-2 bg-white transition cursor-pointer ${
-                    selectedBudget !== 'Semua' ? 'border-[#0d0c22] text-[#0d0c22] bg-neutral-50' : 'border-neutral-200 text-neutral-700 hover:border-neutral-300'
+                    selectedBudget !== 'Semua' ? 'border-[#0B1F3A] text-[#0B1F3A] bg-neutral-50' : 'border-neutral-200 text-neutral-700 hover:border-neutral-300'
                   }`}
                 >
                   <span>
@@ -537,11 +537,11 @@ export const ProjectBriefsPage: React.FC<ProjectBriefsPageProps> = ({
                           setOpenDropdown(null);
                         }}
                         className={`w-full px-4 py-2 text-left text-xs font-medium hover:bg-neutral-50 flex items-center justify-between cursor-pointer ${
-                          selectedBudget === b.id ? 'font-bold text-[#0d0c22]' : 'text-neutral-600'
+                          selectedBudget === b.id ? 'font-bold text-[#0B1F3A]' : 'text-neutral-600'
                         }`}
                       >
                         <span>{b.label}</span>
-                        {selectedBudget === b.id && <Check className="w-3.5 h-3.5 text-[#0d0c22]" />}
+                        {selectedBudget === b.id && <Check className="w-3.5 h-3.5 text-[#0B1F3A]" />}
                       </button>
                     ))}
                   </div>
@@ -553,7 +553,7 @@ export const ProjectBriefsPage: React.FC<ProjectBriefsPageProps> = ({
                 <button
                   onClick={() => setOpenDropdown(openDropdown === 'durasi' ? null : 'durasi')}
                   className={`px-3.5 py-2 rounded-xl border text-xs font-semibold flex items-center gap-2 bg-white transition cursor-pointer ${
-                    selectedDelivery !== 'Semua' ? 'border-[#0d0c22] text-[#0d0c22] bg-neutral-50' : 'border-neutral-200 text-neutral-700 hover:border-neutral-300'
+                    selectedDelivery !== 'Semua' ? 'border-[#0B1F3A] text-[#0B1F3A] bg-neutral-50' : 'border-neutral-200 text-neutral-700 hover:border-neutral-300'
                   }`}
                 >
                   <span>
@@ -583,11 +583,11 @@ export const ProjectBriefsPage: React.FC<ProjectBriefsPageProps> = ({
                           setOpenDropdown(null);
                         }}
                         className={`w-full px-4 py-2 text-left text-xs font-medium hover:bg-neutral-50 flex items-center justify-between cursor-pointer ${
-                          selectedDelivery === d.id ? 'font-bold text-[#0d0c22]' : 'text-neutral-600'
+                          selectedDelivery === d.id ? 'font-bold text-[#0B1F3A]' : 'text-neutral-600'
                         }`}
                       >
                         <span>{d.label}</span>
-                        {selectedDelivery === d.id && <Check className="w-3.5 h-3.5 text-[#0d0c22]" />}
+                        {selectedDelivery === d.id && <Check className="w-3.5 h-3.5 text-[#0B1F3A]" />}
                       </button>
                     ))}
                   </div>
@@ -599,7 +599,7 @@ export const ProjectBriefsPage: React.FC<ProjectBriefsPageProps> = ({
                 <button
                   onClick={() => setOpenDropdown(openDropdown === 'shipping' ? null : 'shipping')}
                   className={`px-3.5 py-2 rounded-xl border text-xs font-semibold flex items-center gap-2 bg-white transition cursor-pointer ${
-                    shippingOnly ? 'border-[#0d0c22] text-[#0d0c22] bg-neutral-50' : 'border-neutral-200 text-neutral-700 hover:border-neutral-300'
+                    shippingOnly ? 'border-[#0B1F3A] text-[#0B1F3A] bg-neutral-50' : 'border-neutral-200 text-neutral-700 hover:border-neutral-300'
                   }`}
                 >
                   <span>{shippingOnly ? 'Sampel Dikirim' : 'Kirim Produk'}</span>
@@ -619,12 +619,12 @@ export const ProjectBriefsPage: React.FC<ProjectBriefsPageProps> = ({
                           setOpenDropdown(null);
                         }}
                         className={`w-full px-4 py-2 text-left text-xs font-medium hover:bg-neutral-50 flex items-center justify-between cursor-pointer ${
-                          shippingOnly === s.val && s.val === true ? 'font-bold text-[#0d0c22]' : 'text-neutral-600'
+                          shippingOnly === s.val && s.val === true ? 'font-bold text-[#0B1F3A]' : 'text-neutral-600'
                         }`}
                       >
                         <span>{s.label}</span>
-                        {shippingOnly === s.val && s.val === true && <Check className="w-3.5 h-3.5 text-[#0d0c22]" />}
-                        {!shippingOnly && s.val === false && <Check className="w-3.5 h-3.5 text-[#0d0c22]" />}
+                        {shippingOnly === s.val && s.val === true && <Check className="w-3.5 h-3.5 text-[#0B1F3A]" />}
+                        {!shippingOnly && s.val === false && <Check className="w-3.5 h-3.5 text-[#0B1F3A]" />}
                       </button>
                     ))}
                   </div>
@@ -636,7 +636,7 @@ export const ProjectBriefsPage: React.FC<ProjectBriefsPageProps> = ({
                 <button
                   onClick={() => setOpenDropdown(openDropdown === 'sort' ? null : 'sort')}
                   className={`px-3.5 py-2 rounded-xl border text-xs font-semibold flex items-center gap-2 bg-white transition cursor-pointer ${
-                    selectedSort !== 'newest' ? 'border-[#0d0c22] text-[#0d0c22] bg-neutral-50' : 'border-neutral-200 text-neutral-700 hover:border-neutral-300'
+                    selectedSort !== 'newest' ? 'border-[#0B1F3A] text-[#0B1F3A] bg-neutral-50' : 'border-neutral-200 text-neutral-700 hover:border-neutral-300'
                   }`}
                 >
                   <span>
@@ -666,11 +666,11 @@ export const ProjectBriefsPage: React.FC<ProjectBriefsPageProps> = ({
                           setOpenDropdown(null);
                         }}
                         className={`w-full px-4 py-2 text-left text-xs font-medium hover:bg-neutral-50 flex items-center justify-between cursor-pointer ${
-                          selectedSort === st.id ? 'font-bold text-[#0d0c22]' : 'text-neutral-600'
+                          selectedSort === st.id ? 'font-bold text-[#0B1F3A]' : 'text-neutral-600'
                         }`}
                       >
                         <span>{st.label}</span>
-                        {selectedSort === st.id && <Check className="w-3.5 h-3.5 text-[#0d0c22]" />}
+                        {selectedSort === st.id && <Check className="w-3.5 h-3.5 text-[#0B1F3A]" />}
                       </button>
                     ))}
                   </div>
@@ -693,7 +693,7 @@ export const ProjectBriefsPage: React.FC<ProjectBriefsPageProps> = ({
             </p>
             <button
               onClick={resetAllFilters}
-              className="px-5 py-2 rounded-full bg-[#0d0c22] text-white text-xs font-semibold hover:bg-neutral-800 transition cursor-pointer"
+              className="px-5 py-2.5 rounded-xl bg-[#0B1F3A] text-white text-xs font-semibold hover:bg-[#123B8C] transition cursor-pointer"
             >
               Reset Semua Filter
             </button>
@@ -710,35 +710,35 @@ export const ProjectBriefsPage: React.FC<ProjectBriefsPageProps> = ({
                     router.push(`/briefs/${project.id}`);
                   }
                 }}
-                className="group bg-white rounded-2xl sm:rounded-3xl border border-neutral-200/80 hover:border-neutral-300 hover:shadow-lg transition-all duration-200 p-6 sm:p-7 flex flex-col justify-between cursor-pointer text-left relative"
+                className="group bg-white rounded-2xl border border-[#E2E8F0] hover:border-[#64748B] transition-colors p-6 flex flex-col justify-between cursor-pointer text-left relative shadow-2xs"
               >
                 <div>
                   {/* Top Meta: Category Badge & Time */}
-                  <div className="flex items-center justify-between gap-3 mb-3.5">
-                    <span className="px-3 py-1 rounded-full bg-[#f3f3f4] text-[#0d0c22] text-xs font-semibold">
+                  <div className="flex items-center justify-between gap-3 mb-3">
+                    <span className="px-3 py-1 rounded-full bg-[#F3F3F4] text-[#0F172A] text-xs font-semibold">
                       {project.category}
                     </span>
-                    <div className="flex items-center gap-1.5 text-xs text-neutral-400 font-medium">
+                    <div className="flex items-center gap-1.5 text-xs text-[#64748B] font-medium">
                       <Clock className="w-3.5 h-3.5" />
                       <span>{project.postedTimeAgo}</span>
                     </div>
                   </div>
 
                   {/* Title */}
-                  <h4 className="text-base sm:text-[17px] font-bold text-[#0d0c22] group-hover:text-blue-600 transition-colors line-clamp-2 leading-snug mb-2">
+                  <h4 className="text-base sm:text-lg font-semibold text-[#0F172A] group-hover:text-[#1D4ED8] transition-colors line-clamp-2 leading-snug mb-2">
                     {project.title}
                   </h4>
 
                   {/* Description */}
-                  <p className="text-xs sm:text-sm text-neutral-500 line-clamp-2 leading-relaxed font-normal mb-4">
+                  <p className="text-xs sm:text-sm text-[#64748B] line-clamp-2 leading-relaxed font-normal mb-4">
                     {project.description}
                   </p>
 
-                  {/* Key Scope & Deliverables (Clean Minimal List without nested gray box) */}
+                  {/* Key Scope & Deliverables */}
                   {project.deliverables && project.deliverables.length > 0 && (
                     <div className="space-y-1.5 mb-4">
                       {project.deliverables.slice(0, 2).map((item, idx) => (
-                        <div key={idx} className="flex items-center gap-2 text-xs text-neutral-600 font-medium">
+                        <div key={idx} className="flex items-center gap-2 text-xs text-[#64748B] font-medium">
                           <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
                           <span className="truncate">{item}</span>
                         </div>
@@ -746,10 +746,10 @@ export const ProjectBriefsPage: React.FC<ProjectBriefsPageProps> = ({
                     </div>
                   )}
 
-                  {/* Skills Tags */}
+                  {/* Skills Tags (Compact, subtle surface, full radius according to design.md §9) */}
                   <div className="flex flex-wrap gap-1.5 pt-1">
                     {project.requiredSkills.map((sk, idx) => (
-                      <span key={idx} className="px-2.5 py-1 rounded-lg bg-[#f3f3f4] text-neutral-700 text-xs font-medium">
+                      <span key={idx} className="px-3 py-1 rounded-full bg-[#F3F3F4] text-[#171717] text-xs font-medium">
                         {sk}
                       </span>
                     ))}
@@ -757,17 +757,17 @@ export const ProjectBriefsPage: React.FC<ProjectBriefsPageProps> = ({
                 </div>
 
                 {/* Bottom Footer: Budget & Actions */}
-                <div className="pt-4 mt-6 border-t border-neutral-100 flex items-center justify-between gap-3">
+                <div className="pt-4 mt-6 border-t border-[#E2E8F0] flex items-center justify-between gap-3">
                   <div>
-                    <span className="text-[11px] text-neutral-400 font-medium block">Estimasi Anggaran</span>
-                    <span className="text-base sm:text-lg font-black text-[#0d0c22] tracking-tight block">
+                    <span className="text-[11px] text-[#64748B] font-medium block">Estimasi Anggaran</span>
+                    <span className="text-base sm:text-lg font-bold text-[#0F172A] tracking-tight block">
                       {formatDisplayBudget(project.formattedBudget, project.budgetMin)}
                     </span>
                   </div>
 
                   <div className="flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
                     {appliedBriefIds[project.id] ? (
-                      <span className="px-3.5 py-1.5 sm:py-2 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 text-xs font-semibold flex items-center gap-1.5">
+                      <span className="px-3.5 py-1.5 rounded-xl bg-emerald-50 text-emerald-700 border border-emerald-200 text-xs font-semibold flex items-center gap-1.5">
                         <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
                         <span>Sudah Dilamar</span>
                       </span>
@@ -775,7 +775,7 @@ export const ProjectBriefsPage: React.FC<ProjectBriefsPageProps> = ({
                       <button
                         type="button"
                         onClick={(e) => handleOpenApplyModal(project, e)}
-                        className="px-4 py-1.5 sm:py-2 rounded-full bg-[#0d0c22] hover:bg-neutral-800 text-white text-xs font-semibold transition cursor-pointer flex items-center gap-1.5 shadow-2xs active:scale-95"
+                        className="h-9 px-4 rounded-xl bg-[#0B1F3A] hover:bg-[#123B8C] text-white text-xs sm:text-sm font-semibold transition-colors cursor-pointer flex items-center gap-1.5 shadow-xs"
                       >
                         <Briefcase className="w-3.5 h-3.5 text-white/80" />
                         <span>Lamar</span>
@@ -848,7 +848,7 @@ export const ProjectBriefsPage: React.FC<ProjectBriefsPageProps> = ({
                   <div className="pt-4 flex flex-col sm:flex-row items-center justify-center gap-2.5">
                     <button
                       onClick={() => setSelectedBriefForApply(null)}
-                      className="w-full sm:w-auto px-5 py-2.5 rounded-full bg-neutral-100 hover:bg-neutral-200 text-neutral-800 text-xs font-semibold transition cursor-pointer"
+                      className="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-neutral-100 hover:bg-neutral-200 text-neutral-800 text-xs font-semibold transition cursor-pointer"
                     >
                       Kembali ke Papan Brief
                     </button>
@@ -857,7 +857,7 @@ export const ProjectBriefsPage: React.FC<ProjectBriefsPageProps> = ({
                         setSelectedBriefForApply(null);
                         navigateTo('chat', '/chat');
                       }}
-                      className="w-full sm:w-auto px-5 py-2.5 rounded-full bg-[#0d0c22] hover:bg-neutral-800 text-white text-xs font-semibold transition cursor-pointer"
+                      className="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-[#0B1F3A] hover:bg-[#123B8C] text-white text-xs font-semibold transition cursor-pointer"
                     >
                       Buka Ruang Obrolan
                     </button>
@@ -952,14 +952,14 @@ export const ProjectBriefsPage: React.FC<ProjectBriefsPageProps> = ({
                     <button
                       type="button"
                       onClick={() => setSelectedBriefForApply(null)}
-                      className="px-4 py-2.5 rounded-full text-xs font-semibold text-neutral-600 hover:bg-neutral-100 transition cursor-pointer"
+                      className="px-4 py-2.5 rounded-xl border border-[#E2E8F0] text-xs font-semibold text-neutral-600 hover:bg-neutral-100 transition cursor-pointer"
                     >
                       Batal
                     </button>
                     <button
                       type="submit"
                       disabled={isSubmittingProposal}
-                      className="px-6 py-2.5 rounded-full bg-[#0d0c22] hover:bg-neutral-800 text-white text-xs font-semibold transition cursor-pointer disabled:opacity-50 flex items-center gap-1.5"
+                      className="px-6 py-2.5 rounded-xl bg-[#0B1F3A] hover:bg-[#123B8C] text-white text-xs font-semibold transition cursor-pointer disabled:opacity-50 flex items-center gap-1.5"
                     >
                       {isSubmittingProposal ? (
                         <span>Mengirimkan...</span>
@@ -988,11 +988,11 @@ export const ProjectBriefsPage: React.FC<ProjectBriefsPageProps> = ({
           <div className="bg-white rounded-3xl max-w-lg w-full p-6 sm:p-7 space-y-4 shadow-2xl relative animate-in fade-in zoom-in-95 my-8">
             <div className="flex items-center justify-between pb-3 border-b border-neutral-100">
               <div className="flex items-center gap-2.5">
-                <div className="w-9 h-9 rounded-xl bg-[#f3f3f4] text-[#0d0c22] flex items-center justify-center">
+                <div className="w-9 h-9 rounded-xl bg-[#f3f3f4] text-[#171717] flex items-center justify-center">
                   <Edit3 className="w-5 h-5 text-blue-600" />
                 </div>
                 <div>
-                  <h3 className="text-base font-bold text-[#0d0c22]">Edit Brief Proyek</h3>
+                  <h3 className="text-base font-bold text-[#171717]">Edit Brief Proyek</h3>
                   <p className="text-xs text-neutral-500">Perbarui rincian kebutuhan dan kriteria kolaborasi brief</p>
                 </div>
               </div>
@@ -1106,13 +1106,13 @@ export const ProjectBriefsPage: React.FC<ProjectBriefsPageProps> = ({
                 <button
                   type="button"
                   onClick={() => setEditingBrief(null)}
-                  className="px-4 py-2 rounded-full border border-neutral-200 text-neutral-700 font-semibold hover:bg-neutral-50 transition cursor-pointer"
+                  className="px-4 py-2 rounded-xl border border-[#E2E8F0] text-neutral-700 font-semibold hover:bg-neutral-50 transition cursor-pointer"
                 >
                   Batal
                 </button>
                 <button
                   type="submit"
-                  className="px-5 py-2 rounded-full bg-[#0d0c22] hover:bg-neutral-800 text-white font-semibold transition cursor-pointer shadow-xs"
+                  className="px-5 py-2 rounded-xl bg-[#0B1F3A] hover:bg-[#123B8C] text-white font-semibold transition cursor-pointer shadow-xs"
                 >
                   Simpan Perubahan
                 </button>
