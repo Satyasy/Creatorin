@@ -47,6 +47,7 @@ import {
 } from 'lucide-react';
 import { ProjectBriefModal } from '@/components/modals/ProjectBriefModal';
 import { ProjectDetailModal } from '@/components/modals/ProjectDetailModal';
+import { ProjectCard } from '@/components/common/ProjectCard';
 import { MOCK_CREATORS } from '@/data/mockCreators';
 import { MOCK_FEED_PROJECTS } from '@/data/mockFeedProjects';
 import { ActivePage, AuthState, Creator, CreatorService, FeedProject } from '@/types';
@@ -587,129 +588,22 @@ export const HomePage: React.FC<HomePageProps> = ({
                 </div>
               ) : (
                 <>
-                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-1 sm:gap-1.5 md:gap-2 animate-in fade-in duration-200">
-                  {displayProjects.map((proj) => {
-                    const isLiked = likedProjects[proj.id];
-                    const isSaved = savedProjects[proj.id];
-
-                    return (
-                      <div
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 animate-in fade-in duration-200">
+                    {displayProjects.map((proj) => (
+                      <ProjectCard
                         key={proj.id}
                         id={`feed-card-${proj.id}`}
+                        project={proj}
+                        isSaved={Boolean(savedProjects[proj.id])}
+                        onToggleSave={(id, e) => toggleSaveProject(id, e)}
                         onClick={() => {
                           setSelectedProject(proj);
                           setCurrentCarouselIndex(0);
                           setIsVideoPlaying(true);
                         }}
-                        className="group relative aspect-[4/5] rounded-xl overflow-hidden bg-neutral-900 cursor-pointer select-none transition-transform duration-200 shadow-2xs"
-                      >
-                        {/* Media Cover Image (Edge to Edge, Uniform 4:5) */}
-                        <img
-                          src={proj.coverImage}
-                          alt={proj.title}
-                          referrerPolicy="no-referrer"
-                          className="w-full h-full object-cover object-center "
-                          loading="lazy"
-                        />
-
-                        {/* Top-Right Media Badge (Play for Video, Stacked Cards for Carousel - matching screenshot) */}
-                        <div className="absolute top-2 right-2 sm:top-2.5 sm:right-2.5 z-10 pointer-events-none">
-                          {proj.mediaType === 'video' ? (
-                            <div className="w-6 h-6 sm:w-7 sm:h-7 rounded-lg bg-black/45 backdrop-blur-md flex items-center justify-center text-white shadow-xs border border-white/15">
-                              <Play className="w-3 h-3 fill-white text-white translate-x-[0.5px]" />
-                            </div>
-                          ) : proj.mediaType === 'carousel' ? (
-                            <div className="w-6 h-6 sm:w-7 sm:h-7 rounded-lg bg-black/45 backdrop-blur-md flex items-center justify-center text-white shadow-xs border border-white/15">
-                              <Layers className="w-3 h-3 text-white" />
-                            </div>
-                          ) : null}
-                        </div>
-
-                        {/* Bottom Static Title & Creator Vignette (Clean and Unobtrusive - matching screenshot) */}
-                        <div className="absolute inset-x-0 bottom-0 p-2.5 sm:p-3 bg-gradient-to-t from-black/85 via-black/35 to-transparent pointer-events-none group-hover:opacity-0 transition-opacity duration-200">
-                          <p className="text-white text-xs sm:text-[13px] font-bold line-clamp-2 leading-snug drop-shadow-md">
-                            {proj.title}
-                          </p>
-                          <div className="flex items-center justify-between mt-1 text-white/80 text-[10px] sm:text-[11px]">
-                            <span className="font-semibold truncate max-w-[130px]">{proj.socialHandle || proj.creator.name}</span>
-                            <span className="shrink-0 opacity-80">{proj.viewsCount}</span>
-                          </div>
-                        </div>
-
-                        {/* Hover Overlay (Instagram Explore Interactive Peek - matching ExploreProjectsPage) */}
-                        <div className="absolute inset-0 bg-black/70 backdrop-blur-[1.5px] opacity-0 group-hover:opacity-100 transition-opacity duration-200 p-3 sm:p-4 flex flex-col justify-between text-white z-20">
-                          {/* Top Creator Header */}
-                          <div className="flex items-center justify-between">
-                            <div 
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleCreatorClick(proj.creator);
-                              }}
-                              className="flex items-center gap-2 group/author cursor-pointer min-w-0"
-                            >
-                              <img
-                                src={proj.creator.avatar}
-                                alt={proj.creator.name}
-                                className="w-7 h-7 rounded-full object-cover border border-white/50 shrink-0"
-                              />
-                              <div className="text-left min-w-0">
-                                <p className="text-xs font-bold group-hover/author:underline leading-tight truncate">
-                                  {proj.creator.name}
-                                </p>
-                                <p className="text-[10px] text-neutral-300 font-mono truncate">
-                                  {proj.socialHandle}
-                                </p>
-                              </div>
-                            </div>
-
-                            {/* Quick Save Bookmark */}
-                            <button
-                              onClick={(e) => toggleSaveProject(proj.id, e)}
-                              className={`p-1.5 rounded-full backdrop-blur-md transition-transform active:scale-90 cursor-pointer ${
-                                isSaved ? 'bg-white text-black' : 'bg-white/25 text-white hover:bg-white/35'
-                              }`}
-                              title={isSaved ? "Tersimpan" : "Simpan Proyek"}
-                            >
-                              <Bookmark className={`w-3.5 h-3.5 ${isSaved ? 'fill-black text-black' : 'text-white'}`} />
-                            </button>
-                          </div>
-
-                          {/* Center Title & Category Tag */}
-                          <div className="my-auto text-center px-1">
-                            <span className="inline-block px-2.5 py-0.5 rounded-full bg-white/20 backdrop-blur-sm text-[9px] sm:text-[10px] font-bold uppercase tracking-wider mb-1.5 border border-white/10">
-                              {proj.category}
-                            </span>
-                            <h4 className="text-xs sm:text-sm font-extrabold line-clamp-3 leading-snug">
-                              {proj.title}
-                            </h4>
-                          </div>
-
-                          {/* Bottom Stats & Engagement (Likes, Comments, Views) */}
-                          <div className="flex items-center justify-between text-xs font-bold pt-2 border-t border-white/20">
-                            <div className="flex items-center gap-3">
-                              <button 
-                                onClick={(e) => toggleLikeProject(proj.id, e)}
-                                className="flex items-center gap-1.5 hover:text-rose-400 transition cursor-pointer"
-                              >
-                                <Heart className={`w-3.5 h-3.5 ${isLiked ? 'fill-rose-500 text-rose-500' : 'text-white'}`} />
-                                <span>{proj.likesCount + (isLiked ? 1 : 0)}</span>
-                              </button>
-                              <div className="flex items-center gap-1 text-white/90">
-                                <MessageCircle className="w-3.5 h-3.5" />
-                                <span>{proj.commentsCount}</span>
-                              </div>
-                            </div>
-
-                            <span className="text-[10px] sm:text-[11px] font-medium text-neutral-300">
-                              {proj.viewsCount} views
-                            </span>
-                          </div>
-                        </div>
-
-                      </div>
-                    );
-                  })}
-                </div>
+                      />
+                    ))}
+                  </div>
 
                 {/* Tombol Aksi Lihat Semua Proyek */}
                 <div className="mt-8 text-center">

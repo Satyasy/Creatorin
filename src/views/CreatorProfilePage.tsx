@@ -54,6 +54,7 @@ import { useAuth } from '@/providers/AuthProvider';
 import { MOCK_CREATORS } from '@/data/mockCreators';
 import { Creator, CreatorService, PortfolioItem, AuthState, ActivePage, FeedProject } from '@/types';
 import { CareerScoreBadge } from '@/components/common/CareerScoreBadge';
+import { ProjectCard } from '@/components/common/ProjectCard';
 import { ProjectBriefModal } from '@/components/modals/ProjectBriefModal';
 import { ProjectDetailModal } from '@/components/modals/ProjectDetailModal';
 import { ServiceDetailModal } from '@/components/modals/ServiceDetailModal';
@@ -845,86 +846,20 @@ export const CreatorProfilePage: React.FC<CreatorProfilePageProps> = ({
                     Show off your best work. Get feedback, likes and be a part of a growing community.
                   </span>
                 </button>
-                {filteredProjects.map((project) => {
-                  const isLiked = likedShots.has(project.id);
-                  const isSaved = savedProjectIds.has(project.id);
-                  const currentMediaIdx = activeMediaIndexes[project.id] || 0;
-                  const displayMedia = project.mediaType === 'carousel' && project.additionalMedia
-                    ? project.additionalMedia[currentMediaIdx] || project.mediaUrl
-                    : project.mediaUrl;
-
-                  const handleText = project.socialHandle || (project.creator?.handle?.startsWith('@') 
-                    ? project.creator.handle 
-                    : `@${project.creator?.handle || creator.username || creator.name.toLowerCase().replace(/\s+/g, '')}`);
-
-                  const viewsFormatted = project.viewsCount || `${Math.round((project.stats?.views || 85400) / 1000)}K`;
-
-                  return (
-                    <div
-                      key={project.id}
-                      onClick={() => {
-                        setSelectedProjectForDetail(project);
-                        setDetailMediaIndex(0);
-                      }}
-                      className="group relative aspect-[326/407.5] overflow-hidden rounded-md border border-[#e5e5e5] bg-[#171717] shadow-[0_1px_0_rgba(0,0,0,0.05)] transition-all duration-300 hover:shadow-xl cursor-pointer select-none"
-                    >
-                      {/* Full-bleed Media Cover (Edge-to-Edge) */}
-                      <img
-                        src={displayMedia}
-                        alt={project.title}
-                        referrerPolicy="no-referrer"
-                        className="w-full h-full object-cover object-center "
-                      />
-
-                      {/* Top Right Media Badge: Circular dark translucent button with icon (matching screenshot) */}
-                      <div className="absolute right-3.5 top-3.5 z-10 pointer-events-none">
-                        {project.mediaType === 'video' ? (
-                          <div className="flex size-9 items-center justify-center rounded-full border border-white/10 bg-black/55 text-white shadow-sm backdrop-blur-md">
-                            <Play className="size-4 translate-x-[1px] fill-white text-white" />
-                          </div>
-                        ) : project.mediaType === 'carousel' ? (
-                          <div className="flex size-9 items-center justify-center rounded-full border border-white/10 bg-black/55 text-white shadow-sm backdrop-blur-md">
-                            <Layers className="size-4 text-white" />
-                          </div>
-                        ) : null}
-                      </div>
-
-                      {/* Quick Save Bookmark button on hover */}
-                      <div className="absolute top-3.5 left-3.5 z-20 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            toggleSaveProject(project.id, e);
-                          }}
-                          className={`w-8 h-8 sm:w-9 sm:h-9 rounded-full flex items-center justify-center backdrop-blur-md transition-all duration-200 cursor-pointer ${
-                            isSaved 
-                              ? 'bg-amber-500 text-white shadow-md' 
-                              : 'bg-black/50 hover:bg-black/80 text-white border border-white/15'
-                          }`}
-                          title={isSaved ? 'Hapus Simpan' : 'Simpan Proyek'}
-                        >
-                          <Bookmark className={`w-3.5 h-3.5 sm:w-4 sm:h-4 ${isSaved ? 'fill-white' : ''}`} />
-                        </button>
-                      </div>
-
-                      {/* Bottom Static Overlay: 2-line title + creator handle + views (Always visible matching screenshot) */}
-                      <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10 flex flex-col justify-end bg-gradient-to-t from-black/90 via-black/45 to-transparent px-4 pb-4 pt-16">
-                        <p className="mb-1.5 line-clamp-2 text-[14px] font-bold leading-[19.25px] tracking-[-0.15px] text-white drop-shadow-sm">
-                          {project.title}
-                        </p>
-                        <div className="flex items-center justify-between text-[12px] font-medium leading-4 text-white/80">
-                          <span className="truncate max-w-[68%] font-medium">
-                            {handleText}
-                          </span>
-                          <span className="shrink-0 font-medium tracking-tight">
-                            {viewsFormatted}
-                          </span>
-                        </div>
-                      </div>
-
-                    </div>
-                  );
-                })}
+                {filteredProjects.map((project) => (
+                  <ProjectCard
+                    key={project.id}
+                    id={`feed-card-${project.id}`}
+                    project={project}
+                    isSaved={savedProjectIds.has(project.id)}
+                    onToggleSave={(id, e) => toggleSaveProject(id, e)}
+                    onClick={() => {
+                      setSelectedProjectForDetail(project);
+                      setDetailMediaIndex(0);
+                    }}
+                    activeMediaIndex={activeMediaIndexes[project.id] || 0}
+                  />
+                ))}
               </div>
             )}
           </div>
@@ -1439,22 +1374,19 @@ export const CreatorProfilePage: React.FC<CreatorProfilePageProps> = ({
         {activeTab === 'liked' && (
           <div className="text-left">
             <h3 className="text-lg font-bold text-[#0d0c22] mb-4">Shots Disukai Oleh {creator.name}</h3>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              {creatorProjects.slice(0, 3).map((project) => (
-                <div 
-                  key={project.id} 
-                  className="group cursor-pointer" 
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+              {creatorProjects.slice(0, 4).map((project) => (
+                <ProjectCard
+                  key={project.id}
+                  id={`liked-card-${project.id}`}
+                  project={project}
+                  isSaved={savedProjectIds.has(project.id)}
+                  onToggleSave={(id, e) => toggleSaveProject(id, e)}
                   onClick={() => {
                     setSelectedProjectForDetail(project);
                     setDetailMediaIndex(0);
                   }}
-                >
-                  <div className="aspect-4/3 rounded-2xl overflow-hidden bg-neutral-100 border border-neutral-200">
-                    <img src={project.coverImage} alt={project.title} className="w-full h-full object-cover " />
-                  </div>
-                  <h4 className="text-sm font-bold text-[#0d0c22] mt-2 truncate">{project.title}</h4>
-                  <span className="text-xs text-neutral-400">{project.category}</span>
-                </div>
+                />
               ))}
             </div>
           </div>
