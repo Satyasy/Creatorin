@@ -1,8 +1,9 @@
+'use client';
+
 import React, { useState, useRef, useEffect } from 'react';
 import {
   X,
   Heart,
-  Bookmark,
   Globe,
   Mail,
   Play,
@@ -15,10 +16,17 @@ import {
   Instagram,
   Video,
   Layers,
-  ArrowUpRight
+  ArrowUpRight,
+  MessageSquare,
+  Upload,
+  Info,
+  Send,
+  Check
 } from 'lucide-react';
 import { FeedProject, Creator } from '@/types';
 import { MOCK_FEED_PROJECTS } from '@/data/mockFeedProjects';
+import { ProjectCard } from '@/components/common/ProjectCard';
+import { Footer } from '@/components/layout/Footer';
 
 export interface ProjectDetailModalProps {
   project: FeedProject;
@@ -31,12 +39,61 @@ export interface ProjectDetailModalProps {
   allProjects?: FeedProject[];
 }
 
+interface CommentItem {
+  id: string;
+  name: string;
+  avatar: string;
+  text: string;
+  time: string;
+  hasBadge?: boolean;
+}
+
+const DEFAULT_COMMENTS: CommentItem[] = [
+  {
+    id: 'c-1',
+    name: 'Mukhlasur Rahman',
+    avatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100&auto=format&fit=crop&q=80',
+    text: 'Impressive work!',
+    time: 'about 1 hour'
+  },
+  {
+    id: 'c-2',
+    name: 'Bhautik Domadiya',
+    avatar: 'https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?w=100&auto=format&fit=crop&q=80',
+    text: 'Framing the main headline ("THE ART OF CRAFTED LUXURY JEWELRY") with that delicate script overlay gives this hero section such an high-end editorial feel! It balances modern luxury web design with Cartier\'s heritage so beautifully. Fantastic work, Halo UI/UX!',
+    time: 'about 1 hour'
+  },
+  {
+    id: 'c-3',
+    name: 'Rifat Jahangir Ony',
+    avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&auto=format&fit=crop&q=80',
+    text: 'superb work!',
+    time: 'about 3 hours'
+  },
+  {
+    id: 'c-4',
+    name: 'Minu Vi',
+    avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&auto=format&fit=crop&q=80',
+    text: 'Cool font 🔥',
+    time: 'about 4 hours'
+  },
+  {
+    id: 'c-5',
+    name: 'Abdur Rouf',
+    avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&auto=format&fit=crop&q=80',
+    text: 'Professional and impressive design work ! Good job',
+    time: 'about 4 hours',
+    hasBadge: true
+  }
+];
+
 export const ProjectDetailModal: React.FC<ProjectDetailModalProps> = ({
   project: initialProject,
   onClose,
   onSelectProject,
   onViewCreatorProfile,
   onGetInTouch,
+  onNavigate,
   allProjects = MOCK_FEED_PROJECTS
 }) => {
   const [currentProject, setCurrentProject] = useState<FeedProject>(initialProject);
@@ -45,8 +102,14 @@ export const ProjectDetailModal: React.FC<ProjectDetailModalProps> = ({
   const [videoProgress, setVideoProgress] = useState(0);
   const [currentSlideIndex, setCurrentSlideIndex] = useState(0);
   const [isLiked, setIsLiked] = useState(false);
-  const [isSaved, setIsSaved] = useState(false);
   const [isFollowing, setIsFollowing] = useState(false);
+
+  // Comment & Sidebar states matching Figma
+  const [isCommentOpen, setIsCommentOpen] = useState(false);
+  const [isInfoOpen, setIsInfoOpen] = useState(false);
+  const [comments, setComments] = useState<CommentItem[]>(DEFAULT_COMMENTS);
+  const [newCommentText, setNewCommentText] = useState('');
+  const [toastMessage, setToastMessage] = useState<string | null>(null);
 
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const modalContainerRef = useRef<HTMLDivElement | null>(null);
@@ -66,6 +129,35 @@ export const ProjectDetailModal: React.FC<ProjectDetailModalProps> = ({
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [onClose]);
+
+  const showToast = (msg: string) => {
+    setToastMessage(msg);
+    setTimeout(() => setToastMessage(null), 3000);
+  };
+
+  const handleShare = () => {
+    if (typeof window !== 'undefined' && navigator.clipboard) {
+      navigator.clipboard.writeText(window.location.href);
+      showToast('Tautan proyek berhasil disalin ke clipboard!');
+    }
+  };
+
+  const handleAddComment = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newCommentText.trim()) return;
+
+    const newComment: CommentItem = {
+      id: `comm-${Date.now()}`,
+      name: 'Anda (Pengunjung)',
+      avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80',
+      text: newCommentText.trim(),
+      time: 'Baru saja'
+    };
+
+    setComments(prev => [newComment, ...prev]);
+    setNewCommentText('');
+    showToast('Komentar berhasil dikirim!');
+  };
 
   const mediaList = currentProject.carouselImages && currentProject.carouselImages.length > 0
     ? currentProject.carouselImages
@@ -203,7 +295,7 @@ export const ProjectDetailModal: React.FC<ProjectDetailModalProps> = ({
             <button
               type="button"
               onClick={togglePlayPause}
-              className="flex size-8 items-center justify-center rounded-full text-white transition hover:bg-white/20"
+              className="flex size-8 items-center justify-center rounded-full text-white transition hover:bg-white/20 cursor-pointer"
               title={isPlaying ? 'Pause' : 'Putar'}
             >
               {isPlaying ? <Pause className="size-5 fill-white" /> : <Play className="size-5 fill-white" />}
@@ -212,7 +304,7 @@ export const ProjectDetailModal: React.FC<ProjectDetailModalProps> = ({
             <button
               type="button"
               onClick={toggleMute}
-              className="flex size-8 items-center justify-center rounded-full text-white transition hover:bg-white/20"
+              className="flex size-8 items-center justify-center rounded-full text-white transition hover:bg-white/20 cursor-pointer"
               title={isMuted ? 'Aktifkan suara' : 'Matikan suara'}
             >
               {isMuted ? <VolumeX className="size-5" /> : <Volume2 className="size-5" />}
@@ -241,7 +333,7 @@ export const ProjectDetailModal: React.FC<ProjectDetailModalProps> = ({
                 type="button"
                 onClick={() => setCurrentSlideIndex(prev => Math.max(0, prev - 1))}
                 disabled={currentSlideIndex === 0}
-                className="absolute left-4 top-1/2 flex size-10 -translate-y-1/2 items-center justify-center rounded-full bg-black/60 text-white backdrop-blur-md transition hover:bg-black disabled:cursor-not-allowed disabled:opacity-30"
+                className="absolute left-4 top-1/2 flex size-10 -translate-y-1/2 items-center justify-center rounded-full bg-black/60 text-white backdrop-blur-md transition hover:bg-black disabled:cursor-not-allowed disabled:opacity-30 cursor-pointer"
                 title="Slide sebelumnya"
               >
                 <ChevronLeft className="size-5" />
@@ -250,7 +342,7 @@ export const ProjectDetailModal: React.FC<ProjectDetailModalProps> = ({
                 type="button"
                 onClick={() => setCurrentSlideIndex(prev => Math.min(mediaList.length - 1, prev + 1))}
                 disabled={currentSlideIndex === mediaList.length - 1}
-                className="absolute right-4 top-1/2 flex size-10 -translate-y-1/2 items-center justify-center rounded-full bg-black/60 text-white backdrop-blur-md transition hover:bg-black disabled:cursor-not-allowed disabled:opacity-30"
+                className="absolute right-4 top-1/2 flex size-10 -translate-y-1/2 items-center justify-center rounded-full bg-black/60 text-white backdrop-blur-md transition hover:bg-black disabled:cursor-not-allowed disabled:opacity-30 cursor-pointer"
                 title="Slide berikutnya"
               >
                 <ChevronRight className="size-5" />
@@ -261,7 +353,7 @@ export const ProjectDetailModal: React.FC<ProjectDetailModalProps> = ({
                     type="button"
                     key={index}
                     onClick={() => setCurrentSlideIndex(index)}
-                    className={`h-2 rounded-full transition-all ${index === currentSlideIndex ? 'w-5 bg-white' : 'w-2 bg-white/40'}`}
+                    className={`h-2 rounded-full transition-all cursor-pointer ${index === currentSlideIndex ? 'w-5 bg-white' : 'w-2 bg-white/40'}`}
                     title={`Lihat slide ${index + 1}`}
                   />
                 ))}
@@ -274,12 +366,13 @@ export const ProjectDetailModal: React.FC<ProjectDetailModalProps> = ({
   );
 
   const renderCreatorNavbar = () => (
-    <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+    <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between w-full">
+      {/* Left: Avatar & Profile Details */}
       <div className="flex min-w-0 items-center gap-[14px]">
         <button
           type="button"
           onClick={() => onViewCreatorProfile?.(creator)}
-          className="relative shrink-0 rounded-full"
+          className="relative shrink-0 rounded-full cursor-pointer"
           title={`Lihat profil ${creator.name}`}
         >
           <span className="block size-12 rounded-full bg-linear-to-tr from-[#155dfc] to-[#615fff] p-0.5 shadow-sm">
@@ -292,11 +385,11 @@ export const ProjectDetailModal: React.FC<ProjectDetailModalProps> = ({
           )}
         </button>
 
-        <div className="min-w-0">
+        <div className="min-w-0 text-left">
           <button
             type="button"
             onClick={() => onViewCreatorProfile?.(creator)}
-            className="block max-w-full truncate text-left text-[16px] font-bold leading-6 tracking-[-0.31px] text-[#171717] hover:underline"
+            className="block max-w-full truncate text-left text-[16px] font-bold leading-6 tracking-[-0.31px] text-[#171717] hover:underline cursor-pointer"
           >
             {creator.name}
           </button>
@@ -309,9 +402,9 @@ export const ProjectDetailModal: React.FC<ProjectDetailModalProps> = ({
             <button
               type="button"
               onClick={() => setIsFollowing(prev => !prev)}
-              className="text-[12px] font-semibold leading-4 text-[#1D4ED8] hover:underline"
+              className="text-[12px] font-semibold leading-4 text-[#1D4ED8] hover:underline cursor-pointer"
             >
-              {isFollowing ? 'Following' : 'Follow'}
+              {isFollowing ? 'Mengikuti' : 'Follow'}
             </button>
           </div>
 
@@ -320,7 +413,7 @@ export const ProjectDetailModal: React.FC<ProjectDetailModalProps> = ({
               <Globe className="size-3.5 shrink-0 text-neutral-500" />
               <span className="truncate">{creatorDomain}</span>
             </a>
-            <span className="hidden sm:inline">|</span>
+            <span className="hidden sm:inline">•</span>
             <a href={`mailto:${creatorEmail}`} className="inline-flex min-w-0 items-center gap-1 hover:text-[#1D4ED8]">
               <Mail className="size-3.5 shrink-0 text-neutral-500" />
               <span className="truncate">{creatorEmail}</span>
@@ -329,31 +422,23 @@ export const ProjectDetailModal: React.FC<ProjectDetailModalProps> = ({
         </div>
       </div>
 
-      <div className="flex shrink-0 items-center gap-2">
+      {/* Right: Actions */}
+      <div className="flex shrink-0 items-center gap-3 self-start sm:self-auto">
         <button
           type="button"
           onClick={() => setIsLiked(prev => !prev)}
-          className={`flex size-10 items-center justify-center rounded-xl border shadow-2xs transition ${
+          className={`flex size-10 items-center justify-center rounded-full border shadow-2xs transition cursor-pointer ${
             isLiked ? 'border-rose-200 bg-rose-50 text-rose-600' : 'border-[#E2E8F0] bg-white text-[#171717] hover:bg-neutral-50'
           }`}
           title="Sukai proyek"
         >
           <Heart className={`size-4 ${isLiked ? 'fill-rose-600' : ''}`} />
         </button>
-        <button
-          type="button"
-          onClick={() => setIsSaved(prev => !prev)}
-          className={`flex size-10 items-center justify-center rounded-xl border shadow-2xs transition ${
-            isSaved ? 'border-amber-200 bg-amber-50 text-amber-600' : 'border-[#E2E8F0] bg-white text-[#171717] hover:bg-neutral-50'
-          }`}
-          title="Simpan proyek"
-        >
-          <Bookmark className={`size-4 ${isSaved ? 'fill-amber-600' : ''}`} />
-        </button>
+
         <button
           type="button"
           onClick={() => onGetInTouch?.(creator)}
-          className="rounded-xl bg-[#0B1F3A] px-5 py-2.5 text-[14px] font-semibold leading-5 tracking-[-0.15px] text-white shadow-xs transition hover:bg-[#123B8C]"
+          className="rounded-full bg-[#0B1F3A] px-6 py-2.5 text-[14px] font-bold leading-5 tracking-[-0.15px] text-white shadow-xs transition hover:bg-[#123B8C] cursor-pointer"
         >
           Kirim Pesan
         </button>
@@ -368,7 +453,7 @@ export const ProjectDetailModal: React.FC<ProjectDetailModalProps> = ({
         <button
           type="button"
           onClick={() => onViewCreatorProfile?.(creator)}
-          className="absolute left-1/2 top-[-24px] size-14 -translate-x-1/2 rounded-full bg-white p-1 shadow-[0_0_0_4px_white,0_4px_6px_-1px_rgba(0,0,0,0.1),0_2px_4px_-2px_rgba(0,0,0,0.1)]"
+          className="absolute left-1/2 top-[-24px] size-14 -translate-x-1/2 rounded-full bg-white p-1 shadow-[0_0_0_4px_white,0_4px_6px_-1px_rgba(0,0,0,0.1),0_2px_4px_-2px_rgba(0,0,0,0.1)] cursor-pointer"
           title={`Lihat profil ${creator.name}`}
         >
           <img src={creator.avatar} alt={creator.name} className="size-full rounded-full object-cover" />
@@ -379,26 +464,26 @@ export const ProjectDetailModal: React.FC<ProjectDetailModalProps> = ({
         <button
           type="button"
           onClick={() => onViewCreatorProfile?.(creator)}
-          className="text-center text-[20px] font-bold leading-7 tracking-[0.2px] text-[#171717] hover:underline"
+          className="text-center text-[20px] font-bold leading-7 tracking-[0.2px] text-[#171717] hover:underline cursor-pointer"
         >
           {creator.name}
         </button>
         <p className="pt-3 text-center text-[14px] font-medium leading-5 tracking-[-0.15px] text-[#525252]">
-          {creator.bio}
+          {creator.bio || 'Kreator UGC autentik dengan engagement tinggi. Spesialis review skincare, makeup tutorial, dan unboxing estetik.'}
         </p>
 
         <div className="flex flex-wrap items-center justify-center gap-3 pt-5">
           <button
             type="button"
             onClick={() => onGetInTouch?.(creator)}
-            className="rounded-xl bg-[#0B1F3A] px-6 py-2.5 text-[12px] font-semibold leading-4 text-white shadow-xs transition hover:bg-[#123B8C]"
+            className="rounded-full bg-[#0B1F3A] px-6 py-2.5 text-[12px] font-semibold leading-4 text-white shadow-xs transition hover:bg-[#123B8C] cursor-pointer"
           >
             Kirim Pesan
           </button>
           <button
             type="button"
             onClick={() => setIsFollowing(prev => !prev)}
-            className="rounded-xl border border-[#E2E8F0] bg-white px-6 py-2.5 text-[12px] font-semibold leading-4 text-[#171717] shadow-2xs transition hover:bg-neutral-50"
+            className="rounded-full border border-[#E2E8F0] bg-white px-6 py-2.5 text-[12px] font-semibold leading-4 text-[#171717] shadow-2xs transition hover:bg-neutral-50 cursor-pointer"
           >
             {isFollowing ? 'Mengikuti' : 'Ikuti Kreator'}
           </button>
@@ -409,6 +494,7 @@ export const ProjectDetailModal: React.FC<ProjectDetailModalProps> = ({
             <Globe className="size-3.5 shrink-0" />
             <span className="truncate">{creatorDomain}</span>
           </a>
+          <span>•</span>
           <a href={`mailto:${creatorEmail}`} className="inline-flex min-w-0 items-center gap-1 hover:text-[#1D4ED8]">
             <Mail className="size-3.5 shrink-0" />
             <span className="truncate">{creatorEmail}</span>
@@ -427,87 +513,24 @@ export const ProjectDetailModal: React.FC<ProjectDetailModalProps> = ({
         <button
           type="button"
           onClick={() => onViewCreatorProfile?.(creator)}
-          className="inline-flex items-center gap-1 text-[12px] font-bold leading-4 text-[#1D4ED8] hover:underline"
+          className="inline-flex items-center gap-1 text-[12px] font-bold leading-4 text-[#1D4ED8] hover:underline cursor-pointer"
         >
           Lihat Proyek Lainnya
           <ArrowUpRight className="size-3.5" />
         </button>
       </div>
 
-      <div className="grid grid-cols-2 gap-4 pt-4 md:grid-cols-4">
-        {displayOtherProjects.map(project => {
-          const isItemVideo = project.mediaType === 'video' || Boolean(project.videoUrl);
-
-          return (
-            <button
-              type="button"
-              key={project.id}
-              onClick={() => handleSwitchProject(project)}
-              className="group relative aspect-[228/285] overflow-hidden rounded-md border border-[#E2E8F0] bg-[#171717] text-left shadow-xs"
-            >
-              <img
-                src={project.coverImage || project.mediaUrl}
-                alt={project.title}
-                className="size-full object-cover "
-              />
-
-              {isItemVideo && (
-                <span className="absolute right-2.5 top-2.5 flex size-6 items-center justify-center rounded-full bg-black/60 text-white backdrop-blur-xs">
-                  <Play className="size-3 fill-white" />
-                </span>
-              )}
-
-              <span className="absolute inset-x-0 bottom-0 block bg-linear-to-t from-black/90 via-black/60 to-transparent p-3 text-white">
-                <span className="line-clamp-2 text-[12px] font-semibold leading-[16.5px]">
-                  {project.title}
-                </span>
-                <span className="mt-1 flex items-center justify-between border-t border-white/10 pt-1 text-[10px] leading-[15px] text-[#d4d4d4]">
-                  <span className="max-w-[100px] truncate font-normal">{project.socialHandle || creatorHandle}</span>
-                  <span className="font-mono">{project.viewsCount || '710.0K'}</span>
-                </span>
-              </span>
-            </button>
-          );
-        })}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 pt-5">
+        {displayOtherProjects.map(otherProject => (
+          <ProjectCard
+            key={otherProject.id}
+            id={`related-project-${otherProject.id}`}
+            project={otherProject}
+            onClick={() => handleSwitchProject(otherProject)}
+          />
+        ))}
       </div>
     </section>
-  );
-
-  const renderProjectContent = () => (
-    <div className="flex flex-col items-start pb-24 pt-6">
-      {renderMedia()}
-
-      <div className="flex w-full flex-col items-start pt-6">
-        <span className="rounded-md bg-[#f5f5f5] px-2.5 py-1 text-[12px] font-medium leading-4 tracking-[0.3px] text-[#525252]">
-          {categoryLabel}
-        </span>
-        <h1 className="mt-3 max-w-[960px] text-[28px] font-extrabold leading-[36px] tracking-[-0.53px] text-[#171717] sm:text-[36px] sm:leading-[49.5px]">
-          {currentProject.title}
-        </h1>
-      </div>
-
-      {description && (
-        <p className="max-w-[896px] pt-8 text-[16px] font-medium leading-[26px] tracking-[-0.31px] text-[#404040]">
-          {description}
-        </p>
-      )}
-
-      {currentProject.tags?.length > 0 && (
-        <div className="flex w-full flex-wrap items-center gap-2 pt-7">
-          {currentProject.tags.map((tag, index) => (
-            <span
-              key={`${tag}-${index}`}
-              className="rounded-full bg-[#F3F3F4] px-4 py-1.5 text-[12px] font-medium leading-4 text-[#171717]"
-            >
-              {tag.startsWith('#') ? tag : `#${tag}`}
-            </span>
-          ))}
-        </div>
-      )}
-
-      {renderCreatorCard()}
-      {renderRelatedProjects()}
-    </div>
   );
 
   return (
@@ -515,6 +538,117 @@ export const ProjectDetailModal: React.FC<ProjectDetailModalProps> = ({
       className="fixed inset-0 z-50 flex flex-col bg-black/65 text-left animate-in fade-in duration-200"
       onClick={onClose}
     >
+      {/* Toast Notification */}
+      {toastMessage && (
+        <div className="fixed bottom-6 right-6 z-60 bg-[#0d0c22] text-white px-5 py-3 rounded-2xl shadow-2xl text-sm font-medium flex items-center gap-2 animate-in fade-in slide-in-from-bottom-3 duration-200">
+          <Check className="w-4 h-4 text-emerald-400 shrink-0" />
+          <span>{toastMessage}</span>
+        </div>
+      )}
+
+      {/* Floating Action Buttons on Right Screen (Visible when comments panel is CLOSED, matching Figma) */}
+      <aside
+        onClick={(e) => e.stopPropagation()}
+        className={`fixed right-6 sm:right-8 top-1/2 -translate-y-1/2 z-40 flex flex-col items-center gap-3 transition-all duration-300 ease-out ${
+          isCommentOpen ? 'translate-x-12 opacity-0 pointer-events-none' : 'translate-x-0 opacity-100'
+        }`}
+      >
+        <button
+          id="btn-open-comments"
+          type="button"
+          onClick={(e) => {
+            e.stopPropagation();
+            setIsCommentOpen(true);
+          }}
+          className="relative flex size-11 items-center justify-center rounded-full border border-neutral-200 bg-white text-[#171717] shadow-sm hover:shadow-md hover:border-neutral-300 transition cursor-pointer"
+          title="Buka Komentar"
+        >
+          <MessageSquare className="size-5" />
+          <span className="absolute -top-1.5 -right-1.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-[#171717] px-1 text-[10px] font-bold text-white shadow-xs">
+            {23 + (comments.length - DEFAULT_COMMENTS.length)}
+          </span>
+        </button>
+
+        <button
+          id="btn-floating-share"
+          type="button"
+          onClick={(e) => {
+            e.stopPropagation();
+            handleShare();
+          }}
+          className="flex size-11 items-center justify-center rounded-full border border-neutral-200 bg-white text-[#171717] shadow-sm hover:shadow-md hover:border-neutral-300 transition cursor-pointer"
+          title="Bagikan Proyek"
+        >
+          <Upload className="size-5" />
+        </button>
+
+        <button
+          id="btn-floating-info"
+          type="button"
+          onClick={(e) => {
+            e.stopPropagation();
+            setIsInfoOpen(prev => !prev);
+          }}
+          className={`flex size-11 items-center justify-center rounded-full border shadow-sm hover:shadow-md transition cursor-pointer ${
+            isInfoOpen ? 'border-[#0B1F3A] bg-[#0B1F3A] text-white' : 'border-neutral-200 bg-white text-[#171717] hover:border-neutral-300'
+          }`}
+          title="Info Proyek"
+        >
+          <Info className="size-5" />
+        </button>
+      </aside>
+
+      {/* Project Info Modal / Tooltip */}
+      {isInfoOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-2xs" onClick={() => setIsInfoOpen(false)}>
+          <div className="bg-white rounded-2xl border border-neutral-200 shadow-2xl p-6 max-w-sm w-full space-y-4 text-left" onClick={e => e.stopPropagation()}>
+            <div className="flex items-center justify-between border-b border-neutral-100 pb-3">
+              <h4 className="text-base font-bold text-[#0d0c22]">Informasi Proyek</h4>
+              <button onClick={() => setIsInfoOpen(false)} className="text-neutral-400 hover:text-neutral-700 cursor-pointer">
+                <X className="size-4" />
+              </button>
+            </div>
+            <div className="space-y-2.5 text-xs text-neutral-600">
+              <div className="flex justify-between">
+                <span className="font-medium text-neutral-400">Judul:</span>
+                <span className="font-semibold text-neutral-800 text-right max-w-[200px] truncate">{currentProject.title}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="font-medium text-neutral-400">Kreator:</span>
+                <span className="font-semibold text-neutral-800">{creator.name}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="font-medium text-neutral-400">Kategori:</span>
+                <span className="font-semibold text-neutral-800">{categoryLabel}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="font-medium text-neutral-400">Format:</span>
+                <span className="font-semibold text-neutral-800 capitalize">{currentProject.mediaType}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="font-medium text-neutral-400">Total Tayangan:</span>
+                <span className="font-semibold text-neutral-800">{currentProject.viewsCount || '710.0K'}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="font-medium text-neutral-400">Total Komentar:</span>
+                <span className="font-semibold text-neutral-800">{comments.length}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="font-medium text-neutral-400">Perangkat Lunak:</span>
+                <span className="font-semibold text-neutral-800">Figma, Framer, CapCut</span>
+              </div>
+            </div>
+            <button
+              onClick={() => setIsInfoOpen(false)}
+              className="w-full py-2.5 rounded-xl bg-[#0B1F3A] text-white text-xs font-semibold hover:bg-neutral-800 transition cursor-pointer"
+            >
+              Tutup
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Top Close Button for the Entire Modal */}
       <div className="flex h-12 shrink-0 items-center justify-end px-5 py-2.5 pointer-events-none">
         <button
           id="btn-close-project-detail"
@@ -523,29 +657,197 @@ export const ProjectDetailModal: React.FC<ProjectDetailModalProps> = ({
             event.stopPropagation();
             onClose();
           }}
-          className="pointer-events-auto flex size-9 items-center justify-center rounded-full text-white/80 transition hover:bg-white/15 hover:text-white"
+          className="pointer-events-auto flex size-9 items-center justify-center rounded-full text-white/80 transition hover:bg-white/15 hover:text-white cursor-pointer"
           title="Tutup"
         >
           <X className="size-6" />
         </button>
       </div>
 
+      {/* Main Modal Surface (Rounded-T 24px) */}
       <div
         onClick={(event) => event.stopPropagation()}
         className="relative flex min-h-0 flex-1 flex-col overflow-hidden rounded-t-[24px] bg-white font-sans text-[#171717] shadow-2xl selection:bg-[#0B1F3A] selection:text-white"
       >
-        <header className="shrink-0 border-b border-[#E2E8F0] bg-white">
-          <div className="mx-auto w-full max-w-[1440px] px-5 py-3.5 sm:px-8">
-            {renderCreatorNavbar()}
-          </div>
-        </header>
+        {/* Scrollable Container with Content and Footer */}
+        <div ref={modalContainerRef} className="min-h-0 flex-1 overflow-y-auto overflow-x-hidden">
+          <main
+            className={`mx-auto w-full max-w-[1024px] px-5 sm:px-8 pt-8 pb-20 transition-transform duration-300 ease-out ${
+              isCommentOpen ? 'lg:-translate-x-[160px] xl:-translate-x-[180px]' : 'translate-x-0'
+            }`}
+          >
+            {/* Primary Content Column */}
+            <div className="min-w-0 w-full text-left">
+              {/* Creator Profile Navbar - perfectly aligned with the media */}
+              <div className="pb-6">
+                {renderCreatorNavbar()}
+              </div>
 
-        <div ref={modalContainerRef} className="min-h-0 flex-1 overflow-y-auto">
-          <main className="mx-auto w-full max-w-[1024px] px-5 sm:px-8">
-            {renderProjectContent()}
+              {/* Media Preview */}
+              {renderMedia()}
+
+              {/* Category & Title */}
+              <div className="flex w-full flex-col items-start pt-6">
+                <span className="rounded-md bg-[#f5f5f5] px-2.5 py-1 text-[12px] font-medium leading-4 tracking-[0.3px] text-[#525252]">
+                  {categoryLabel}
+                </span>
+                <h1 className="mt-3 max-w-[960px] text-[28px] font-extrabold leading-[36px] tracking-[-0.53px] text-[#171717] sm:text-[36px] sm:leading-[49.5px]">
+                  {currentProject.title}
+                </h1>
+              </div>
+
+              {/* Description */}
+              {description && (
+                <p className="max-w-[896px] pt-6 text-[15px] sm:text-[16px] font-medium leading-[26px] tracking-[-0.31px] text-[#404040]">
+                  {description}
+                </p>
+              )}
+
+              {/* Tags */}
+              {currentProject.tags?.length > 0 && (
+                <div className="flex w-full flex-wrap items-center gap-2 pt-6">
+                  {currentProject.tags.map((tag, index) => (
+                    <span
+                      key={`${tag}-${index}`}
+                      className="rounded-full bg-[#F3F3F4] px-4 py-1.5 text-[12px] font-medium leading-4 text-[#171717]"
+                    >
+                      {tag.startsWith('#') ? tag : `#${tag}`}
+                    </span>
+                  ))}
+                </div>
+              )}
+
+              {/* Signature Creator Divider Section */}
+              {renderCreatorCard()}
+
+              {/* Related Projects Section (4 columns x 2 rows) */}
+              {renderRelatedProjects()}
+            </div>
           </main>
+
+          {/* Full Creatorin Footer inside modal scroll area matching Figma */}
+          <div
+            className={`transition-transform duration-300 ease-out ${
+              isCommentOpen ? 'lg:-translate-x-[160px] xl:-translate-x-[180px]' : 'translate-x-0'
+            }`}
+          >
+            <Footer onNavigate={onNavigate} />
+          </div>
         </div>
 
+        {/* Mobile Backdrop for Comment Overlay */}
+        {isCommentOpen && (
+          <div
+            className="fixed inset-0 bg-black/30 z-35 lg:hidden"
+            onClick={() => setIsCommentOpen(false)}
+          />
+        )}
+
+        {/* Clean Slide-Over Comment Overlay Panel (Simple horizontal shift, no layout reflow or popups) */}
+        <aside
+          onClick={(e) => e.stopPropagation()}
+          className={`absolute top-0 right-0 bottom-0 z-40 w-full sm:w-[400px] xl:w-[420px] bg-white border-l border-neutral-200/90 shadow-2xl flex flex-col transition-transform duration-300 ease-out ${
+            isCommentOpen ? 'translate-x-0' : 'translate-x-full pointer-events-none'
+          }`}
+        >
+          {/* Top Row: Title & Action Buttons moved to top header */}
+          <div className="flex items-center justify-between px-6 py-5 border-b border-neutral-100 shrink-0">
+            <div className="flex items-center gap-2">
+              <h3 className="text-[15px] font-bold text-[#171717]">Komentar</h3>
+              <span className="text-[11px] px-2 py-0.5 rounded-full bg-neutral-100 text-neutral-600 font-semibold">
+                {23 + (comments.length - DEFAULT_COMMENTS.length)}
+              </span>
+            </div>
+
+            <div className="flex items-center gap-2.5">
+              <button
+                id="btn-active-comment"
+                type="button"
+                onClick={() => setIsCommentOpen(false)}
+                className="relative flex size-10 items-center justify-center rounded-full bg-[#171717] text-white shadow-xs transition hover:bg-neutral-800 cursor-pointer"
+                title="Tutup Komentar"
+              >
+                <MessageSquare className="size-4.5" />
+                <span className="absolute -top-1 -right-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-white text-[#171717] px-1 text-[9px] font-bold shadow-xs border border-neutral-200">
+                  {23 + (comments.length - DEFAULT_COMMENTS.length)}
+                </span>
+              </button>
+
+              <button
+                id="btn-active-share"
+                type="button"
+                onClick={handleShare}
+                className="flex size-10 items-center justify-center rounded-full border border-neutral-200 bg-white text-[#171717] shadow-2xs hover:border-neutral-300 hover:shadow-xs transition cursor-pointer"
+                title="Bagikan Proyek"
+              >
+                <Upload className="size-4.5" />
+              </button>
+
+              <button
+                id="btn-active-info"
+                type="button"
+                onClick={() => setIsInfoOpen(prev => !prev)}
+                className={`flex size-10 items-center justify-center rounded-full border shadow-2xs transition cursor-pointer ${
+                  isInfoOpen ? 'border-[#0B1F3A] bg-[#0B1F3A] text-white' : 'border-neutral-200 bg-white text-[#171717] hover:border-neutral-300'
+                }`}
+                title="Info Proyek"
+              >
+                <Info className="size-4.5" />
+              </button>
+            </div>
+          </div>
+
+          {/* Scrollable Comments Feed */}
+          <div className="flex-1 overflow-y-auto px-6 py-5 space-y-6">
+            {comments.map((item) => (
+              <div key={item.id} className="flex items-start gap-3.5">
+                <img
+                  src={item.avatar}
+                  alt={item.name}
+                  className="size-9 rounded-full object-cover shrink-0 mt-0.5"
+                />
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-1.5">
+                    <p className="text-[14px] font-bold text-[#171717] leading-tight">
+                      {item.name}
+                    </p>
+                    {item.hasBadge && (
+                      <span className="size-2 rounded-full bg-amber-500" title="Kreator Terverifikasi" />
+                    )}
+                  </div>
+                  <p className="mt-1.5 text-[13px] text-[#404040] leading-relaxed font-normal">
+                    {item.text}
+                  </p>
+                  <span className="block mt-1 text-[11px] text-[#a3a3a3] font-normal">
+                    {item.time}
+                  </span>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Comment Input Form at Bottom */}
+          <form
+            onSubmit={handleAddComment}
+            className="p-5 border-t border-neutral-100 flex items-center gap-2.5 bg-white shrink-0"
+          >
+            <input
+              type="text"
+              value={newCommentText}
+              onChange={(e) => setNewCommentText(e.target.value)}
+              placeholder="Tulis ulasan atau apresiasi..."
+              className="flex-1 h-11 px-5 rounded-full bg-[#f5f5f5] text-[13px] text-neutral-900 placeholder:text-neutral-400 focus:outline-none focus:ring-1 focus:ring-[#171717]"
+            />
+            <button
+              type="submit"
+              disabled={!newCommentText.trim()}
+              className="size-11 rounded-full bg-[#171717] disabled:bg-neutral-300 text-white flex items-center justify-center transition cursor-pointer shrink-0 shadow-xs hover:bg-neutral-800"
+              title="Kirim Komentar"
+            >
+              <Send className="size-4" />
+            </button>
+          </form>
+        </aside>
       </div>
     </div>
   );

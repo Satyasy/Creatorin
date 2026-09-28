@@ -27,9 +27,9 @@ export const SettingsPage: React.FC = () => {
   // Form states
   const [fullName, setFullName] = useState(user?.name || 'Sobakhul Munir Siroj');
   const [email, setEmail] = useState(user?.email || 'munir@creatorin.id');
-  const [location, setLocation] = useState('Jakarta Selatan, Indonesia');
-  const [phone, setPhone] = useState('+62 812-3456-7890');
-  const [bio, setBio] = useState('Spesialis antarmuka UI/UX modern, visual website konversi tinggi, dan sistem desain komersial.');
+  const [location, setLocation] = useState(user?.location || 'Jakarta Selatan, Indonesia');
+  const [phone, setPhone] = useState(user?.phone || '+62 812-3456-7890');
+  const [bio, setBio] = useState(user?.bio || 'Spesialis antarmuka UI/UX modern, visual website konversi tinggi, dan sistem desain komersial.');
   
   // Notification states
   const [notifyEmail, setNotifyEmail] = useState(true);
@@ -49,6 +49,17 @@ export const SettingsPage: React.FC = () => {
     e.preventDefault();
     setIsSaving(true);
 
+    const updatedUser = user
+      ? {
+          ...user,
+          name: fullName,
+          email: email,
+          location,
+          bio,
+          phone,
+        }
+      : null;
+
     try {
       // Call account settings API
       const res = await fetch('/api/account/settings', {
@@ -58,6 +69,7 @@ export const SettingsPage: React.FC = () => {
           fullName,
           location,
           phone,
+          bio,
           notifyEmail,
           notifyPush,
           language,
@@ -66,21 +78,13 @@ export const SettingsPage: React.FC = () => {
       });
 
       // Update local state in auth provider if user exists
-      if (user) {
-        login({
-          ...user,
-          name: fullName,
-          email: email
-        });
+      if (updatedUser) {
+        login(updatedUser);
       }
     } catch {
-      // Local fallback
-      if (user) {
-        login({
-          ...user,
-          name: fullName,
-          email: email
-        });
+      // Local fallback — always persist to auth state
+      if (updatedUser) {
+        login(updatedUser);
       }
     } finally {
       setIsSaving(false);

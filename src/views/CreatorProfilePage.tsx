@@ -47,7 +47,9 @@ import {
   Twitter,
   Facebook,
   Instagram,
-  Linkedin
+  Linkedin,
+  Pencil,
+  Link as LinkIcon
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/providers/AuthProvider';
@@ -70,6 +72,8 @@ interface CreatorProfilePageProps {
   onSignOut?: () => void;
   onNavigate?: (page: ActivePage) => void;
   onSelectCreator?: (creator: Creator) => void;
+  /** When true, renders the owner's own profile view (Bagikan + Edit buttons, upload tiles visible) */
+  isOwnProfile?: boolean;
 }
 
 type ProfileTab = 'work' | 'services' | 'reviews' | 'statistics' | 'liked' | 'about';
@@ -80,7 +84,8 @@ export const CreatorProfilePage: React.FC<CreatorProfilePageProps> = ({
   currentUser: propUser,
   onSignOut,
   onNavigate,
-  onSelectCreator
+  onSelectCreator,
+  isOwnProfile = false
 }) => {
   const router = useRouter();
   const { user: authUser } = useAuth();
@@ -567,28 +572,54 @@ export const CreatorProfilePage: React.FC<CreatorProfilePageProps> = ({
               )}
             </div>
 
-            {/* Button 2: Follow Toggle Button (rounded-xl 10-12px according to design.md §7) */}
-            <button
-              id="btn-follow-toggle"
-              onClick={toggleFollow}
-              className={`h-10 px-5 rounded-xl border text-sm font-semibold transition-colors cursor-pointer ${
-                isFollowing
-                  ? 'border-[#E2E8F0] bg-white text-[#171717] hover:bg-[#F8FAFC]'
-                  : 'border-[#0B1F3A] bg-[#0B1F3A] text-white hover:bg-[#123B8C]'
-              }`}
-            >
-              {isFollowing ? 'Following' : 'Follow'}
-            </button>
+            {isOwnProfile ? (
+              <>
+                {/* Own Profile: Bagikan Profil */}
+                <button
+                  id="btn-share-profile"
+                  onClick={handleCopyLink}
+                  className="flex items-center gap-2 h-10 px-5 rounded-xl border border-[#E2E8F0] bg-white text-[#171717] hover:bg-[#F8FAFC] text-sm font-semibold transition-colors cursor-pointer"
+                >
+                  <LinkIcon className="w-3.5 h-3.5" />
+                  <span>Bagikan Profil</span>
+                </button>
 
-            {/* Button 3: Primary Transactional CTA Button (Dark Navy #0B1F3A, rounded-xl 12px) */}
-            <button
-              id="btn-send-message-primary"
-              onClick={() => setIsGetInTouchOpen(true)}
-              className="flex items-center gap-2 h-10 px-5 rounded-xl bg-[#0B1F3A] hover:bg-[#123B8C] text-sm font-semibold text-white shadow-xs transition-colors cursor-pointer"
-            >
-              <Mail className="w-3.5 h-3.5" />
-              <span>Kirim Pesan</span>
-            </button>
+                {/* Own Profile: Edit Profil */}
+                <button
+                  id="btn-edit-profile"
+                  onClick={() => navigateTo('settings', '/settings')}
+                  className="flex items-center gap-2 h-10 px-5 rounded-xl bg-[#0B1F3A] hover:bg-[#123B8C] text-sm font-semibold text-white shadow-xs transition-colors cursor-pointer"
+                >
+                  <Pencil className="w-3.5 h-3.5" />
+                  <span>Edit Profil</span>
+                </button>
+              </>
+            ) : (
+              <>
+                {/* Public Profile: Follow Toggle Button */}
+                <button
+                  id="btn-follow-toggle"
+                  onClick={toggleFollow}
+                  className={`h-10 px-5 rounded-xl border text-sm font-semibold transition-colors cursor-pointer ${
+                    isFollowing
+                      ? 'border-[#E2E8F0] bg-white text-[#171717] hover:bg-[#F8FAFC]'
+                      : 'border-[#0B1F3A] bg-[#0B1F3A] text-white hover:bg-[#123B8C]'
+                  }`}
+                >
+                  {isFollowing ? 'Following' : 'Follow'}
+                </button>
+
+                {/* Public Profile: Kirim Pesan */}
+                <button
+                  id="btn-send-message-primary"
+                  onClick={() => setIsGetInTouchOpen(true)}
+                  className="flex items-center gap-2 h-10 px-5 rounded-xl bg-[#0B1F3A] hover:bg-[#123B8C] text-sm font-semibold text-white shadow-xs transition-colors cursor-pointer"
+                >
+                  <Mail className="w-3.5 h-3.5" />
+                  <span>Kirim Pesan</span>
+                </button>
+              </>
+            )}
 
           </div>
 
@@ -835,17 +866,19 @@ export const CreatorProfilePage: React.FC<CreatorProfilePageProps> = ({
               </div>
             ) : (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                <button
-                  type="button"
-                  onClick={() => setIsBriefModalOpen(true)}
-                  className="flex aspect-[326/407.5] flex-col items-center justify-center rounded-md border border-dashed border-[#acacac] bg-white px-8 text-center transition hover:border-[#0d0c22] hover:bg-neutral-50 cursor-pointer"
-                >
-                  <span className="text-6xl font-light leading-none text-[#acacac]">+</span>
-                  <span className="mt-6 text-[24px] font-bold leading-none text-black">Upload Proyek</span>
-                  <span className="mt-2 max-w-[256px] text-[12px] font-normal leading-[1.4] text-black">
-                    Show off your best work. Get feedback, likes and be a part of a growing community.
-                  </span>
-                </button>
+                {isOwnProfile && (
+                  <button
+                    type="button"
+                    onClick={() => setIsBriefModalOpen(true)}
+                    className="flex aspect-[326/407.5] flex-col items-center justify-center rounded-md border border-dashed border-[#acacac] bg-white px-8 text-center transition hover:border-[#0d0c22] hover:bg-neutral-50 cursor-pointer"
+                  >
+                    <span className="text-6xl font-light leading-none text-[#acacac]">+</span>
+                    <span className="mt-6 text-[24px] font-bold leading-none text-black">Upload Proyek</span>
+                    <span className="mt-2 max-w-[256px] text-[12px] font-normal leading-[1.4] text-black">
+                      Show off your best work. Get feedback, likes and be a part of a growing community.
+                    </span>
+                  </button>
+                )}
                 {filteredProjects.map((project) => (
                   <ProjectCard
                     key={project.id}
@@ -884,17 +917,19 @@ export const CreatorProfilePage: React.FC<CreatorProfilePageProps> = ({
               </div>
             ) : (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                <button
-                  type="button"
-                  onClick={() => setIsBriefModalOpen(true)}
-                  className="flex min-h-[468px] flex-col items-center justify-center rounded-md border border-dashed border-[#acacac] bg-white px-8 text-center transition hover:border-[#0d0c22] hover:bg-neutral-50 cursor-pointer"
-                >
-                  <span className="text-6xl font-light leading-none text-[#acacac]">+</span>
-                  <span className="mt-6 text-[24px] font-bold leading-none text-black">Upload Layanan</span>
-                  <span className="mt-2 max-w-[256px] text-[12px] font-normal leading-[1.4] text-black">
-                    Show off your best work. Get feedback, likes and be a part of a growing community.
-                  </span>
-                </button>
+                {isOwnProfile && (
+                  <button
+                    type="button"
+                    onClick={() => setIsBriefModalOpen(true)}
+                    className="flex min-h-[468px] flex-col items-center justify-center rounded-md border border-dashed border-[#acacac] bg-white px-8 text-center transition hover:border-[#0d0c22] hover:bg-neutral-50 cursor-pointer"
+                  >
+                    <span className="text-6xl font-light leading-none text-[#acacac]">+</span>
+                    <span className="mt-6 text-[24px] font-bold leading-none text-black">Upload Layanan</span>
+                    <span className="mt-2 max-w-[256px] text-[12px] font-normal leading-[1.4] text-black">
+                      Show off your best work. Get feedback, likes and be a part of a growing community.
+                    </span>
+                  </button>
+                )}
                 {creator.services.map((srv) => (
                   <div
                     key={srv.id}

@@ -173,6 +173,12 @@ export interface AuthState {
     role: UserRole;
     creatorCategory?: CreatorCategory;
     avatar?: string;
+    /** Extended profile fields — populated on save from SettingsPage */
+    location?: string;
+    bio?: string;
+    phone?: string;
+    roleTitle?: string;
+    handle?: string;
   } | null;
 }
 

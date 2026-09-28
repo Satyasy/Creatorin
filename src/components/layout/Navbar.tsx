@@ -349,12 +349,12 @@ export const Navbar: React.FC<NavbarProps> = ({
                     id="nav-user-creator-profile-btn"
                     onClick={() => {
                       setUserDropdownOpen(false);
-                      navigateTo('creator-profile', '/creator/cr-1');
+                      navigateTo('creator-profile', '/profile');
                     }}
                     className="w-full px-4 py-2.5 text-left text-xs font-semibold text-neutral-700 hover:bg-neutral-50 hover:text-[#0d0c22] flex items-center gap-2.5 cursor-pointer transition-colors"
                   >
                     <User className="w-4 h-4 text-neutral-500" />
-                    <span>Profile Creator</span>
+                    <span>Profil Saya</span>
                   </button>
                   <button
                     id="nav-user-settings-btn"
