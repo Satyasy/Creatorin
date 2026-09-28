@@ -22,6 +22,7 @@ import {
 import { InvoiceDetailPage } from './InvoiceDetailPage';
 import { ActivePage, AuthState, ChatConversation, ChatInvoice, ChatMessage, Creator, CreatorService } from '@/types';
 import { MOCK_CREATORS } from '@/data/mockCreators';
+import { chatService } from '@/services/chatService';
 
 interface ChatPageProps {
   currentUser?: AuthState['user'];
@@ -316,6 +317,59 @@ export const ChatPage: React.FC<ChatPageProps> = ({
   const activeConversation = activeChatId ? (conversations.find(c => c.id === activeChatId) || null) : null;
   const activeCreator = activeConversation ? (MOCK_CREATORS.find(cr => cr.id === activeConversation.creatorId) || null) : null;
 
+  // 1. Fetch conversations from live database with fallback
+  useEffect(() => {
+    chatService.getConversations().then((dbConvs) => {
+      if (dbConvs && dbConvs.length > 0) {
+        setConversations(prev => {
+          const existingIds = new Set(prev.map(p => p.id));
+          const newFromDb = dbConvs.filter(d => !existingIds.has(d.id));
+          return [...newFromDb, ...prev];
+        });
+      }
+    });
+  }, []);
+
+  // 2. Realtime listener for active database conversation
+  useEffect(() => {
+    if (!activeChatId) return;
+    const isDbConversation = activeChatId.length > 20 && !activeChatId.startsWith('conv-');
+    if (!isDbConversation) return;
+
+    // Load initial messages for DB conversation
+    chatService.getMessages(activeChatId, currentUser?.name).then((msgs) => {
+      if (msgs && msgs.length > 0) {
+        setConversations(prev => prev.map(c => c.id === activeChatId ? { ...c, messages: msgs } : c));
+      }
+    });
+
+    const unsubscribe = chatService.subscribeToMessages(activeChatId, (newMsg) => {
+      const incoming: ChatMessage = {
+        id: newMsg.id,
+        senderId: newMsg.sender_id,
+        text: newMsg.content,
+        timestamp: new Date(newMsg.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        isSelf: newMsg.sender_id === (currentUser as any)?.id,
+        status: 'delivered',
+      };
+      setConversations(prev => prev.map(c => {
+        if (c.id === activeChatId) {
+          return {
+            ...c,
+            lastMessage: incoming.text,
+            lastMessageTime: incoming.timestamp,
+            messages: [...c.messages.filter(m => m.id !== incoming.id), incoming],
+          };
+        }
+        return c;
+      }));
+    });
+
+    return () => {
+      unsubscribe();
+    };
+  }, [activeChatId, currentUser]);
+
   useEffect(() => {
     if (activeConversation) {
       messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -350,7 +404,13 @@ export const ChatPage: React.FC<ChatPageProps> = ({
 
     setInputText('');
 
-    // Simulasi respon kontekstual kreator
+    // If connected to a real database conversation, persist to server
+    if (activeChatId && activeChatId.length > 20 && !activeChatId.startsWith('conv-')) {
+      chatService.sendMessage(activeChatId, messageContent).catch(() => {});
+      return;
+    }
+
+    // Simulasi respon kontekstual kreator (untuk demo mock)
     setTimeout(() => {
       setConversations(prev => prev.map(conv => {
         if (conv.id === activeChatId) {

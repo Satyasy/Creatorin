@@ -1,10 +1,11 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/providers/AuthProvider';
 import { Creator, CreatorCategory, AuthState, ActivePage } from '@/types';
 import { MOCK_CREATORS } from '@/data/mockCreators';
+import { creatorService } from '@/services/creatorService';
 import { CareerScoreBadge } from '@/components/common/CareerScoreBadge';
 import { ProfileModal } from '@/components/modals/ProfileModal';
 import { 
@@ -90,9 +91,17 @@ export const ExplorePage: React.FC<ExplorePageProps> = ({ currentUser: propUser,
     setTimeout(() => setToastMessage(null), 3000);
   };
 
+  const [creatorsList, setCreatorsList] = useState<Creator[]>(MOCK_CREATORS);
+
+  useEffect(() => {
+    creatorService.getCreators().then((data) => {
+      if (data && data.length > 0) setCreatorsList(data);
+    });
+  }, []);
+
   // Filter and sort logic
   const filteredCreators = useMemo(() => {
-    return MOCK_CREATORS.filter((creator) => {
+    return creatorsList.filter((creator) => {
       // Search filter (name, skills, bio, roleTitle)
       if (searchQuery.trim()) {
         const q = searchQuery.toLowerCase();

@@ -1,4 +1,3 @@
-@import "./Base.css";
 
 .tabs button {
   transition: color .18s ease, background-color .18s ease, border-color .18s ease, box-shadow .18s ease, transform .18s ease;
