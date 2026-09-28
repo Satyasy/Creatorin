@@ -3,6 +3,8 @@
  * Comprehensive end-to-end tests for all 42 pages / 15 backend modules
  */
 
+export {};
+
 const BASE_URL = process.env.TEST_API_URL || "http://localhost:3000";
 
 // Seeded user IDs from database
