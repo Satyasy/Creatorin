@@ -5,3 +5,4 @@ export * from './chatService';
 export * from './collabService';
 export * from './notificationService';
 export * from './schoolService';
+export * from './aiSummarizeService';

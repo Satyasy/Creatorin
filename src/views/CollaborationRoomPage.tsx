@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/providers/AuthProvider';
 import {
@@ -22,11 +22,15 @@ import {
   Play,
   Pause,
   X,
-  Send
+  Send,
+  Sparkles,
+  Copy,
+  ListChecks
 } from 'lucide-react';
 import { ActivePage, AuthState, CollaborationItem, CollabStage, Creator } from '@/types';
 import { MOCK_COLLABORATIONS } from '@/data/mockCollaborations';
 import { collabService } from '@/services/collabService';
+import { aiSummarizeService } from '@/services/aiSummarizeService';
 
 interface CollaborationRoomPageProps {
   currentUser?: AuthState['user'];
@@ -94,6 +98,62 @@ export const CollaborationRoomPage: React.FC<CollaborationRoomPageProps> = ({
   const activeCollab = useMemo(() => {
     return collaborations.find(c => c.id === selectedCollabId) || collaborations[0];
   }, [collaborations, selectedCollabId]);
+
+  // AI Summarize State
+  const [summaryData, setSummaryData] = useState<{
+    executiveSummary: string;
+    agreements: string[];
+    actionItems: { task: string; assignee: string; status: 'pending' | 'in_progress' | 'completed' }[];
+    lastRevisionNotes?: string;
+    modelUsed: string;
+    generatedAt: string;
+  } | null>(null);
+  const [isSummarizing, setIsSummarizing] = useState(false);
+  const [isCopied, setIsCopied] = useState(false);
+
+  // Generate or Load Summary for activeCollab
+  const handleGenerateSummary = async () => {
+    setIsSummarizing(true);
+    try {
+      const data = await aiSummarizeService.summarizeConversation({
+        roomId: activeCollab.id,
+        projectTitle: activeCollab.projectTitle,
+        creatorName: activeCollab.creatorName,
+        businessBrand: activeCollab.businessBrand,
+      });
+      setSummaryData(data);
+      showToast('Ringkasan percakapan berhasil diperbarui via AI');
+    } catch {
+      showToast('Gagal memproses ringkasan percakapan');
+    } finally {
+      setIsSummarizing(false);
+    }
+  };
+
+  useEffect(() => {
+    handleGenerateSummary();
+  }, [selectedCollabId]);
+
+  const handleCopySummary = () => {
+    if (!summaryData) return;
+    const text = `[RINGKASAN PERCAKAPAN CREATORIN: ${activeCollab.projectTitle}]
+Model: ${summaryData.modelUsed} (${summaryData.generatedAt})
+
+RINGKASAN:
+${summaryData.executiveSummary}
+
+KESEPAKATAN:
+${summaryData.agreements.map((a, i) => `${i + 1}. ${a}`).join('\n')}
+
+ACTION ITEMS:
+${summaryData.actionItems.map((item, i) => `${i + 1}. [${item.status.toUpperCase()}] ${item.task} (PJ: ${item.assignee})`).join('\n')}
+${summaryData.lastRevisionNotes ? `\nCATATAN REVISI TERAKHIR:\n${summaryData.lastRevisionNotes}` : ''}`;
+
+    navigator.clipboard.writeText(text);
+    setIsCopied(true);
+    setTimeout(() => setIsCopied(false), 2500);
+    showToast('Ringkasan berhasil disalin ke clipboard');
+  };
 
   // Filtered Collaborations List
   const filteredCollaborations = useMemo(() => {
@@ -506,6 +566,132 @@ export const CollaborationRoomPage: React.FC<CollaborationRoomPageProps> = ({
                 )}
               </div>
 
+            </div>
+
+            {/* AI Conversation Summarize Card (HuggingFace Multilingual / NLP Safe) */}
+            <div className="bg-white rounded-[18px] border border-[#E2E8F0] p-5 space-y-4 shadow-2xs">
+              {/* Header */}
+              <div className="flex items-start justify-between gap-3">
+                <div className="flex items-center gap-2.5">
+                  <div className="w-8 h-8 rounded-[10px] bg-blue-50 text-[#155DFC] flex items-center justify-center shrink-0 border border-blue-100">
+                    <Sparkles className="w-4 h-4 stroke-[1.8]" />
+                  </div>
+                  <div>
+                    <h3 className="text-sm font-bold text-[#0F172A]">AI Summarize Percakapan</h3>
+                    <span className="text-[10px] font-semibold text-[#155DFC] bg-blue-50 px-1.5 py-0.5 rounded-[4px] border border-blue-100/80">
+                      {summaryData?.modelUsed || 'HuggingFace Multilingual'}
+                    </span>
+                  </div>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={handleGenerateSummary}
+                  disabled={isSummarizing}
+                  className="p-1.5 rounded-[8px] bg-slate-50 hover:bg-slate-100 text-slate-600 transition-colors cursor-pointer disabled:opacity-50"
+                  title="Perbarui Ringkasan AI"
+                >
+                  <RefreshCw className={`w-3.5 h-3.5 ${isSummarizing ? 'animate-spin text-[#155DFC]' : ''}`} />
+                </button>
+              </div>
+
+              <p className="text-[11px] text-[#64748B] leading-relaxed">
+                Ringkasan kesepakatan dan tindak lanjut percakapan antara Kreator dan UMKM terfokus tanpa halusinasi.
+              </p>
+
+              {/* Summary Content Body */}
+              {isSummarizing ? (
+                <div className="p-4 rounded-[12px] bg-slate-50 border border-slate-100 flex items-center justify-center gap-2.5 text-xs text-slate-500 py-6">
+                  <div className="w-4 h-4 border-2 border-[#155DFC] border-t-transparent rounded-full animate-spin" />
+                  <span>Menganalisis transkrip percakapan...</span>
+                </div>
+              ) : summaryData ? (
+                <div className="space-y-3.5 text-xs">
+                  {/* Executive Summary */}
+                  <div className="p-3 rounded-[12px] bg-blue-50/50 border border-blue-100/70 text-[#0F172A] leading-relaxed text-[11px]">
+                    <span className="font-bold text-[#155DFC] block mb-1 uppercase tracking-wider text-[10px]">
+                      Ringkasan Eksekutif
+                    </span>
+                    {summaryData.executiveSummary}
+                  </div>
+
+                  {/* Agreed Points */}
+                  <div className="space-y-1.5">
+                    <span className="font-bold text-[#0F172A] text-[11px] flex items-center gap-1.5">
+                      <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                      Poin Kesepakatan & Arahan
+                    </span>
+                    <ul className="space-y-1 pl-1">
+                      {summaryData.agreements.map((agr, idx) => (
+                        <li key={idx} className="text-[11px] text-[#475569] flex items-start gap-1.5 leading-snug">
+                          <span className="text-[#155DFC] font-bold">•</span>
+                          <span>{agr}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+
+                  {/* Action Items */}
+                  <div className="space-y-1.5">
+                    <span className="font-bold text-[#0F172A] text-[11px] flex items-center gap-1.5">
+                      <ListChecks className="w-3.5 h-3.5 text-[#155DFC]" />
+                      Action Items (Tugas Terdekat)
+                    </span>
+                    <div className="space-y-1.5">
+                      {summaryData.actionItems.map((item, idx) => (
+                        <div
+                          key={idx}
+                          className="p-2 rounded-[8px] bg-slate-50 border border-slate-100 flex items-center justify-between gap-2 text-[10px]"
+                        >
+                          <div className="min-w-0">
+                            <span className="font-medium text-[#0F172A] block truncate">{item.task}</span>
+                            <span className="text-slate-400">PJ: {item.assignee}</span>
+                          </div>
+                          <span
+                            className={`px-1.5 py-0.5 rounded-[4px] font-bold shrink-0 ${
+                              item.status === 'in_progress'
+                                ? 'bg-amber-100 text-amber-800'
+                                : 'bg-slate-200 text-slate-700'
+                            }`}
+                          >
+                            {item.status === 'in_progress' ? 'Proses' : 'Pending'}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Last Revision Notes if any */}
+                  {summaryData.lastRevisionNotes && (
+                    <div className="p-2.5 rounded-[10px] bg-amber-50/60 border border-amber-200/60 text-[11px] text-amber-950">
+                      <span className="font-bold block text-[10px] text-amber-800 mb-0.5">Catatan Revisi Terkini:</span>
+                      {summaryData.lastRevisionNotes}
+                    </div>
+                  )}
+
+                  {/* Card Footer: Timestamp & Copy Button */}
+                  <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-[10px] text-slate-400">
+                    <span>Diperbarui: {summaryData.generatedAt}</span>
+                    <button
+                      type="button"
+                      onClick={handleCopySummary}
+                      className="inline-flex items-center gap-1 text-[#155DFC] hover:underline font-bold cursor-pointer"
+                    >
+                      {isCopied ? (
+                        <>
+                          <Check className="w-3 h-3 text-emerald-600" />
+                          <span className="text-emerald-600">Tersalin!</span>
+                        </>
+                      ) : (
+                        <>
+                          <Copy className="w-3 h-3" />
+                          <span>Salin Ringkasan</span>
+                        </>
+                      )}
+                    </button>
+                  </div>
+                </div>
+              ) : null}
             </div>
 
           </div>
