@@ -11,6 +11,7 @@ export interface ScrollRevealProps {
   threshold?: number;
   direction?: 'up' | 'down' | 'left' | 'right';
   once?: boolean;
+  immediate?: boolean;
 }
 
 export const ScrollReveal: React.FC<ScrollRevealProps> = ({
@@ -22,8 +23,9 @@ export const ScrollReveal: React.FC<ScrollRevealProps> = ({
   threshold = 0.08,
   direction = 'up',
   once = true,
+  immediate = false,
 }) => {
-  const [isVisible, setIsVisible] = useState(false);
+  const [isVisible, setIsVisible] = useState(immediate);
   const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {

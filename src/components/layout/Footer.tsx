@@ -306,11 +306,13 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, onOpenBrief }) => {
 
         </div>
 
-        {/* Elemen Visual Branding Creatorin di Bagian Bawah Menggunakan Font Sans (SF Pro) Sesuai Permintaan */}
-        <div className="mt-14 sm:mt-20 pt-4 select-none pointer-events-none text-center overflow-hidden">
-          <span className="block text-[14vw] sm:text-[13vw] lg:text-[12vw] font-black tracking-tighter text-neutral-200/70 leading-none font-sans -mb-6 sm:-mb-10 uppercase">
-            creatorin
-          </span>
+        {/* Elemen Visual Branding Creatorin di Bagian Bawah Menggunakan Font Sans Sesuai Permintaan */}
+        <div className="mt-14 sm:mt-20 pt-4 select-none pointer-events-none text-center overflow-hidden" aria-hidden="true">
+          <svg className="w-full h-24 sm:h-36 lg:h-44 -mb-6 sm:-mb-10 block mx-auto" viewBox="0 0 1200 180" fill="none" aria-hidden="true">
+            <text x="50%" y="80%" textAnchor="middle" fill="#E5E5E5" fontSize="180" fontWeight="900" letterSpacing="-0.05em" fontFamily="system-ui, -apple-system, sans-serif">
+              CREATORIN
+            </text>
+          </svg>
         </div>
 
         {/* Bagian Bawah: Copyright & Informasi Tambahan */}

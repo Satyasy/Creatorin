@@ -45,8 +45,17 @@ import {
   ExternalLink,
   X
 } from 'lucide-react';
-import { ProjectBriefModal } from '@/components/modals/ProjectBriefModal';
-import { ProjectDetailModal } from '@/components/modals/ProjectDetailModal';
+import dynamic from 'next/dynamic';
+
+const ProjectBriefModal = dynamic(
+  () => import('@/components/modals/ProjectBriefModal').then((mod) => mod.ProjectBriefModal),
+  { ssr: false }
+);
+
+const ProjectDetailModal = dynamic(
+  () => import('@/components/modals/ProjectDetailModal').then((mod) => mod.ProjectDetailModal),
+  { ssr: false }
+);
 import { ProjectCard } from '@/components/common/ProjectCard';
 import { ScrollReveal } from '@/components/common/ScrollReveal';
 import { MOCK_CREATORS } from '@/data/mockCreators';
@@ -460,7 +469,7 @@ export const HomePage: React.FC<HomePageProps> = ({
           >
             
             {/* Sleek, Modern Hero Badge */}
-            <ScrollReveal distance={20} duration={600} delay={60}>
+            <ScrollReveal distance={20} duration={600} delay={0} immediate={true}>
               <div className="inline-flex items-center gap-2 sm:gap-2.5 px-3.5 sm:px-4 py-1.5 rounded-full bg-white border border-neutral-200/80 shadow-2xs hover:border-neutral-300 transition-all">
                 <span className="flex items-center justify-center w-5 h-5 rounded-full bg-blue-50 text-blue-600 shrink-0">
                   <Sparkles className="w-3 h-3 text-blue-600" />
@@ -476,27 +485,25 @@ export const HomePage: React.FC<HomePageProps> = ({
             </ScrollReveal>
 
             {/* Focal Point Display Headline (Display 64/72 according to design.md §3) */}
-            <ScrollReveal distance={26} duration={700} delay={120}>
-              <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-[64px] text-[#0F172A] tracking-tight leading-[1.125] lg:leading-[72px]">
-                <span className="font-bold">Temukan</span>{' '}
-                <span className="font-medium text-[#171717]">Talenta Kreatif</span>,{' '}
-                <br className="hidden sm:inline" />
-                <span className="font-medium text-[#171717]">Wujudkan</span>{' '}
-                <span className="bg-gradient-to-r from-[#155DFC] to-[#05A4FD] bg-clip-text text-transparent font-bold">
-                  Ide Digital
-                </span>.
-              </h1>
-            </ScrollReveal>
+            <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-[64px] text-[#0F172A] tracking-tight leading-[1.125] lg:leading-[72px]">
+              <span className="font-bold">Temukan</span>{' '}
+              <span className="font-medium text-[#171717]">Talenta Kreatif</span>,{' '}
+              <br className="hidden sm:inline" />
+              <span className="font-medium text-[#171717]">Wujudkan</span>{' '}
+              <span className="bg-gradient-to-r from-[#155DFC] to-[#05A4FD] bg-clip-text text-transparent font-bold">
+                Ide Digital
+              </span>.
+            </h1>
 
             {/* Concise Value Proposition Description */}
-            <ScrollReveal distance={20} duration={650} delay={180}>
+            <ScrollReveal distance={20} duration={650} delay={0} immediate={true}>
               <p className="text-base sm:text-lg text-[#64748B] max-w-2xl mx-auto leading-relaxed font-normal">
                 Temukan creator berbakat untuk kebutuhan digitalmu, atau tampilkan keahlianmu dan dapatkan project yang tepat.
               </p>
             </ScrollReveal>
 
             {/* Dual CTA Buttons (Height 48px, rounded-xl 12px according to design.md §7, §8) */}
-            <ScrollReveal distance={20} duration={650} delay={240}>
+            <ScrollReveal distance={20} duration={650} delay={0} immediate={true}>
               <div className="flex flex-col sm:flex-row items-center justify-center gap-3.5 pt-3">
                 <button
                   type="button"
@@ -873,9 +880,9 @@ export const HomePage: React.FC<HomePageProps> = ({
                             {/* Detail Nama & Status Promoted */}
                             <div className="min-w-0">
                               <div className="flex flex-wrap items-center gap-2">
-                                <h3 className="text-[20px] font-bold leading-7 tracking-[-0.95px] text-[#0d0c22] group-hover:text-blue-600 transition-colors truncate">
+                                <h2 className="text-[20px] font-bold leading-7 tracking-[-0.95px] text-[#0d0c22] group-hover:text-blue-600 transition-colors truncate">
                                   {creator.name}
-                                </h3>
+                                </h2>
 
                                 {creator.proBadge && (
                                   <span
@@ -1002,9 +1009,9 @@ export const HomePage: React.FC<HomePageProps> = ({
 
                                   {/* Clean Title & Price Below Image */}
                                   <div className="pt-3 px-0.5">
-                                    <h4 className="text-[14px] font-bold leading-[19.25px] tracking-[-0.15px] text-[#0d0c22] group-hover/srv:text-blue-600 transition-colors line-clamp-1">
+                                    <h3 className="text-[14px] font-bold leading-[19.25px] tracking-[-0.15px] text-[#0d0c22] group-hover/srv:text-blue-600 transition-colors line-clamp-1">
                                       {service.title}
-                                    </h4>
+                                    </h3>
 
                                     <div className="flex items-center justify-between gap-3 pt-1.5">
                                       <span className="text-[14px] font-black leading-[21px] text-[#0d0c22] tracking-[-0.5px]">
@@ -1128,9 +1135,9 @@ export const HomePage: React.FC<HomePageProps> = ({
 
                         {/* Metadata below image */}
                         <div className="mt-3 space-y-1">
-                          <h4 className="text-xs sm:text-sm font-bold text-[#0d0c22] group-hover:text-blue-600 transition-colors truncate">
+                          <h3 className="text-xs sm:text-sm font-bold text-[#0d0c22] group-hover:text-blue-600 transition-colors truncate">
                             {srv.title}
-                          </h4>
+                          </h3>
 
                           <div className="flex items-center justify-between gap-2 pt-0.5">
                             {/* Creator Info */}

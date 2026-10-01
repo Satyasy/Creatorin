@@ -1,11 +1,20 @@
 'use client';
 
 import React from 'react';
+import dynamic from 'next/dynamic';
 import { usePathname } from 'next/navigation';
 import { Navbar } from '@/components/layout/Navbar';
 import { Footer } from '@/components/layout/Footer';
-import { CreatorinChatbot } from '@/components/common/CreatorinChatbot';
-import { RoleSwitcher } from '@/components/common/RoleSwitcher';
+
+const CreatorinChatbot = dynamic(
+  () => import('@/components/common/CreatorinChatbot').then((mod) => mod.CreatorinChatbot),
+  { ssr: false }
+);
+
+const RoleSwitcher = dynamic(
+  () => import('@/components/common/RoleSwitcher').then((mod) => mod.RoleSwitcher),
+  { ssr: false }
+);
 
 export default function MainLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
