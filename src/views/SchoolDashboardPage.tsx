@@ -278,11 +278,11 @@ export function SchoolDashboardPage() {
   }
 
   return (
-    <div className="flex-1 w-full bg-[#F8FAFC] flex flex-col md:flex-row min-h-screen">
-      {/* 1. Sidebar School Dashboard */}
-      <aside className="w-full md:w-64 bg-white border-r border-black/10 flex flex-col shrink-0 md:sticky md:top-16 md:h-[calc(100vh-4rem)] md:overflow-y-auto">
+    <div className="flex-1 w-full bg-[#F8FAFC] flex flex-col md:flex-row md:h-full md:min-h-0 md:overflow-hidden min-h-screen md:min-h-0">
+      {/* 1. Desktop Left Sidebar (100% Fixed & Pinned, Never Scrolls or Clips) */}
+      <aside className="hidden md:flex md:w-64 md:h-full md:shrink-0 bg-white border-r border-black/10 flex-col md:overflow-hidden select-none">
         {/* School Identity Header */}
-        <div className="p-5 border-b border-black/10">
+        <div className="p-5 border-b border-black/10 shrink-0">
           <div className="flex items-center gap-3">
             <img
               src={schoolProfile?.logoUrl || 'https://images.unsplash.com/photo-1592280771190-3e2e4d571952?w=200&auto=format&fit=crop&q=80'}
@@ -404,7 +404,7 @@ export function SchoolDashboardPage() {
         </nav>
 
         {/* View Public School Profile link */}
-        <div className="p-3 border-t border-black/10">
+        <div className="p-3 border-t border-black/10 shrink-0">
           <Link
             href={`/school/${schoolProfile?.slug || 'smk-kreatif-indonesia'}`}
             target="_blank"
@@ -419,8 +419,113 @@ export function SchoolDashboardPage() {
         </div>
       </aside>
 
-      {/* Main Content Area */}
-      <div className="flex-1 min-w-0 p-4 sm:p-6 lg:p-8 max-w-7xl">
+      {/* Mobile Top Navigation Bar (Compact & Sticky Horizontal Tab Bar) */}
+      <div className="md:hidden w-full bg-white border-b border-black/10 sticky top-0 z-30">
+        {/* Mobile School Identity Row */}
+        <div className="px-4 py-3 flex items-center justify-between border-b border-black/5">
+          <div className="flex items-center gap-2.5 min-w-0">
+            <img
+              src={schoolProfile?.logoUrl || 'https://images.unsplash.com/photo-1592280771190-3e2e4d571952?w=200&auto=format&fit=crop&q=80'}
+              alt={schoolProfile?.name || 'School Logo'}
+              className="w-8 h-8 rounded-[6px] object-cover border border-black/10 shrink-0"
+            />
+            <div className="min-w-0">
+              <h2 className="text-xs font-bold text-[#0D0C22] truncate">
+                {schoolProfile?.name || 'SMK Kreatif Indonesia'}
+              </h2>
+              <span className="text-[10px] font-semibold text-[#155DFC] block">
+                Dashboard Vokasi
+              </span>
+            </div>
+          </div>
+
+          <Link
+            href={`/school/${schoolProfile?.slug || 'smk-kreatif-indonesia'}`}
+            target="_blank"
+            className="text-[11px] font-semibold text-neutral-600 hover:text-[#155DFC] flex items-center gap-1 shrink-0 px-2.5 py-1 rounded-md bg-neutral-50 border border-black/5"
+          >
+            <span>Profil</span>
+            <ExternalLink className="w-3 h-3" />
+          </Link>
+        </div>
+
+        {/* Mobile Horizontal Pill Tabs Bar */}
+        <div className="flex items-center gap-1.5 overflow-x-auto p-2 scrollbar-none">
+          <button
+            onClick={() => { setActiveTab('overview'); setSelectedStudentId(null); }}
+            className={`px-3 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition cursor-pointer flex items-center gap-1.5 ${
+              activeTab === 'overview' && !selectedStudentId
+                ? 'bg-[#155DFC] text-white shadow-xs'
+                : 'bg-neutral-100 text-neutral-600 hover:text-[#0D0C22]'
+            }`}
+          >
+            <LayoutDashboard className="w-3.5 h-3.5" />
+            <span>Overview</span>
+          </button>
+
+          <button
+            onClick={() => { setActiveTab('approval'); setSelectedStudentId(null); }}
+            className={`px-3 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition cursor-pointer flex items-center gap-1.5 ${
+              activeTab === 'approval' && !selectedStudentId
+                ? 'bg-[#155DFC] text-white shadow-xs'
+                : 'bg-neutral-100 text-neutral-600 hover:text-[#0D0C22]'
+            }`}
+          >
+            <UserCheck className="w-3.5 h-3.5" />
+            <span>Approval</span>
+            {approvals.filter(a => a.status === 'pending').length > 0 && (
+              <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-amber-200 text-amber-900">
+                {approvals.filter(a => a.status === 'pending').length}
+              </span>
+            )}
+          </button>
+
+          <button
+            onClick={() => { setActiveTab('penilaian'); setSelectedStudentId(null); }}
+            className={`px-3 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition cursor-pointer flex items-center gap-1.5 ${
+              activeTab === 'penilaian' && !selectedStudentId
+                ? 'bg-[#155DFC] text-white shadow-xs'
+                : 'bg-neutral-100 text-neutral-600 hover:text-[#0D0C22]'
+            }`}
+          >
+            <Award className="w-3.5 h-3.5" />
+            <span>Penilaian</span>
+            <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-neutral-200 text-neutral-700">
+              {students.length}
+            </span>
+          </button>
+
+          <button
+            onClick={() => { setActiveTab('profile'); setSelectedStudentId(null); }}
+            className={`px-3 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition cursor-pointer flex items-center gap-1.5 ${
+              activeTab === 'profile' && !selectedStudentId
+                ? 'bg-[#155DFC] text-white shadow-xs'
+                : 'bg-neutral-100 text-neutral-600 hover:text-[#0D0C22]'
+            }`}
+          >
+            <Sliders className="w-3.5 h-3.5" />
+            <span>Profile</span>
+          </button>
+
+          <button
+            onClick={() => { setActiveTab('settings'); setSelectedStudentId(null); }}
+            className={`px-3 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition cursor-pointer flex items-center gap-1.5 ${
+              activeTab === 'settings' && !selectedStudentId
+                ? 'bg-[#155DFC] text-white shadow-xs'
+                : 'bg-neutral-100 text-neutral-600 hover:text-[#0D0C22]'
+            }`}
+          >
+            <Settings className="w-3.5 h-3.5" />
+            <span>Settings</span>
+          </button>
+        </div>
+      </div>
+
+      {/* 2. Main Content Area (Independent Inner-Scroll Container on Desktop) */}
+      <div 
+        id="school-dashboard-main-content" 
+        className="flex-1 min-w-0 md:h-full md:overflow-y-auto p-4 sm:p-6 lg:p-8 max-w-7xl"
+      >
         {/* ======================================================== */}
         {/* VIEW 1: OVERVIEW                                         */}
         {/* ======================================================== */}

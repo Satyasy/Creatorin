@@ -23,10 +23,10 @@ async function runTests() {
 
   try {
     // -------------------------------------------------------------
-    // TEST 1: Navbar Shrink on Scroll (80px -> 64px)
+    // TEST 1: Navbar Shrink on Scroll (80px -> 64px) on Home Page
     // -------------------------------------------------------------
     console.log('\n--- TEST 1: Dynamic Shrinking Sticky Navbar ---');
-    await page.goto('http://localhost:3000', { waitUntil: 'load' });
+    await page.goto('http://localhost:3000', { waitUntil: 'domcontentloaded' });
     await page.waitForTimeout(500);
 
     const initialNavHeight = await page.evaluate(() => {
@@ -73,51 +73,72 @@ async function runTests() {
     assert(visibleElementsCount > 0, `Items smoothly rise and reveal (opacity > 0.8)`);
 
     // -------------------------------------------------------------
-    // TEST 3: School Dashboard Profile Management Scrolling
+    // TEST 3: School Dashboard Fixed Left Sidebar & Independent Center Scroll
     // -------------------------------------------------------------
-    console.log('\n--- TEST 3: School Dashboard Profile Management Scroll ---');
-    await page.goto('http://localhost:3000/dashboard/school', { waitUntil: 'load' });
-    await page.waitForTimeout(1000);
+    console.log('\n--- TEST 3: School Dashboard Fixed Sidebar & Center Scroll ---');
+    await page.goto('http://localhost:3000/dashboard/school', { waitUntil: 'domcontentloaded' });
+    await page.waitForSelector('#school-dashboard-main-content', { timeout: 10000 });
+    await page.waitForTimeout(400);
 
-    // Click Profil Management tab if available
+    // Switch to Profile tab inside aside nav
     await page.evaluate(() => {
-      const buttons = Array.from(document.querySelectorAll('button'));
-      const profileBtn = buttons.find(b => b.textContent && b.textContent.includes('Profil Sekolah'));
+      const asideButtons = Array.from(document.querySelectorAll('aside nav button'));
+      const profileBtn = asideButtons.find(b => b.textContent && b.textContent.trim().includes('Profile'));
       if (profileBtn) profileBtn.click();
     });
     await page.waitForTimeout(500);
 
-    const scrollCheck = await page.evaluate(() => {
-      const initialScrollY = window.scrollY;
-      const initialScrollHeight = document.documentElement.scrollHeight;
-      const viewportHeight = window.innerHeight;
-
-      // Try scrolling down
-      window.scrollTo(0, 800);
-      const newScrollY = window.scrollY;
+    const dashboardCheck = await page.evaluate(() => {
+      const aside = document.querySelector('aside');
+      const asideRect = aside ? aside.getBoundingClientRect() : null;
+      const mainContent = document.querySelector('#school-dashboard-main-content');
+      
+      const initialAsideTop = asideRect ? Math.round(asideRect.top) : null;
+      const initialAsideHeight = asideRect ? Math.round(asideRect.height) : null;
+      
+      const contentScrollHeight = mainContent ? mainContent.scrollHeight : 0;
+      const contentClientHeight = mainContent ? mainContent.clientHeight : 0;
+      
+      // Scroll inside center content
+      if (mainContent) {
+        mainContent.scrollTop = 600;
+      }
+      
+      const afterScrollAsideRect = aside ? aside.getBoundingClientRect() : null;
+      const afterScrollAsideTop = afterScrollAsideRect ? Math.round(afterScrollAsideRect.top) : null;
+      const contentScrollTop = mainContent ? mainContent.scrollTop : 0;
+      const windowScrollY = window.scrollY;
 
       return {
-        initialScrollY,
-        newScrollY,
-        initialScrollHeight,
-        viewportHeight,
-        canScroll: initialScrollHeight > viewportHeight
+        asidePresent: Boolean(aside),
+        initialAsideTop,
+        initialAsideHeight,
+        afterScrollAsideTop,
+        asideRemainsFixed: initialAsideTop === afterScrollAsideTop,
+        contentScrollHeight,
+        contentClientHeight,
+        contentIsScrollable: contentScrollHeight > contentClientHeight,
+        contentScrollTop,
+        windowScrollY
       };
     });
 
-    console.log(`School dashboard scrollHeight: ${scrollCheck.initialScrollHeight}px, viewport: ${scrollCheck.viewportHeight}px, scrolledTo: ${scrollCheck.newScrollY}px`);
-    assert(scrollCheck.canScroll, `School Dashboard content is taller than viewport and scrollable (${scrollCheck.initialScrollHeight}px > ${scrollCheck.viewportHeight}px)`);
-    assert(scrollCheck.newScrollY > 0, `School Dashboard scrolls smoothly (scrolled to ${scrollCheck.newScrollY}px)`);
+    console.log(`Sidebar top before scroll: ${dashboardCheck.initialAsideTop}px, after scroll: ${dashboardCheck.afterScrollAsideTop}px, height: ${dashboardCheck.initialAsideHeight}px`);
+    console.log(`Center content scrollHeight: ${dashboardCheck.contentScrollHeight}px, clientHeight: ${dashboardCheck.contentClientHeight}px, scrollTop: ${dashboardCheck.contentScrollTop}px, windowScrollY: ${dashboardCheck.windowScrollY}px`);
+    
+    assert(dashboardCheck.asidePresent && dashboardCheck.asideRemainsFixed, `Sidebar stays 100% fixed at top: ${dashboardCheck.initialAsideTop}px and does not move`);
+    assert(dashboardCheck.contentIsScrollable, `Center content is scrollable (${dashboardCheck.contentScrollHeight}px > ${dashboardCheck.contentClientHeight}px)`);
+    assert(dashboardCheck.contentScrollTop > 0 && dashboardCheck.windowScrollY === 0, `Only center content scrolls (scrollTop: ${dashboardCheck.contentScrollTop}px, windowScrollY: ${dashboardCheck.windowScrollY}px)`);
 
     // -------------------------------------------------------------
-    // TEST 4: Mobile Viewport Optimization (375x667)
+    // TEST 4: Mobile View Optimization (375x667)
     // -------------------------------------------------------------
     console.log('\n--- TEST 4: Mobile View Optimization (375x667) ---');
     const mobileContext = await browser.newContext({
       viewport: { width: 375, height: 667 }
     });
     const mobilePage = await mobileContext.newPage();
-    await mobilePage.goto('http://localhost:3000', { waitUntil: 'load' });
+    await mobilePage.goto('http://localhost:3000', { waitUntil: 'domcontentloaded' });
     await mobilePage.waitForTimeout(600);
 
     const mobileScrollWidth = await mobilePage.evaluate(() => {
@@ -138,6 +159,31 @@ async function runTests() {
     });
     console.log(`Floating banner bottom on mobile: ${bannerStyle}`);
     assert(bannerStyle === '80px', `Floating banner positioned at bottom-20 (80px) on mobile to clear chatbot button`);
+
+    // -------------------------------------------------------------
+    // TEST 5: School Dashboard on Mobile View (Horizontal Sticky Tabs)
+    // -------------------------------------------------------------
+    console.log('\n--- TEST 5: School Dashboard on Mobile (375x667) ---');
+    await mobilePage.goto('http://localhost:3000/dashboard/school', { waitUntil: 'domcontentloaded' });
+    await mobilePage.waitForTimeout(600);
+
+    const mobileDashboardCheck = await mobilePage.evaluate(() => {
+      const desktopAside = document.querySelector('aside');
+      const desktopAsideVisible = desktopAside ? window.getComputedStyle(desktopAside).display !== 'none' : false;
+      const mobileNav = document.querySelector('.md\\:hidden');
+      const mobileNavVisible = mobileNav ? window.getComputedStyle(mobileNav).display !== 'none' : false;
+      const hasOverflow = document.documentElement.scrollWidth > document.documentElement.clientWidth;
+
+      return {
+        desktopAsideVisible,
+        mobileNavVisible,
+        hasOverflow
+      };
+    });
+
+    console.log(`Mobile: desktop aside hidden: ${!mobileDashboardCheck.desktopAsideVisible}, mobile tabs visible: ${mobileDashboardCheck.mobileNavVisible}`);
+    assert(!mobileDashboardCheck.desktopAsideVisible && mobileDashboardCheck.mobileNavVisible, `On mobile, desktop sidebar is hidden and horizontal sticky tab bar is active`);
+    assert(!mobileDashboardCheck.hasOverflow, `No horizontal overflow on school dashboard mobile`);
 
     await mobileContext.close();
 
