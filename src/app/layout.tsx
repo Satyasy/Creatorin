@@ -5,6 +5,14 @@ import { AuthProvider } from "@/providers/AuthProvider";
 export const metadata: Metadata = {
   title: "Creatorin — Platform Kolaborasi Kreatif",
   description: "Platform kolaborasi UMKM dan content creator berbasis career score.",
+  icons: {
+    icon: [
+      { url: '/favicon.ico', sizes: 'any' },
+      { url: '/creatorin/logo.svg', type: 'image/svg+xml' },
+    ],
+    shortcut: '/favicon.ico',
+    apple: '/creatorin/logo.svg',
+  },
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {

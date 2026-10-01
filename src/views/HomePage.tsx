@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/providers/AuthProvider';
 import { 
@@ -202,6 +202,15 @@ export const HomePage: React.FC<HomePageProps> = ({
   const [likedProjects, setLikedProjects] = useState<Record<string, boolean>>({});
   const [savedProjects, setSavedProjects] = useState<Record<string, boolean>>({});
   const [isBriefBannerVisible, setIsBriefBannerVisible] = useState(true);
+  const [scrollY, setScrollY] = useState(0);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrollY(window.scrollY);
+    };
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   // Lightbox modal state for project card click
   const [selectedProject, setSelectedProject] = useState<FeedProject | null>(null);
@@ -361,6 +370,47 @@ export const HomePage: React.FC<HomePageProps> = ({
                 WebkitMaskImage: 'radial-gradient(ellipse 80% 70% at 50% 50%, black 35%, transparent 95%)'
               }}
             />
+
+            {/* Siluet Logo Creatorin di Kanan Bawah Hero dengan Brand Blue Gradient & Subtle Parallax Glow */}
+            <div 
+              className="absolute -right-14 -bottom-16 sm:-right-8 sm:-bottom-12 md:right-4 md:-bottom-10 lg:right-12 lg:-bottom-8 w-[280px] h-[264px] sm:w-[360px] sm:h-[340px] md:w-[420px] md:h-[396px] lg:w-[460px] lg:h-[434px] transition-transform duration-100 ease-out pointer-events-none select-none z-0"
+              style={{
+                transform: `translate3d(0, ${Math.min(scrollY * 0.18, 55)}px, 0)`
+              }}
+            >
+              {/* Soft ambient back-glow behind logo silhouette */}
+              <div className="absolute inset-4 bg-gradient-to-br from-[#03ACFD]/25 to-[#155DFC]/20 rounded-full blur-3xl pointer-events-none" />
+
+              {/* Exact Vector Silhouette from /creatorin/logo.svg */}
+              <svg 
+                className="w-full h-full opacity-22 hover:opacity-28 transition-opacity duration-300 drop-shadow-[0_8px_24px_rgba(21,93,252,0.14)]"
+                preserveAspectRatio="xMidYMid meet" 
+                viewBox="0 0 34.0608 32.0987" 
+                fill="none" 
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <defs>
+                  <linearGradient id="heroSilhouetteGrad" x1="0" y1="0" x2="34.0946" y2="32.0625" gradientUnits="userSpaceOnUse">
+                    <stop offset="0%" stopColor="#03ACFD" />
+                    <stop offset="100%" stopColor="#155DFC" />
+                  </linearGradient>
+                </defs>
+                <g id="HeroSilhouetteGroup">
+                  <path 
+                    d="M14.6734 0.0488397C18.7039 -0.282822 23.0405 1.08602 26.0613 3.81028C26.5593 4.25946 27.6061 5.08781 27.6893 5.75197C27.4144 6.16801 23.2771 9.3333 22.6847 9.63686C22.3105 9.68873 21.1521 8.52521 20.7703 8.27595C18.4935 6.78937 15.5157 6.44004 12.9225 7.2802C10.6474 8.03042 8.75853 9.64478 7.66348 11.7749C6.53453 14.0432 6.34872 16.6657 7.14658 19.0704C8.95844 24.552 15.4014 26.8895 20.3742 24.0882C20.973 23.7509 21.9305 22.8136 22.4582 22.6384C22.9989 22.6663 23.5835 23.2309 24.0215 23.5793C24.5722 23.9612 27.473 26.1816 27.5847 26.6874C27.5058 26.9069 27.3749 27.1226 27.2159 27.2925C24.5564 30.1343 20.9762 31.7154 17.1923 32.0416C13.0028 32.3977 8.84287 31.0799 5.62316 28.3767C2.3748 25.6087 0.369138 21.6568 0.0529795 17.4017C-0.2919 13.1385 1.05699 8.91102 3.80765 5.63477C6.63166 2.2969 10.3192 0.409821 14.6734 0.0488397Z" 
+                    fill="url(#heroSilhouetteGrad)"
+                  />
+                  <path 
+                    d="M32.6835 8.85233C33.6489 8.76102 34.0639 9.38588 34.0608 10.2843C34.0475 14.1416 34.058 17.9999 34.055 21.8571C34.0548 22.1165 34.0134 22.5461 33.9078 22.7814C33.7895 23.0436 33.5727 23.2488 33.3042 23.3524C33.1384 23.4162 32.8513 23.4493 32.694 23.3928C31.0498 22.8015 29.2454 21.876 27.6298 21.1666C26.5103 20.6598 25.306 20.1396 24.2207 19.5768C25.1105 16.9299 24.9622 15.2492 24.2082 12.6704C25.2979 11.9441 28.0197 10.9228 29.3051 10.3275C30.2018 9.91205 31.7883 9.15612 32.6835 8.85233Z" 
+                    fill="url(#heroSilhouetteGrad)"
+                  />
+                  <path 
+                    d="M15.5208 11.5434L15.718 11.6074C15.8182 11.6933 16.5366 13.4837 16.5753 13.6856C16.8702 15.2244 19.6345 15.347 19.9995 16.1661C19.7267 16.6701 18.1637 16.709 17.2472 17.6616C16.1409 18.8114 16.3239 19.854 15.7305 20.7154C14.9942 20.2653 15.0904 18.5706 14.1839 17.6671C13.4863 16.9718 11.4852 16.6321 11.3551 16.0757C11.604 15.6531 12.6313 15.4483 13.1556 15.2045C14.9666 14.3626 14.9254 13.1063 15.5208 11.5434Z" 
+                    fill="url(#heroSilhouetteGrad)"
+                  />
+                </g>
+              </svg>
+            </div>
           </div>
           
           {/* Centered Hero Header Block */}
@@ -416,6 +466,28 @@ export const HomePage: React.FC<HomePageProps> = ({
               </button>
             </div>
 
+            {/* Scroll Down Indicator with Bouncing Mouse Wheel & Smooth Scroll Interaction */}
+            <div className="pt-6 sm:pt-10 flex justify-center">
+              <button
+                type="button"
+                onClick={() => {
+                  const exploreSec = document.getElementById('explore-section');
+                  if (exploreSec) {
+                    exploreSec.scrollIntoView({ behavior: 'smooth' });
+                  }
+                }}
+                className="group inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full bg-white/90 hover:bg-white border border-neutral-200/90 hover:border-[#155DFC]/40 text-xs font-semibold text-neutral-500 hover:text-[#155DFC] transition-all cursor-pointer shadow-2xs hover:shadow-xs focus:outline-hidden focus:ring-2 focus:ring-[#155DFC]/20"
+                aria-label="Gulir ke bawah untuk menjelajahi karya"
+              >
+                {/* Mouse Outline with Animated Wheel Dot */}
+                <span className="relative flex items-start justify-center w-3.5 h-5 pt-0.5 border-[1.5px] border-neutral-400 group-hover:border-[#155DFC] rounded-full transition-colors">
+                  <span className="w-1 h-1 bg-[#155DFC] rounded-full animate-bounce" />
+                </span>
+                <span className="tracking-tight">Jelajahi Karya</span>
+                <ChevronDown className="w-3.5 h-3.5 text-neutral-400 group-hover:text-[#155DFC] group-hover:translate-y-0.5 transition-all" />
+              </button>
+            </div>
+
           </div>
 
         </section>
@@ -425,7 +497,7 @@ export const HomePage: React.FC<HomePageProps> = ({
         {/* SECTION 2: EKSPLORASI DENGAN FILTER AKTIF (Proyek, Creator, Layanan) */}
         {/* Desain Bersih & Elegan Sesuai Referensi (Shots / Designers / Services) */}
         {/* ========================================================================= */}
-        <section className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 pt-8 pb-16">
+        <section id="explore-section" className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 pt-8 pb-16">
           
           {/* Baris 1: Segmented Tabs (Creator, Layanan, Proyek) */}
           <div className="flex items-center gap-2 mb-5">
