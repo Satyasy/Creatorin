@@ -1,7 +1,7 @@
 'use client';
 
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
-import { AuthState } from '../types';
+import { AuthState, UserRole } from '../types';
 import { authService } from '@/services/authService';
 
 const AUTH_STORAGE_KEY = 'creatorin_session_user';
@@ -13,6 +13,7 @@ interface AuthContextType {
   logout: () => void;
   signOut: () => void;
   refreshUser: () => Promise<void>;
+  switchRole: (role: UserRole) => void;
 }
 
 const AuthContext = createContext<AuthContextType>({
@@ -22,12 +23,26 @@ const AuthContext = createContext<AuthContextType>({
   logout: () => {},
   signOut: () => {},
   refreshUser: async () => {},
+  switchRole: () => {},
 });
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [authState, setAuthState] = useState<AuthState>({
-    isAuthenticated: false,
-    user: null,
+  const [authState, setAuthState] = useState<AuthState>(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const saved = localStorage.getItem(AUTH_STORAGE_KEY);
+        if (saved) {
+          return {
+            isAuthenticated: true,
+            user: JSON.parse(saved),
+          };
+        }
+      } catch {}
+    }
+    return {
+      isAuthenticated: false,
+      user: null,
+    };
   });
 
   const syncServerSession = useCallback(async () => {
@@ -94,6 +109,45 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
+  const switchRole = (role: UserRole) => {
+    const defaultSchool = {
+      name: 'SMK Telkom Sidoarjo',
+      email: 'smktelkom@creatorin.id',
+      avatar: 'https://images.unsplash.com/photo-1546410531-bb4caa6b424d?w=120&auto=format&fit=crop&q=80',
+    };
+    const defaultUmkm = {
+      name: 'Batik Sekar Wangi',
+      email: 'umkm@sekarwangi.id',
+      avatar: 'https://images.unsplash.com/photo-1542744094-3a31f272c490?w=120&auto=format&fit=crop&q=80',
+    };
+    const defaultCreator = {
+      name: 'Revano Pandega',
+      email: 'revano@creatorin.id',
+      avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=120&auto=format&fit=crop&q=80',
+    };
+
+    const roleProfile = role === 'school' ? defaultSchool : role === 'umkm' ? defaultUmkm : defaultCreator;
+
+    const nextUser: NonNullable<AuthState['user']> = {
+      ...(authState.user || {}),
+      name: roleProfile.name,
+      email: roleProfile.email,
+      avatar: roleProfile.avatar,
+      role,
+    };
+
+    setAuthState({
+      isAuthenticated: true,
+      user: nextUser,
+    });
+
+    try {
+      localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(nextUser));
+    } catch (e) {
+      console.error('Failed to switch role in localStorage', e);
+    }
+  };
+
   return (
     <AuthContext.Provider
       value={{
@@ -103,6 +157,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         logout,
         signOut: logout,
         refreshUser: syncServerSession,
+        switchRole,
       }}
     >
       {children}

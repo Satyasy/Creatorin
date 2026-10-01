@@ -772,12 +772,16 @@ export const ChatPage: React.FC<ChatPageProps> = ({
                 <MessageSquare className="w-8 h-8 sm:w-9 sm:h-9 text-neutral-800" strokeWidth={1.75} />
               </div>
 
-              {/* Creatorin Logo Text with Signature Blue Dot */}
-              <div className="flex items-center gap-1.5 justify-center mb-2">
-                <span className="text-2xl sm:text-3xl font-bold tracking-tight text-[#171717] font-serif italic">
+              {/* Official Creatorin Brand Logo */}
+              <div className="inline-flex items-center gap-2.5 justify-center mb-3">
+                <img
+                  src="/creatorin/logo.svg"
+                  alt="Creatorin"
+                  className="h-8 w-auto shrink-0"
+                />
+                <span className="text-2xl sm:text-3xl font-medium leading-none tracking-[-0.714px] text-black font-[var(--font-logo)]">
                   Creatorin
                 </span>
-                <span className="w-2 h-2 rounded-full bg-blue-600 inline-block -ml-0.5 mt-2"></span>
               </div>
 
               {/* Headline Ringkas & Sederhana */}
@@ -1357,7 +1361,7 @@ export const ChatPage: React.FC<ChatPageProps> = ({
 
             <div>
               <h3 className="text-sm font-semibold text-neutral-900">
-                Collaboration Room Aktif!
+                Proyek & Rekening Escrow Aktif!
               </h3>
               <p className="text-xs text-neutral-500 mt-1 leading-relaxed">
                 Pembayaran {collaborationNotice.amount} untuk <strong>{collaborationNotice.serviceTitle}</strong> telah diamankan di Rekening Escrow Creatorin.
@@ -1374,26 +1378,17 @@ export const ChatPage: React.FC<ChatPageProps> = ({
                 <span className="font-semibold text-emerald-600">Tersimpan Aman</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-neutral-400">Workspace:</span>
-                <span className="font-semibold text-neutral-800">Brief & Approval Aktif</span>
+                <span className="text-neutral-400">Pengerjaan:</span>
+                <span className="font-semibold text-neutral-800">Brief & Milestone Aktif</span>
               </div>
             </div>
 
-            <div className="flex items-center gap-2 pt-2">
+            <div className="pt-2">
               <button
                 onClick={() => setCollaborationNotice(null)}
-                className="flex-1 py-2 text-xs text-neutral-600 hover:bg-neutral-100 rounded-lg cursor-pointer"
+                className="w-full py-2.5 text-xs font-semibold text-white bg-[#0B1F3A] hover:bg-[#123B8C] rounded-xl transition-colors cursor-pointer"
               >
-                Tetap di Chat
-              </button>
-              <button
-                onClick={() => {
-                  setCollaborationNotice(null);
-                  navigateTo('collaboration-room', '/collaboration');
-                }}
-                className="flex-1 py-2.5 text-xs font-semibold text-white bg-[#0B1F3A] hover:bg-[#123B8C] rounded-xl transition-colors cursor-pointer"
-              >
-                Ke Collaboration Room
+                Lanjut di Room Chat
               </button>
             </div>
           </div>

@@ -318,17 +318,6 @@ export const Navbar: React.FC<NavbarProps> = ({
             </div>
           </div>
 
-          <button
-            id="nav-collab-room-btn"
-            onClick={() => navigateTo('collaboration-room', '/collaboration')}
-            className={`transition-colors flex items-center gap-1.5 cursor-pointer font-semibold relative py-1 ${
-              activePage === 'collaboration-room' || (pathname && pathname.startsWith('/collaboration'))
-                ? 'text-[#155DFC] font-bold after:content-[""] after:absolute after:-bottom-5 after:left-0 after:right-0 after:h-[2px] after:bg-[#155DFC] after:rounded-full'
-                : 'text-neutral-700 hover:text-[#155DFC]'
-            }`}
-          >
-            <span>Collaboration Room</span>
-          </button>
 
           {/* Menu Brief Proyek */}
           <button
@@ -410,17 +399,6 @@ export const Navbar: React.FC<NavbarProps> = ({
                   >
                     <Settings className="w-4 h-4 text-neutral-500" />
                     <span>Setting</span>
-                  </button>
-                  <button
-                    id="nav-user-school-dashboard-btn"
-                    onClick={() => {
-                      setUserDropdownOpen(false);
-                      navigateTo('school-dashboard', '/dashboard/school');
-                    }}
-                    className="w-full px-4 py-2.5 text-left text-xs font-semibold text-neutral-700 hover:bg-[#F3F3F4] hover:text-[#0D0C22] flex items-center gap-2.5 cursor-pointer transition-colors"
-                  >
-                    <GraduationCap className="w-4 h-4 text-neutral-500" />
-                    <span>Dashboard Sekolah</span>
                   </button>
                   <div className="my-1 border-t border-black/5" />
                   <button
@@ -576,18 +554,6 @@ export const Navbar: React.FC<NavbarProps> = ({
               )}
             </div>
 
-            <button 
-              onClick={() => { 
-                setMobileMenuOpen(false); 
-                navigateTo('collaboration-room', '/collaboration'); 
-              }} 
-              className={`py-2 text-left hover:text-blue-600 font-semibold flex items-center justify-between ${
-                activePage === 'collaboration-room' || (pathname && pathname.startsWith('/collaboration')) ? 'text-blue-600 font-bold' : 'text-neutral-700'
-              }`}
-            >
-              <span>Collaboration Room</span>
-              <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
-            </button>
 
             <button 
               onClick={() => { 

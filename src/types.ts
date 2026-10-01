@@ -1,4 +1,4 @@
-export type UserRole = 'umkm' | 'creator';
+export type UserRole = 'umkm' | 'creator' | 'school' | 'admin';
 export type CreatorCategory = 'Video' | 'Image';
 
 export interface CareerScoreBreakdown {

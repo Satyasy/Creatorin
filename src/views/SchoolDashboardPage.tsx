@@ -13,6 +13,7 @@ import {
   AssessmentStatus
 } from '@/types';
 import { schoolService, DEFAULT_RUBRIC, calculateFinalScore } from '@/services/schoolService';
+import { useAuth } from '@/providers/AuthProvider';
 import {
   LayoutDashboard,
   UserCheck,
@@ -35,13 +36,16 @@ import {
   Trash2,
   Sliders,
   Eye,
-  AlertCircle
+  AlertCircle,
+  ShieldAlert,
+  BarChart3
 } from 'lucide-react';
 
 type DashboardTab = 'overview' | 'approval' | 'penilaian' | 'profile' | 'settings';
 type AssessmentTab = 'rubrik' | 'profile' | 'projects';
 
 export function SchoolDashboardPage() {
+  const { user, switchRole } = useAuth();
   const [activeTab, setActiveTab] = useState<DashboardTab>('overview');
   const [isLoading, setIsLoading] = useState(true);
 
@@ -272,6 +276,53 @@ export function SchoolDashboardPage() {
         <div className="flex flex-col items-center gap-3">
           <div className="w-8 h-8 border-2 border-[#155DFC] border-t-transparent rounded-full animate-spin" />
           <p className="text-sm font-medium text-neutral-600">Memuat data dashboard sekolah...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (user?.role !== 'school') {
+    return (
+      <div 
+        id="school-rbac-restricted"
+        data-testid="school-rbac-restricted"
+        className="flex-1 w-full bg-[#0B1527] text-white flex items-center justify-center p-6 min-h-[85vh]"
+      >
+        <div className="max-w-md w-full bg-[#111C33] border border-slate-700/60 rounded-3xl p-8 text-center shadow-2xl space-y-6">
+          <div className="size-16 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-amber-400 flex items-center justify-center mx-auto shadow-inner">
+            <ShieldAlert className="size-8" />
+          </div>
+
+          <div className="space-y-2">
+            <span className="inline-block px-3 py-1 rounded-full bg-slate-800 text-amber-400 text-xs font-semibold tracking-wide uppercase border border-slate-700">
+              Hak Akses Terbatas (RBAC)
+            </span>
+            <h1 className="text-xl font-bold text-white">Khusus Akun Sekolah & Institusi Vokasi</h1>
+            <p className="text-sm text-slate-300 leading-relaxed">
+              Anda saat ini terhubung sebagai{' '}
+              <strong className="text-white capitalize">{user?.role || 'Pengunjung'}</strong>{' '}
+              ({user?.name || user?.email || 'Tamu'}). Dashboard ini dikhususkan bagi guru pembimbing dan koordinator kemitraan industri SMK.
+            </p>
+          </div>
+
+          <div className="pt-2 space-y-3">
+            <button
+              id="btn-switch-to-school"
+              data-testid="btn-switch-school-role"
+              onClick={() => switchRole('school')}
+              className="w-full py-3 px-4 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-semibold text-sm shadow-lg shadow-blue-600/30 transition cursor-pointer flex items-center justify-center gap-2"
+            >
+              <GraduationCap className="size-4" />
+              <span>Beralih ke Akun Sekolah (Mode QA / Demo)</span>
+            </button>
+
+            <Link
+              href="/"
+              className="inline-flex w-full py-2.5 px-4 rounded-xl border border-slate-700 hover:bg-slate-800 text-slate-400 hover:text-white font-medium text-xs transition items-center justify-center"
+            >
+              Kembali ke Beranda
+            </Link>
+          </div>
         </div>
       </div>
     );
@@ -530,33 +581,266 @@ export function SchoolDashboardPage() {
         {/* VIEW 1: OVERVIEW                                         */}
         {/* ======================================================== */}
         {activeTab === 'overview' && !selectedStudentId && overview && (
-          <div className="space-y-6">
-            <div>
-              <h1 className="text-xl sm:text-2xl font-bold text-[#0D0C22]">Overview Sekolah</h1>
-              <p className="text-xs sm:text-sm text-neutral-500 mt-1">
-                Kondisi keterhubungan siswa, status persetujuan, dan kemajuan asesmen kompetensi industri.
-              </p>
+          <div className="space-y-7">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div>
+                <div className="flex items-center gap-2">
+                  <span className="px-2.5 py-0.5 rounded-full bg-blue-100 text-blue-700 text-[11px] font-bold uppercase tracking-wider">
+                    Dashboard Vokasi
+                  </span>
+                  <span className="text-xs text-neutral-400">•</span>
+                  <span className="text-xs text-neutral-500 font-medium">Tahun Ajaran 2025/2026</span>
+                </div>
+                <h1 className="text-xl sm:text-2xl font-bold text-[#0D0C22] mt-1">Overview Kinerja Siswa</h1>
+                <p className="text-xs sm:text-sm text-neutral-500 mt-0.5">
+                  Analisis capaian kompetensi industri, tren proyek kreatif, dan pemantauan asesmen pembelajaran.
+                </p>
+              </div>
             </div>
 
-            {/* 6 Summary Metric Cards */}
-            <div className="grid grid-cols-2 lg:grid-cols-6 gap-3 sm:gap-4">
-              <div className="bg-white rounded-[12px] p-4 border border-black/10 shadow-xs">
-                <span className="text-xs font-medium text-neutral-500">Total Siswa</span>
-                <p className="text-2xl font-bold text-[#0D0C22] mt-1">{overview.totalStudents}</p>
-                <div className="flex items-center gap-1 text-[11px] text-neutral-400 mt-1">
-                  <Users className="w-3 h-3" />
-                  <span>Terdaftar</span>
+            {/* 1. PROMINENT CHARTS SECTION (Center Stage Highlight) */}
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-5" id="school-overview-charts" data-testid="school-overview-charts">
+              {/* Chart 1: Tren Aktivitas & Status Proyek Industri (7 cols) */}
+              <div className="lg:col-span-7 bg-white rounded-2xl p-5 sm:p-6 border border-slate-200/90 shadow-xs flex flex-col justify-between">
+                <div>
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2.5">
+                      <div className="size-9 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center font-bold">
+                        <TrendingUp className="size-5" />
+                      </div>
+                      <div>
+                        <h2 className="text-sm sm:text-base font-bold text-slate-900 leading-tight">
+                          Tren & Distribusi Status Proyek Siswa
+                        </h2>
+                        <p className="text-[11px] sm:text-xs text-slate-500">
+                          Kemajuan portofolio industri siswa 6 bulan terakhir
+                        </p>
+                      </div>
+                    </div>
+                    <span className="text-[11px] font-semibold px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
+                      +18.4% Semester Ini
+                    </span>
+                  </div>
+
+                  {/* Chart Visualizer (SVG multi-bar) */}
+                  <div className="mt-6 pt-2">
+                    <div className="h-44 sm:h-52 w-full flex items-end justify-between gap-3 px-2 border-b border-slate-100 pb-3">
+                      {[
+                        { month: 'Nov', active: 6, review: 2, completed: 8, revision: 1 },
+                        { month: 'Des', active: 8, review: 3, completed: 11, revision: 2 },
+                        { month: 'Jan', active: 10, review: 4, completed: 14, revision: 1 },
+                        { month: 'Feb', active: 13, review: 5, completed: 19, revision: 2 },
+                        { month: 'Mar', active: 15, review: 7, completed: 23, revision: 3 },
+                        { month: 'Apr', active: 18, review: 6, completed: 28, revision: 2 },
+                      ].map((item) => {
+                        const total = item.active + item.review + item.completed + item.revision;
+                        const maxVal = 60;
+                        const heightPct = Math.min(100, Math.round((total / maxVal) * 100));
+
+                        return (
+                          <div key={item.month} className="flex-1 flex flex-col items-center gap-2 group">
+                            <div className="relative w-full flex flex-col items-center justify-end h-40">
+                              {/* Stacked bar */}
+                              <div
+                                style={{ height: `${heightPct}%` }}
+                                className="w-full max-w-[28px] rounded-t-md overflow-hidden flex flex-col justify-end bg-slate-100 transition-all duration-300 group-hover:scale-105"
+                              >
+                                <div style={{ height: `${(item.completed / total) * 100}%` }} className="bg-emerald-500 w-full" title={`Selesai: ${item.completed}`} />
+                                <div style={{ height: `${(item.review / total) * 100}%` }} className="bg-blue-600 w-full" title={`Review: ${item.review}`} />
+                                <div style={{ height: `${(item.active / total) * 100}%` }} className="bg-amber-400 w-full" title={`Aktif: ${item.active}`} />
+                                <div style={{ height: `${(item.revision / total) * 100}%` }} className="bg-rose-400 w-full" title={`Revisi: ${item.revision}`} />
+                              </div>
+
+                              {/* Tooltip on hover */}
+                              <div className="absolute -top-10 opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity bg-slate-900 text-white text-[10px] rounded px-1.5 py-0.5 whitespace-nowrap z-20 shadow-md">
+                                {total} Proyek
+                              </div>
+                            </div>
+                            <span className="text-[11px] font-medium text-slate-500 group-hover:text-slate-900">
+                              {item.month}
+                            </span>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Legend & Summary Row */}
+                <div className="mt-4 pt-3 border-t border-slate-100 flex flex-wrap items-center justify-between gap-3 text-xs">
+                  <div className="flex flex-wrap items-center gap-4">
+                    <span className="flex items-center gap-1.5 text-slate-600">
+                      <span className="size-2.5 rounded-sm bg-emerald-500" />
+                      Selesai
+                    </span>
+                    <span className="flex items-center gap-1.5 text-slate-600">
+                      <span className="size-2.5 rounded-sm bg-blue-600" />
+                      Review Guru
+                    </span>
+                    <span className="flex items-center gap-1.5 text-slate-600">
+                      <span className="size-2.5 rounded-sm bg-amber-400" />
+                      Aktif Dikerjakan
+                    </span>
+                    <span className="flex items-center gap-1.5 text-slate-600">
+                      <span className="size-2.5 rounded-sm bg-rose-400" />
+                      Revisi
+                    </span>
+                  </div>
+                  <span className="font-semibold text-slate-900">
+                    Total {overview.totalProjects} Proyek Industri
+                  </span>
                 </div>
               </div>
 
-              <div className="bg-white rounded-[12px] p-4 border border-black/10 shadow-xs">
-                <span className="text-xs font-medium text-neutral-500">Siswa Aktif</span>
-                <p className="text-2xl font-bold text-emerald-600 mt-1">{overview.activeStudents}</p>
-                <div className="flex items-center gap-1 text-[11px] text-neutral-400 mt-1">
-                  <CheckCircle2 className="w-3 h-3 text-emerald-500" />
-                  <span>Telah disetujui</span>
+              {/* Chart 2: Distribusi Capaian Standar Industri & Predikat Kompetensi (5 cols) */}
+              <div className="lg:col-span-5 bg-white rounded-2xl p-5 sm:p-6 border border-slate-200/90 shadow-xs flex flex-col justify-between">
+                <div>
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2.5">
+                      <div className="size-9 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center font-bold">
+                        <Award className="size-5" />
+                      </div>
+                      <div>
+                        <h2 className="text-sm sm:text-base font-bold text-slate-900 leading-tight">
+                          Distribusi Predikat Kompetensi
+                        </h2>
+                        <p className="text-[11px] sm:text-xs text-slate-500">
+                          Standar kelulusan asesmen industri (SKKNI)
+                        </p>
+                      </div>
+                    </div>
+                    <span className="text-[11px] font-semibold px-2 py-0.5 rounded-md bg-slate-100 text-slate-700">
+                      Terverifikasi
+                    </span>
+                  </div>
+
+                  {/* Donut / Gauge Visualization */}
+                  <div className="mt-5 flex items-center justify-center gap-6">
+                    <div className="relative size-36 sm:size-40 flex items-center justify-center shrink-0">
+                      <svg className="size-full -rotate-90" viewBox="0 0 36 36">
+                        {/* Background track */}
+                        <path
+                          className="text-slate-100"
+                          strokeWidth="3.8"
+                          stroke="currentColor"
+                          fill="none"
+                          d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                        />
+                        {/* Segment A (45%) */}
+                        <path
+                          className="text-emerald-500"
+                          strokeDasharray="45, 100"
+                          strokeDashoffset="0"
+                          strokeWidth="3.8"
+                          strokeLinecap="round"
+                          stroke="currentColor"
+                          fill="none"
+                          d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                        />
+                        {/* Segment B (35%) */}
+                        <path
+                          className="text-blue-600"
+                          strokeDasharray="35, 100"
+                          strokeDashoffset="-45"
+                          strokeWidth="3.8"
+                          strokeLinecap="round"
+                          stroke="currentColor"
+                          fill="none"
+                          d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                        />
+                        {/* Segment C (15%) */}
+                        <path
+                          className="text-amber-400"
+                          strokeDasharray="15, 100"
+                          strokeDashoffset="-80"
+                          strokeWidth="3.8"
+                          strokeLinecap="round"
+                          stroke="currentColor"
+                          fill="none"
+                          d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                        />
+                      </svg>
+                      <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
+                        <span className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">88.6</span>
+                        <span className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Rata-rata Skor</span>
+                      </div>
+                    </div>
+
+                    <div className="space-y-2 flex-1 text-xs">
+                      <div className="flex items-center justify-between">
+                        <span className="flex items-center gap-1.5 text-slate-600">
+                          <span className="size-2 rounded-full bg-emerald-500" />
+                          Predikat A (Sangat Baik)
+                        </span>
+                        <span className="font-bold text-slate-900">45%</span>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span className="flex items-center gap-1.5 text-slate-600">
+                          <span className="size-2 rounded-full bg-blue-600" />
+                          Predikat B (Kompeten)
+                        </span>
+                        <span className="font-bold text-slate-900">35%</span>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span className="flex items-center gap-1.5 text-slate-600">
+                          <span className="size-2 rounded-full bg-amber-400" />
+                          Predikat C (Cukup)
+                        </span>
+                        <span className="font-bold text-slate-900">15%</span>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span className="flex items-center gap-1.5 text-slate-600">
+                          <span className="size-2 rounded-full bg-slate-300" />
+                          Predikat D (Remedial)
+                        </span>
+                        <span className="font-bold text-slate-900">5%</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Sub-bar averages */}
+                <div className="mt-4 pt-3 border-t border-slate-100 grid grid-cols-2 gap-2 text-[11px]">
+                  <div className="p-2.5 bg-slate-50 rounded-xl">
+                    <span className="text-slate-500 block">Kualitas Teknis & Aset</span>
+                    <strong className="text-slate-900 font-bold text-xs">91.2 / 100</strong>
+                  </div>
+                  <div className="p-2.5 bg-slate-50 rounded-xl">
+                    <span className="text-slate-500 block">Relevansi Brief Industri</span>
+                    <strong className="text-slate-900 font-bold text-xs">89.4 / 100</strong>
+                  </div>
                 </div>
               </div>
+            </div>
+
+            {/* 2. SUPPORTING METRICS (Below Charts) */}
+            <div>
+              <div className="flex items-center justify-between mb-3">
+                <h3 className="text-xs font-bold uppercase tracking-wider text-slate-500">
+                  Indikator Kinerja Utama (Supporting Metrics)
+                </h3>
+                <span className="text-[11px] text-slate-400">Data terdistribusi realtime</span>
+              </div>
+
+              {/* 6 Summary Metric Cards */}
+              <div className="grid grid-cols-2 lg:grid-cols-6 gap-3 sm:gap-4">
+                <div className="bg-white rounded-[12px] p-4 border border-black/10 shadow-xs">
+                  <span className="text-xs font-medium text-neutral-500">Total Siswa</span>
+                  <p className="text-2xl font-bold text-[#0D0C22] mt-1">{overview.totalStudents}</p>
+                  <div className="flex items-center gap-1 text-[11px] text-neutral-400 mt-1">
+                    <Users className="w-3 h-3" />
+                    <span>Terdaftar</span>
+                  </div>
+                </div>
+
+                <div className="bg-white rounded-[12px] p-4 border border-black/10 shadow-xs">
+                  <span className="text-xs font-medium text-neutral-500">Siswa Aktif</span>
+                  <p className="text-2xl font-bold text-emerald-600 mt-1">{overview.activeStudents}</p>
+                  <div className="flex items-center gap-1 text-[11px] text-neutral-400 mt-1">
+                    <CheckCircle2 className="w-3 h-3 text-emerald-500" />
+                    <span>Telah disetujui</span>
+                  </div>
+                </div>
 
               <div className="bg-white rounded-[12px] p-4 border border-black/10 shadow-xs">
                 <span className="text-xs font-medium text-neutral-500">Pending Approval</span>
@@ -603,9 +887,10 @@ export function SchoolDashboardPage() {
                 </div>
               </div>
             </div>
+          </div>
 
-            {/* Assessment Progress Bar & Recent Student Activity */}
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Assessment Progress Bar & Recent Student Activity */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
               {/* Assessment Progress */}
               <div className="bg-white rounded-[12px] p-5 border border-black/10 shadow-xs space-y-4">
                 <div className="flex items-center justify-between">

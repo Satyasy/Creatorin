@@ -42,7 +42,8 @@ import {
   Camera,
   Upload,
   Zap,
-  Users
+  Users,
+  Pencil
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/providers/AuthProvider';
@@ -176,6 +177,13 @@ export const UmkmProfilePage: React.FC<UmkmProfilePageProps> = ({
   const [proposalPitch, setProposalPitch] = useState('');
   const [proposalPortfolio, setProposalPortfolio] = useState('');
   const [isSubmittingProposal, setIsSubmittingProposal] = useState(false);
+
+  // In-place inline edit state
+  const isUmkmOwner = currentUser?.role === 'umkm';
+  const [isEditModeActive, setIsEditModeActive] = useState(false);
+  const [inlineSection, setInlineSection] = useState<'name' | 'tagline' | null>(null);
+  const [tempBrandName, setTempBrandName] = useState(profile.brandName);
+  const [tempTagline, setTempTagline] = useState(profile.tagline || '');
 
   // User Profile Mode Refs & Handlers
   const coverFileInputRef = React.useRef<HTMLInputElement>(null);
@@ -472,6 +480,16 @@ export const UmkmProfilePage: React.FC<UmkmProfilePageProps> = ({
             alt={profile.brandName}
             className="w-full h-full object-cover"
           />
+          {isUmkmOwner && isEditModeActive && (
+            <button
+              onClick={() => coverFileInputRef.current?.click()}
+              className="absolute top-4 right-4 z-30 px-3 py-1.5 rounded-full bg-white/95 hover:bg-white text-black text-xs font-semibold shadow-md flex items-center gap-1.5 cursor-pointer backdrop-blur-xs transition"
+              title="Ganti Foto Sampul"
+            >
+              <Camera className="w-3.5 h-3.5 text-blue-600" />
+              <span>Ganti Sampul</span>
+            </button>
+          )}
         </div>
 
         {/* Squircle / Circular Avatar & Action Bar Row */}
@@ -479,12 +497,22 @@ export const UmkmProfilePage: React.FC<UmkmProfilePageProps> = ({
           
           {/* Circular Avatar */}
           <div className="relative inline-block self-start">
-            <div className="w-24 h-24 sm:w-32 sm:h-32 md:w-36 md:h-36 rounded-full p-1 sm:p-1.5 bg-white shadow-xl shadow-black/8 ring-1 ring-neutral-900/5">
+            <div className="w-24 h-24 sm:w-32 sm:h-32 md:w-36 md:h-36 rounded-full p-1 sm:p-1.5 bg-white shadow-xl shadow-black/8 ring-1 ring-neutral-900/5 relative group">
               <img
                 src={profile.logo}
                 alt={profile.brandName}
                 className="w-full h-full rounded-full object-cover"
               />
+              {isUmkmOwner && isEditModeActive && (
+                <button
+                  onClick={() => logoFileInputRef.current?.click()}
+                  className="absolute inset-0 rounded-full bg-black/50 flex flex-col items-center justify-center text-white cursor-pointer z-20 transition"
+                  title="Ganti Logo Brand"
+                >
+                  <Camera className="w-5 h-5 mb-0.5" />
+                  <span className="text-[10px] font-semibold">Ganti Logo</span>
+                </button>
+              )}
             </div>
 
             {/* Escrow Badge */}
@@ -498,7 +526,7 @@ export const UmkmProfilePage: React.FC<UmkmProfilePageProps> = ({
             )}
           </div>
 
-          {/* Action Buttons Row (Right Aligned, Style Exactly Matching Reference Image) */}
+          {/* Action Buttons Row */}
           <div className="flex items-center gap-2 sm:gap-2.5 self-start sm:self-end pb-1">
             
             {/* Button 1: More Options (...) */}
@@ -515,16 +543,18 @@ export const UmkmProfilePage: React.FC<UmkmProfilePageProps> = ({
 
               {isMoreMenuOpen && (
                 <div className="absolute right-0 top-full mt-2 w-56 bg-white rounded-2xl border border-neutral-200 shadow-xl py-2 z-50 text-left">
-                  <button
-                    onClick={() => {
-                      setIsMoreMenuOpen(false);
-                      openEditModal();
-                    }}
-                    className="w-full px-4 py-2.5 text-xs font-semibold text-neutral-700 hover:bg-neutral-50 flex items-center gap-2.5 cursor-pointer"
-                  >
-                    <Edit3 className="w-4 h-4 text-blue-600" />
-                    <span>Edit Profil & Informasi Brand</span>
-                  </button>
+                  {isUmkmOwner && (
+                    <button
+                      onClick={() => {
+                        setIsMoreMenuOpen(false);
+                        openEditModal();
+                      }}
+                      className="w-full px-4 py-2.5 text-xs font-semibold text-neutral-700 hover:bg-neutral-50 flex items-center gap-2.5 cursor-pointer"
+                    >
+                      <Edit3 className="w-4 h-4 text-blue-600" />
+                      <span>Edit Lengkap Brand</span>
+                    </button>
+                  )}
                   <button
                     onClick={() => {
                       setIsMoreMenuOpen(false);
@@ -535,50 +565,48 @@ export const UmkmProfilePage: React.FC<UmkmProfilePageProps> = ({
                     <Copy className="w-4 h-4 text-neutral-400" />
                     <span>Salin Tautan Profil</span>
                   </button>
-                  <button
-                    onClick={() => {
-                      setIsMoreMenuOpen(false);
-                      setIsPostBriefOpen(true);
-                    }}
-                    className="w-full px-4 py-2.5 text-xs font-semibold text-neutral-700 hover:bg-neutral-50 flex items-center gap-2.5 cursor-pointer"
-                  >
-                    <Zap className="w-4 h-4 text-amber-500" />
-                    <span>Pasang Brief Proyek</span>
-                  </button>
-                  <button
-                    onClick={() => {
-                      setIsMoreMenuOpen(false);
-                      coverFileInputRef.current?.click();
-                    }}
-                    className="w-full px-4 py-2.5 text-xs font-semibold text-neutral-700 hover:bg-neutral-50 flex items-center gap-2.5 cursor-pointer"
-                  >
-                    <Camera className="w-4 h-4 text-neutral-500" />
-                    <span>Ubah Foto Sampul</span>
-                  </button>
-                  <button
-                    onClick={() => {
-                      setIsMoreMenuOpen(false);
-                      logoFileInputRef.current?.click();
-                    }}
-                    className="w-full px-4 py-2.5 text-xs font-semibold text-neutral-700 hover:bg-neutral-50 flex items-center gap-2.5 cursor-pointer"
-                  >
-                    <Camera className="w-4 h-4 text-neutral-500" />
-                    <span>Ubah Logo Brand</span>
-                  </button>
+                  {isUmkmOwner && (
+                    <button
+                      onClick={() => {
+                        setIsMoreMenuOpen(false);
+                        setIsPostBriefOpen(true);
+                      }}
+                      className="w-full px-4 py-2.5 text-xs font-semibold text-neutral-700 hover:bg-neutral-50 flex items-center gap-2.5 cursor-pointer"
+                    >
+                      <Zap className="w-4 h-4 text-amber-500" />
+                      <span>Pasang Brief Proyek</span>
+                    </button>
+                  )}
                 </div>
               )}
             </div>
 
-            {/* Button 2: Edit Profil */}
-            <button
-              id="btn-edit-profile"
-              onClick={openEditModal}
-              className="px-5 py-2 sm:py-2.5 rounded-xl border border-[#E2E8F0] bg-white hover:bg-neutral-50 text-[#171717] text-xs sm:text-sm font-semibold transition cursor-pointer"
-            >
-              Edit Profil
-            </button>
+            {/* Button 2: Edit Profil Mode Toggle (Owner UMKM) OR Hubungi Brand (Creator/Visitor) */}
+            {isUmkmOwner ? (
+              <button
+                id="btn-edit-profile"
+                onClick={() => setIsEditModeActive(!isEditModeActive)}
+                className={`px-5 py-2 sm:py-2.5 rounded-xl text-xs sm:text-sm font-semibold transition cursor-pointer flex items-center gap-1.5 ${
+                  isEditModeActive
+                    ? 'bg-emerald-600 hover:bg-emerald-700 text-white'
+                    : 'border border-[#E2E8F0] bg-white hover:bg-neutral-50 text-[#171717]'
+                }`}
+              >
+                {isEditModeActive ? <Check className="w-3.5 h-3.5" /> : <Pencil className="w-3.5 h-3.5" />}
+                <span>{isEditModeActive ? 'Selesai Edit' : 'Edit Profil'}</span>
+              </button>
+            ) : (
+              <button
+                id="btn-contact-brand"
+                onClick={() => navigateTo('chat', '/chat')}
+                className="px-5 py-2 sm:py-2.5 rounded-xl border border-neutral-300 bg-white hover:bg-neutral-50 text-neutral-900 text-xs sm:text-sm font-semibold transition cursor-pointer flex items-center gap-2"
+              >
+                <MessageSquare className="w-3.5 h-3.5" />
+                <span>Kirim Pesan</span>
+              </button>
+            )}
 
-            {/* Button 3: Bagikan (Primary CTA matching Kirim Pesan in reference) */}
+            {/* Button 3: Bagikan */}
             <button
               id="btn-share-profile"
               onClick={handleCopyLink}
@@ -600,15 +628,41 @@ export const UmkmProfilePage: React.FC<UmkmProfilePageProps> = ({
             <h1 className="text-2xl sm:text-3xl lg:text-[32px] font-bold text-[#171717] tracking-tight">
               {profile.brandName}
             </h1>
+            {isUmkmOwner && isEditModeActive && (
+              <button
+                onClick={() => {
+                  setTempBrandName(profile.brandName);
+                  setInlineSection('name');
+                }}
+                className="p-1.5 rounded-lg bg-neutral-100 hover:bg-neutral-200 text-neutral-700 cursor-pointer transition"
+                title="Edit Nama Brand"
+              >
+                <Pencil className="w-4 h-4 text-blue-600" />
+              </button>
+            )}
             {profile.verified && (
               <CheckCircle2 className="w-5 h-5 sm:w-6 sm:h-6 text-blue-600 fill-blue-600 text-white" />
             )}
           </div>
 
-          {/* Tagline / Headline (Directly Below Name, Clean & Concise) */}
-          <p className="text-sm sm:text-base text-neutral-600 font-normal mt-1 max-w-2xl leading-relaxed">
-            {profile.tagline || `${profile.industry} • Berkolaborasi dengan talenta kreatif terbaik Indonesia.`}
-          </p>
+          {/* Tagline / Headline */}
+          <div className="flex items-center gap-2 mt-1">
+            <p className="text-sm sm:text-base text-neutral-600 font-normal max-w-2xl leading-relaxed">
+              {profile.tagline || `${profile.industry} • Berkolaborasi dengan talenta kreatif terbaik Indonesia.`}
+            </p>
+            {isUmkmOwner && isEditModeActive && (
+              <button
+                onClick={() => {
+                  setTempTagline(profile.tagline || '');
+                  setInlineSection('tagline');
+                }}
+                className="p-1 rounded-md hover:bg-neutral-100 text-neutral-500 hover:text-black cursor-pointer transition shrink-0"
+                title="Edit Slogan"
+              >
+                <Pencil className="w-3.5 h-3.5 text-blue-600" />
+              </button>
+            )}
+          </div>
 
           {/* Inline Stats Row (Exact Match to Creator Profile Style in Reference Image) */}
           <div className="flex flex-wrap items-center gap-x-5 gap-y-1.5 text-xs sm:text-sm text-neutral-500 mt-2.5 font-medium">
@@ -1991,6 +2045,79 @@ export const UmkmProfilePage: React.FC<UmkmProfilePageProps> = ({
                   Lihat Profil Kreator
                 </button>
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ========================================================================= */}
+      {/* INLINE EDIT MICRO-MODALS FOR SECTIONS (NAMA BRAND, TAGLINE)               */}
+      {/* ========================================================================= */}
+      {inlineSection && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-xs animate-in fade-in duration-150">
+          <div className="bg-white w-full max-w-md rounded-2xl shadow-xl p-5 text-left space-y-4">
+            <div className="flex items-center justify-between border-b border-neutral-100 pb-3">
+              <h3 className="text-sm font-bold text-[#0D0C22]">
+                {inlineSection === 'name' && 'Ubah Nama Brand / Usaha'}
+                {inlineSection === 'tagline' && 'Ubah Slogan / Tagline Brand'}
+              </h3>
+              <button 
+                onClick={() => setInlineSection(null)} 
+                className="w-7 h-7 rounded-full hover:bg-neutral-100 flex items-center justify-center text-neutral-400 hover:text-black cursor-pointer"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            {inlineSection === 'name' && (
+              <div className="space-y-2 text-xs">
+                <label className="font-semibold text-neutral-700 block">Nama Brand</label>
+                <input
+                  type="text"
+                  value={tempBrandName}
+                  onChange={(e) => setTempBrandName(e.target.value)}
+                  className="w-full px-3 py-2 rounded-xl border border-neutral-200 text-xs focus:outline-none focus:border-[#0D0C22]"
+                />
+              </div>
+            )}
+
+            {inlineSection === 'tagline' && (
+              <div className="space-y-2 text-xs">
+                <label className="font-semibold text-neutral-700 block">Slogan / Deskripsi Singkat</label>
+                <textarea
+                  rows={3}
+                  value={tempTagline}
+                  onChange={(e) => setTempTagline(e.target.value)}
+                  className="w-full px-3 py-2 rounded-xl border border-neutral-200 text-xs focus:outline-none focus:border-[#0D0C22] resize-none"
+                  placeholder="Tuliskan slogan brand Anda..."
+                />
+              </div>
+            )}
+
+            <div className="flex items-center justify-end gap-2 pt-2 border-t border-neutral-100">
+              <button
+                type="button"
+                onClick={() => setInlineSection(null)}
+                className="px-3.5 py-1.5 rounded-xl border border-neutral-200 text-xs font-semibold text-neutral-600 hover:bg-neutral-50 cursor-pointer"
+              >
+                Batal
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  if (inlineSection === 'name') {
+                    setProfile(prev => ({ ...prev, brandName: tempBrandName }));
+                    showToast('Nama brand berhasil diperbarui!');
+                  } else if (inlineSection === 'tagline') {
+                    setProfile(prev => ({ ...prev, tagline: tempTagline }));
+                    showToast('Tagline brand berhasil diperbarui!');
+                  }
+                  setInlineSection(null);
+                }}
+                className="px-4 py-1.5 rounded-xl bg-[#0D0C22] hover:bg-neutral-800 text-white text-xs font-bold cursor-pointer transition shadow-xs"
+              >
+                Simpan
+              </button>
             </div>
           </div>
         </div>

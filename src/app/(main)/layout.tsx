@@ -5,6 +5,7 @@ import { usePathname } from 'next/navigation';
 import { Navbar } from '@/components/layout/Navbar';
 import { Footer } from '@/components/layout/Footer';
 import { CreatorinChatbot } from '@/components/common/CreatorinChatbot';
+import { RoleSwitcher } from '@/components/common/RoleSwitcher';
 
 export default function MainLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -23,6 +24,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
       </main>
       {!hideFooter && <Footer />}
       <CreatorinChatbot />
+      <RoleSwitcher />
     </div>
   );
 }

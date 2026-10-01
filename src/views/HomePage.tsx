@@ -973,12 +973,6 @@ export const HomePage: React.FC<HomePageProps> = ({
                               const imageSrc = service.coverImage || 
                                 creator.portfolioSamples?.[srvIdx % (creator.portfolioSamples?.length || 1)]?.thumbnail ||
                                 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&auto=format&fit=crop&q=80';
-                              const colMultiplier = srvIdx === 0 ? -0.8 : srvIdx === 1 ? 0.8 : srvIdx === 2 ? -0.4 : 0.4;
-                              const serviceOffset = isReducedMotion
-                                ? 0
-                                : isMobile
-                                  ? 0
-                                  : colMultiplier * Math.min(scrollY * 0.02, 12);
 
                               return (
                                 <div
@@ -989,10 +983,7 @@ export const HomePage: React.FC<HomePageProps> = ({
                                     setTargetCreatorForBrief(creator);
                                     setIsBriefModalOpen(true);
                                   }}
-                                  className="group/srv flex flex-col cursor-pointer text-left select-none transition-transform duration-100 ease-out will-change-transform"
-                                  style={{
-                                    transform: serviceOffset ? `translate3d(0, ${serviceOffset}px, 0)` : undefined,
-                                  }}
+                                  className="group/srv flex flex-col cursor-pointer text-left select-none"
                                 >
                                   {/* Cover Image Preview (Clean Rounded) */}
                                   <div className="aspect-[4/3] w-full rounded-2xl overflow-hidden bg-[#171717] relative shadow-[0_1px_0_rgba(0,0,0,0.05)] group-hover/srv:shadow-md transition-all duration-300">
@@ -1085,14 +1076,6 @@ export const HomePage: React.FC<HomePageProps> = ({
                 <>
                   <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-6 gap-y-8 animate-in fade-in duration-200">
                   {displayServices.map((srv, idx) => {
-                    const colIndex = idx % 4;
-                    const colMultiplier = colIndex === 0 ? -1 : colIndex === 1 ? 1 : colIndex === 2 ? -0.5 : 0.5;
-                    const cardOffset = isReducedMotion
-                      ? 0
-                      : isMobile
-                        ? (idx % 2 === 0 ? -3 : 3)
-                        : colMultiplier * Math.min(scrollY * 0.026, 15);
-
                     return (
                       <ScrollReveal
                         key={srv.id}
@@ -1103,10 +1086,7 @@ export const HomePage: React.FC<HomePageProps> = ({
                         <div
                           id={`service-shot-${srv.id}`}
                           onClick={() => navigateTo('services', '/explore/services')}
-                          className="group flex flex-col text-left cursor-pointer select-none transition-transform duration-100 ease-out will-change-transform"
-                          style={{
-                            transform: cardOffset ? `translate3d(0, ${cardOffset}px, 0)` : undefined,
-                          }}
+                          className="group flex flex-col text-left cursor-pointer select-none"
                         >
                         {/* Media Cover Image Card (Aspect 4:3 matching screenshot) */}
                         <div className="relative aspect-[4/3] rounded-2xl overflow-hidden bg-neutral-100 shadow-2xs group-hover:shadow-md transition-all duration-300">
@@ -1200,41 +1180,6 @@ export const HomePage: React.FC<HomePageProps> = ({
           </div>
         )}
 
-          {/* Floating Start a Project Brief Banner (Persis Gambar Referensi) */}
-          {isBriefBannerVisible && (
-            <div className="fixed bottom-20 sm:bottom-6 left-1/2 -translate-x-1/2 z-40 max-w-xl w-[92%] sm:w-auto bg-white/95 backdrop-blur-md border border-neutral-200/90 rounded-2xl sm:rounded-full py-2.5 px-4 sm:px-6 shadow-2xl flex items-center justify-between gap-4 animate-in fade-in slide-in-from-bottom-4 duration-300">
-              <div className="flex items-center gap-3 min-w-0">
-                <div className="w-8 h-8 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center shrink-0 border border-blue-100">
-                  <Briefcase className="w-4 h-4 text-blue-600" />
-                </div>
-                <p className="text-xs sm:text-sm text-neutral-700 truncate">
-                  <strong className="text-[#0d0c22] font-bold">Start a Project Brief</strong>{' '}
-                  <span className="hidden sm:inline text-neutral-500">: Tell us what you need and find the right talent for your project.</span>
-                </p>
-              </div>
-
-              <div className="flex items-center gap-2 shrink-0">
-                <button
-                  type="button"
-                  onClick={() => {
-                    setTargetCreatorForBrief(undefined);
-                    setIsBriefModalOpen(true);
-                  }}
-                  className="h-8 px-3.5 rounded-xl bg-[#0B1F3A] hover:bg-[#123B8C] text-white text-xs font-semibold transition-colors shadow-xs cursor-pointer"
-                >
-                  Get Started
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setIsBriefBannerVisible(false)}
-                  className="p-1.5 rounded-full hover:bg-neutral-100 text-neutral-400 hover:text-neutral-700 transition cursor-pointer"
-                  title="Tutup banner"
-                >
-                  <X className="w-3.5 h-3.5" />
-                </button>
-              </div>
-            </div>
-          )}
 
         </section>
 

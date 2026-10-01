@@ -485,14 +485,6 @@ export const BriefDetailPage: React.FC<BriefDetailPageProps> = ({
                 <Bookmark className={`w-4 h-4 ${isSaved ? 'fill-current' : ''}`} />
               </button>
 
-              <button
-                type="button"
-                onClick={() => setIsEditModalOpen(true)}
-                className="px-3.5 py-2 rounded-xl border border-[#E2E8F0] hover:border-neutral-300 text-neutral-700 hover:text-black font-semibold text-xs transition cursor-pointer flex items-center gap-1.5 shadow-2xs"
-              >
-                <Edit3 className="w-3.5 h-3.5 text-neutral-500" />
-                <span>Edit</span>
-              </button>
 
               {hasApplied ? (
                 <div className="px-4 py-2 rounded-xl bg-emerald-50 text-emerald-700 border border-emerald-200 text-xs font-semibold flex items-center gap-1.5 shadow-2xs">

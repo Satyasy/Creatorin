@@ -21,7 +21,9 @@ import {
   Upload,
   Info,
   Send,
-  Check
+  Check,
+  Pencil,
+  Trash2
 } from 'lucide-react';
 import { FeedProject, Creator } from '@/types';
 import { MOCK_FEED_PROJECTS } from '@/data/mockFeedProjects';
@@ -46,9 +48,21 @@ interface CommentItem {
   text: string;
   time: string;
   hasBadge?: boolean;
+  createdAt?: number;
+  isOwner?: boolean;
 }
 
 const DEFAULT_COMMENTS: CommentItem[] = [
+  {
+    id: 'c-mine',
+    name: 'Anda (Kreator)',
+    avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80',
+    text: 'Sangat suka dengan komposisi warna dan tipografi di proyek ini!',
+    time: '2 menit lalu',
+    createdAt: Date.now() - 2 * 60 * 1000,
+    isOwner: true,
+    hasBadge: true
+  },
   {
     id: 'c-1',
     name: 'Mukhlasur Rahman',
@@ -109,6 +123,8 @@ export const ProjectDetailModal: React.FC<ProjectDetailModalProps> = ({
   const [isInfoOpen, setIsInfoOpen] = useState(false);
   const [comments, setComments] = useState<CommentItem[]>(DEFAULT_COMMENTS);
   const [newCommentText, setNewCommentText] = useState('');
+  const [editingCommentId, setEditingCommentId] = useState<string | null>(null);
+  const [editingCommentText, setEditingCommentText] = useState('');
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
   const videoRef = useRef<HTMLVideoElement | null>(null);
@@ -148,15 +164,48 @@ export const ProjectDetailModal: React.FC<ProjectDetailModalProps> = ({
 
     const newComment: CommentItem = {
       id: `comm-${Date.now()}`,
-      name: 'Anda (Pengunjung)',
+      name: 'Anda (Kreator)',
       avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80',
       text: newCommentText.trim(),
-      time: 'Baru saja'
+      time: 'Baru saja',
+      createdAt: Date.now(),
+      isOwner: true,
+      hasBadge: true
     };
 
     setComments(prev => [newComment, ...prev]);
     setNewCommentText('');
     showToast('Komentar berhasil dikirim!');
+  };
+
+  const handleStartEdit = (item: CommentItem) => {
+    setEditingCommentId(item.id);
+    setEditingCommentText(item.text);
+  };
+
+  const handleSaveEdit = (commentId: string) => {
+    if (!editingCommentText.trim()) return;
+    setComments(prev => prev.map(c => {
+      if (c.id === commentId) {
+        return {
+          ...c,
+          text: editingCommentText.trim(),
+          time: 'Diedit baru saja'
+        };
+      }
+      return c;
+    }));
+    setEditingCommentId(null);
+    setEditingCommentText('');
+    showToast('Komentar berhasil diperbarui!');
+  };
+
+  const handleDeleteComment = (commentId: string) => {
+    setComments(prev => prev.filter(c => c.id !== commentId));
+    if (editingCommentId === commentId) {
+      setEditingCommentId(null);
+    }
+    showToast('Komentar berhasil dihapus!');
   };
 
   const mediaList = currentProject.carouselImages && currentProject.carouselImages.length > 0
@@ -433,6 +482,22 @@ export const ProjectDetailModal: React.FC<ProjectDetailModalProps> = ({
           title="Sukai proyek"
         >
           <Heart className={`size-4 ${isLiked ? 'fill-rose-600' : ''}`} />
+        </button>
+
+        <button
+          id="btn-active-comment"
+          data-testid="btn-open-comments"
+          type="button"
+          onClick={() => setIsCommentOpen(prev => !prev)}
+          className={`relative flex size-10 items-center justify-center rounded-full border shadow-2xs transition cursor-pointer ${
+            isCommentOpen ? 'border-[#0B1F3A] bg-[#0B1F3A] text-white' : 'border-[#E2E8F0] bg-white text-[#171717] hover:bg-neutral-50'
+          }`}
+          title={isCommentOpen ? 'Tutup komentar' : 'Buka komentar'}
+        >
+          <MessageSquare className="size-4" />
+          <span className="absolute -top-1 -right-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-[#171717] text-white px-1 text-[9px] font-bold">
+            {23 + (comments.length - DEFAULT_COMMENTS.length)}
+          </span>
         </button>
 
         <button
@@ -761,7 +826,7 @@ export const ProjectDetailModal: React.FC<ProjectDetailModalProps> = ({
 
             <div className="flex items-center gap-2.5">
               <button
-                id="btn-active-comment"
+                id="btn-close-comment"
                 type="button"
                 onClick={() => setIsCommentOpen(false)}
                 className="relative flex size-10 items-center justify-center rounded-full bg-[#171717] text-white shadow-xs transition hover:bg-neutral-800 cursor-pointer"
@@ -799,31 +864,104 @@ export const ProjectDetailModal: React.FC<ProjectDetailModalProps> = ({
 
           {/* Scrollable Comments Feed */}
           <div className="flex-1 overflow-y-auto px-6 py-5 space-y-6">
-            {comments.map((item) => (
-              <div key={item.id} className="flex items-start gap-3.5">
-                <img
-                  src={item.avatar}
-                  alt={item.name}
-                  className="size-9 rounded-full object-cover shrink-0 mt-0.5"
-                />
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-1.5">
-                    <p className="text-[14px] font-bold text-[#171717] leading-tight">
-                      {item.name}
-                    </p>
-                    {item.hasBadge && (
-                      <span className="size-2 rounded-full bg-amber-500" title="Kreator Terverifikasi" />
+            {comments.map((item) => {
+              const canEditOrDelete = item.isOwner && item.createdAt && (Date.now() - item.createdAt < 10 * 60 * 1000);
+              const isEditing = editingCommentId === item.id;
+
+              return (
+                <div key={item.id} className="flex items-start gap-3.5 group">
+                  <img
+                    src={item.avatar}
+                    alt={item.name}
+                    className="size-9 rounded-full object-cover shrink-0 mt-0.5"
+                  />
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center justify-between gap-1.5">
+                      <div className="flex items-center gap-1.5">
+                        <p className="text-[14px] font-bold text-[#171717] leading-tight">
+                          {item.name}
+                        </p>
+                        {item.hasBadge && (
+                          <span className="size-2 rounded-full bg-amber-500" title="Kreator Terverifikasi" />
+                        )}
+                        {item.isOwner && (
+                          <span className="text-[10px] px-1.5 py-0.5 rounded bg-neutral-100 text-neutral-600 font-medium">
+                            Anda
+                          </span>
+                        )}
+                      </div>
+
+                      {canEditOrDelete && !isEditing && (
+                        <div className="flex items-center gap-1 text-neutral-400 opacity-90 transition">
+                          <button
+                            type="button"
+                            onClick={() => handleStartEdit(item)}
+                            className="p-1 hover:text-[#171717] hover:bg-neutral-100 rounded cursor-pointer transition"
+                            title="Edit Komentar (< 10 menit)"
+                            data-testid={`btn-edit-comment-${item.id}`}
+                          >
+                            <Pencil className="size-3.5" />
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => handleDeleteComment(item.id)}
+                            className="p-1 hover:text-rose-600 hover:bg-rose-50 rounded cursor-pointer transition"
+                            title="Hapus Komentar"
+                            data-testid={`btn-delete-comment-${item.id}`}
+                          >
+                            <Trash2 className="size-3.5" />
+                          </button>
+                        </div>
+                      )}
+                    </div>
+
+                    {isEditing ? (
+                      <div className="mt-2 space-y-2">
+                        <textarea
+                          value={editingCommentText}
+                          onChange={(e) => setEditingCommentText(e.target.value)}
+                          className="w-full p-2.5 text-[13px] border border-neutral-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-black bg-white"
+                          rows={2}
+                          data-testid="input-edit-comment"
+                        />
+                        <div className="flex items-center justify-end gap-2">
+                          <button
+                            type="button"
+                            onClick={() => setEditingCommentId(null)}
+                            className="px-2.5 py-1 text-xs text-neutral-600 hover:bg-neutral-100 rounded cursor-pointer"
+                          >
+                            Batal
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => handleSaveEdit(item.id)}
+                            className="px-3 py-1 text-xs bg-[#171717] text-white rounded font-medium cursor-pointer hover:bg-neutral-800"
+                            data-testid="btn-save-comment"
+                          >
+                            Simpan
+                          </button>
+                        </div>
+                      </div>
+                    ) : (
+                      <p className="mt-1.5 text-[13px] text-[#404040] leading-relaxed font-normal">
+                        {item.text}
+                      </p>
                     )}
+
+                    <div className="flex items-center gap-2 mt-1">
+                      <span className="text-[11px] text-[#a3a3a3] font-normal">
+                        {item.time}
+                      </span>
+                      {canEditOrDelete && (
+                        <span className="text-[10px] text-amber-600 font-medium">
+                          Bisa diedit/hapus &lt; 10m
+                        </span>
+                      )}
+                    </div>
                   </div>
-                  <p className="mt-1.5 text-[13px] text-[#404040] leading-relaxed font-normal">
-                    {item.text}
-                  </p>
-                  <span className="block mt-1 text-[11px] text-[#a3a3a3] font-normal">
-                    {item.time}
-                  </span>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
 
           {/* Comment Input Form at Bottom */}

@@ -60,6 +60,8 @@ import { ProjectCard } from '@/components/common/ProjectCard';
 import { ProjectBriefModal } from '@/components/modals/ProjectBriefModal';
 import { ProjectDetailModal } from '@/components/modals/ProjectDetailModal';
 import { ServiceDetailModal } from '@/components/modals/ServiceDetailModal';
+import { UploadProjectModal } from '@/components/modals/UploadProjectModal';
+import { UploadServiceModal } from '@/components/modals/UploadServiceModal';
 import { MOCK_FEED_PROJECTS } from '@/data/mockFeedProjects';
 import { ShaderFill } from '@/lib/custom-effect-runtime';
 import { setup as setupConcentric, render as renderConcentric, manifest as manifestConcentric } from '@/lib/custom-effects/CodeComponentId_c2b302fbdfce8a1ec92a5a80b10a5916ab506ed7_430';
@@ -90,6 +92,7 @@ export const CreatorProfilePage: React.FC<CreatorProfilePageProps> = ({
   const router = useRouter();
   const { user: authUser } = useAuth();
   const currentUser = propUser !== undefined ? propUser : authUser;
+  const isEffectiveOwner = isOwnProfile || currentUser?.role === 'creator';
 
   const navigateTo = (page: ActivePage, path: string) => {
     if (onNavigate) onNavigate(page);
@@ -119,9 +122,26 @@ export const CreatorProfilePage: React.FC<CreatorProfilePageProps> = ({
   const [selectedServiceForDetail, setSelectedServiceForDetail] = useState<CreatorService | null>(null);
   const [isGetInTouchOpen, setIsGetInTouchOpen] = useState(false);
   const [isBriefModalOpen, setIsBriefModalOpen] = useState(false);
+  const [isUploadProjectModalOpen, setIsUploadProjectModalOpen] = useState(false);
+  const [isUploadServiceModalOpen, setIsUploadServiceModalOpen] = useState(false);
   const [inquiryMessage, setInquiryMessage] = useState('');
   const [inquirySentSuccess, setInquirySentSuccess] = useState(false);
   const [copiedLinkSuccess, setCopiedLinkSuccess] = useState(false);
+
+  // In-place inline edit profile state
+  const [isEditModeActive, setIsEditModeActive] = useState(false);
+  const [editingSection, setEditingSection] = useState<'name' | 'bio' | 'avatar' | 'banner' | null>(null);
+  const [creatorName, setCreatorName] = useState(creator.name);
+  const [creatorRoleTitle, setCreatorRoleTitle] = useState(creator.roleTitle);
+  const [creatorBio, setCreatorBio] = useState(creator.bio);
+  const [creatorAvatar, setCreatorAvatar] = useState(creator.avatar);
+  const [creatorBannerColor, setCreatorBannerColor] = useState('#0063b4');
+
+  // Temp editing inputs
+  const [tempName, setTempName] = useState(creator.name);
+  const [tempRoleTitle, setTempRoleTitle] = useState(creator.roleTitle);
+  const [tempBio, setTempBio] = useState(creator.bio);
+  const [tempAvatar, setTempAvatar] = useState(creator.avatar);
 
   // Saved shots / projects in profile
   const [likedShots, setLikedShots] = useState<Set<string>>(new Set());
@@ -453,7 +473,10 @@ export const CreatorProfilePage: React.FC<CreatorProfilePageProps> = ({
       {/* ==================================================================== */}
       <section className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 py-6">
         {/* Rounded Top Banner Card (Large panel radius 24px according to design.md §7) */}
-        <div className="relative h-[220px] sm:h-[260px] lg:h-[288px] w-full overflow-hidden rounded-3xl bg-[#0063b4]">
+        <div 
+          className="relative h-[220px] sm:h-[260px] lg:h-[288px] w-full overflow-hidden rounded-3xl"
+          style={{ backgroundColor: creatorBannerColor }}
+        >
           <ShaderFill
             className="absolute inset-0 rounded-3xl"
             shader={{
@@ -487,20 +510,43 @@ export const CreatorProfilePage: React.FC<CreatorProfilePageProps> = ({
               manifest: manifestWater,
             }}
           />
+          {isOwnProfile && isEditModeActive && (
+            <button
+              onClick={() => setEditingSection('banner')}
+              className="absolute top-4 right-4 z-30 px-3 py-1.5 rounded-full bg-white/95 hover:bg-white text-black text-xs font-semibold shadow-md flex items-center gap-1.5 cursor-pointer backdrop-blur-xs transition"
+              title="Edit Banner"
+            >
+              <Pencil className="w-3.5 h-3.5 text-blue-600" />
+              <span>Ganti Banner</span>
+            </button>
+          )}
         </div>
 
         {/* Squircle Avatar & Action Bar Row */}
         <div className="relative z-20 flex flex-col gap-4 px-4 -mt-20 sm:flex-row sm:items-end sm:justify-between">
           
           {/* Circular Avatar */}
-          <div className="relative inline-block self-start">
+          <div className="relative inline-block self-start group">
             <div className="size-[144px] rounded-full bg-white p-1.5 shadow-[0_20px_25px_-5px_rgba(0,0,0,0.08),0_8px_10px_-6px_rgba(0,0,0,0.08)] ring-1 ring-neutral-900/5">
               <img
-                src={creator.avatar}
-                alt={creator.name}
+                src={creatorAvatar}
+                alt={creatorName}
                 className="w-full h-full rounded-full object-cover"
               />
             </div>
+            {isOwnProfile && isEditModeActive && (
+              <button
+                onClick={() => {
+                  setTempAvatar(creatorAvatar);
+                  setEditingSection('avatar');
+                }}
+                className="absolute inset-0 rounded-full bg-black/50 flex flex-col items-center justify-center text-white cursor-pointer z-20 transition"
+                title="Ganti Foto Profil"
+              >
+                <Pencil className="w-5 h-5 mb-0.5" />
+                <span className="text-[10px] font-semibold">Ganti Foto</span>
+              </button>
+            )}
             {creator.proBadge && (
               <div 
                 className="absolute left-[114px] top-[114px] rounded-full bg-[#0d0c22] p-1.5 text-white shadow-xs ring-[3px] ring-white" 
@@ -511,7 +557,7 @@ export const CreatorProfilePage: React.FC<CreatorProfilePageProps> = ({
             )}
           </div>
 
-          {/* Action Buttons Row (Right Aligned, Style from Reference Image) */}
+          {/* Action Buttons Row */}
           <div className="flex items-center gap-2.5 self-start pb-1 sm:self-end">
             
             {/* Button 1: More Options (...) */}
@@ -561,7 +607,7 @@ export const CreatorProfilePage: React.FC<CreatorProfilePageProps> = ({
                   <button
                     onClick={() => {
                       setIsMoreMenuOpen(false);
-                      alert(`Profil ${creator.name} telah diverifikasi oleh tim Creatorin.`);
+                      alert(`Profil ${creatorName} telah diverifikasi oleh tim Creatorin.`);
                     }}
                     className="w-full px-4 py-2.5 text-xs font-semibold text-neutral-700 hover:bg-neutral-50 flex items-center gap-2.5 cursor-pointer"
                   >
@@ -584,14 +630,18 @@ export const CreatorProfilePage: React.FC<CreatorProfilePageProps> = ({
                   <span>Bagikan Profil</span>
                 </button>
 
-                {/* Own Profile: Edit Profil */}
+                {/* Own Profile: Edit Profil Mode Toggle */}
                 <button
                   id="btn-edit-profile"
-                  onClick={() => navigateTo('settings', '/settings')}
-                  className="flex items-center gap-2 h-10 px-5 rounded-xl bg-[#0B1F3A] hover:bg-[#123B8C] text-sm font-semibold text-white shadow-xs transition-colors cursor-pointer"
+                  onClick={() => setIsEditModeActive(!isEditModeActive)}
+                  className={`flex items-center gap-2 h-10 px-5 rounded-xl text-sm font-semibold transition-colors cursor-pointer shadow-xs ${
+                    isEditModeActive
+                      ? 'bg-emerald-600 hover:bg-emerald-700 text-white'
+                      : 'bg-[#0B1F3A] hover:bg-[#123B8C] text-white'
+                  }`}
                 >
-                  <Pencil className="w-3.5 h-3.5" />
-                  <span>Edit Profil</span>
+                  {isEditModeActive ? <Check className="w-3.5 h-3.5" /> : <Pencil className="w-3.5 h-3.5" />}
+                  <span>{isEditModeActive ? 'Selesai Edit' : 'Edit Profil'}</span>
                 </button>
               </>
             ) : (
@@ -628,11 +678,24 @@ export const CreatorProfilePage: React.FC<CreatorProfilePageProps> = ({
         {/* Creator Identity & Meta Stats Block (Below Avatar) */}
         <div className="px-4 pt-4 text-left">
           
-          {/* Name & Badges */}
+          {/* Name & Badges with inline pencil */}
           <div className="flex items-center gap-2.5">
             <h1 className="text-2xl sm:text-3xl lg:text-[40px] font-bold leading-tight lg:leading-[48px] tracking-tight text-[#0F172A]">
-              {creator.name}
+              {creatorName}
             </h1>
+            {isOwnProfile && isEditModeActive && (
+              <button
+                onClick={() => {
+                  setTempName(creatorName);
+                  setTempRoleTitle(creatorRoleTitle);
+                  setEditingSection('name');
+                }}
+                className="p-1.5 rounded-lg bg-neutral-100 hover:bg-neutral-200 text-neutral-700 cursor-pointer transition"
+                title="Edit Nama & Gelar"
+              >
+                <Pencil className="w-4 h-4 text-blue-600" />
+              </button>
+            )}
             {creator.verified && (
               <CheckCircle2 className="w-5 h-5 sm:w-6 sm:h-6 text-[#1D4ED8] fill-[#1D4ED8] text-white" />
             )}
@@ -645,7 +708,7 @@ export const CreatorProfilePage: React.FC<CreatorProfilePageProps> = ({
 
           {/* Tagline / Headline */}
           <p className="mt-2 max-w-2xl text-base font-normal leading-6 text-[#64748B]">
-            {creator.roleTitle || creator.heroHeadline || 'Design in business. Business in design.'}
+            {creatorRoleTitle || 'Design in business. Business in design.'}
           </p>
 
           {/* Inline Stats Row (Standardized scale spacing gap-x-6 gap-y-2) */}
@@ -866,10 +929,12 @@ export const CreatorProfilePage: React.FC<CreatorProfilePageProps> = ({
               </div>
             ) : (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                {isOwnProfile && (
+                {isEffectiveOwner && (
                   <button
+                    id="btn-upload-project-action"
+                    data-testid="btn-upload-project-action"
                     type="button"
-                    onClick={() => setIsBriefModalOpen(true)}
+                    onClick={() => setIsUploadProjectModalOpen(true)}
                     className="flex aspect-[326/407.5] flex-col items-center justify-center rounded-md border border-dashed border-[#acacac] bg-white px-8 text-center transition hover:border-[#0d0c22] hover:bg-neutral-50 cursor-pointer"
                   >
                     <span className="text-6xl font-light leading-none text-[#acacac]">+</span>
@@ -917,10 +982,12 @@ export const CreatorProfilePage: React.FC<CreatorProfilePageProps> = ({
               </div>
             ) : (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                {isOwnProfile && (
+                {isEffectiveOwner && (
                   <button
+                    id="btn-upload-service-action"
+                    data-testid="btn-upload-service-action"
                     type="button"
-                    onClick={() => setIsBriefModalOpen(true)}
+                    onClick={() => setIsUploadServiceModalOpen(true)}
                     className="flex min-h-[468px] flex-col items-center justify-center rounded-md border border-dashed border-[#acacac] bg-white px-8 text-center transition hover:border-[#0d0c22] hover:bg-neutral-50 cursor-pointer"
                   >
                     <span className="text-6xl font-light leading-none text-[#acacac]">+</span>
@@ -1436,20 +1503,23 @@ export const CreatorProfilePage: React.FC<CreatorProfilePageProps> = ({
               
               {/* Biography */}
               <div>
-                <h3 className="text-base sm:text-lg font-bold text-[#0d0c22] mb-3.5">Biography</h3>
-                <div className="space-y-4 text-sm sm:text-[15px] text-neutral-800 leading-relaxed font-normal">
-                  <p>
-                    We are Kreativa Studio – a forward thinking digital design studio delivering meticulous experiences that talk to people.
-                  </p>
-                  <p>
-                    Our creations help clients around the world, ranging from industry icons and brands the likes of Tony Robbins, Sony, Hasbro, Toyota and Government of Dubai, to small ambitious startups such as EnduroSat, Backpack and Ybot to name a few.
-                  </p>
-                  <p>
-                    From concept to execution, we partner with clients to help them establish brands that resonate, launch impeccable apps, edgy websites and products adapted for what&apos;s to come.
-                  </p>
-                  <p>
-                    So, if you&apos;re looking for the right dance partner to help you make that next step, and think we might be a good fit, reach out to us, and let&apos;s create something special – together!
-                  </p>
+                <div className="flex items-center gap-2 mb-3.5">
+                  <h3 className="text-base sm:text-lg font-bold text-[#0d0c22]">Biography</h3>
+                  {isOwnProfile && isEditModeActive && (
+                    <button
+                      onClick={() => {
+                        setTempBio(creatorBio);
+                        setEditingSection('bio');
+                      }}
+                      className="p-1 rounded-md hover:bg-neutral-100 text-neutral-600 hover:text-black cursor-pointer transition"
+                      title="Edit Bio"
+                    >
+                      <Pencil className="w-3.5 h-3.5 text-blue-600" />
+                    </button>
+                  )}
+                </div>
+                <div className="space-y-4 text-sm sm:text-[15px] text-neutral-800 leading-relaxed font-normal whitespace-pre-line">
+                  <p>{creatorBio}</p>
                 </div>
               </div>
 
@@ -1850,6 +1920,150 @@ export const CreatorProfilePage: React.FC<CreatorProfilePageProps> = ({
           }}
         />
       )}
+
+      {/* ==================================================================== */}
+      {/* INLINE EDIT MICRO-MODALS FOR SECTIONS (NAMA, BIO, AVATAR, BANNER)    */}
+      {/* ==================================================================== */}
+      {editingSection && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-xs animate-in fade-in duration-150">
+          <div className="bg-white w-full max-w-md rounded-2xl shadow-xl p-5 text-left space-y-4">
+            <div className="flex items-center justify-between border-b border-neutral-100 pb-3">
+              <h3 className="text-sm font-bold text-[#0D0C22]">
+                {editingSection === 'name' && 'Edit Nama & Gelar Profesional'}
+                {editingSection === 'bio' && 'Edit Biografi / Ringkasan Diri'}
+                {editingSection === 'avatar' && 'Ubah Foto Profil'}
+                {editingSection === 'banner' && 'Ubah Warna / Banner Profil'}
+              </h3>
+              <button 
+                onClick={() => setEditingSection(null)} 
+                className="w-7 h-7 rounded-full hover:bg-neutral-100 flex items-center justify-center text-neutral-400 hover:text-black cursor-pointer"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            {editingSection === 'name' && (
+              <div className="space-y-3 text-xs">
+                <div>
+                  <label className="font-semibold text-neutral-700 block mb-1">Nama Lengkap</label>
+                  <input
+                    type="text"
+                    value={tempName}
+                    onChange={(e) => setTempName(e.target.value)}
+                    className="w-full px-3 py-2 rounded-xl border border-neutral-200 text-xs focus:outline-none focus:border-[#0D0C22]"
+                  />
+                </div>
+                <div>
+                  <label className="font-semibold text-neutral-700 block mb-1">Gelar / Role Profesional</label>
+                  <input
+                    type="text"
+                    value={tempRoleTitle}
+                    onChange={(e) => setTempRoleTitle(e.target.value)}
+                    className="w-full px-3 py-2 rounded-xl border border-neutral-200 text-xs focus:outline-none focus:border-[#0D0C22]"
+                  />
+                </div>
+              </div>
+            )}
+
+            {editingSection === 'bio' && (
+              <div className="space-y-2 text-xs">
+                <label className="font-semibold text-neutral-700 block">Biografi</label>
+                <textarea
+                  rows={4}
+                  value={tempBio}
+                  onChange={(e) => setTempBio(e.target.value)}
+                  className="w-full px-3 py-2 rounded-xl border border-neutral-200 text-xs focus:outline-none focus:border-[#0D0C22] resize-none"
+                  placeholder="Tuliskan biografi singkat Anda..."
+                />
+              </div>
+            )}
+
+            {editingSection === 'avatar' && (
+              <div className="space-y-3 text-xs">
+                <div className="flex items-center gap-3">
+                  <img src={tempAvatar} alt="Preview" className="w-14 h-14 rounded-full object-cover ring-2 ring-neutral-200" />
+                  <div className="flex-1">
+                    <label className="font-semibold text-neutral-700 block mb-1">Pilih File Baru</label>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (file) setTempAvatar(URL.createObjectURL(file));
+                      }}
+                      className="text-xs text-neutral-500"
+                    />
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {editingSection === 'banner' && (
+              <div className="space-y-3 text-xs">
+                <label className="font-semibold text-neutral-700 block">Pilih Warna Aksen Banner</label>
+                <div className="flex gap-2">
+                  {['#0063b4', '#0d0c22', '#155DFC', '#0f766e', '#7c3aed', '#be185d'].map((c) => (
+                    <button
+                      key={c}
+                      type="button"
+                      onClick={() => setCreatorBannerColor(c)}
+                      className={`w-8 h-8 rounded-full border-2 transition cursor-pointer ${
+                        creatorBannerColor === c ? 'border-black scale-110' : 'border-transparent'
+                      }`}
+                      style={{ backgroundColor: c }}
+                    />
+                  ))}
+                </div>
+              </div>
+            )}
+
+            <div className="flex items-center justify-end gap-2 pt-2 border-t border-neutral-100">
+              <button
+                type="button"
+                onClick={() => setEditingSection(null)}
+                className="px-3.5 py-1.5 rounded-xl border border-neutral-200 text-xs font-semibold text-neutral-600 hover:bg-neutral-50 cursor-pointer"
+              >
+                Batal
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  if (editingSection === 'name') {
+                    setCreatorName(tempName);
+                    setCreatorRoleTitle(tempRoleTitle);
+                  } else if (editingSection === 'bio') {
+                    setCreatorBio(tempBio);
+                  } else if (editingSection === 'avatar') {
+                    setCreatorAvatar(tempAvatar);
+                  }
+                  setEditingSection(null);
+                }}
+                className="px-4 py-1.5 rounded-xl bg-[#0D0C22] hover:bg-neutral-800 text-white text-xs font-bold cursor-pointer transition shadow-xs"
+              >
+                Simpan
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Upload Project Modal (Instagram style) */}
+      <UploadProjectModal
+        isOpen={isUploadProjectModalOpen}
+        onClose={() => setIsUploadProjectModalOpen(false)}
+        onSuccess={() => {
+          alert('Karya proyek berhasil diposting!');
+        }}
+      />
+
+      {/* Upload Service Modal */}
+      <UploadServiceModal
+        isOpen={isUploadServiceModalOpen}
+        onClose={() => setIsUploadServiceModalOpen(false)}
+        onSuccess={(newSrv) => {
+          alert(`Paket layanan "${newSrv.title}" berhasil diterbitkan!`);
+        }}
+      />
 
     </div>
   );
