@@ -34,6 +34,7 @@ import {
 import { ProjectBriefModal } from '@/components/modals/ProjectBriefModal';
 import { ProjectDetailModal } from '@/components/modals/ProjectDetailModal';
 import { ProjectCard } from '@/components/common/ProjectCard';
+import { ScrollReveal } from '@/components/common/ScrollReveal';
 import { MOCK_FEED_PROJECTS } from '@/data/mockFeedProjects';
 import { ActivePage, AuthState, FeedProject, Creator } from '@/types';
 
@@ -283,47 +284,49 @@ export const ExploreProjectsPage: React.FC<ExploreProjectsPageProps> = ({
         </div>
 
         {/* Page Title & Subtitle Header */}
-        <div className="mb-6 space-y-2">
-          <div>
-            <h1 className="text-2xl sm:text-3xl lg:text-[40px] font-bold text-[#0F172A] tracking-tight leading-tight lg:leading-[48px]">
-              Jelajah Proyek & Portofolio Kreator
-            </h1>
-            <p className="text-sm sm:text-base text-[#64748B] mt-2 max-w-2xl leading-normal font-normal">
-              Temukan portofolio nyata, video Reels, konten TikTok, dan sistem desain yang telah diproduksi oleh kreator top terverifikasi Creatorin.
-            </p>
-          </div>
+        <ScrollReveal distance={20} duration={600}>
+          <div className="mb-6 space-y-2">
+            <div>
+              <h1 className="text-2xl sm:text-3xl lg:text-[40px] font-bold text-[#0F172A] tracking-tight leading-tight lg:leading-[48px]">
+                Jelajah Proyek & Portofolio Kreator
+              </h1>
+              <p className="text-sm sm:text-base text-[#64748B] mt-2 max-w-2xl leading-normal font-normal">
+                Temukan portofolio nyata, video Reels, konten TikTok, dan sistem desain yang telah diproduksi oleh kreator top terverifikasi Creatorin.
+              </p>
+            </div>
 
-          {/* Popular Tag Pills */}
-          <div className="pt-3 flex flex-wrap items-center gap-1.5">
-            <span className="text-xs font-semibold text-[#64748B] mr-1 flex items-center gap-1">
-              <span>Tagar Populer:</span>
-            </span>
-            {POPULAR_PROJECT_TAGS.map((tag) => {
-              const isSelected = selectedTag === tag;
-              return (
+            {/* Popular Tag Pills */}
+            <div className="pt-3 flex flex-wrap items-center gap-1.5">
+              <span className="text-xs font-semibold text-[#64748B] mr-1 flex items-center gap-1">
+                <span>Tagar Populer:</span>
+              </span>
+              {POPULAR_PROJECT_TAGS.map((tag) => {
+                const isSelected = selectedTag === tag;
+                return (
+                  <button
+                    key={tag}
+                    onClick={() => setSelectedTag(isSelected ? null : tag)}
+                    className={`px-3 py-1 rounded-full text-xs font-medium border transition-all cursor-pointer ${
+                      isSelected 
+                        ? 'bg-[#0B1F3A] text-white border-[#0B1F3A] shadow-2xs font-semibold' 
+                        : 'bg-white text-[#64748B] border-[#E2E8F0] hover:border-[#64748B] hover:text-[#0F172A] hover:bg-[#F8FAFC]'
+                    }`}
+                  >
+                    {tag}
+                  </button>
+                );
+              })}
+              {selectedTag && (
                 <button
-                  key={tag}
-                  onClick={() => setSelectedTag(isSelected ? null : tag)}
-                  className={`px-3 py-1 rounded-full text-xs font-medium border transition-all cursor-pointer ${
-                    isSelected 
-                      ? 'bg-[#0B1F3A] text-white border-[#0B1F3A] shadow-2xs font-semibold' 
-                      : 'bg-white text-[#64748B] border-[#E2E8F0] hover:border-[#64748B] hover:text-[#0F172A] hover:bg-[#F8FAFC]'
-                  }`}
+                  onClick={() => setSelectedTag(null)}
+                  className="text-xs text-[#1D4ED8] font-semibold hover:underline ml-1.5 cursor-pointer"
                 >
-                  {tag}
+                  Reset Tagar
                 </button>
-              );
-            })}
-            {selectedTag && (
-              <button
-                onClick={() => setSelectedTag(null)}
-                className="text-xs text-[#1D4ED8] font-semibold hover:underline ml-1.5 cursor-pointer"
-              >
-                Reset Tagar
-              </button>
-            )}
+              )}
+            </div>
           </div>
-        </div>
+        </ScrollReveal>
 
         {/* Section Heading & Filter Toolbar */}
         <section className="pt-4 pb-4 border-t border-[#E2E8F0] mb-6 relative">
@@ -574,15 +577,21 @@ export const ExploreProjectsPage: React.FC<ExploreProjectsPageProps> = ({
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {filteredProjects.map((project) => (
-              <ProjectCard
+            {filteredProjects.map((project, pIdx) => (
+              <ScrollReveal
                 key={project.id}
-                id={`feed-card-${project.id}`}
-                project={project}
-                isSaved={Boolean(savedPosts[project.id])}
-                onToggleSave={(id, e) => handleToggleSave(id, e)}
-                onClick={() => handleOpenProjectModal(project)}
-              />
+                distance={28}
+                delay={Math.min((pIdx % 4) * 70, 240)}
+                duration={600}
+              >
+                <ProjectCard
+                  id={`feed-card-${project.id}`}
+                  project={project}
+                  isSaved={Boolean(savedPosts[project.id])}
+                  onToggleSave={(id, e) => handleToggleSave(id, e)}
+                  onClick={() => handleOpenProjectModal(project)}
+                />
+              </ScrollReveal>
             ))}
           </div>
         )}

@@ -7,6 +7,7 @@ import { MOCK_CREATORS } from '@/data/mockCreators';
 import { Creator, CreatorCategory, AuthState, ActivePage } from '@/types';
 import { ProfileModal } from '@/components/modals/ProfileModal';
 import { ProjectBriefModal } from '@/components/modals/ProjectBriefModal';
+import { ScrollReveal } from '@/components/common/ScrollReveal';
 import { 
   ShieldCheck, 
   Star, 
@@ -202,47 +203,49 @@ export const LandingPage: React.FC<LandingPageProps> = ({ currentUser: propUser,
         </div>
 
         {/* Page Title & Subtitle Header */}
-        <div className="mb-6 space-y-3">
-          <div>
-            <h1 className="text-2xl sm:text-3xl lg:text-[40px] font-bold text-[#0F172A] tracking-tight leading-tight lg:leading-[48px]">
-              Jelajah Profil Kreator & Talenta Terverifikasi
-            </h1>
-            <p className="text-sm sm:text-base text-[#64748B] mt-2 max-w-2xl leading-normal font-normal">
-              Telusuri portofolio karya asli, bandingkan Career Score & performa nyata kreator, dan hubungi langsung.
-            </p>
-          </div>
+        <ScrollReveal distance={20} duration={600}>
+          <div className="mb-6 space-y-3">
+            <div>
+              <h1 className="text-2xl sm:text-3xl lg:text-[40px] font-bold text-[#0F172A] tracking-tight leading-tight lg:leading-[48px]">
+                Jelajah Profil Kreator & Talenta Terverifikasi
+              </h1>
+              <p className="text-sm sm:text-base text-[#64748B] mt-2 max-w-2xl leading-normal font-normal">
+                Telusuri portofolio karya asli, bandingkan Career Score & performa nyata kreator, dan hubungi langsung.
+              </p>
+            </div>
 
-          {/* Popular Tag Pills */}
-          <div className="pt-2 flex flex-wrap items-center gap-1.5">
-            <span className="text-xs font-semibold text-[#64748B] mr-1 flex items-center gap-1">
-              <span>Tagar Populer:</span>
-            </span>
-            {POPULAR_TAGS.map((tag) => {
-              const isSelected = selectedTag === tag;
-              return (
+            {/* Popular Tag Pills */}
+            <div className="pt-2 flex flex-wrap items-center gap-1.5">
+              <span className="text-xs font-semibold text-[#64748B] mr-1 flex items-center gap-1">
+                <span>Tagar Populer:</span>
+              </span>
+              {POPULAR_TAGS.map((tag) => {
+                const isSelected = selectedTag === tag;
+                return (
+                  <button
+                    key={tag}
+                    onClick={() => setSelectedTag(isSelected ? null : tag)}
+                    className={`px-3 py-1 rounded-full text-xs font-medium border transition-all cursor-pointer ${
+                      isSelected 
+                        ? 'bg-[#0B1F3A] text-white border-[#0B1F3A] shadow-2xs font-semibold' 
+                        : 'bg-white text-[#64748B] border-[#E2E8F0] hover:border-[#64748B] hover:text-[#0F172A] hover:bg-[#F8FAFC]'
+                    }`}
+                  >
+                    {tag}
+                  </button>
+                );
+              })}
+              {selectedTag && (
                 <button
-                  key={tag}
-                  onClick={() => setSelectedTag(isSelected ? null : tag)}
-                  className={`px-3 py-1 rounded-full text-xs font-medium border transition-all cursor-pointer ${
-                    isSelected 
-                      ? 'bg-[#0B1F3A] text-white border-[#0B1F3A] shadow-2xs font-semibold' 
-                      : 'bg-white text-[#64748B] border-[#E2E8F0] hover:border-[#64748B] hover:text-[#0F172A] hover:bg-[#F8FAFC]'
-                  }`}
+                  onClick={() => setSelectedTag(null)}
+                  className="text-xs text-[#1D4ED8] font-semibold hover:underline ml-1.5 cursor-pointer"
                 >
-                  {tag}
+                  Reset Tagar
                 </button>
-              );
-            })}
-            {selectedTag && (
-              <button
-                onClick={() => setSelectedTag(null)}
-                className="text-xs text-[#1D4ED8] font-semibold hover:underline ml-1.5 cursor-pointer"
-              >
-                Reset Tagar
-              </button>
-            )}
+              )}
+            </div>
           </div>
-        </div>
+        </ScrollReveal>
 
         {/* Section Heading: Cari Talenta Berdasarkan Kategori & Filter Toolbar */}
         <div className="pt-4 pb-4 border-t border-[#E2E8F0]">
@@ -460,18 +463,23 @@ export const LandingPage: React.FC<LandingPageProps> = ({ currentUser: propUser,
               </p>
             </div>
           ) : (
-            filteredCreators.map((creator) => {
+            filteredCreators.map((creator, cIdx) => {
               const isSaved = savedCreators.has(creator.id);
 
               return (
-                <div
+                <ScrollReveal
                   key={creator.id}
-                  id={`creator-card-${creator.id}`}
-                  onClick={() => {
-                    handleCreatorClick(creator);
-                  }}
-                  className="group bg-white rounded-2xl sm:rounded-3xl border border-neutral-200/80 hover:border-neutral-300 p-6 sm:p-8 transition-all shadow-xs hover:shadow-md cursor-pointer text-left"
+                  distance={32}
+                  delay={Math.min(cIdx * 60, 240)}
+                  duration={600}
                 >
+                  <div
+                    id={`creator-card-${creator.id}`}
+                    onClick={() => {
+                      handleCreatorClick(creator);
+                    }}
+                    className="group bg-white rounded-2xl sm:rounded-3xl border border-neutral-200/80 hover:border-neutral-300 p-6 sm:p-8 transition-all shadow-xs hover:shadow-md cursor-pointer text-left"
+                  >
                   
                   {/* BARIS 1: Header Profil Kreator, Badges, & Action Buttons */}
                   <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
@@ -715,7 +723,8 @@ export const LandingPage: React.FC<LandingPageProps> = ({ currentUser: propUser,
                   </div>
 
                 </div>
-              );
+              </ScrollReveal>
+            );
             })
           )}
         </div>

@@ -85,6 +85,26 @@ export const Navbar: React.FC<NavbarProps> = ({
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
+  // Dynamic shrinking navbar state when scrolled
+  const [isScrolled, setIsScrolled] = useState(false);
+
+  useEffect(() => {
+    let rafId: number | null = null;
+    const handleScroll = () => {
+      if (rafId) return;
+      rafId = window.requestAnimationFrame(() => {
+        setIsScrolled(window.scrollY > 20);
+        rafId = null;
+      });
+    };
+    handleScroll();
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      if (rafId) window.cancelAnimationFrame(rafId);
+    };
+  }, []);
+
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (onSearch) {
@@ -104,8 +124,17 @@ export const Navbar: React.FC<NavbarProps> = ({
   ];
 
   return (
-    <header id="main-header" className="sticky top-0 z-40 w-full bg-white border-b border-neutral-200/80 transition-all font-sans">
-      <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between gap-4">
+    <header 
+      id="main-header" 
+      className={`sticky top-0 z-40 w-full transition-all duration-300 ease-in-out font-sans ${
+        isScrolled 
+          ? 'bg-white/92 backdrop-blur-md shadow-xs border-b border-neutral-200/80' 
+          : 'bg-white border-b border-neutral-200/60'
+      }`}
+    >
+      <div className={`max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 transition-all duration-300 ease-in-out flex items-center justify-between gap-4 ${
+        isScrolled ? 'h-16' : 'h-20'
+      }`}>
         
         {/* Sisi Kiri: Logo Brand & Search Bar Dribbble Style */}
         <div className={`flex items-center gap-6 xl:gap-8 ${isSearchVisible ? 'flex-1 max-w-2xl' : 'shrink-0'}`}>
@@ -120,10 +149,10 @@ export const Navbar: React.FC<NavbarProps> = ({
             <img
               src="/creatorin/logo.svg"
               alt=""
-              className="h-[32px] w-[34px] shrink-0"
+              className={`shrink-0 transition-all duration-300 ease-in-out ${isScrolled ? 'h-[28px] w-[30px]' : 'h-[32px] w-[34px]'}`}
               aria-hidden="true"
             />
-            <span className="text-[23.794px] font-medium leading-none tracking-[-0.714px] text-black font-[var(--font-logo)]">
+            <span className={`font-medium leading-none tracking-[-0.714px] text-black font-[var(--font-logo)] transition-all duration-300 ease-in-out ${isScrolled ? 'text-[21px]' : 'text-[23.794px]'}`}>
               Creatorin
             </span>
           </button>
@@ -175,7 +204,7 @@ export const Navbar: React.FC<NavbarProps> = ({
 
           {/* Dropdown Jelajah dengan Sub-navigasi on Hover & Smooth Animation */}
           <div 
-            className="relative py-6 group/explore"
+            className={`relative group/explore transition-all duration-300 ${isScrolled ? 'py-4' : 'py-6'}`}
             onMouseEnter={() => setExploreDropdownOpen(true)}
             onMouseLeave={() => setExploreDropdownOpen(false)}
           >
@@ -409,18 +438,18 @@ export const Navbar: React.FC<NavbarProps> = ({
               )}
             </div>
           ) : (
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1.5 sm:gap-2">
               <button
                 id="nav-signin-btn"
                 onClick={() => navigateTo('signin', '/sign-in')}
-                className="h-10 px-4 text-xs sm:text-sm font-semibold text-[#0D0B0B] hover:text-[#155DFC] hover:bg-[#F3F3F4] rounded-[8px] transition-colors cursor-pointer"
+                className="hidden sm:inline-flex h-10 px-4 text-xs sm:text-sm font-semibold text-[#0D0B0B] hover:text-[#155DFC] hover:bg-[#F3F3F4] rounded-[8px] transition-colors cursor-pointer"
               >
                 Masuk
               </button>
               <button
                 id="nav-signup-btn"
                 onClick={() => navigateTo('signup', '/sign-up')}
-                className="h-10 px-4 text-xs sm:text-sm font-semibold text-white bg-[#155DFC] hover:bg-[#0E4CD1] rounded-[8px] transition-colors cursor-pointer"
+                className="h-9 sm:h-10 px-3 sm:px-4 text-xs sm:text-sm font-semibold text-white bg-[#155DFC] hover:bg-[#0E4CD1] rounded-[8px] transition-colors cursor-pointer flex items-center justify-center shrink-0"
               >
                 Daftar
               </button>

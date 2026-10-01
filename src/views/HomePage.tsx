@@ -48,6 +48,7 @@ import {
 import { ProjectBriefModal } from '@/components/modals/ProjectBriefModal';
 import { ProjectDetailModal } from '@/components/modals/ProjectDetailModal';
 import { ProjectCard } from '@/components/common/ProjectCard';
+import { ScrollReveal } from '@/components/common/ScrollReveal';
 import { MOCK_CREATORS } from '@/data/mockCreators';
 import { MOCK_FEED_PROJECTS } from '@/data/mockFeedProjects';
 import { ActivePage, AuthState, Creator, CreatorService, FeedProject } from '@/types';
@@ -373,7 +374,7 @@ export const HomePage: React.FC<HomePageProps> = ({
   };
 
   return (
-    <div className="w-full bg-white text-[#171717] font-sans selection:bg-[#0B1F3A] selection:text-white">
+    <div className="w-full overflow-x-hidden bg-white text-[#171717] font-sans selection:bg-[#0B1F3A] selection:text-white">
       <main className="w-full">
         
         {/* ========================================================================= */}
@@ -459,76 +460,86 @@ export const HomePage: React.FC<HomePageProps> = ({
           >
             
             {/* Sleek, Modern Hero Badge */}
-            <div className="inline-flex items-center gap-2 sm:gap-2.5 px-3.5 sm:px-4 py-1.5 rounded-full bg-white border border-neutral-200/80 shadow-2xs hover:border-neutral-300 transition-all">
-              <span className="flex items-center justify-center w-5 h-5 rounded-full bg-blue-50 text-blue-600 shrink-0">
-                <Sparkles className="w-3 h-3 text-blue-600" />
-              </span>
-              <span className="text-xs sm:text-[13px] font-semibold text-[#0d0c22] tracking-tight">
-                Platform Kolaborasi Kreatif
-              </span>
-              <span className="w-1 h-1 rounded-full bg-neutral-300 hidden sm:inline-block" />
-              <span className="text-xs sm:text-[13px] font-normal text-neutral-500 hidden sm:inline">
-                Marketplace Jasa Digital & UMKM
-              </span>
-            </div>
+            <ScrollReveal distance={20} duration={600} delay={60}>
+              <div className="inline-flex items-center gap-2 sm:gap-2.5 px-3.5 sm:px-4 py-1.5 rounded-full bg-white border border-neutral-200/80 shadow-2xs hover:border-neutral-300 transition-all">
+                <span className="flex items-center justify-center w-5 h-5 rounded-full bg-blue-50 text-blue-600 shrink-0">
+                  <Sparkles className="w-3 h-3 text-blue-600" />
+                </span>
+                <span className="text-xs sm:text-[13px] font-semibold text-[#0d0c22] tracking-tight">
+                  Platform Kolaborasi Kreatif
+                </span>
+                <span className="w-1 h-1 rounded-full bg-neutral-300 hidden sm:inline-block" />
+                <span className="text-xs sm:text-[13px] font-normal text-neutral-500 hidden sm:inline">
+                  Marketplace Jasa Digital & UMKM
+                </span>
+              </div>
+            </ScrollReveal>
 
             {/* Focal Point Display Headline (Display 64/72 according to design.md §3) */}
-            <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-[64px] text-[#0F172A] tracking-tight leading-[1.125] lg:leading-[72px]">
-              <span className="font-bold">Temukan</span>{' '}
-              <span className="font-medium text-[#171717]">Talenta Kreatif</span>,{' '}
-              <br className="hidden sm:inline" />
-              <span className="font-medium text-[#171717]">Wujudkan</span>{' '}
-              <span className="bg-gradient-to-r from-[#155DFC] to-[#05A4FD] bg-clip-text text-transparent font-bold">
-                Ide Digital
-              </span>.
-            </h1>
+            <ScrollReveal distance={26} duration={700} delay={120}>
+              <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-[64px] text-[#0F172A] tracking-tight leading-[1.125] lg:leading-[72px]">
+                <span className="font-bold">Temukan</span>{' '}
+                <span className="font-medium text-[#171717]">Talenta Kreatif</span>,{' '}
+                <br className="hidden sm:inline" />
+                <span className="font-medium text-[#171717]">Wujudkan</span>{' '}
+                <span className="bg-gradient-to-r from-[#155DFC] to-[#05A4FD] bg-clip-text text-transparent font-bold">
+                  Ide Digital
+                </span>.
+              </h1>
+            </ScrollReveal>
 
             {/* Concise Value Proposition Description */}
-            <p className="text-base sm:text-lg text-[#64748B] max-w-2xl mx-auto leading-relaxed font-normal">
-              Temukan creator berbakat untuk kebutuhan digitalmu, atau tampilkan keahlianmu dan dapatkan project yang tepat.
-            </p>
+            <ScrollReveal distance={20} duration={650} delay={180}>
+              <p className="text-base sm:text-lg text-[#64748B] max-w-2xl mx-auto leading-relaxed font-normal">
+                Temukan creator berbakat untuk kebutuhan digitalmu, atau tampilkan keahlianmu dan dapatkan project yang tepat.
+              </p>
+            </ScrollReveal>
 
             {/* Dual CTA Buttons (Height 48px, rounded-xl 12px according to design.md §7, §8) */}
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-3.5 pt-3">
-              <button
-                type="button"
-                onClick={() => navigateTo('landing', '/landing')}
-                className="w-full sm:w-auto h-12 px-7 sm:px-8 rounded-xl bg-[#0B1F3A] hover:bg-[#123B8C] text-white text-base font-semibold transition-colors shadow-xs flex items-center justify-center gap-2 cursor-pointer"
-              >
-                <span>Jelajah Creator</span>
-                <ArrowRight className="w-4 h-4" />
-              </button>
+            <ScrollReveal distance={20} duration={650} delay={240}>
+              <div className="flex flex-col sm:flex-row items-center justify-center gap-3.5 pt-3">
+                <button
+                  type="button"
+                  onClick={() => navigateTo('landing', '/landing')}
+                  className="w-full sm:w-auto h-12 px-7 sm:px-8 rounded-xl bg-[#0B1F3A] hover:bg-[#123B8C] text-white text-base font-semibold transition-colors shadow-xs flex items-center justify-center gap-2 cursor-pointer"
+                >
+                  <span>Jelajah Creator</span>
+                  <ArrowRight className="w-4 h-4" />
+                </button>
 
-              <button
-                type="button"
-                onClick={() => navigateTo('projects', '/explore/projects')}
-                className="w-full sm:w-auto h-12 px-7 sm:px-8 rounded-xl bg-white hover:bg-[#F8FAFC] text-[#0F172A] text-base font-semibold transition-colors border border-[#E2E8F0] hover:border-[#64748B] shadow-2xs flex items-center justify-center gap-2 cursor-pointer"
-              >
-                <span>Tawarkan Keahlian</span>
-              </button>
-            </div>
+                <button
+                  type="button"
+                  onClick={() => navigateTo('projects', '/explore/projects')}
+                  className="w-full sm:w-auto h-12 px-7 sm:px-8 rounded-xl bg-white hover:bg-[#F8FAFC] text-[#0F172A] text-base font-semibold transition-colors border border-[#E2E8F0] hover:border-[#64748B] shadow-2xs flex items-center justify-center gap-2 cursor-pointer"
+                >
+                  <span>Tawarkan Keahlian</span>
+                </button>
+              </div>
+            </ScrollReveal>
 
             {/* Scroll Down Indicator with Bouncing Mouse Wheel & Smooth Scroll Interaction */}
-            <div className="pt-6 sm:pt-10 flex justify-center">
-              <button
-                type="button"
-                onClick={() => {
-                  const exploreSec = document.getElementById('explore-section');
-                  if (exploreSec) {
-                    exploreSec.scrollIntoView({ behavior: 'smooth' });
-                  }
-                }}
-                className="group inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full bg-white/90 hover:bg-white border border-neutral-200/90 hover:border-[#155DFC]/40 text-xs font-semibold text-neutral-500 hover:text-[#155DFC] transition-all cursor-pointer shadow-2xs hover:shadow-xs focus:outline-hidden focus:ring-2 focus:ring-[#155DFC]/20"
-                aria-label="Gulir ke bawah untuk menjelajahi karya"
-              >
-                {/* Mouse Outline with Animated Wheel Dot */}
-                <span className="relative flex items-start justify-center w-3.5 h-5 pt-0.5 border-[1.5px] border-neutral-400 group-hover:border-[#155DFC] rounded-full transition-colors">
-                  <span className="w-1 h-1 bg-[#155DFC] rounded-full animate-bounce" />
-                </span>
-                <span className="tracking-tight">Jelajahi Karya</span>
-                <ChevronDown className="w-3.5 h-3.5 text-neutral-400 group-hover:text-[#155DFC] group-hover:translate-y-0.5 transition-all" />
-              </button>
-            </div>
+            <ScrollReveal distance={16} duration={600} delay={300}>
+              <div className="pt-6 sm:pt-10 flex justify-center">
+                <button
+                  type="button"
+                  onClick={() => {
+                    const exploreSec = document.getElementById('explore-section');
+                    if (exploreSec) {
+                      exploreSec.scrollIntoView({ behavior: 'smooth' });
+                    }
+                  }}
+                  className="group inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full bg-white/90 hover:bg-white border border-neutral-200/90 hover:border-[#155DFC]/40 text-xs font-semibold text-neutral-500 hover:text-[#155DFC] transition-all cursor-pointer shadow-2xs hover:shadow-xs focus:outline-hidden focus:ring-2 focus:ring-[#155DFC]/20"
+                  aria-label="Gulir ke bawah untuk menjelajahi karya"
+                >
+                  {/* Mouse Outline with Animated Wheel Dot */}
+                  <span className="relative flex items-start justify-center w-3.5 h-5 pt-0.5 border-[1.5px] border-neutral-400 group-hover:border-[#155DFC] rounded-full transition-colors">
+                    <span className="w-1 h-1 bg-[#155DFC] rounded-full animate-bounce" />
+                  </span>
+                  <span className="tracking-tight">Jelajahi Karya</span>
+                  <ChevronDown className="w-3.5 h-3.5 text-neutral-400 group-hover:text-[#155DFC] group-hover:translate-y-0.5 transition-all" />
+                </button>
+              </div>
+            </ScrollReveal>
 
           </div>
 
@@ -542,150 +553,156 @@ export const HomePage: React.FC<HomePageProps> = ({
         <section id="explore-section" className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 pt-8 pb-16">
           
           {/* Baris 1: Segmented Tabs (Creator, Layanan, Proyek) */}
-          <div className="flex items-center gap-2 mb-5">
-            <button
-              type="button"
-              onClick={() => setActiveExploreTab('creator')}
-              className={`flex items-center gap-2 px-4 sm:px-5 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-colors cursor-pointer ${
-                activeExploreTab === 'creator'
-                  ? 'bg-[#F3F3F4] text-[#0F172A] font-semibold'
-                  : 'text-[#64748B] hover:text-[#0F172A] hover:bg-[#F8FAFC] font-medium'
-              }`}
-            >
-              <Users className="w-4 h-4" />
-              <span>Creator</span>
-            </button>
-
-            <button
-              type="button"
-              onClick={() => setActiveExploreTab('layanan')}
-              className={`flex items-center gap-2 px-4 sm:px-5 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-colors cursor-pointer ${
-                activeExploreTab === 'layanan'
-                  ? 'bg-[#F3F3F4] text-[#0F172A] font-semibold'
-                  : 'text-[#64748B] hover:text-[#0F172A] hover:bg-[#F8FAFC] font-medium'
-              }`}
-            >
-              <Briefcase className="w-4 h-4" />
-              <span>Layanan</span>
-            </button>
-
-            <button
-              type="button"
-              onClick={() => setActiveExploreTab('proyek')}
-              className={`flex items-center gap-2 px-4 sm:px-5 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-colors cursor-pointer ${
-                activeExploreTab === 'proyek'
-                  ? 'bg-[#F3F3F4] text-[#0F172A] font-semibold'
-                  : 'text-[#64748B] hover:text-[#0F172A] hover:bg-[#F8FAFC] font-medium'
-              }`}
-            >
-              <Layers className="w-4 h-4" />
-              <span>Proyek</span>
-            </button>
-          </div>
-
-          {/* Baris 2: Clean Wide Pill Search Bar (Persis Gambar Referensi) */}
-          <div className="relative w-full mb-4">
-            <div className="w-full flex items-center justify-between rounded-full bg-[#f4f4f6] sm:bg-[#f3f3f4] hover:bg-white hover:border-neutral-300 focus-within:bg-white focus-within:border-[#0d0c22] border border-neutral-200/80 px-4 sm:px-6 py-2.5 sm:py-3.5 transition-all shadow-2xs">
-              <input
-                type="text"
-                value={exploreSearch}
-                onChange={(e) => setExploreSearch(e.target.value)}
-                placeholder="What type of design are you interested in?"
-                className="w-full bg-transparent text-xs sm:text-sm font-medium text-[#0d0c22] placeholder:text-neutral-500 focus:outline-none pr-3"
-              />
-              <div className="flex items-center gap-2 shrink-0">
-                {exploreSearch && (
-                  <button
-                    type="button"
-                    onClick={() => setExploreSearch('')}
-                    className="p-1 rounded-full text-neutral-400 hover:text-neutral-700 cursor-pointer"
-                    title="Hapus pencarian"
-                  >
-                    <X className="w-4 h-4" />
-                  </button>
-                )}
-                <button
-                  type="button"
-                  onClick={() => {}}
-                  className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-[#ea4c89] hover:bg-[#d63f7a] active:scale-95 text-white flex items-center justify-center transition-all shadow-xs cursor-pointer"
-                  title="Cari"
-                >
-                  <Search className="w-4 h-4" />
-                </button>
-              </div>
-            </div>
-          </div>
-
-          {/* Baris 3: Popular Chips & Following/Sort Dropdown (Persis Gambar Referensi) */}
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 mb-8">
-            {/* Popular tags list */}
-            <div className="flex items-center gap-2 overflow-x-auto pb-1 sm:pb-0 scrollbar-none">
-              <span className="text-xs sm:text-sm font-bold text-[#0d0c22] shrink-0">
-                Popular:
-              </span>
-              <div className="flex items-center gap-1.5 flex-wrap sm:flex-nowrap">
-                {POPULAR_SEARCH_TAGS.map((tag) => {
-                  const isActive = selectedPopularTag === tag;
-                  return (
-                    <button
-                      key={tag}
-                      type="button"
-                      onClick={() => setSelectedPopularTag(isActive ? null : tag)}
-                      className={`px-3 py-1 sm:py-1.5 rounded-full text-xs font-medium transition cursor-pointer shrink-0 ${
-                        isActive
-                          ? 'bg-[#0d0c22] text-white border border-[#0d0c22] shadow-2xs font-semibold'
-                          : 'bg-white border border-neutral-200 text-neutral-600 hover:border-neutral-300 hover:text-[#0d0c22]'
-                      }`}
-                    >
-                      {tag.toLowerCase()}
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-
-            {/* Right: Sort / Following Dropdown */}
-            <div className="relative shrink-0 self-end md:self-auto">
+          <ScrollReveal distance={20} duration={600} delay={60}>
+            <div className="flex items-center gap-2 mb-5">
               <button
                 type="button"
-                onClick={() => setIsSortDropdownOpen(!isSortDropdownOpen)}
-                className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full border border-neutral-200 bg-white hover:border-neutral-300 text-xs font-semibold text-neutral-700 transition cursor-pointer shadow-2xs"
+                onClick={() => setActiveExploreTab('creator')}
+                className={`flex items-center gap-2 px-4 sm:px-5 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-colors cursor-pointer ${
+                  activeExploreTab === 'creator'
+                    ? 'bg-[#F3F3F4] text-[#0F172A] font-semibold'
+                    : 'text-[#64748B] hover:text-[#0F172A] hover:bg-[#F8FAFC] font-medium'
+                }`}
               >
-                <span>
-                  {exploreSort === 'populer' && 'Following'}
-                  {exploreSort === 'likes' && 'Terbanyak Disukai'}
-                  {exploreSort === 'views' && 'Terbanyak Dilihat'}
-                  {exploreSort === 'terbaru' && 'Terbaru'}
-                </span>
-                <ChevronDown className="w-3.5 h-3.5 text-neutral-400" />
+                <Users className="w-4 h-4" />
+                <span>Creator</span>
               </button>
 
-              {isSortDropdownOpen && (
-                <div className="absolute right-0 mt-1.5 w-44 bg-white rounded-2xl border border-neutral-200 shadow-xl py-2 z-30 animate-in fade-in">
-                  {[
-                    { id: 'populer', label: 'Following' },
-                    { id: 'likes', label: 'Terbanyak Disukai' },
-                    { id: 'views', label: 'Terbanyak Dilihat' },
-                    { id: 'terbaru', label: 'Terbaru' },
-                  ].map((s) => (
-                    <button
-                      key={s.id}
-                      onClick={() => {
-                        setExploreSort(s.id as any);
-                        setIsSortDropdownOpen(false);
-                      }}
-                      className={`w-full px-4 py-2 text-left text-xs font-medium hover:bg-neutral-50 flex items-center justify-between cursor-pointer ${
-                        exploreSort === s.id ? 'font-bold text-[#0d0c22]' : 'text-neutral-600'
-                      }`}
-                    >
-                      <span>{s.label}</span>
-                      {exploreSort === s.id && <Check className="w-3.5 h-3.5 text-[#0d0c22]" />}
-                    </button>
-                  ))}
-                </div>
-              )}
+              <button
+                type="button"
+                onClick={() => setActiveExploreTab('layanan')}
+                className={`flex items-center gap-2 px-4 sm:px-5 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-colors cursor-pointer ${
+                  activeExploreTab === 'layanan'
+                    ? 'bg-[#F3F3F4] text-[#0F172A] font-semibold'
+                    : 'text-[#64748B] hover:text-[#0F172A] hover:bg-[#F8FAFC] font-medium'
+                }`}
+              >
+                <Briefcase className="w-4 h-4" />
+                <span>Layanan</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setActiveExploreTab('proyek')}
+                className={`flex items-center gap-2 px-4 sm:px-5 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-colors cursor-pointer ${
+                  activeExploreTab === 'proyek'
+                    ? 'bg-[#F3F3F4] text-[#0F172A] font-semibold'
+                    : 'text-[#64748B] hover:text-[#0F172A] hover:bg-[#F8FAFC] font-medium'
+                }`}
+              >
+                <Layers className="w-4 h-4" />
+                <span>Proyek</span>
+              </button>
             </div>
-          </div>
+          </ScrollReveal>
+
+          {/* Baris 2: Clean Wide Pill Search Bar (Persis Gambar Referensi) */}
+          <ScrollReveal distance={22} duration={600} delay={100}>
+            <div className="relative w-full mb-4">
+              <div className="w-full flex items-center justify-between rounded-full bg-[#f4f4f6] sm:bg-[#f3f3f4] hover:bg-white hover:border-neutral-300 focus-within:bg-white focus-within:border-[#0d0c22] border border-neutral-200/80 px-4 sm:px-6 py-2.5 sm:py-3.5 transition-all shadow-2xs">
+                <input
+                  type="text"
+                  value={exploreSearch}
+                  onChange={(e) => setExploreSearch(e.target.value)}
+                  placeholder="What type of design are you interested in?"
+                  className="w-full bg-transparent text-xs sm:text-sm font-medium text-[#0d0c22] placeholder:text-neutral-500 focus:outline-none pr-3"
+                />
+                <div className="flex items-center gap-2 shrink-0">
+                  {exploreSearch && (
+                    <button
+                      type="button"
+                      onClick={() => setExploreSearch('')}
+                      className="p-1 rounded-full text-neutral-400 hover:text-neutral-700 cursor-pointer"
+                      title="Hapus pencarian"
+                    >
+                      <X className="w-4 h-4" />
+                    </button>
+                  )}
+                  <button
+                    type="button"
+                    onClick={() => {}}
+                    className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-[#ea4c89] hover:bg-[#d63f7a] active:scale-95 text-white flex items-center justify-center transition-all shadow-xs cursor-pointer"
+                    title="Cari"
+                  >
+                    <Search className="w-4 h-4" />
+                  </button>
+                </div>
+              </div>
+            </div>
+          </ScrollReveal>
+
+          {/* Baris 3: Popular Chips & Following/Sort Dropdown (Persis Gambar Referensi) */}
+          <ScrollReveal distance={22} duration={600} delay={140}>
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 mb-8">
+              {/* Popular tags list */}
+              <div className="flex items-center gap-2 overflow-x-auto pb-1 sm:pb-0 scrollbar-none">
+                <span className="text-xs sm:text-sm font-bold text-[#0d0c22] shrink-0">
+                  Popular:
+                </span>
+                <div className="flex items-center gap-1.5 flex-wrap sm:flex-nowrap">
+                  {POPULAR_SEARCH_TAGS.map((tag) => {
+                    const isActive = selectedPopularTag === tag;
+                    return (
+                      <button
+                        key={tag}
+                        type="button"
+                        onClick={() => setSelectedPopularTag(isActive ? null : tag)}
+                        className={`px-3 py-1 sm:py-1.5 rounded-full text-xs font-medium transition cursor-pointer shrink-0 ${
+                          isActive
+                            ? 'bg-[#0d0c22] text-white border border-[#0d0c22] shadow-2xs font-semibold'
+                            : 'bg-white border border-neutral-200 text-neutral-600 hover:border-neutral-300 hover:text-[#0d0c22]'
+                        }`}
+                      >
+                        {tag.toLowerCase()}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Right: Sort / Following Dropdown */}
+              <div className="relative shrink-0 self-end md:self-auto">
+                <button
+                  type="button"
+                  onClick={() => setIsSortDropdownOpen(!isSortDropdownOpen)}
+                  className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full border border-neutral-200 bg-white hover:border-neutral-300 text-xs font-semibold text-neutral-700 transition cursor-pointer shadow-2xs"
+                >
+                  <span>
+                    {exploreSort === 'populer' && 'Following'}
+                    {exploreSort === 'likes' && 'Terbanyak Disukai'}
+                    {exploreSort === 'views' && 'Terbanyak Dilihat'}
+                    {exploreSort === 'terbaru' && 'Terbaru'}
+                  </span>
+                  <ChevronDown className="w-3.5 h-3.5 text-neutral-400" />
+                </button>
+
+                {isSortDropdownOpen && (
+                  <div className="absolute right-0 mt-1.5 w-44 bg-white rounded-2xl border border-neutral-200 shadow-xl py-2 z-30 animate-in fade-in">
+                    {[
+                      { id: 'populer', label: 'Following' },
+                      { id: 'likes', label: 'Terbanyak Disukai' },
+                      { id: 'views', label: 'Terbanyak Dilihat' },
+                      { id: 'terbaru', label: 'Terbaru' },
+                    ].map((s) => (
+                      <button
+                        key={s.id}
+                        onClick={() => {
+                          setExploreSort(s.id as any);
+                          setIsSortDropdownOpen(false);
+                        }}
+                        className={`w-full px-4 py-2 text-left text-xs font-medium hover:bg-neutral-50 flex items-center justify-between cursor-pointer ${
+                          exploreSort === s.id ? 'font-bold text-[#0d0c22]' : 'text-neutral-600'
+                        }`}
+                      >
+                        <span>{s.label}</span>
+                        {exploreSort === s.id && <Check className="w-3.5 h-3.5 text-[#0d0c22]" />}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+          </ScrollReveal>
 
           {/* TAB 1: PROYEK / SHOTS (Persis Tampilan Gambar Referensi) */}
           {activeExploreTab === 'proyek' && (
@@ -713,25 +730,31 @@ export const HomePage: React.FC<HomePageProps> = ({
                           : colMultiplier * Math.min(scrollY * 0.028, 16);
 
                       return (
-                        <div
+                        <ScrollReveal
                           key={proj.id}
-                          className="transition-transform duration-100 ease-out will-change-transform"
-                          style={{
-                            transform: cardOffset ? `translate3d(0, ${cardOffset}px, 0)` : undefined,
-                          }}
+                          distance={30}
+                          delay={Math.min((idx % 4) * 80, 240)}
+                          duration={600}
                         >
-                          <ProjectCard
-                            id={`feed-card-${proj.id}`}
-                            project={proj}
-                            isSaved={Boolean(savedProjects[proj.id])}
-                            onToggleSave={(id, e) => toggleSaveProject(id, e)}
-                            onClick={() => {
-                              setSelectedProject(proj);
-                              setCurrentCarouselIndex(0);
-                              setIsVideoPlaying(true);
+                          <div
+                            className="transition-transform duration-100 ease-out will-change-transform"
+                            style={{
+                              transform: cardOffset ? `translate3d(0, ${cardOffset}px, 0)` : undefined,
                             }}
-                          />
-                        </div>
+                          >
+                            <ProjectCard
+                              id={`feed-card-${proj.id}`}
+                              project={proj}
+                              isSaved={Boolean(savedProjects[proj.id])}
+                              onToggleSave={(id, e) => toggleSaveProject(id, e)}
+                              onClick={() => {
+                                setSelectedProject(proj);
+                                setCurrentCarouselIndex(0);
+                                setIsVideoPlaying(true);
+                              }}
+                            />
+                          </div>
+                        </ScrollReveal>
                       );
                     })}
                   </div>
@@ -767,7 +790,7 @@ export const HomePage: React.FC<HomePageProps> = ({
                 </div>
               ) : (
                 <div className="space-y-6 animate-in fade-in duration-200">
-                  {displayCreators.map((creator) => {
+                  {displayCreators.map((creator, cIdx) => {
                     const isSaved = savedProjects[`creator-${creator.id}`];
 
                     // Siapkan 4 kartu layanan seperti di halaman Jelajah > Profil Creator
@@ -817,10 +840,15 @@ export const HomePage: React.FC<HomePageProps> = ({
                         : defaultServices;
 
                     return (
-                      <div
+                      <ScrollReveal
                         key={creator.id}
-                        id={`creator-card-${creator.id}`}
-                        onClick={() => handleCreatorClick(creator)}
+                        distance={32}
+                        delay={Math.min(cIdx * 70, 280)}
+                        duration={650}
+                      >
+                        <div
+                          id={`creator-card-${creator.id}`}
+                          onClick={() => handleCreatorClick(creator)}
                         className="group bg-white rounded-[24px] border border-[rgba(229,229,229,0.8)] p-6 sm:p-8 transition-all shadow-[0_1px_1px_rgba(0,0,0,0.05)] hover:border-neutral-300 hover:shadow-[0_8px_24px_rgba(0,0,0,0.06)] cursor-pointer text-left"
                       >
                         {/* BARIS 1: Header Profil Kreator, Badges, Rating & Tombol Hubungi */}
@@ -1019,9 +1047,9 @@ export const HomePage: React.FC<HomePageProps> = ({
                             )}
                           </div>
                         </div>
-
                       </div>
-                    );
+                    </ScrollReveal>
+                  );
                   })}
 
                   {/* Tombol Aksi Lihat Semua Creator */}
@@ -1066,86 +1094,92 @@ export const HomePage: React.FC<HomePageProps> = ({
                         : colMultiplier * Math.min(scrollY * 0.026, 15);
 
                     return (
-                      <div
+                      <ScrollReveal
                         key={srv.id}
-                        id={`service-shot-${srv.id}`}
-                        onClick={() => navigateTo('services', '/explore/services')}
-                        className="group flex flex-col text-left cursor-pointer select-none transition-transform duration-100 ease-out will-change-transform"
-                        style={{
-                          transform: cardOffset ? `translate3d(0, ${cardOffset}px, 0)` : undefined,
-                        }}
+                        distance={28}
+                        delay={Math.min((idx % 4) * 70, 240)}
+                        duration={600}
                       >
-                      {/* Media Cover Image Card (Aspect 4:3 matching screenshot) */}
-                      <div className="relative aspect-[4/3] rounded-2xl overflow-hidden bg-neutral-100 shadow-2xs group-hover:shadow-md transition-all duration-300">
-                        <img
-                          src={srv.coverImage || 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&auto=format&fit=crop&q=80'}
-                          alt={srv.title}
-                          className="w-full h-full object-cover "
-                          loading="lazy"
-                          referrerPolicy="no-referrer"
-                        />
+                        <div
+                          id={`service-shot-${srv.id}`}
+                          onClick={() => navigateTo('services', '/explore/services')}
+                          className="group flex flex-col text-left cursor-pointer select-none transition-transform duration-100 ease-out will-change-transform"
+                          style={{
+                            transform: cardOffset ? `translate3d(0, ${cardOffset}px, 0)` : undefined,
+                          }}
+                        >
+                        {/* Media Cover Image Card (Aspect 4:3 matching screenshot) */}
+                        <div className="relative aspect-[4/3] rounded-2xl overflow-hidden bg-neutral-100 shadow-2xs group-hover:shadow-md transition-all duration-300">
+                          <img
+                            src={srv.coverImage || 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&auto=format&fit=crop&q=80'}
+                            alt={srv.title}
+                            className="w-full h-full object-cover "
+                            loading="lazy"
+                            referrerPolicy="no-referrer"
+                          />
 
-                        {/* Tag pill overlay top left */}
-                        {srv.tag && (
-                          <div className="absolute top-3 left-3">
-                            <span className="px-2.5 py-1 rounded-full bg-black/60 backdrop-blur-md text-white text-[11px] font-bold tracking-tight shadow-xs">
-                              {srv.tag}
+                          {/* Tag pill overlay top left */}
+                          {srv.tag && (
+                            <div className="absolute top-3 left-3">
+                              <span className="px-2.5 py-1 rounded-full bg-black/60 backdrop-blur-md text-white text-[11px] font-bold tracking-tight shadow-xs">
+                                {srv.tag}
+                              </span>
+                            </div>
+                          )}
+
+                          {/* Delivery time pill overlay bottom left */}
+                          {srv.deliveryDays && (
+                            <div className="absolute bottom-3 left-3">
+                              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-white/95 backdrop-blur-md text-[#0d0c22] text-[11px] font-bold shadow-xs">
+                                <Clock className="w-3 h-3 text-neutral-500" />
+                                {srv.deliveryDays}
+                              </span>
+                            </div>
+                          )}
+
+                          {/* Hover action overlay */}
+                          <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center p-4">
+                            <span className="px-4 py-2 rounded-full bg-white text-[#0d0c22] text-xs font-bold shadow-lg hover:bg-neutral-100 transition flex items-center gap-1.5">
+                              <Zap className="w-3.5 h-3.5 fill-amber-400 text-amber-500" />
+                              <span>Pesan Layanan</span>
                             </span>
-                          </div>
-                        )}
-
-                        {/* Delivery time pill overlay bottom left */}
-                        {srv.deliveryDays && (
-                          <div className="absolute bottom-3 left-3">
-                            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-white/95 backdrop-blur-md text-[#0d0c22] text-[11px] font-bold shadow-xs">
-                              <Clock className="w-3 h-3 text-neutral-500" />
-                              {srv.deliveryDays}
-                            </span>
-                          </div>
-                        )}
-
-                        {/* Hover action overlay */}
-                        <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center p-4">
-                          <span className="px-4 py-2 rounded-full bg-white text-[#0d0c22] text-xs font-bold shadow-lg hover:bg-neutral-100 transition flex items-center gap-1.5">
-                            <Zap className="w-3.5 h-3.5 fill-amber-400 text-amber-500" />
-                            <span>Pesan Layanan</span>
-                          </span>
-                        </div>
-                      </div>
-
-                      {/* Metadata below image */}
-                      <div className="mt-3 space-y-1">
-                        <h4 className="text-xs sm:text-sm font-bold text-[#0d0c22] group-hover:text-blue-600 transition-colors truncate">
-                          {srv.title}
-                        </h4>
-
-                        <div className="flex items-center justify-between gap-2 pt-0.5">
-                          {/* Creator Info */}
-                          <div className="flex items-center gap-1.5 min-w-0">
-                            <img
-                              src={srv.creator.avatar}
-                              alt={srv.creator.name}
-                              className="w-5 h-5 rounded-full object-cover border border-neutral-200 shrink-0"
-                            />
-                            <span className="text-xs font-semibold text-neutral-700 truncate max-w-[120px]">
-                              {srv.creator.name}
-                            </span>
-                            <span className="px-1.5 py-0.5 rounded text-[9px] font-black uppercase tracking-wider bg-neutral-200 text-neutral-700 shrink-0">
-                              PRO
-                            </span>
-                          </div>
-
-                          {/* Price */}
-                          <div className="flex items-center gap-1 shrink-0">
-                            <span className="text-xs sm:text-sm font-extrabold text-[#0d0c22]">
-                              {srv.formattedPrice}
-                            </span>
-                            <Zap className="w-3 h-3 fill-amber-400 text-amber-500" />
                           </div>
                         </div>
-                      </div>
 
-                      </div>
+                        {/* Metadata below image */}
+                        <div className="mt-3 space-y-1">
+                          <h4 className="text-xs sm:text-sm font-bold text-[#0d0c22] group-hover:text-blue-600 transition-colors truncate">
+                            {srv.title}
+                          </h4>
+
+                          <div className="flex items-center justify-between gap-2 pt-0.5">
+                            {/* Creator Info */}
+                            <div className="flex items-center gap-1.5 min-w-0">
+                              <img
+                                src={srv.creator.avatar}
+                                alt={srv.creator.name}
+                                className="w-5 h-5 rounded-full object-cover border border-neutral-200 shrink-0"
+                              />
+                              <span className="text-xs font-semibold text-neutral-700 truncate max-w-[120px]">
+                                {srv.creator.name}
+                              </span>
+                              <span className="px-1.5 py-0.5 rounded text-[9px] font-black uppercase tracking-wider bg-neutral-200 text-neutral-700 shrink-0">
+                                PRO
+                              </span>
+                            </div>
+
+                            {/* Price */}
+                            <div className="flex items-center gap-1 shrink-0">
+                              <span className="text-xs sm:text-sm font-extrabold text-[#0d0c22]">
+                                {srv.formattedPrice}
+                              </span>
+                              <Zap className="w-3 h-3 fill-amber-400 text-amber-500" />
+                            </div>
+                          </div>
+                        </div>
+
+                        </div>
+                      </ScrollReveal>
                     );
                   })}
                 </div>
@@ -1168,7 +1202,7 @@ export const HomePage: React.FC<HomePageProps> = ({
 
           {/* Floating Start a Project Brief Banner (Persis Gambar Referensi) */}
           {isBriefBannerVisible && (
-            <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-40 max-w-xl w-[92%] sm:w-auto bg-white/95 backdrop-blur-md border border-neutral-200/90 rounded-2xl sm:rounded-full py-2.5 px-4 sm:px-6 shadow-2xl flex items-center justify-between gap-4 animate-in fade-in slide-in-from-bottom-4 duration-300">
+            <div className="fixed bottom-20 sm:bottom-6 left-1/2 -translate-x-1/2 z-40 max-w-xl w-[92%] sm:w-auto bg-white/95 backdrop-blur-md border border-neutral-200/90 rounded-2xl sm:rounded-full py-2.5 px-4 sm:px-6 shadow-2xl flex items-center justify-between gap-4 animate-in fade-in slide-in-from-bottom-4 duration-300">
               <div className="flex items-center gap-3 min-w-0">
                 <div className="w-8 h-8 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center shrink-0 border border-blue-100">
                   <Briefcase className="w-4 h-4 text-blue-600" />

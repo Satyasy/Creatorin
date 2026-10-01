@@ -278,9 +278,9 @@ export function SchoolDashboardPage() {
   }
 
   return (
-    <div className="flex-1 w-full bg-[#F8FAFC] flex flex-col md:flex-row">
+    <div className="flex-1 w-full bg-[#F8FAFC] flex flex-col md:flex-row min-h-screen">
       {/* 1. Sidebar School Dashboard */}
-      <aside className="w-full md:w-64 bg-white border-r border-black/10 flex flex-col shrink-0">
+      <aside className="w-full md:w-64 bg-white border-r border-black/10 flex flex-col shrink-0 md:sticky md:top-16 md:h-[calc(100vh-4rem)] md:overflow-y-auto">
         {/* School Identity Header */}
         <div className="p-5 border-b border-black/10">
           <div className="flex items-center gap-3">

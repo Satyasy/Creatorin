@@ -27,6 +27,7 @@ import { ProjectBriefModal } from '@/components/modals/ProjectBriefModal';
 import { CareerScoreBadge } from '@/components/common/CareerScoreBadge';
 import { ServiceDetailModal } from '@/components/modals/ServiceDetailModal';
 import { ServiceFilterModal, FilterState } from '@/components/modals/ServiceFilterModal';
+import { ScrollReveal } from '@/components/common/ScrollReveal';
 import { MOCK_CREATORS } from '@/data/mockCreators';
 import { ActivePage, AuthState, Creator, CreatorService } from '@/types';
 
@@ -321,57 +322,59 @@ export const ExploreServicesPage: React.FC<ExploreServicesPageProps> = ({
         </div>
 
         {/* Page Title & Subtitle Header */}
-        <div className="mb-6 space-y-3">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-            <div>
-              <h1 className="text-2xl sm:text-3xl lg:text-[40px] font-bold text-[#0F172A] tracking-tight leading-tight lg:leading-[48px]">
-                Jelajah Katalog Layanan & Jasa Kreator
-              </h1>
-              <p className="text-sm sm:text-base text-[#64748B] mt-2 max-w-2xl leading-normal font-normal">
-                Pilih paket layanan konten instan mulai dari video UGC, desain feed, hingga branding dengan harga transparan dan garansi pengerjaan tepat waktu.
-              </p>
+        <ScrollReveal distance={20} duration={600}>
+          <div className="mb-6 space-y-3">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div>
+                <h1 className="text-2xl sm:text-3xl lg:text-[40px] font-bold text-[#0F172A] tracking-tight leading-tight lg:leading-[48px]">
+                  Jelajah Katalog Layanan & Jasa Kreator
+                </h1>
+                <p className="text-sm sm:text-base text-[#64748B] mt-2 max-w-2xl leading-normal font-normal">
+                  Pilih paket layanan konten instan mulai dari video UGC, desain feed, hingga branding dengan harga transparan dan garansi pengerjaan tepat waktu.
+                </p>
+              </div>
+
+              <button
+                onClick={() => setIsBriefModalOpen(true)}
+                className="self-start sm:self-auto h-11 px-4 rounded-xl border border-[#E2E8F0] bg-white hover:bg-[#F8FAFC] text-[#0F172A] text-sm font-semibold shadow-2xs transition-colors cursor-pointer flex items-center gap-2"
+              >
+                <Sparkles className="w-3.5 h-3.5 text-[#1D4ED8]" />
+                <span>Request Custom Brief</span>
+              </button>
             </div>
 
-            <button
-              onClick={() => setIsBriefModalOpen(true)}
-              className="self-start sm:self-auto h-11 px-4 rounded-xl border border-[#E2E8F0] bg-white hover:bg-[#F8FAFC] text-[#0F172A] text-sm font-semibold shadow-2xs transition-colors cursor-pointer flex items-center gap-2"
-            >
-              <Sparkles className="w-3.5 h-3.5 text-[#1D4ED8]" />
-              <span>Request Custom Brief</span>
-            </button>
-          </div>
-
-          {/* Popular Tag Pills */}
-          <div className="pt-2 flex flex-wrap items-center gap-1.5">
-            <span className="text-xs font-semibold text-[#64748B] mr-1 flex items-center gap-1">
-              <span>Tagar Populer:</span>
-            </span>
-            {POPULAR_SERVICES_TAGS.map((tag) => {
-              const isSelected = selectedTag === tag;
-              return (
+            {/* Popular Tag Pills */}
+            <div className="pt-2 flex flex-wrap items-center gap-1.5">
+              <span className="text-xs font-semibold text-[#64748B] mr-1 flex items-center gap-1">
+                <span>Tagar Populer:</span>
+              </span>
+              {POPULAR_SERVICES_TAGS.map((tag) => {
+                const isSelected = selectedTag === tag;
+                return (
+                  <button
+                    key={tag}
+                    onClick={() => setSelectedTag(isSelected ? null : tag)}
+                    className={`px-3 py-1 rounded-full text-xs font-medium border transition-all cursor-pointer ${
+                      isSelected 
+                        ? 'bg-[#0B1F3A] text-white border-[#0B1F3A] shadow-2xs font-semibold' 
+                        : 'bg-white text-[#64748B] border-[#E2E8F0] hover:border-[#64748B] hover:text-[#0F172A] hover:bg-[#F8FAFC]'
+                    }`}
+                  >
+                    {tag}
+                  </button>
+                );
+              })}
+              {selectedTag && (
                 <button
-                  key={tag}
-                  onClick={() => setSelectedTag(isSelected ? null : tag)}
-                  className={`px-3 py-1 rounded-full text-xs font-medium border transition-all cursor-pointer ${
-                    isSelected 
-                      ? 'bg-[#0B1F3A] text-white border-[#0B1F3A] shadow-2xs font-semibold' 
-                      : 'bg-white text-[#64748B] border-[#E2E8F0] hover:border-[#64748B] hover:text-[#0F172A] hover:bg-[#F8FAFC]'
-                  }`}
+                  onClick={() => setSelectedTag(null)}
+                  className="text-xs text-[#1D4ED8] font-semibold hover:underline ml-1.5 cursor-pointer"
                 >
-                  {tag}
+                  Reset Tagar
                 </button>
-              );
-            })}
-            {selectedTag && (
-              <button
-                onClick={() => setSelectedTag(null)}
-                className="text-xs text-[#1D4ED8] font-semibold hover:underline ml-1.5 cursor-pointer"
-              >
-                Reset Tagar
-              </button>
-            )}
+              )}
+            </div>
           </div>
-        </div>
+        </ScrollReveal>
 
         {/* Section Heading & Filter Toolbar (Identical to Screenshot) */}
         <div className="pt-4 pb-4 border-t border-neutral-200/80">
@@ -609,17 +612,22 @@ export const ExploreServicesPage: React.FC<ExploreServicesPageProps> = ({
             </div>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5 sm:gap-6">
-              {filteredServices.map((item) => {
+              {filteredServices.map((item, sIdx) => {
                 const coverImage = item.coverImage || 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&auto=format&fit=crop&q=80';
                 const formattedDelivery = item.deliveryDays
                   ? (item.deliveryDays.toLowerCase().includes('hari') ? item.deliveryDays : `${item.deliveryDays} Hari Kerja`)
                   : '2-3 Hari Kerja';
 
                 return (
-                  <div
+                  <ScrollReveal
                     key={item.id}
-                    className="bg-white rounded-2xl border border-[#E2E8F0] hover:border-[#64748B] transition-colors p-5 flex flex-col justify-between text-left group shadow-2xs"
+                    distance={28}
+                    delay={Math.min((sIdx % 4) * 70, 240)}
+                    duration={600}
                   >
+                    <div
+                      className="bg-white rounded-2xl border border-[#E2E8F0] hover:border-[#64748B] transition-colors p-5 flex flex-col justify-between text-left group shadow-2xs h-full"
+                    >
                     <div>
                       {/* Cover Thumbnail Image inside card padding */}
                       <div 
@@ -729,7 +737,8 @@ export const ExploreServicesPage: React.FC<ExploreServicesPageProps> = ({
                       </div>
                     </div>
                   </div>
-                );
+                </ScrollReveal>
+              );
               })}
             </div>
           )}
