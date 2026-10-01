@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { searchKnowledgeBase } from '@/data/creatorinKnowledgeBase';
+import { semanticVectorSearch } from '@/lib/ai/localEmbedding';
 
 export async function POST(request: NextRequest) {
   try {
@@ -19,8 +19,8 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Step 1: RAG Semantic Retrieval from Creatorin Knowledge Base
-    const matchedDocs = searchKnowledgeBase(userQuery, 3);
+    // Step 1: Local Vector RAG Semantic Retrieval (all-MiniLM-L6-v2)
+    const matchedDocs = await semanticVectorSearch(userQuery, 3);
     const contextText = matchedDocs
       .map(doc => `### ${doc.title}\n${doc.content}`)
       .join('\n\n');

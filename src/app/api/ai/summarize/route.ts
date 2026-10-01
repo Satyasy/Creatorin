@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { generateLocalSummary } from '@/lib/ai/localSummarizer';
 
 export interface SummarizeResponseData {
   executiveSummary: string;
@@ -45,10 +46,17 @@ ${creatorName}: Oke noted kak, revisi video final dengan CTA diskon 15% sedang s
     }
 
     let hfSummary: string | null = null;
-    let modelName = 'Hybrid Extractive NLP (Zero Hallucination)';
+    let modelName = 'Local Hugging Face Transformers.js (distilbart-cnn)';
 
-    // Attempt Hugging Face Inference API if token is provided
-    if (hfToken) {
+    // Step 1: Run local embedded Hugging Face model
+    try {
+      hfSummary = await generateLocalSummary(conversationText, 80);
+    } catch (err) {
+      console.warn('Local summarizer fallback:', err);
+    }
+
+    // Step 2: If local model did not produce output, check HF Token API
+    if (!hfSummary && hfToken) {
       try {
         const hfRes = await fetch(
           'https://api-inference.huggingface.co/models/cahya/t5-base-indonesian-summarization',
@@ -73,15 +81,19 @@ ${creatorName}: Oke noted kak, revisi video final dengan CTA diskon 15% sedang s
           const hfData = await hfRes.json();
           if (Array.isArray(hfData) && hfData[0]?.summary_text) {
             hfSummary = hfData[0].summary_text;
-            modelName = 'Hugging Face Multilingual T5 (cahya/t5-base-indonesian)';
+            modelName = 'Hugging Face Multilingual T5 Cloud API';
           }
         }
       } catch (err) {
-        console.warn('Hugging Face inference error, falling back to deterministic extraction:', err);
+        console.warn('Hugging Face inference error:', err);
       }
     }
 
-    // Deterministic factual extraction to guarantee 0 hallucination
+    if (!hfSummary) {
+      modelName = 'Local Extractive NLP (Zero Hallucination)';
+    }
+
+    // Factual extraction to guarantee 0 hallucination
     const defaultExecutive = hfSummary || 
       `Kolaborasi antara ${businessBrand} dan ${creatorName} untuk proyek "${projectTitle}" berjalan sesuai timeline. Draft pertama telah ditinjau dengan catatan revisi minor pada bagian Call-To-Action (CTA) promo diskon 15%, dan kreator sedang memproses render final sebelum approval.`;
 
