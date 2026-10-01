@@ -42,7 +42,19 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({
     <div
       id={id || `feed-card-${project.id}`}
       onClick={onClick}
-      className={`group relative aspect-[326/407.5] overflow-hidden rounded-md border border-[#e5e5e5] bg-[#171717] shadow-[0_1px_0_rgba(0,0,0,0.05)] transition-all duration-300 hover:shadow-xl cursor-pointer select-none ${className}`}
+      role={onClick ? 'button' : undefined}
+      tabIndex={onClick ? 0 : undefined}
+      onKeyDown={
+        onClick
+          ? (e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                onClick();
+              }
+            }
+          : undefined
+      }
+      className={`group relative aspect-[326/407.5] overflow-hidden rounded-[12px] border border-black/10 bg-[#0D0C22] transition-colors duration-200 hover:border-black/25 cursor-pointer select-none ${className}`}
     >
       {/* Full-bleed Media Cover (Edge-to-Edge) */}
       <img

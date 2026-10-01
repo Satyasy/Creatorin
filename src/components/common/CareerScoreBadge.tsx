@@ -1,5 +1,5 @@
 import React from 'react';
-import { ShieldCheck, Award, Star } from 'lucide-react';
+import { ShieldCheck } from 'lucide-react';
 
 interface CareerScoreBadgeProps {
   score: number;
@@ -14,16 +14,40 @@ export const CareerScoreBadge: React.FC<CareerScoreBadgeProps> = ({
   tier,
   onClick,
 }) => {
+  const sizeClasses = {
+    sm: 'px-2 py-0.5 text-[11px] gap-1',
+    md: 'px-2.5 py-1 text-xs gap-1.5',
+    lg: 'px-3 py-1.5 text-sm gap-2',
+  }[size];
+
+  const iconSizes = {
+    sm: 'w-3 h-3',
+    md: 'w-3.5 h-3.5',
+    lg: 'w-4 h-4',
+  }[size];
+
   return (
     <div
       id={`career-score-badge-${score}`}
       onClick={onClick}
-      className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-50/90 border border-amber-200/80 text-amber-900 font-medium shadow-2xs transition-all ${
+      role={onClick ? 'button' : undefined}
+      tabIndex={onClick ? 0 : undefined}
+      onKeyDown={
+        onClick
+          ? (e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                onClick();
+              }
+            }
+          : undefined
+      }
+      className={`inline-flex items-center rounded-full bg-amber-50/90 border border-amber-200/80 text-amber-900 font-medium transition-colors ${sizeClasses} ${
         onClick ? 'cursor-pointer hover:bg-amber-100 hover:border-amber-300' : ''
       }`}
     >
-      <ShieldCheck className="w-3.5 h-3.5 text-amber-600 shrink-0" />
-      <span className="text-xs font-bold text-amber-950">
+      <ShieldCheck className={`${iconSizes} text-amber-600 shrink-0`} />
+      <span className="font-bold text-amber-950">
         Score {score}
       </span>
       {tier && (

@@ -554,12 +554,12 @@ export const ExploreServicesPage: React.FC<ExploreServicesPageProps> = ({
                 </button>
 
                 {openDropdown === 'score' && (
-                  <div className="absolute right-0 mt-1.5 w-56 bg-white rounded-2xl border border-neutral-200 shadow-xl py-2 z-30 animate-in fade-in">
+                  <div className="absolute right-0 mt-1.5 w-56 bg-white rounded-[16px] border border-black/10 shadow-lg py-2 z-30 animate-in fade-in">
                     {[
                       { label: 'Semua Rating & Score', val: 'Semua' },
-                      { label: '💎 Career Score 95+ (Top 1%)', val: '95+' },
-                      { label: '⭐ Career Score 90+ (Top Tier)', val: '90+' },
-                      { label: '★ Rating Bintang 4.9+', val: 'rating49' }
+                      { label: 'Career Score 95+ (Top 1%)', val: '95+' },
+                      { label: 'Career Score 90+ (Top Tier)', val: '90+' },
+                      { label: 'Rating Bintang 4.9+', val: 'rating49' }
                     ].map((s) => (
                       <button
                         key={s.val}

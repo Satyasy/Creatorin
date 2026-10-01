@@ -130,7 +130,7 @@ export const Navbar: React.FC<NavbarProps> = ({
           {isSearchVisible && (
             <form 
               onSubmit={handleSearchSubmit}
-              className="hidden md:flex items-center w-full max-w-md bg-[#F3F3F4] hover:bg-neutral-200/70 focus-within:bg-white focus-within:ring-2 focus-within:ring-[#0B1F3A] rounded-xl p-1 pl-4 transition-all border border-[#E2E8F0] focus-within:border-transparent"
+              className="hidden md:flex items-center w-full max-w-md bg-[#F3F3F4] hover:bg-neutral-200/60 focus-within:bg-white focus-within:ring-2 focus-within:ring-[#155DFC] rounded-[8px] p-1 pl-4 transition-all border border-black/10 focus-within:border-transparent"
             >
               <input
                 type="text"
@@ -141,13 +141,13 @@ export const Navbar: React.FC<NavbarProps> = ({
                   if (onSearch) onSearch(e.target.value);
                 }}
                 placeholder="Cari kreator, keahlian, atau video UGC..."
-                className="w-full bg-transparent text-xs sm:text-sm text-[#171717] placeholder:text-[#9F9F9F] focus:outline-hidden"
+                className="w-full bg-transparent text-xs sm:text-sm text-[#0D0B0B] placeholder:text-neutral-400 focus:outline-hidden"
               />
               
               {/* Brand Blue Search Button */}
               <button
                 type="submit"
-                className="w-8 h-8 rounded-lg bg-[#1D4ED8] hover:bg-[#1e40af] text-white flex items-center justify-center shrink-0 transition shadow-2xs cursor-pointer ml-2"
+                className="w-8 h-8 rounded-[6px] bg-[#155DFC] hover:bg-[#0E4CD1] text-white flex items-center justify-center shrink-0 transition cursor-pointer ml-2"
               >
                 <Search className="w-4 h-4" />
               </button>
@@ -156,8 +156,8 @@ export const Navbar: React.FC<NavbarProps> = ({
 
         </div>
 
-        {/* Tengah: Nav Link (Beranda, Jelajah & Collaboration Room) — Gap 32px according to design.md §11 */}
-        <nav className="hidden lg:flex items-center gap-8 xl:gap-9 text-sm font-semibold text-[#171717]">
+        {/* Tengah: Nav Link (Beranda, Jelajah & Collaboration Room) */}
+        <nav className="hidden lg:flex items-center gap-8 xl:gap-9 text-sm font-semibold text-[#0D0B0B]">
           
           {/* Nav Link Beranda */}
           <button
@@ -165,8 +165,8 @@ export const Navbar: React.FC<NavbarProps> = ({
             onClick={() => navigateTo('home', '/')}
             className={`transition-colors flex items-center gap-1.5 cursor-pointer ${
               activePage === 'home' || pathname === '/'
-                ? 'text-[#1D4ED8] font-bold'
-                : 'text-[#64748B] hover:text-[#1D4ED8]'
+                ? 'text-[#155DFC] font-bold'
+                : 'text-neutral-600 hover:text-[#155DFC]'
             }`}
           >
             <span>Beranda</span>
@@ -180,17 +180,17 @@ export const Navbar: React.FC<NavbarProps> = ({
           >
             <button
               onClick={() => navigateTo('projects', '/explore/projects')}
-              className={`hover:text-blue-600 transition-colors flex items-center gap-1.5 cursor-pointer font-bold ${
-                pathname?.startsWith('/explore') ? 'text-blue-600' : 'text-[#0d0c22]'
-              } group-hover/explore:text-blue-600`}
+              className={`hover:text-[#155DFC] transition-colors flex items-center gap-1.5 cursor-pointer font-bold ${
+                pathname?.startsWith('/explore') ? 'text-[#155DFC]' : 'text-[#0D0C22]'
+              } group-hover/explore:text-[#155DFC]`}
             >
               <span>Jelajah</span>
-              <ChevronDown className="w-3.5 h-3.5 transition-transform duration-300 text-neutral-500 group-hover/explore:rotate-180 group-hover/explore:text-blue-600" />
+              <ChevronDown className="w-3.5 h-3.5 transition-transform duration-200 text-neutral-500 group-hover/explore:rotate-180 group-hover/explore:text-[#155DFC]" />
             </button>
 
             {/* Sub-navigasi Panel dengan Animasi Mulus */}
             <div 
-              className={`absolute left-0 top-[calc(100%-12px)] w-64 bg-white rounded-2xl border border-neutral-200/90 shadow-2xl py-3 px-2 z-50 transition-all duration-200 origin-top-left ${
+              className={`absolute left-0 top-[calc(100%-12px)] w-64 bg-white rounded-[16px] border border-black/10 shadow-lg py-3 px-2 z-50 transition-all duration-200 origin-top-left ${
                 exploreDropdownOpen 
                   ? 'opacity-100 translate-y-0 scale-100 pointer-events-auto visible' 
                   : 'opacity-0 -translate-y-2 scale-95 pointer-events-none invisible'
@@ -200,15 +200,15 @@ export const Navbar: React.FC<NavbarProps> = ({
               <div className="absolute -top-3 left-0 right-0 h-4 bg-transparent" />
               
               {/* Bagian Atas: Profil, Proyek, Layanan dengan Icon */}
-              <div className="space-y-0.5 pb-2.5 mb-2.5 border-b border-neutral-100">
+              <div className="space-y-0.5 pb-2.5 mb-2.5 border-b border-black/5">
                 <button
                   onClick={() => {
                     setExploreDropdownOpen(false);
                     navigateTo('projects', '/explore/projects');
                   }}
-                  className="w-full px-3.5 py-2.5 rounded-xl text-left text-sm font-bold text-[#0d0c22] hover:bg-neutral-50 flex items-center gap-3 transition-colors cursor-pointer group/item"
+                  className="w-full px-3.5 py-2.5 rounded-[8px] text-left text-sm font-bold text-[#0D0C22] hover:bg-[#F3F3F4] flex items-center gap-3 transition-colors cursor-pointer group/item"
                 >
-                  <TrendingUp className="w-4 h-4 text-neutral-800 group-hover/item:text-blue-600 transition-colors" />
+                  <TrendingUp className="w-4 h-4 text-neutral-800 group-hover/item:text-[#155DFC] transition-colors" />
                   <div>
                     <span className="block">Feed Proyek (Explore)</span>
                     <span className="text-[10px] font-normal text-neutral-400">Reels, TikTok & Visual Feed</span>
@@ -220,9 +220,9 @@ export const Navbar: React.FC<NavbarProps> = ({
                     setExploreDropdownOpen(false);
                     navigateTo('landing', '/landing');
                   }}
-                  className="w-full px-3.5 py-2.5 rounded-xl text-left text-sm font-bold text-[#0d0c22] hover:bg-neutral-50 flex items-center gap-3 transition-colors cursor-pointer group/item"
+                  className="w-full px-3.5 py-2.5 rounded-[8px] text-left text-sm font-bold text-[#0D0C22] hover:bg-[#F3F3F4] flex items-center gap-3 transition-colors cursor-pointer group/item"
                 >
-                  <UserCheck className="w-4 h-4 text-neutral-800 group-hover/item:text-blue-600 transition-colors" />
+                  <UserCheck className="w-4 h-4 text-neutral-800 group-hover/item:text-[#155DFC] transition-colors" />
                   <span>Kreator & Profil</span>
                 </button>
 
@@ -231,9 +231,9 @@ export const Navbar: React.FC<NavbarProps> = ({
                     setExploreDropdownOpen(false);
                     navigateTo('umkm-profile', '/umkm/umkm-1');
                   }}
-                  className="w-full px-3.5 py-2.5 rounded-xl text-left text-sm font-bold text-[#0d0c22] hover:bg-neutral-50 flex items-center gap-3 transition-colors cursor-pointer group/item"
+                  className="w-full px-3.5 py-2.5 rounded-[8px] text-left text-sm font-bold text-[#0D0C22] hover:bg-[#F3F3F4] flex items-center gap-3 transition-colors cursor-pointer group/item"
                 >
-                  <Building2 className="w-4 h-4 text-neutral-800 group-hover/item:text-blue-600 transition-colors" />
+                  <Building2 className="w-4 h-4 text-neutral-800 group-hover/item:text-[#155DFC] transition-colors" />
                   <div>
                     <span className="block">Profil UMKM & Brand</span>
                     <span className="text-[10px] font-normal text-neutral-400">Brief Aktif & Reputasi Klien</span>
@@ -245,9 +245,9 @@ export const Navbar: React.FC<NavbarProps> = ({
                     setExploreDropdownOpen(false);
                     navigateTo('services', '/explore/services');
                   }}
-                  className="w-full px-3.5 py-2.5 rounded-xl text-left text-sm font-bold text-[#0d0c22] hover:bg-neutral-50 flex items-center gap-3 transition-colors cursor-pointer group/item"
+                  className="w-full px-3.5 py-2.5 rounded-[8px] text-left text-sm font-bold text-[#0D0C22] hover:bg-[#F3F3F4] flex items-center gap-3 transition-colors cursor-pointer group/item"
                 >
-                  <Briefcase className="w-4 h-4 text-neutral-800 group-hover/item:text-blue-600 transition-colors" />
+                  <Briefcase className="w-4 h-4 text-neutral-800 group-hover/item:text-[#155DFC] transition-colors" />
                   <span>Katalog Layanan</span>
                 </button>
               </div>
@@ -264,7 +264,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                       }
                       navigateTo('projects', '/explore/projects');
                     }}
-                    className="w-full px-3.5 py-2 rounded-xl text-left text-[13px] font-semibold text-neutral-700 hover:text-[#0d0c22] hover:bg-neutral-50 flex items-center justify-between transition-colors cursor-pointer"
+                    className="w-full px-3.5 py-2 rounded-[8px] text-left text-[13px] font-semibold text-neutral-700 hover:text-[#0D0C22] hover:bg-[#F3F3F4] flex items-center justify-between transition-colors cursor-pointer"
                   >
                     <span>{item}</span>
                   </button>
@@ -279,19 +279,19 @@ export const Navbar: React.FC<NavbarProps> = ({
             onClick={() => navigateTo('collaboration-room', '/collaboration')}
             className={`transition-colors flex items-center gap-1.5 cursor-pointer font-semibold relative py-1 ${
               activePage === 'collaboration-room' || (pathname && pathname.startsWith('/collaboration'))
-                ? 'text-[#1D4ED8] font-bold after:content-[""] after:absolute after:-bottom-5 after:left-0 after:right-0 after:h-[2.5px] after:bg-[#1D4ED8] after:rounded-full'
-                : 'text-neutral-700 hover:text-[#1D4ED8]'
+                ? 'text-[#155DFC] font-bold after:content-[""] after:absolute after:-bottom-5 after:left-0 after:right-0 after:h-[2px] after:bg-[#155DFC] after:rounded-full'
+                : 'text-neutral-700 hover:text-[#155DFC]'
             }`}
           >
             <span>Collaboration Room</span>
           </button>
 
-          {/* Menu Brief Proyek (Nav Item di samping Collaboration Room) */}
+          {/* Menu Brief Proyek */}
           <button
             id="nav-start-brief-btn"
             onClick={() => navigateTo('briefs', '/briefs')}
-            className={`hover:text-blue-600 transition-colors cursor-pointer font-semibold ${
-              activePage === 'briefs' || (pathname && pathname.startsWith('/briefs')) ? 'text-blue-600 font-bold' : 'text-neutral-700'
+            className={`hover:text-[#155DFC] transition-colors cursor-pointer font-semibold ${
+              activePage === 'briefs' || (pathname && pathname.startsWith('/briefs')) ? 'text-[#155DFC] font-bold' : 'text-neutral-700'
             }`}
           >
             <span>Brief Proyek</span>
@@ -304,19 +304,19 @@ export const Navbar: React.FC<NavbarProps> = ({
           <button
             id="nav-chat-btn"
             onClick={() => navigateTo('chat', '/chat')}
-            className="w-10 h-10 rounded-full hover:bg-neutral-100 flex items-center justify-center text-neutral-600 hover:text-[#0d0c22] transition-colors relative cursor-pointer"
+            className="w-10 h-10 rounded-full hover:bg-[#F3F3F4] flex items-center justify-center text-neutral-600 hover:text-[#0D0C22] transition-colors relative cursor-pointer"
             aria-label="Messages"
             title="Buka Ruang Obrolan & Pesan"
           >
             <MessageSquare className="w-5 h-5" />
-            <span className="absolute top-2 right-2 w-2 h-2 bg-blue-600 rounded-full ring-2 ring-white"></span>
+            <span className="absolute top-2 right-2 w-2 h-2 bg-[#155DFC] rounded-full ring-2 ring-white"></span>
           </button>
 
           {/* Ikon Notifikasi */}
           <button
             id="nav-notifications-btn"
             onClick={() => navigateTo('notifications', '/notifications')}
-            className="w-10 h-10 rounded-full hover:bg-neutral-100 flex items-center justify-center text-neutral-600 hover:text-[#0d0c22] transition-colors relative cursor-pointer"
+            className="w-10 h-10 rounded-full hover:bg-[#F3F3F4] flex items-center justify-center text-neutral-600 hover:text-[#0D0C22] transition-colors relative cursor-pointer"
             aria-label="Notifications"
             title="Buka Notifikasi"
           >
@@ -330,28 +330,28 @@ export const Navbar: React.FC<NavbarProps> = ({
               <button
                 id="nav-user-profile-logo-btn"
                 onClick={() => setUserDropdownOpen(!userDropdownOpen)}
-                className="flex items-center gap-1.5 p-1 rounded-full hover:bg-neutral-100 transition cursor-pointer"
+                className="flex items-center gap-1.5 p-1 rounded-full hover:bg-[#F3F3F4] transition cursor-pointer"
                 title="Buka menu profil"
               >
                 <div className="relative">
                   <img
                     src={currentUser.avatar || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100&auto=format&fit=crop&q=80'}
                     alt={currentUser.name}
-                    className="w-9 h-9 rounded-full object-cover ring-2 ring-neutral-200"
+                    className="w-9 h-9 rounded-full object-cover ring-1 ring-black/10"
                   />
                 </div>
                 <ChevronDown className="w-3.5 h-3.5 text-neutral-500" />
               </button>
 
               {userDropdownOpen && (
-                <div className="absolute right-0 mt-2 w-48 bg-white rounded-2xl border border-neutral-200 shadow-xl py-1.5 z-50 animate-in fade-in zoom-in-95">
+                <div className="absolute right-0 mt-2 w-48 bg-white rounded-[16px] border border-black/10 shadow-lg py-1.5 z-50 animate-in fade-in zoom-in-95">
                   <button
                     id="nav-user-creator-profile-btn"
                     onClick={() => {
                       setUserDropdownOpen(false);
                       navigateTo('creator-profile', '/profile');
                     }}
-                    className="w-full px-4 py-2.5 text-left text-xs font-semibold text-neutral-700 hover:bg-neutral-50 hover:text-[#0d0c22] flex items-center gap-2.5 cursor-pointer transition-colors"
+                    className="w-full px-4 py-2.5 text-left text-xs font-semibold text-neutral-700 hover:bg-[#F3F3F4] hover:text-[#0D0C22] flex items-center gap-2.5 cursor-pointer transition-colors"
                   >
                     <User className="w-4 h-4 text-neutral-500" />
                     <span>Profil Saya</span>
@@ -362,12 +362,12 @@ export const Navbar: React.FC<NavbarProps> = ({
                       setUserDropdownOpen(false);
                       navigateTo('settings', '/settings');
                     }}
-                    className="w-full px-4 py-2.5 text-left text-xs font-semibold text-neutral-700 hover:bg-neutral-50 hover:text-[#0d0c22] flex items-center gap-2.5 cursor-pointer transition-colors"
+                    className="w-full px-4 py-2.5 text-left text-xs font-semibold text-neutral-700 hover:bg-[#F3F3F4] hover:text-[#0D0C22] flex items-center gap-2.5 cursor-pointer transition-colors"
                   >
                     <Settings className="w-4 h-4 text-neutral-500" />
                     <span>Setting</span>
                   </button>
-                  <div className="my-1 border-t border-neutral-100" />
+                  <div className="my-1 border-t border-black/5" />
                   <button
                     id="nav-user-logout-btn"
                     onClick={() => {
@@ -387,14 +387,14 @@ export const Navbar: React.FC<NavbarProps> = ({
               <button
                 id="nav-signin-btn"
                 onClick={() => navigateTo('signin', '/sign-in')}
-                className="px-3.5 py-2 text-xs sm:text-sm font-semibold text-[#171717] hover:text-[#1D4ED8] transition-colors cursor-pointer"
+                className="h-10 px-4 text-xs sm:text-sm font-semibold text-[#0D0B0B] hover:text-[#155DFC] hover:bg-[#F3F3F4] rounded-[8px] transition-colors cursor-pointer"
               >
                 Masuk
               </button>
               <button
                 id="nav-signup-btn"
                 onClick={() => navigateTo('signup', '/sign-up')}
-                className="h-10 px-4 text-xs sm:text-sm font-semibold text-white bg-[#0B1F3A] hover:bg-[#123B8C] rounded-xl transition-colors shadow-xs cursor-pointer"
+                className="h-10 px-4 text-xs sm:text-sm font-semibold text-white bg-[#155DFC] hover:bg-[#0E4CD1] rounded-[8px] transition-colors cursor-pointer"
               >
                 Daftar
               </button>
@@ -404,7 +404,7 @@ export const Navbar: React.FC<NavbarProps> = ({
           {/* Mobile Hamburger */}
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="p-2 lg:hidden text-neutral-700 hover:text-[#0d0c22] rounded-xl hover:bg-neutral-100 cursor-pointer"
+            className="p-2 lg:hidden text-neutral-700 hover:text-[#0D0C22] rounded-[8px] hover:bg-[#F3F3F4] cursor-pointer"
           >
             {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
           </button>

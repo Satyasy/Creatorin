@@ -440,13 +440,13 @@ export const ExplorePage: React.FC<ExplorePageProps> = ({ currentUser: propUser,
                     key={cat}
                     id={`filter-category-${cat.toLowerCase()}`}
                     onClick={() => setSelectedCategory(cat)}
-                    className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
+                    className={`px-3.5 py-1.5 rounded-[8px] text-xs font-semibold transition-colors cursor-pointer ${
                       selectedCategory === cat
-                        ? 'bg-indigo-600 text-white shadow-2xs'
-                        : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                        ? 'bg-[#155DFC] text-white'
+                        : 'bg-[#F3F3F4] text-neutral-600 hover:bg-neutral-200/70'
                     }`}
                   >
-                    {cat === 'All' ? 'All Formats' : cat === 'Video' ? '🎬 Video (Reels/TikTok)' : '🖼️ Image (Feed/Carousel)'}
+                    {cat === 'All' ? 'All Formats' : cat === 'Video' ? 'Video (Reels/TikTok)' : 'Image (Feed/Carousel)'}
                   </button>
                 ))}
               </div>

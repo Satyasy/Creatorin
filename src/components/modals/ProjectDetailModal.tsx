@@ -247,7 +247,7 @@ export const ProjectDetailModal: React.FC<ProjectDetailModalProps> = ({
     }
 
     return (
-      <span className="inline-flex items-center gap-1.5 rounded-full bg-[#0B1F3A] px-3 py-1.5 text-[12px] font-bold leading-4 text-white shadow-sm">
+      <span className="inline-flex items-center gap-1.5 rounded-full bg-[#0D0C22] px-3 py-1.5 text-[12px] font-bold leading-4 text-white">
         <Layers className="size-3.5" />
         Portofolio
       </span>
@@ -255,7 +255,7 @@ export const ProjectDetailModal: React.FC<ProjectDetailModalProps> = ({
   };
 
   const renderMedia = () => (
-    <div className="relative w-full overflow-hidden rounded-[24px] border border-[#E2E8F0] bg-[#171717] shadow-xs">
+    <div className="relative w-full overflow-hidden rounded-[16px] border border-black/10 bg-[#0D0C22]">
       <div className="absolute left-4 top-4 z-20 rounded-full bg-black/60 px-3 py-1.5 text-[11px] font-semibold leading-[16.5px] tracking-[0.06px] text-white backdrop-blur-md">
         {creatorHandle}
       </div>
@@ -438,7 +438,7 @@ export const ProjectDetailModal: React.FC<ProjectDetailModalProps> = ({
         <button
           type="button"
           onClick={() => onGetInTouch?.(creator)}
-          className="rounded-full bg-[#0B1F3A] px-6 py-2.5 text-[14px] font-bold leading-5 tracking-[-0.15px] text-white shadow-xs transition hover:bg-[#123B8C] cursor-pointer"
+          className="rounded-[8px] bg-[#155DFC] px-6 py-2.5 text-[14px] font-bold leading-5 tracking-[-0.15px] text-white transition hover:bg-[#0E4CD1] cursor-pointer"
         >
           Kirim Pesan
         </button>
@@ -449,11 +449,11 @@ export const ProjectDetailModal: React.FC<ProjectDetailModalProps> = ({
   const renderCreatorCard = () => (
     <section className="w-full pt-[72px] text-center">
       <div className="relative h-[38px] w-full">
-        <div className="absolute inset-x-0 top-0 border-t border-[#E2E8F0]" />
+        <div className="absolute inset-x-0 top-0 border-t border-black/10" />
         <button
           type="button"
           onClick={() => onViewCreatorProfile?.(creator)}
-          className="absolute left-1/2 top-[-24px] size-14 -translate-x-1/2 rounded-full bg-white p-1 shadow-[0_0_0_4px_white,0_4px_6px_-1px_rgba(0,0,0,0.1),0_2px_4px_-2px_rgba(0,0,0,0.1)] cursor-pointer"
+          className="absolute left-1/2 top-[-24px] size-14 -translate-x-1/2 rounded-full bg-white p-1 ring-1 ring-black/10 cursor-pointer"
           title={`Lihat profil ${creator.name}`}
         >
           <img src={creator.avatar} alt={creator.name} className="size-full rounded-full object-cover" />
@@ -464,11 +464,11 @@ export const ProjectDetailModal: React.FC<ProjectDetailModalProps> = ({
         <button
           type="button"
           onClick={() => onViewCreatorProfile?.(creator)}
-          className="text-center text-[20px] font-bold leading-7 tracking-[0.2px] text-[#171717] hover:underline cursor-pointer"
+          className="text-center text-[20px] font-bold leading-7 tracking-[0.2px] text-[#0D0C22] hover:underline cursor-pointer"
         >
           {creator.name}
         </button>
-        <p className="pt-3 text-center text-[14px] font-medium leading-5 tracking-[-0.15px] text-[#525252]">
+        <p className="pt-3 text-center text-[14px] font-medium leading-5 tracking-[-0.15px] text-neutral-600">
           {creator.bio || 'Kreator UGC autentik dengan engagement tinggi. Spesialis review skincare, makeup tutorial, dan unboxing estetik.'}
         </p>
 
@@ -476,26 +476,26 @@ export const ProjectDetailModal: React.FC<ProjectDetailModalProps> = ({
           <button
             type="button"
             onClick={() => onGetInTouch?.(creator)}
-            className="rounded-full bg-[#0B1F3A] px-6 py-2.5 text-[12px] font-semibold leading-4 text-white shadow-xs transition hover:bg-[#123B8C] cursor-pointer"
+            className="rounded-[8px] bg-[#155DFC] px-6 py-2.5 text-[12px] font-semibold leading-4 text-white transition hover:bg-[#0E4CD1] cursor-pointer"
           >
             Kirim Pesan
           </button>
           <button
             type="button"
             onClick={() => setIsFollowing(prev => !prev)}
-            className="rounded-full border border-[#E2E8F0] bg-white px-6 py-2.5 text-[12px] font-semibold leading-4 text-[#171717] shadow-2xs transition hover:bg-neutral-50 cursor-pointer"
+            className="rounded-[8px] border border-black/10 bg-white px-6 py-2.5 text-[12px] font-semibold leading-4 text-[#0D0B0B] transition hover:bg-[#F3F3F4] cursor-pointer"
           >
             {isFollowing ? 'Mengikuti' : 'Ikuti Kreator'}
           </button>
         </div>
 
-        <div className="flex max-w-full flex-wrap items-center justify-center gap-x-4 gap-y-2 pt-4 text-[12px] font-medium leading-4 text-[#737373]">
-          <a href={`https://${creatorDomain}`} target="_blank" rel="noreferrer" className="inline-flex min-w-0 items-center gap-1 hover:text-[#1D4ED8]">
+        <div className="flex max-w-full flex-wrap items-center justify-center gap-x-4 gap-y-2 pt-4 text-[12px] font-medium leading-4 text-neutral-500">
+          <a href={`https://${creatorDomain}`} target="_blank" rel="noreferrer" className="inline-flex min-w-0 items-center gap-1 hover:text-[#155DFC]">
             <Globe className="size-3.5 shrink-0" />
             <span className="truncate">{creatorDomain}</span>
           </a>
           <span>•</span>
-          <a href={`mailto:${creatorEmail}`} className="inline-flex min-w-0 items-center gap-1 hover:text-[#1D4ED8]">
+          <a href={`mailto:${creatorEmail}`} className="inline-flex min-w-0 items-center gap-1 hover:text-[#155DFC]">
             <Mail className="size-3.5 shrink-0" />
             <span className="truncate">{creatorEmail}</span>
           </a>
@@ -507,13 +507,13 @@ export const ProjectDetailModal: React.FC<ProjectDetailModalProps> = ({
   const renderRelatedProjects = () => (
     <section className="w-full pt-14">
       <div className="flex items-center justify-between gap-4">
-        <h3 className="text-[18px] font-bold leading-7 tracking-[-0.44px] text-[#171717]">
+        <h3 className="text-[18px] font-bold leading-7 tracking-[-0.44px] text-[#0D0C22]">
           Proyek Serupa
         </h3>
         <button
           type="button"
           onClick={() => onViewCreatorProfile?.(creator)}
-          className="inline-flex items-center gap-1 text-[12px] font-bold leading-4 text-[#1D4ED8] hover:underline cursor-pointer"
+          className="inline-flex items-center gap-1 text-[12px] font-bold leading-4 text-[#155DFC] hover:underline cursor-pointer"
         >
           Lihat Proyek Lainnya
           <ArrowUpRight className="size-3.5" />
@@ -664,10 +664,10 @@ export const ProjectDetailModal: React.FC<ProjectDetailModalProps> = ({
         </button>
       </div>
 
-      {/* Main Modal Surface (Rounded-T 24px) */}
+      {/* Main Modal Surface (Rounded-T 16px) */}
       <div
         onClick={(event) => event.stopPropagation()}
-        className="relative flex min-h-0 flex-1 flex-col overflow-hidden rounded-t-[24px] bg-white font-sans text-[#171717] shadow-2xl selection:bg-[#0B1F3A] selection:text-white"
+        className="relative flex min-h-0 flex-1 flex-col overflow-hidden rounded-t-[16px] bg-white font-sans text-[#0D0B0B] shadow-xl selection:bg-[#155DFC] selection:text-white"
       >
         {/* Scrollable Container with Content and Footer */}
         <div ref={modalContainerRef} className="min-h-0 flex-1 overflow-y-auto overflow-x-hidden">

@@ -279,7 +279,7 @@ export const ServiceDetailModal: React.FC<ServiceDetailModalProps> = ({
       {/* Floating Modal Pop-up Sheet */}
       <div
         onClick={(e) => e.stopPropagation()}
-        className="flex-1 min-h-0 bg-white text-[#171717] font-sans selection:bg-[#0B1F3A] selection:text-white rounded-t-2xl sm:rounded-t-3xl shadow-2xl flex flex-col overflow-hidden relative"
+        className="flex-1 min-h-0 bg-white text-[#0D0B0B] font-sans selection:bg-[#155DFC] selection:text-white rounded-t-[16px] shadow-xl flex flex-col overflow-hidden relative"
       >
         {/* Right Side Floating Action Rail (Share & Chat) */}
         <div className="fixed top-1/2 -translate-y-1/2 right-4 sm:right-6 z-40 flex flex-col items-center gap-2.5">
@@ -287,7 +287,7 @@ export const ServiceDetailModal: React.FC<ServiceDetailModalProps> = ({
           <button
             id="btn-share-service"
             onClick={handleShare}
-            className="w-10 h-10 rounded-full border border-[#E2E8F0] bg-white hover:bg-neutral-50 text-neutral-600 hover:text-black flex items-center justify-center transition-colors duration-150 cursor-pointer shadow-xs"
+            className="w-10 h-10 rounded-full border border-black/10 bg-white hover:bg-[#F3F3F4] text-neutral-600 hover:text-[#0D0B0B] flex items-center justify-center transition-colors duration-150 cursor-pointer"
             title="Salin Tautan Layanan"
           >
             <Copy className="w-4 h-4 stroke-[1.75]" />
@@ -297,7 +297,7 @@ export const ServiceDetailModal: React.FC<ServiceDetailModalProps> = ({
           <button
             id="btn-chat-creator"
             onClick={handleGoToChat}
-            className="w-10 h-10 rounded-full border border-[#E2E8F0] bg-white hover:bg-neutral-50 text-neutral-600 hover:text-blue-600 flex items-center justify-center transition-colors duration-150 cursor-pointer shadow-xs"
+            className="w-10 h-10 rounded-full border border-black/10 bg-white hover:bg-[#F3F3F4] text-neutral-600 hover:text-[#155DFC] flex items-center justify-center transition-colors duration-150 cursor-pointer"
             title="Diskusikan via Chat"
           >
             <MessageSquare className="w-4 h-4 stroke-[1.75]" />
@@ -306,14 +306,14 @@ export const ServiceDetailModal: React.FC<ServiceDetailModalProps> = ({
 
         {/* Share Copied Toast */}
         {copiedToast && (
-          <div className="fixed bottom-8 left-1/2 -translate-x-1/2 z-50 flex items-center gap-2 px-4 py-2.5 rounded-full bg-[#0B1F3A] text-white text-xs font-semibold shadow-xl animate-in fade-in slide-in-from-bottom-3 duration-200">
+          <div className="fixed bottom-8 left-1/2 -translate-x-1/2 z-50 flex items-center gap-2 px-4 py-2.5 rounded-full bg-[#0D0C22] text-white text-xs font-semibold shadow-lg animate-in fade-in slide-in-from-bottom-3 duration-200">
             <Check className="w-4 h-4 text-emerald-400 stroke-[2]" />
             <span>Tautan layanan berhasil disalin ke clipboard!</span>
           </div>
         )}
 
-        {/* FIXED NAVBAR: Creator Profile Row (Identik dengan Gambar Referensi & Detail Proyek) */}
-        <header className="shrink-0 bg-white/95 backdrop-blur-xs border-b border-[#E2E8F0] z-20">
+        {/* FIXED NAVBAR: Creator Profile Row */}
+        <header className="shrink-0 bg-white/95 backdrop-blur-xs border-b border-black/10 z-20">
           <div className="w-full max-w-5xl mx-auto px-6 lg:px-8 py-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             
             {/* Left: Avatar & Profile Details */}
@@ -322,14 +322,14 @@ export const ServiceDetailModal: React.FC<ServiceDetailModalProps> = ({
                 onClick={() => onViewCreatorProfile && onViewCreatorProfile(creator)}
                 className="relative cursor-pointer group shrink-0"
               >
-                <div className="w-11 h-11 sm:w-12 sm:h-12 rounded-full p-0.5 bg-linear-to-tr from-blue-600 to-indigo-500 shadow-sm">
+                <div className="w-11 h-11 sm:w-12 sm:h-12 rounded-full p-0.5 bg-[#155DFC]">
                   <img
                     src={creator.avatar}
                     alt={creator.name}
-                    className="w-full h-full rounded-full object-cover "
+                    className="w-full h-full rounded-full object-cover"
                   />
                 </div>
-                <div className="absolute -bottom-0.5 -right-0.5 bg-[#0B1F3A] text-white p-0.5 rounded-full ring-2 ring-white">
+                <div className="absolute -bottom-0.5 -right-0.5 bg-[#0D0C22] text-white p-0.5 rounded-full ring-2 ring-white">
                   <ShieldCheck className="w-3 h-3 text-amber-400" />
                 </div>
               </div>
@@ -407,7 +407,7 @@ export const ServiceDetailModal: React.FC<ServiceDetailModalProps> = ({
               <button
                 id="btn-service-discuss"
                 onClick={handleGoToChat}
-                className="px-5 py-2.5 rounded-xl bg-[#0B1F3A] hover:bg-[#123B8C] text-white font-semibold text-xs sm:text-sm transition cursor-pointer shadow-xs whitespace-nowrap"
+                className="px-5 py-2.5 rounded-[8px] bg-[#155DFC] hover:bg-[#0E4CD1] text-white font-semibold text-xs sm:text-sm transition cursor-pointer whitespace-nowrap"
               >
                 Diskusikan Layanan
               </button>
@@ -423,10 +423,10 @@ export const ServiceDetailModal: React.FC<ServiceDetailModalProps> = ({
         >
           <div className="w-full max-w-5xl mx-auto px-6 lg:px-8 py-6 sm:py-8 space-y-7 text-left">
             
-            {/* 1. VISUAL MEDIA GALLERY (1 COVER UTAMA BESAR + DERETAN FOTO TAMBAHAN DI BAWAH) */}
+            {/* 1. VISUAL MEDIA GALLERY */}
             <div className="space-y-3 sm:space-y-3.5">
-              {/* Cover Preview Utama (1 Besar Sesuai Wireframe) */}
-              <div className="relative w-full rounded-2xl sm:rounded-3xl overflow-hidden border border-neutral-200/80 bg-neutral-900 aspect-[16/10] sm:aspect-16/9 group shadow-2xs">
+              {/* Cover Preview Utama */}
+              <div className="relative w-full rounded-[16px] overflow-hidden border border-black/10 bg-neutral-900 aspect-[16/10] sm:aspect-16/9 group">
                 <img
                   id="main-service-preview-image"
                   src={currentActiveImage}
@@ -530,17 +530,17 @@ export const ServiceDetailModal: React.FC<ServiceDetailModalProps> = ({
             {/* 3. INFORMASI UTAMA: HARGA, ESTIMASI WAKTU, & JUMLAH REVISI */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
               {/* Card 1: Harga */}
-              <div className="p-4 sm:p-5 rounded-2xl border border-[#E2E8F0] bg-white hover:border-neutral-300 transition-colors shadow-2xs flex flex-col justify-between gap-3">
+              <div className="p-4 sm:p-5 rounded-[12px] border border-black/10 bg-white hover:border-black/20 transition-colors flex flex-col justify-between gap-3">
                 <div className="flex items-center justify-between">
                   <span className="text-[11px] font-bold text-neutral-400 uppercase tracking-wider">
                     Harga Mulai
                   </span>
-                  <div className="w-8 h-8 rounded-xl bg-neutral-100/90 text-neutral-700 flex items-center justify-center">
+                  <div className="w-8 h-8 rounded-[8px] bg-[#F3F3F4] text-neutral-700 flex items-center justify-center">
                     <CreditCard className="w-4 h-4 stroke-[1.75]" />
                   </div>
                 </div>
                 <div>
-                  <div className="text-xl sm:text-2xl font-bold text-[#171717] tracking-tight">
+                  <div className="text-xl sm:text-2xl font-bold text-[#0D0C22] tracking-tight">
                     {currentService.formattedPrice}
                   </div>
                   <span className="text-xs text-neutral-500 font-normal">
@@ -550,17 +550,17 @@ export const ServiceDetailModal: React.FC<ServiceDetailModalProps> = ({
               </div>
 
               {/* Card 2: Estimasi Pengerjaan */}
-              <div className="p-4 sm:p-5 rounded-2xl border border-[#E2E8F0] bg-white hover:border-neutral-300 transition-colors shadow-2xs flex flex-col justify-between gap-3">
+              <div className="p-4 sm:p-5 rounded-[12px] border border-black/10 bg-white hover:border-black/20 transition-colors flex flex-col justify-between gap-3">
                 <div className="flex items-center justify-between">
                   <span className="text-[11px] font-bold text-neutral-400 uppercase tracking-wider">
                     Waktu Pengerjaan
                   </span>
-                  <div className="w-8 h-8 rounded-xl bg-neutral-100/90 text-neutral-700 flex items-center justify-center">
+                  <div className="w-8 h-8 rounded-[8px] bg-[#F3F3F4] text-neutral-700 flex items-center justify-center">
                     <Clock className="w-4 h-4 stroke-[1.75]" />
                   </div>
                 </div>
                 <div>
-                  <div className="text-xl sm:text-2xl font-bold text-[#171717] tracking-tight">
+                  <div className="text-xl sm:text-2xl font-bold text-[#0D0C22] tracking-tight">
                     {formattedDelivery}
                   </div>
                   <span className="text-xs text-neutral-500 font-normal">
@@ -570,17 +570,17 @@ export const ServiceDetailModal: React.FC<ServiceDetailModalProps> = ({
               </div>
 
               {/* Card 3: Garansi Revisi */}
-              <div className="p-4 sm:p-5 rounded-2xl border border-[#E2E8F0] bg-white hover:border-neutral-300 transition-colors shadow-2xs flex flex-col justify-between gap-3">
+              <div className="p-4 sm:p-5 rounded-[12px] border border-black/10 bg-white hover:border-black/20 transition-colors flex flex-col justify-between gap-3">
                 <div className="flex items-center justify-between">
                   <span className="text-[11px] font-bold text-neutral-400 uppercase tracking-wider">
                     Jumlah Revisi
                   </span>
-                  <div className="w-8 h-8 rounded-xl bg-neutral-100/90 text-neutral-700 flex items-center justify-center">
+                  <div className="w-8 h-8 rounded-[8px] bg-[#F3F3F4] text-neutral-700 flex items-center justify-center">
                     <RotateCcw className="w-4 h-4 stroke-[1.75]" />
                   </div>
                 </div>
                 <div>
-                  <div className="text-xl sm:text-2xl font-bold text-[#171717] tracking-tight">
+                  <div className="text-xl sm:text-2xl font-bold text-[#0D0C22] tracking-tight">
                     {formattedRevisions}
                   </div>
                   <span className="text-xs text-neutral-500 font-normal">
@@ -656,17 +656,17 @@ export const ServiceDetailModal: React.FC<ServiceDetailModalProps> = ({
                 <button
                   id="btn-creator-spotlight-chat"
                   onClick={handleGoToChat}
-                  className="px-6 py-2.5 rounded-xl bg-[#0B1F3A] hover:bg-[#123B8C] text-white text-xs sm:text-sm font-semibold transition cursor-pointer shadow-xs"
+                  className="px-6 py-2.5 rounded-[8px] bg-[#155DFC] hover:bg-[#0E4CD1] text-white text-xs sm:text-sm font-semibold transition cursor-pointer"
                 >
                   Kirim Pesan
                 </button>
                 <button
                   id="btn-creator-spotlight-follow"
                   onClick={() => setIsFollowing(!isFollowing)}
-                  className={`px-6 py-2.5 rounded-xl border text-xs sm:text-sm font-semibold transition cursor-pointer ${
+                  className={`px-6 py-2.5 rounded-[8px] border text-xs sm:text-sm font-semibold transition cursor-pointer ${
                     isFollowing
-                      ? 'bg-neutral-100 text-neutral-700 border-[#E2E8F0]'
-                      : 'bg-white hover:bg-neutral-50 text-[#171717] border-[#E2E8F0] shadow-2xs'
+                      ? 'bg-[#F3F3F4] text-neutral-700 border-black/10'
+                      : 'bg-white hover:bg-[#F3F3F4] text-[#0D0B0B] border-black/10'
                   }`}
                 >
                   {isFollowing ? 'Mengikuti' : 'Ikuti Kreator'}
@@ -675,14 +675,14 @@ export const ServiceDetailModal: React.FC<ServiceDetailModalProps> = ({
 
               {/* Contact / Links: Domain & Email */}
               <div className="flex items-center justify-center gap-3 pt-2 text-xs text-neutral-500 font-medium">
-                <span className="inline-flex items-center gap-1.5 hover:text-neutral-800 transition cursor-pointer">
+                <span className="inline-flex items-center gap-1.5 hover:text-[#0D0B0B] transition cursor-pointer">
                   <Globe className="w-3.5 h-3.5 text-neutral-400 stroke-[1.75]" />
                   <span>{creatorDomain}</span>
                 </span>
                 <span className="text-neutral-300">•</span>
                 <a
                   href={`mailto:${creatorEmail}`}
-                  className="inline-flex items-center gap-1.5 hover:text-neutral-800 transition"
+                  className="inline-flex items-center gap-1.5 hover:text-[#0D0B0B] transition"
                 >
                   <Mail className="w-3.5 h-3.5 text-neutral-400 stroke-[1.75]" />
                   <span>{creatorEmail}</span>
@@ -690,10 +690,10 @@ export const ServiceDetailModal: React.FC<ServiceDetailModalProps> = ({
               </div>
             </div>
             {otherServices.length > 0 && (
-              <div className="pt-8 border-t border-[#E2E8F0] space-y-4">
+              <div className="pt-8 border-t border-black/10 space-y-4">
                 <div className="flex items-center justify-between">
                   <div>
-                    <h3 className="text-base sm:text-lg font-bold text-[#171717]">
+                    <h3 className="text-base sm:text-lg font-bold text-[#0D0C22]">
                       Layanan Lain dari {creator.name}
                     </h3>
                     <p className="text-xs text-neutral-500 mt-0.5">
@@ -703,14 +703,14 @@ export const ServiceDetailModal: React.FC<ServiceDetailModalProps> = ({
                   {onViewCreatorProfile && (
                     <button
                       onClick={() => onViewCreatorProfile(creator)}
-                      className="text-xs font-semibold text-blue-600 hover:underline cursor-pointer shrink-0"
+                      className="text-xs font-semibold text-[#155DFC] hover:underline cursor-pointer shrink-0"
                     >
                       Lihat semua
                     </button>
                   )}
                 </div>
 
-                {/* 3-column Grid matching the screenshot card design */}
+                {/* 3-column Grid matching the card design */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6">
                   {otherServices.slice(0, 3).map((srv) => {
                     const srvFormattedDelivery = srv.deliveryDays
@@ -720,20 +720,20 @@ export const ServiceDetailModal: React.FC<ServiceDetailModalProps> = ({
                     return (
                       <div
                         key={srv.id}
-                        className="bg-white rounded-2xl sm:rounded-3xl border border-[#E2E8F0] hover:border-neutral-300 hover:shadow-lg transition-all p-5 sm:p-6 flex flex-col justify-between text-left group"
+                        className="bg-white rounded-[12px] border border-black/10 hover:border-black/25 transition-colors p-5 sm:p-6 flex flex-col justify-between text-left group"
                       >
                         <div>
                           {/* Cover Thumbnail */}
                           {srv.coverImage && (
                             <div
                               onClick={() => handleSwitchService(srv)}
-                              className="aspect-[16/10] rounded-xl sm:rounded-2xl overflow-hidden bg-neutral-100 mb-4 cursor-pointer"
+                              className="aspect-[16/10] rounded-[8px] overflow-hidden bg-neutral-100 mb-4 cursor-pointer"
                               title="Lihat detail layanan"
                             >
                               <img
                                 src={srv.coverImage}
                                 alt={srv.title}
-                                className="w-full h-full object-cover "
+                                className="w-full h-full object-cover"
                                 loading="lazy"
                               />
                             </div>
@@ -741,7 +741,7 @@ export const ServiceDetailModal: React.FC<ServiceDetailModalProps> = ({
 
                           {/* Tag */}
                           {srv.tag && (
-                            <span className="px-2.5 py-1 rounded-md bg-neutral-100 text-neutral-600 text-[10px] font-bold uppercase tracking-wider inline-block mb-2.5">
+                            <span className="px-2.5 py-1 rounded-[6px] bg-[#F3F3F4] text-neutral-600 text-[10px] font-bold uppercase tracking-wider inline-block mb-2.5">
                               {srv.tag}
                             </span>
                           )}
@@ -749,7 +749,7 @@ export const ServiceDetailModal: React.FC<ServiceDetailModalProps> = ({
                           {/* Title */}
                           <h4
                             onClick={() => handleSwitchService(srv)}
-                            className="text-base sm:text-[17px] font-bold text-[#171717] mb-1.5 leading-snug cursor-pointer group-hover:text-blue-600 transition-colors"
+                            className="text-base sm:text-[17px] font-bold text-[#0D0C22] mb-1.5 leading-snug cursor-pointer group-hover:text-[#155DFC] transition-colors"
                             title="Lihat detail layanan"
                           >
                             {srv.title}
@@ -779,14 +779,14 @@ export const ServiceDetailModal: React.FC<ServiceDetailModalProps> = ({
                             <span className="text-[10px] text-neutral-400 font-bold uppercase tracking-wider block mb-0.5">
                               HARGA
                             </span>
-                            <span className="text-base sm:text-lg font-bold text-[#171717]">
+                            <span className="text-base sm:text-lg font-bold text-[#0D0C22]">
                               {srv.formattedPrice}
                             </span>
                           </div>
 
                           <button
                             onClick={() => onOrderService(srv, creator)}
-                            className="px-5 py-2.5 rounded-xl bg-[#0B1F3A] hover:bg-[#123B8C] text-white text-xs font-semibold transition shadow-xs hover:shadow-sm cursor-pointer"
+                            className="px-5 py-2.5 rounded-[8px] bg-[#155DFC] hover:bg-[#0E4CD1] text-white text-xs font-semibold transition cursor-pointer"
                           >
                             Pesan Layanan
                           </button>

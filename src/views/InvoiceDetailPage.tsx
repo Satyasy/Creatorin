@@ -167,7 +167,7 @@ export const InvoiceDetailPage: React.FC<InvoiceDetailProps> = ({
     setTimeout(() => {
       setIsVerifying(false);
       setPaymentStatus('paid');
-      showToast('🎉 Pembayaran Berhasil Diverifikasi! Dana telah diamankan di Rekening Escrow Creatorin.');
+      showToast('Pembayaran Berhasil Diverifikasi! Dana telah diamankan di Rekening Escrow Creatorin.');
       if (onPaymentSuccess) {
         onPaymentSuccess(invoice.id, invoiceData?.messageId);
       }
@@ -882,7 +882,7 @@ export const InvoiceDetailPage: React.FC<InvoiceDetailProps> = ({
                   <div className="grid grid-cols-2 gap-2">
                     <button
                       type="button"
-                      onClick={() => showToast('📥 Gambar QRIS berhasil diunduh ke galeri perangkat Anda!')}
+                      onClick={() => showToast('Gambar QRIS berhasil diunduh ke galeri perangkat Anda!')}
                       className="py-2 px-3 rounded-xl border border-neutral-200/80 hover:bg-neutral-50 text-[#0d0c22] text-xs font-semibold transition cursor-pointer flex items-center justify-center gap-1.5 shadow-2xs"
                     >
                       <Download className="w-3.5 h-3.5 text-neutral-500" />

@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getAuthenticatedUser } from "@/lib/api-auth";
 import { getDb } from "@/lib/db";
-import { collaborationRooms, submissions, revisions, profiles } from "@/lib/db/schema";
+import { collaborationRooms, submissions, profiles } from "@/lib/db/schema";
 import { eq, desc } from "drizzle-orm";
 
 export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
