@@ -718,7 +718,7 @@ export const HomePage: React.FC<HomePageProps> = ({
                         title: `1x Layanan Konten ${creator.category === 'Video' ? 'Reels & TikTok UGC' : 'Feed & Desain Visual'}`,
                         formattedPrice: creator.formattedRate.replace('/proyek', '').replace('/video', '').replace('/sesi', ''),
                         price: creator.startingRate,
-                        coverImage: creator.portfolioSamples?.[0]?.thumbnail || '/creatorin/service-pattern-1.png',
+                        coverImage: creator.portfolioSamples?.[0]?.thumbnail || 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&auto=format&fit=crop&q=80',
                         tag: creator.category === 'Video' ? 'UGC Video' : 'Design',
                         deliveryDays: '2 Hari Kerja'
                       },
@@ -885,7 +885,7 @@ export const HomePage: React.FC<HomePageProps> = ({
                             {servicesList.map((service, srvIdx) => {
                               const imageSrc = service.coverImage || 
                                 creator.portfolioSamples?.[srvIdx % (creator.portfolioSamples?.length || 1)]?.thumbnail ||
-                                '/creatorin/service-pattern-1.png';
+                                'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&auto=format&fit=crop&q=80';
 
                               return (
                                 <div
@@ -998,7 +998,7 @@ export const HomePage: React.FC<HomePageProps> = ({
                       {/* Media Cover Image Card (Aspect 4:3 matching screenshot) */}
                       <div className="relative aspect-[4/3] rounded-2xl overflow-hidden bg-neutral-100 shadow-2xs group-hover:shadow-md transition-all duration-300">
                         <img
-                          src={srv.coverImage || '/creatorin/service-pattern-1.png'}
+                          src={srv.coverImage || 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&auto=format&fit=crop&q=80'}
                           alt={srv.title}
                           className="w-full h-full object-cover "
                           loading="lazy"
@@ -1094,7 +1094,7 @@ export const HomePage: React.FC<HomePageProps> = ({
                 </div>
                 <p className="text-xs sm:text-sm text-neutral-700 truncate">
                   <strong className="text-[#0d0c22] font-bold">Start a Project Brief</strong>{' '}
-                  <span className="hidden sm:inline text-neutral-500">— Tell us what you need and find the right talent for your project.</span>
+                  <span className="hidden sm:inline text-neutral-500">: Tell us what you need and find the right talent for your project.</span>
                 </p>
               </div>
 

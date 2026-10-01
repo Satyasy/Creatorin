@@ -69,7 +69,7 @@ const INITIAL_CONVERSATIONS: ChatConversation[] = [
           formattedPrice: 'Rp1.500.000',
           deliveryDays: '2 Hari Kerja',
           tag: 'Figma Template',
-          coverImage: '/creatorin/service-pattern-1.png',
+          coverImage: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&auto=format&fit=crop&q=80',
           description: 'Desain antarmuka landing page SaaS modern 20+ komponen responsif, auto-layout rapi, dan panduan variabel warna token.'
         }
       },
@@ -158,7 +158,7 @@ const INITIAL_CONVERSATIONS: ChatConversation[] = [
           formattedPrice: 'Rp450.000',
           deliveryDays: '2 Hari Kerja',
           tag: 'UGC Video',
-          coverImage: '/creatorin/service-pattern-4.png'
+          coverImage: 'https://images.unsplash.com/photo-1574717024653-61fd2cf4d44d?w=800&auto=format&fit=crop&q=80'
         }
       },
       {
@@ -641,14 +641,14 @@ export const ChatPage: React.FC<ChatPageProps> = ({
   const totalUnreadCount = conversations.reduce((acc, c) => acc + c.unreadCount, 0);
 
   return (
-    <div className="flex-1 w-full flex flex-col min-h-0 bg-white text-[#171717] font-sans overflow-hidden h-[calc(100vh-80px)] selection:bg-[#0B1F3A] selection:text-white">
+    <div className="flex-1 w-full flex flex-col min-h-0 bg-white text-[#171717] font-sans overflow-hidden h-[calc(100vh-80px)] max-h-[calc(100vh-80px)] overscroll-none selection:bg-[#0B1F3A] selection:text-white">
       {/* Kontainer 3 Kolom Terstruktur */}
       <div className="flex-1 min-h-0 w-full flex overflow-hidden">
         
         {/* ========================================================== */}
         {/* KOLOM 1: SIDEBAR KIRI (DAFTAR PERCAKAPAN - PALING KECIL)   */}
         {/* ========================================================== */}
-        <aside className={`w-full md:w-[280px] lg:w-[300px] xl:w-[320px] shrink-0 border-r border-neutral-200 flex flex-col bg-white ${
+        <aside className={`w-full md:w-[280px] lg:w-[300px] xl:w-[320px] shrink-0 border-r border-neutral-200 flex flex-col bg-white h-full overflow-hidden ${
           isMobileChatOpen ? 'hidden md:flex' : 'flex'
         }`}>
           
@@ -699,7 +699,7 @@ export const ChatPage: React.FC<ChatPageProps> = ({
           </div>
 
           {/* Daftar Percakapan Flat & Minimalis */}
-          <div className="flex-1 overflow-y-auto px-2 py-1 space-y-0.5">
+          <div className="flex-1 overflow-y-auto overscroll-contain px-2 py-1 space-y-0.5">
             {filteredConversations.length === 0 ? (
               <div className="p-8 text-center text-xs text-neutral-400">
                 Tidak ada percakapan ditemukan.
@@ -762,7 +762,7 @@ export const ChatPage: React.FC<ChatPageProps> = ({
         {/* KOLOM 2: ROOM CHAT UTAMA ATAU TAMPILAN PREVIEW AWAL       */}
         {/* ========================================================== */}
         {!activeConversation || !activeCreator ? (
-          <section className={`flex-1 flex flex-col items-center justify-center bg-white min-w-0 p-6 sm:p-12 text-center select-none ${
+          <section className={`flex-1 flex flex-col items-center justify-center bg-white min-w-0 p-6 sm:p-12 text-center select-none h-full overflow-hidden ${
             isMobileChatOpen ? 'flex' : 'hidden md:flex'
           }`}>
             <div className="max-w-md w-full flex flex-col items-center">
@@ -787,7 +787,7 @@ export const ChatPage: React.FC<ChatPageProps> = ({
             </div>
           </section>
         ) : (
-          <section className={`flex-1 flex flex-col bg-white min-w-0 ${
+          <section className={`flex-1 flex flex-col bg-white min-w-0 h-full overflow-hidden ${
             !isMobileChatOpen ? 'hidden md:flex' : 'flex'
           }`}>
           
@@ -869,7 +869,7 @@ export const ChatPage: React.FC<ChatPageProps> = ({
           </header>
 
           {/* AREA PESAN CHAT (WHITESPACE LUAS & FOKUS PERCAKAPAN) */}
-          <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-3.5 bg-white">
+          <div className="flex-1 overflow-y-auto overscroll-contain p-4 sm:p-6 space-y-3.5 bg-white">
             
             {/* Tanggal Ringkas */}
             <div className="flex items-center justify-center my-2">
@@ -1103,7 +1103,7 @@ export const ChatPage: React.FC<ChatPageProps> = ({
         {/* KOLOM 3: SIDEBAR KANAN "LAYANAN CREATOR" (PANEL PENDUKUNG) */}
         {/* ========================================================== */}
         {activeConversation && activeCreator && (
-          <aside className={`w-[300px] lg:w-[320px] xl:w-[330px] shrink-0 border-l border-neutral-200 bg-white flex flex-col ${
+          <aside className={`w-[300px] lg:w-[320px] xl:w-[330px] shrink-0 border-l border-neutral-200 bg-white flex flex-col h-full overflow-hidden ${
             isRightSidebarOpenMobile ? 'fixed inset-y-0 right-0 z-40 flex shadow-xl md:shadow-none' : 'hidden xl:flex'
           }`}>
             
@@ -1144,7 +1144,7 @@ export const ChatPage: React.FC<ChatPageProps> = ({
             </div>
 
             {/* DAFTAR RINGKASAN PERCAKAPAN CHAT DENGAN CREATOR */}
-            <div className="flex-1 overflow-y-auto p-3.5 space-y-3">
+            <div className="flex-1 overflow-y-auto overscroll-contain p-3.5 space-y-3">
               <p className="text-[11px] text-neutral-500 leading-relaxed">
                 Ringkasan kesepakatan dan tindak lanjut obrolan dengan <strong className="text-neutral-800">{activeConversation.name}</strong> tanpa halusinasi.
               </p>

@@ -14,7 +14,7 @@ export const fallbackCreators = {
     score: "95%",
     location: "Jakarta Barat",
     school: "SMK Telkom Sidoarjo",
-    bio: "We are Kreativa Studio — a forward-thinking digital design studio delivering meticulous experiences that connect with people.",
+    bio: "We are Kreativa Studio, a forward-thinking digital design studio delivering meticulous experiences that connect with people.",
     skills: ["app ui", "branding", "dashboard", "design systems", "development", "front end development", "icons", "illustration", "mobile", "product design", "strategy", "ui", "ux", "web design", "website ui", "wordpress"],
     languages: ["English", "Indonesia", "Jawa"],
   },

@@ -592,7 +592,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ currentUser: propUser,
                         title: `1x Layanan Konten ${creator.category === 'Video' ? 'Reels & TikTok UGC' : 'Feed & Desain Visual'}`,
                         formattedPrice: creator.formattedRate.replace('/proyek', '').replace('/video', '').replace('/sesi', ''),
                         price: creator.startingRate,
-                        coverImage: creator.portfolioSamples?.[0]?.thumbnail || '/creatorin/service-pattern-1.png',
+                        coverImage: creator.portfolioSamples?.[0]?.thumbnail || 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&auto=format&fit=crop&q=80',
                         tag: creator.category === 'Video' ? 'UGC Video' : 'Design',
                         deliveryDays: '2 Hari Kerja'
                       },
@@ -637,7 +637,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ currentUser: propUser,
                           {servicesList.map((service, srvIdx) => {
                             const imageSrc = service.coverImage || 
                               creator.portfolioSamples?.[srvIdx % (creator.portfolioSamples?.length || 1)]?.thumbnail ||
-                              '/creatorin/service-pattern-1.png';
+                              'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&auto=format&fit=crop&q=80';
 
                             return (
                               <div

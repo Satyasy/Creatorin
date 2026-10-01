@@ -82,7 +82,7 @@ export const SettingsPage: React.FC = () => {
         login(updatedUser);
       }
     } catch {
-      // Local fallback — always persist to auth state
+      // Local fallback : always persist to auth state
       if (updatedUser) {
         login(updatedUser);
       }

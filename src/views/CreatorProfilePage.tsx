@@ -442,7 +442,7 @@ export const CreatorProfilePage: React.FC<CreatorProfilePageProps> = ({
 
       {/* Copy Notification */}
       {copiedLinkSuccess && (
-        <div className="fixed bottom-6 right-6 z-50 bg-[#0d0c22] text-white px-5 py-3 rounded-2xl shadow-2xl flex items-center gap-2.5 text-sm font-bold animate-in fade-in slide-in-from-bottom-3">
+        <div className="fixed bottom-24 right-6 z-50 bg-[#0d0c22] text-white px-5 py-3 rounded-2xl shadow-2xl flex items-center gap-2.5 text-sm font-bold animate-in fade-in slide-in-from-bottom-3">
           <Check className="w-4 h-4 text-emerald-400" />
           <span>Tautan profil berhasil disalin ke clipboard!</span>
         </div>
@@ -1229,7 +1229,7 @@ export const CreatorProfilePage: React.FC<CreatorProfilePageProps> = ({
                     92 <span className="text-xl sm:text-2xl font-normal text-neutral-400">/ 100</span>
                   </span>
                   <span className="text-base sm:text-lg lg:text-xl font-semibold text-neutral-700">
-                    — Skor Rekam Jejak
+                    • Skor Rekam Jejak
                   </span>
                 </div>
                 <p className="text-sm sm:text-[15px] text-neutral-600 leading-relaxed font-normal mt-3 max-w-2xl">

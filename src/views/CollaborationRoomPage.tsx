@@ -361,7 +361,7 @@ ${summaryData.lastRevisionNotes ? `\nCATATAN REVISI TERAKHIR:\n${summaryData.las
 
       {/* Toast Notification */}
       {toastMessage && (
-        <div className="fixed bottom-6 right-6 z-50 bg-[#0F172A] text-white px-5 py-3 rounded-[14px] shadow-lg flex items-center gap-3 border border-slate-800 text-xs sm:text-sm font-medium">
+        <div className="fixed bottom-24 right-6 z-50 bg-[#0F172A] text-white px-5 py-3 rounded-[14px] shadow-lg flex items-center gap-3 border border-slate-800 text-xs sm:text-sm font-medium animate-in fade-in slide-in-from-bottom-3 duration-200">
           <Check className="w-4 h-4 text-[#1D4ED8] shrink-0" />
           <span className="font-normal">{toastMessage}</span>
         </div>
@@ -472,7 +472,7 @@ ${summaryData.lastRevisionNotes ? `\nCATATAN REVISI TERAKHIR:\n${summaryData.las
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-7 items-start">
           
           {/* ------------------------------------------------------------ */}
-          {/* SECTION D: LEFT SIDEBAR — DAFTAR PROJECT (30%)               */}
+          {/* SECTION D: LEFT SIDEBAR : DAFTAR PROJECT (30%)               */}
           {/* ------------------------------------------------------------ */}
           <div className="lg:col-span-4 space-y-4">
             

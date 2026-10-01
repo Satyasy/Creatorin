@@ -13,9 +13,9 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
   const isWorkspace = pathname?.startsWith('/chat') || pathname?.startsWith('/collaboration') || pathname?.startsWith('/dashboard');
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#F8FAFC] text-[#171717] font-sans selection:bg-[#0B1F3A] selection:text-white">
+    <div className={`min-h-screen flex flex-col bg-[#F8FAFC] text-[#171717] font-sans selection:bg-[#0B1F3A] selection:text-white ${isWorkspace ? 'h-screen max-h-screen overflow-hidden' : ''}`}>
       <Navbar />
-      <main className="flex-1 w-full flex flex-col">
+      <main className={`flex-1 w-full flex flex-col ${isWorkspace ? 'min-h-0 overflow-hidden' : ''}`}>
         {children}
       </main>
       {!isWorkspace && <Footer />}
