@@ -11,17 +11,17 @@ export const MOCK_COLLABORATIONS: CollaborationItem[] = [
     escrowStatus: 'released_to_creator',
     invoiceNumber: 'INV/2026/09/CRT-661009',
     invoicePaidDate: '15 September 2026',
-    thumbnail: 'https://images.unsplash.com/photo-1509785307050-d4066910ec1e?w=240&auto=format&fit=crop&q=80',
+    thumbnail: 'https://images.unsplash.com/photo-1509785307050-d4066910ec1e?w=800&auto=format&fit=crop&q=80',
     
     creatorId: 'c3',
     creatorName: 'Amanda Larasati',
-    creatorAvatar: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=240&auto=format&fit=crop&q=80',
+    creatorAvatar: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=200&auto=format&fit=crop&q=80',
     creatorRole: 'Commercial Product Photographer',
     creatorRating: 4.96,
     
     businessName: 'Dimas Wicaksono',
     businessBrand: 'Kopi Kenangan Senja',
-    businessAvatar: 'https://images.unsplash.com/photo-1541167760496-1628856ab772?w=240&auto=format&fit=crop&q=80',
+    businessAvatar: 'https://images.unsplash.com/photo-1554118811-1e0d58224f24?w=200&auto=format&fit=crop&q=80',
     
     startDate: '15 September 2026',
     deadlineDate: '20 September 2026',
@@ -126,17 +126,17 @@ export const MOCK_COLLABORATIONS: CollaborationItem[] = [
     escrowStatus: 'held_in_escrow',
     invoiceNumber: 'INV/2026/09/CRT-882194',
     invoicePaidDate: '10 September 2026',
-    thumbnail: 'https://images.unsplash.com/photo-1517256064527-09c73fc73e38?w=240&auto=format&fit=crop&q=80',
+    thumbnail: 'https://images.unsplash.com/photo-1517256064527-09c73fc73e38?w=800&auto=format&fit=crop&q=80',
     
     creatorId: 'c-munir',
     creatorName: 'Sobakhul Munir Siroj',
-    creatorAvatar: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=240&auto=format&fit=crop&q=80',
+    creatorAvatar: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=200&auto=format&fit=crop&q=80',
     creatorRole: 'Product Designer & Video Specialist',
     creatorRating: 4.95,
     
     businessName: 'Dimas Wicaksono',
     businessBrand: 'Kopi Kenangan Senja',
-    businessAvatar: 'https://images.unsplash.com/photo-1541167760496-1628856ab772?w=240&auto=format&fit=crop&q=80',
+    businessAvatar: 'https://images.unsplash.com/photo-1554118811-1e0d58224f24?w=200&auto=format&fit=crop&q=80',
     
     startDate: '10 September 2026',
     deadlineDate: '18 September 2026',
@@ -235,17 +235,17 @@ export const MOCK_COLLABORATIONS: CollaborationItem[] = [
     escrowStatus: 'held_in_escrow',
     invoiceNumber: 'INV/2026/09/CRT-994110',
     invoicePaidDate: '5 September 2026',
-    thumbnail: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=240&auto=format&fit=crop&q=80',
+    thumbnail: 'https://images.unsplash.com/photo-1572044160415-96cb340e4f48?w=800&auto=format&fit=crop&q=80',
     
     creatorId: 'c1',
     creatorName: 'Rian Pratama',
-    creatorAvatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=240&auto=format&fit=crop&q=80',
+    creatorAvatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&auto=format&fit=crop&q=80',
     creatorRole: 'Creative Visual Designer',
     creatorRating: 4.88,
     
     businessName: 'Dimas Wicaksono',
     businessBrand: 'Kopi Kenangan Senja',
-    businessAvatar: 'https://images.unsplash.com/photo-1541167760496-1628856ab772?w=240&auto=format&fit=crop&q=80',
+    businessAvatar: 'https://images.unsplash.com/photo-1554118811-1e0d58224f24?w=200&auto=format&fit=crop&q=80',
     
     startDate: '5 September 2026',
     deadlineDate: '15 September 2026',
@@ -300,17 +300,17 @@ export const MOCK_COLLABORATIONS: CollaborationItem[] = [
     escrowStatus: 'held_in_escrow',
     invoiceNumber: 'INV/2026/09/CRT-773102',
     invoicePaidDate: '1 September 2026',
-    thumbnail: 'https://images.unsplash.com/photo-1541167760496-1628856ab772?w=240&auto=format&fit=crop&q=80',
+    thumbnail: 'https://images.unsplash.com/photo-1559056199-641a0ac8b55e?w=800&auto=format&fit=crop&q=80',
     
     creatorId: 'c2',
     creatorName: 'Nusantara Pack',
-    creatorAvatar: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=240&auto=format&fit=crop&q=80',
+    creatorAvatar: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=200&auto=format&fit=crop&q=80',
     creatorRole: 'Brand & Packaging Specialist',
     creatorRating: 4.92,
     
     businessName: 'Dimas Wicaksono',
     businessBrand: 'Kopi Kenangan Senja',
-    businessAvatar: 'https://images.unsplash.com/photo-1541167760496-1628856ab772?w=240&auto=format&fit=crop&q=80',
+    businessAvatar: 'https://images.unsplash.com/photo-1554118811-1e0d58224f24?w=200&auto=format&fit=crop&q=80',
     
     startDate: '1 September 2026',
     deadlineDate: '10 September 2026',

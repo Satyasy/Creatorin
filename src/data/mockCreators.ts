@@ -95,7 +95,7 @@ export const MOCK_CREATORS: Creator[] = [
         id: 'p-3',
         title: 'Novaire - Minimalist Designer & Motion Showcase',
         categoryTag: 'UX/UI DESIGN',
-        thumbnail: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=800&auto=format&fit=crop&q=80',
+        thumbnail: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&auto=format&fit=crop&q=80',
         type: 'image',
         likes: '3.1k',
         views: '64k'

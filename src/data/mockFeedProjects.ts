@@ -5,9 +5,9 @@ export const MOCK_FEED_PROJECTS: FeedProject[] = [
   {
     id: 'feed-1',
     title: 'Tips bertahan as Product Designer di 2026 ditengah gempuran AI boii :(',
-    coverImage: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=900&auto=format&fit=crop&q=80',
+    coverImage: 'https://images.unsplash.com/photo-1581291518857-4e27b48ff24e?w=900&auto=format&fit=crop&q=80',
     carouselImages: [
-      'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=900&auto=format&fit=crop&q=80',
+      'https://images.unsplash.com/photo-1581291518857-4e27b48ff24e?w=900&auto=format&fit=crop&q=80',
       'https://images.unsplash.com/photo-1507238691740-187a5b1d37b8?w=900&auto=format&fit=crop&q=80',
       'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=900&auto=format&fit=crop&q=80'
     ],
@@ -339,7 +339,7 @@ export const MOCK_FEED_PROJECTS: FeedProject[] = [
     coverImage: 'https://images.unsplash.com/photo-1507238691740-187a5b1d37b8?w=900&auto=format&fit=crop&q=80',
     carouselImages: [
       'https://images.unsplash.com/photo-1507238691740-187a5b1d37b8?w=900&auto=format&fit=crop&q=80',
-      'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=900&auto=format&fit=crop&q=80',
+      'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=900&auto=format&fit=crop&q=80',
       'https://images.unsplash.com/photo-1554080353-a576cf803bda?w=900&auto=format&fit=crop&q=80'
     ],
     mediaType: 'carousel',

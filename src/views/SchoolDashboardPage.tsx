@@ -78,7 +78,7 @@ export function SchoolDashboardPage() {
     description: '',
     year: '2026',
     category: 'Kompetisi',
-    imageUrl: 'https://images.unsplash.com/photo-1578574577315-3fbeb0cecdc2?w=600&auto=format&fit=crop&q=80',
+    imageUrl: 'https://images.unsplash.com/photo-1567427017947-545c5f8d16ad?w=800&auto=format&fit=crop&q=80',
   });
 
   // Load Initial Data
@@ -244,7 +244,7 @@ export function SchoolDashboardPage() {
       description: '',
       year: '2026',
       category: 'Kompetisi',
-      imageUrl: 'https://images.unsplash.com/photo-1578574577315-3fbeb0cecdc2?w=600&auto=format&fit=crop&q=80',
+      imageUrl: 'https://images.unsplash.com/photo-1567427017947-545c5f8d16ad?w=800&auto=format&fit=crop&q=80',
     });
     setProfileFeedback('Prestasi baru berhasil ditambahkan.');
     setTimeout(() => setProfileFeedback(null), 3000);
@@ -285,7 +285,7 @@ export function SchoolDashboardPage() {
         <div className="p-5 border-b border-black/10">
           <div className="flex items-center gap-3">
             <img
-              src={schoolProfile?.logoUrl || 'https://images.unsplash.com/photo-1592280771190-3e2e4d571952?w=160&auto=format&fit=crop&q=80'}
+              src={schoolProfile?.logoUrl || 'https://images.unsplash.com/photo-1592280771190-3e2e4d571952?w=200&auto=format&fit=crop&q=80'}
               alt={schoolProfile?.name || 'School Logo'}
               className="w-10 h-10 rounded-[8px] object-cover border border-black/10 shrink-0"
             />
@@ -638,7 +638,7 @@ export function SchoolDashboardPage() {
                         <td className="py-3 px-4">
                           <div className="flex items-center gap-2.5">
                             <img
-                              src={req.avatarUrl || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100&auto=format&fit=crop&q=80'}
+                              src={req.avatarUrl || 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=200&auto=format&fit=crop&q=80'}
                               alt={req.name}
                               className="w-7 h-7 rounded-full object-cover border border-black/10 shrink-0"
                             />
@@ -871,7 +871,7 @@ export function SchoolDashboardPage() {
                           <td className="py-3 px-4">
                             <div className="flex items-center gap-2.5">
                               <img
-                                src={student.avatarUrl || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100&auto=format&fit=crop&q=80'}
+                                src={student.avatarUrl || 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=200&auto=format&fit=crop&q=80'}
                                 alt={student.name}
                                 className="w-8 h-8 rounded-full object-cover border border-black/10"
                               />
@@ -957,7 +957,7 @@ export function SchoolDashboardPage() {
             <div className="bg-white rounded-[12px] p-5 sm:p-6 border border-black/10 shadow-xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
               <div className="flex items-center gap-4">
                 <img
-                  src={studentDetail.student.avatarUrl || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=160&auto=format&fit=crop&q=80'}
+                  src={studentDetail.student.avatarUrl || 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=200&auto=format&fit=crop&q=80'}
                   alt={studentDetail.student.name}
                   className="w-16 h-16 rounded-[12px] object-cover border border-black/10 shrink-0"
                 />

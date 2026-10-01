@@ -17,12 +17,19 @@ import {
   FileText,
   ExternalLink,
   MessageSquare,
-  QrCode
+  QrCode,
+  Sparkles,
+  RefreshCw,
+  Copy,
+  Check,
+  CheckCircle2,
+  ListChecks
 } from 'lucide-react';
 import { InvoiceDetailPage } from './InvoiceDetailPage';
 import { ActivePage, AuthState, ChatConversation, ChatInvoice, ChatMessage, Creator, CreatorService } from '@/types';
 import { MOCK_CREATORS } from '@/data/mockCreators';
 import { chatService } from '@/services/chatService';
+import { aiSummarizeService } from '@/services/aiSummarizeService';
 
 interface ChatPageProps {
   currentUser?: AuthState['user'];
@@ -316,6 +323,50 @@ export const ChatPage: React.FC<ChatPageProps> = ({
 
   const activeConversation = activeChatId ? (conversations.find(c => c.id === activeChatId) || null) : null;
   const activeCreator = activeConversation ? (MOCK_CREATORS.find(cr => cr.id === activeConversation.creatorId) || null) : null;
+
+  // State untuk AI Summarize Obrolan di Bar Kanan
+  const [chatSummaryData, setChatSummaryData] = useState<{
+    executiveSummary: string;
+    agreements: string[];
+    actionItems: { task: string; assignee: string; status: 'pending' | 'in_progress' | 'completed' }[];
+    lastRevisionNotes?: string;
+    modelUsed: string;
+    generatedAt: string;
+  } | null>(null);
+  const [isChatSummarizing, setIsChatSummarizing] = useState(false);
+  const [isChatSummaryCopied, setIsChatSummaryCopied] = useState(false);
+
+  // Generate live summary for active conversation
+  const handleGenerateChatSummary = async () => {
+    if (!activeConversation) return;
+    setIsChatSummarizing(true);
+    try {
+      const messages = activeConversation.messages.map(m => ({
+        sender: m.isSelf ? 'Anda (UMKM)' : activeConversation.name,
+        text: m.text,
+        time: m.timestamp,
+      }));
+
+      const data = await aiSummarizeService.summarizeConversation({
+        roomId: activeConversation.id,
+        projectTitle: activeConversation.category || 'Diskusi Kolaborasi',
+        creatorName: activeConversation.name,
+        businessBrand: 'Anda (UMKM)',
+        messages,
+      });
+      setChatSummaryData(data);
+    } catch {
+      // Fallback
+    } finally {
+      setIsChatSummarizing(false);
+    }
+  };
+
+  useEffect(() => {
+    if (activeConversation) {
+      handleGenerateChatSummary();
+    }
+  }, [activeChatId]);
 
   // 1. Fetch conversations from live database with fallback
   useEffect(() => {
@@ -787,11 +838,11 @@ export const ChatPage: React.FC<ChatPageProps> = ({
             <div className="flex items-center gap-2">
               <button
                 onClick={() => setIsRightSidebarOpenMobile(!isRightSidebarOpenMobile)}
-                className="xl:hidden inline-flex items-center gap-1.5 text-xs font-medium text-neutral-700 hover:text-blue-600 px-2.5 py-1.5 rounded-md hover:bg-neutral-100 border border-neutral-200 transition-colors cursor-pointer"
-                title="Lihat Layanan Creator"
+                className="xl:hidden inline-flex items-center gap-1.5 text-xs font-semibold text-blue-600 bg-blue-50 px-2.5 py-1.5 rounded-md hover:bg-blue-100 border border-blue-200 transition-colors cursor-pointer"
+                title="Lihat AI Ringkasan Obrolan"
               >
-                <Briefcase className="w-3.5 h-3.5 text-neutral-500" />
-                <span className="hidden sm:inline">Layanan</span>
+                <Sparkles className="w-3.5 h-3.5 text-blue-600" />
+                <span className="hidden sm:inline">Ringkasan AI</span>
               </button>
 
               <button
@@ -1056,83 +1107,145 @@ export const ChatPage: React.FC<ChatPageProps> = ({
             isRightSidebarOpenMobile ? 'fixed inset-y-0 right-0 z-40 flex shadow-xl md:shadow-none' : 'hidden xl:flex'
           }`}>
             
-            {/* HEADER SIDEBAR KANAN (HANYA SECTION HEADLINE) */}
-            <div className="px-4 py-3.5 border-b border-neutral-100 flex items-center justify-between shrink-0">
-              <h3 className="text-sm font-semibold text-neutral-900 tracking-tight">
-                Layanan Creator
-              </h3>
+            {/* HEADER SIDEBAR KANAN (AI SUMMARIZE OBROLAN) */}
+            <div className="px-4 py-3.5 border-b border-neutral-100 flex items-center justify-between shrink-0 bg-white">
+              <div className="flex items-center gap-2">
+                <div className="w-7 h-7 rounded-[8px] bg-blue-50 text-[#155DFC] flex items-center justify-center shrink-0 border border-blue-100">
+                  <Sparkles className="w-3.5 h-3.5 stroke-[1.8]" />
+                </div>
+                <div>
+                  <h3 className="text-xs font-bold text-neutral-900 tracking-tight">
+                    AI Summarize Obrolan
+                  </h3>
+                  <span className="text-[9px] font-semibold text-[#155DFC] bg-blue-50 px-1 py-0.2 rounded-xs border border-blue-100">
+                    {chatSummaryData?.modelUsed || 'Transformers.js'}
+                  </span>
+                </div>
+              </div>
               
-              {/* Tombol tutup jika di mobile/tablet */}
-              <button
-                onClick={() => setIsRightSidebarOpenMobile(false)}
-                className="xl:hidden p-1 text-neutral-400 hover:text-neutral-700 rounded-md cursor-pointer"
-                title="Tutup sidebar layanan"
-              >
-                <X className="w-4 h-4" />
-              </button>
+              <div className="flex items-center gap-1">
+                <button
+                  type="button"
+                  onClick={handleGenerateChatSummary}
+                  disabled={isChatSummarizing}
+                  className="p-1 rounded-[6px] text-neutral-500 hover:text-[#155DFC] hover:bg-neutral-100 transition-colors cursor-pointer disabled:opacity-50"
+                  title="Perbarui Ringkasan AI"
+                >
+                  <RefreshCw className={`w-3.5 h-3.5 ${isChatSummarizing ? 'animate-spin text-[#155DFC]' : ''}`} />
+                </button>
+                <button
+                  onClick={() => setIsRightSidebarOpenMobile(false)}
+                  className="xl:hidden p-1 text-neutral-400 hover:text-neutral-700 rounded-md cursor-pointer"
+                  title="Tutup sidebar"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
             </div>
 
-            {/* DAFTAR LAYANAN PENDUKUNG (COMPACT CARDS, TANPA PROFIL/ESCROW BANNER) */}
-            <div className="flex-1 overflow-y-auto p-3.5 space-y-2.5">
-              {activeCreator.services && activeCreator.services.length > 0 ? (
-                activeCreator.services.map((service) => (
-                  <div
-                    key={service.id}
-                    className="p-3 rounded-xl border border-neutral-200/80 hover:border-neutral-300 bg-white transition-colors text-left space-y-2.5"
-                  >
-                    {/* Thumbnail & Informasi Ringkas */}
-                    <div className="flex items-start gap-2.5">
-                      {service.coverImage && (
-                        <img
-                          src={service.coverImage}
-                          alt={service.title}
-                          className="w-12 h-12 rounded-lg object-cover ring-1 ring-neutral-100 shrink-0"
-                        />
-                      )}
-                      <div className="flex-1 min-w-0">
-                        <h4 className="text-xs font-semibold text-neutral-900 line-clamp-2 leading-snug">
-                          {service.title}
-                        </h4>
-                        <div className="flex items-center gap-1.5 mt-1 text-[11px] text-neutral-500">
-                          {service.tag && (
-                            <span className="font-medium text-neutral-600">{service.tag}</span>
-                          )}
-                          {service.tag && service.deliveryDays && (
-                            <span className="text-neutral-300">•</span>
-                          )}
-                          {service.deliveryDays && (
-                            <span className="text-neutral-400">{service.deliveryDays}</span>
-                          )}
-                        </div>
-                        <p className="text-xs font-semibold text-neutral-900 mt-1">
-                          {service.formattedPrice}
-                        </p>
-                      </div>
-                    </div>
+            {/* DAFTAR RINGKASAN PERCAKAPAN CHAT DENGAN CREATOR */}
+            <div className="flex-1 overflow-y-auto p-3.5 space-y-3">
+              <p className="text-[11px] text-neutral-500 leading-relaxed">
+                Ringkasan kesepakatan dan tindak lanjut obrolan dengan <strong className="text-neutral-800">{activeConversation.name}</strong> tanpa halusinasi.
+              </p>
 
-                    {/* CTA: "Lihat Detail" & "Diskusikan" (Bukan Tombol Beli/Order) */}
-                    <div className="flex items-center gap-2 pt-2 border-t border-neutral-100">
-                      <button
-                        onClick={() => setSelectedServiceDetail(service)}
-                        className="flex-1 py-1.5 px-2 rounded-md text-[11px] font-medium text-neutral-700 hover:text-neutral-900 bg-neutral-100 hover:bg-neutral-200/70 text-center transition-colors cursor-pointer"
-                      >
-                        Lihat Detail
-                      </button>
-                      <button
-                        onClick={() => handleDiscussService(service)}
-                        className="flex-1 py-1.5 px-2 rounded-md text-[11px] font-semibold text-blue-600 hover:text-white hover:bg-blue-600 bg-blue-50 text-center transition-colors cursor-pointer"
-                      >
-                        Diskusikan
-                      </button>
+              {isChatSummarizing ? (
+                <div className="p-4 rounded-xl bg-neutral-50 border border-neutral-100 flex items-center justify-center gap-2 text-xs text-neutral-500 py-8">
+                  <div className="w-4 h-4 border-2 border-[#155DFC] border-t-transparent rounded-full animate-spin" />
+                  <span>Menganalisis obrolan...</span>
+                </div>
+              ) : chatSummaryData ? (
+                <div className="space-y-3 text-xs">
+                  {/* Executive Summary */}
+                  <div className="p-3 rounded-xl bg-blue-50/60 border border-blue-100 text-[#0D0C22] leading-relaxed text-[11px]">
+                    <span className="font-bold text-[#155DFC] block mb-1 uppercase tracking-wider text-[10px]">
+                      Ringkasan Kesepakatan
+                    </span>
+                    {chatSummaryData.executiveSummary}
+                  </div>
+
+                  {/* Poin Kesepakatan */}
+                  <div className="space-y-1.5">
+                    <span className="font-bold text-neutral-800 text-[11px] flex items-center gap-1.5">
+                      <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                      Poin yang Disepakati
+                    </span>
+                    <ul className="space-y-1 pl-1">
+                      {chatSummaryData.agreements.map((agr, idx) => (
+                        <li key={idx} className="text-[11px] text-neutral-600 flex items-start gap-1.5 leading-snug">
+                          <span className="text-[#155DFC] font-bold">•</span>
+                          <span>{agr}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+
+                  {/* Action Items */}
+                  <div className="space-y-1.5">
+                    <span className="font-bold text-neutral-800 text-[11px] flex items-center gap-1.5">
+                      <ListChecks className="w-3.5 h-3.5 text-[#155DFC]" />
+                      Tindak Lanjut Terdekat
+                    </span>
+                    <div className="space-y-1.5">
+                      {chatSummaryData.actionItems.map((item, idx) => (
+                        <div
+                          key={idx}
+                          className="p-2 rounded-lg bg-neutral-50 border border-neutral-100 flex items-center justify-between gap-2 text-[10px]"
+                        >
+                          <div className="min-w-0">
+                            <span className="font-medium text-neutral-800 block truncate">{item.task}</span>
+                            <span className="text-neutral-400">PJ: {item.assignee}</span>
+                          </div>
+                          <span
+                            className={`px-1.5 py-0.5 rounded-[4px] font-bold shrink-0 ${
+                              item.status === 'in_progress'
+                                ? 'bg-amber-100 text-amber-800'
+                                : 'bg-neutral-200 text-neutral-700'
+                            }`}
+                          >
+                            {item.status === 'in_progress' ? 'Proses' : 'Pending'}
+                          </span>
+                        </div>
+                      ))}
                     </div>
                   </div>
-                ))
-              ) : (
-                <div className="p-6 rounded-xl border border-dashed border-neutral-200 text-center text-xs text-neutral-400">
-                  Belum ada paket layanan terdaftar dari creator ini.
-                </div>
-              )}
 
+                  {/* Catatan Khusus */}
+                  {chatSummaryData.lastRevisionNotes && (
+                    <div className="p-2.5 rounded-lg bg-amber-50/70 border border-amber-200/60 text-[11px] text-amber-950">
+                      <span className="font-bold block text-[10px] text-amber-800 mb-0.5">Catatan Khusus:</span>
+                      {chatSummaryData.lastRevisionNotes}
+                    </div>
+                  )}
+
+                  {/* Footer & Copy */}
+                  <div className="pt-2 border-t border-neutral-100 flex items-center justify-between text-[10px] text-neutral-400">
+                    <span>Diperbarui: {chatSummaryData.generatedAt}</span>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const copyText = `[RINGKASAN OBROLAN CREATORIN - ${activeConversation.name}]\nModel: ${chatSummaryData.modelUsed}\n\n${chatSummaryData.executiveSummary}\n\nPoin Kesepakatan:\n${chatSummaryData.agreements.map((a, i) => `${i + 1}. ${a}`).join('\n')}\n\nTindak Lanjut:\n${chatSummaryData.actionItems.map((item, i) => `${i + 1}. [${item.status.toUpperCase()}] ${item.task} (PJ: ${item.assignee})`).join('\n')}`;
+                        navigator.clipboard.writeText(copyText);
+                        setIsChatSummaryCopied(true);
+                        setTimeout(() => setIsChatSummaryCopied(false), 2000);
+                      }}
+                      className="inline-flex items-center gap-1 text-[#155DFC] hover:underline font-bold cursor-pointer"
+                    >
+                      {isChatSummaryCopied ? (
+                        <>
+                          <Check className="w-3 h-3 text-emerald-600" />
+                          <span className="text-emerald-600">Tersalin</span>
+                        </>
+                      ) : (
+                        <>
+                          <Copy className="w-3 h-3" />
+                          <span>Salin</span>
+                        </>
+                      )}
+                    </button>
+                  </div>
+                </div>
+              ) : null}
             </div>
 
           </aside>

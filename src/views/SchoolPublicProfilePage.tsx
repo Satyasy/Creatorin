@@ -113,7 +113,7 @@ export function SchoolPublicProfilePage({ slug = 'smk-kreatif-indonesia' }: Scho
               {/* Logo & Main Info */}
               <div className="flex flex-col sm:flex-row items-start sm:items-center gap-5">
                 <img
-                  src={school.logoUrl || 'https://images.unsplash.com/photo-1592280771190-3e2e4d571952?w=160&auto=format&fit=crop&q=80'}
+                  src={school.logoUrl || 'https://images.unsplash.com/photo-1592280771190-3e2e4d571952?w=200&auto=format&fit=crop&q=80'}
                   alt={school.name}
                   className="w-20 h-20 sm:w-24 sm:h-24 rounded-[16px] object-cover border-2 border-white shadow-md shrink-0 bg-white"
                 />

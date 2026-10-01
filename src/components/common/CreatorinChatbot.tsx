@@ -10,7 +10,9 @@ import {
   ExternalLink,
   ChevronDown,
   RotateCcw,
-  CheckCircle2
+  CheckCircle2,
+  Copy,
+  Check
 } from 'lucide-react';
 
 interface ChatMessage {
@@ -33,6 +35,7 @@ export function CreatorinChatbot() {
   const [inputMessage, setInputMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [hasUnreadNotice, setHasUnreadNotice] = useState(true);
+  const [copiedMessageId, setCopiedMessageId] = useState<string | null>(null);
 
   const [messages, setMessages] = useState<ChatMessage[]>([
     {
@@ -201,13 +204,112 @@ export function CreatorinChatbot() {
                 className={`flex flex-col ${msg.role === 'user' ? 'items-end' : 'items-start'}`}
               >
                 <div
-                  className={`max-w-[85%] px-3.5 py-2.5 rounded-[12px] leading-relaxed ${
+                  className={`max-w-[88%] px-3.5 py-2.5 rounded-[12px] leading-relaxed relative group/bubble ${
                     msg.role === 'user'
                       ? 'bg-[#0B1F3A] text-white rounded-br-[2px]'
-                      : 'bg-[#F3F3F4] text-[#0D0C22] rounded-bl-[2px] border border-black/5'
+                      : 'bg-[#F8FAFC] text-[#0D0C22] rounded-bl-[2px] border border-black/10 shadow-2xs'
                   }`}
                 >
-                  <p className="whitespace-pre-line text-xs font-normal">{msg.content}</p>
+                  {msg.role === 'user' ? (
+                    <p className="whitespace-pre-line text-xs font-normal">{msg.content}</p>
+                  ) : (
+                    <div className="space-y-1.5">
+                      {msg.content.split('\n').map((line, lIdx) => {
+                        const trimmed = line.trim();
+                        if (!trimmed) return <div key={lIdx} className="h-1.5" />;
+
+                        // Check Numbered item
+                        const numMatch = trimmed.match(/^(\d+)\.\s+(.*)$/);
+                        if (numMatch) {
+                          const num = numMatch[1];
+                          const body = numMatch[2];
+                          return (
+                            <div key={lIdx} className="flex items-start gap-2 my-1 pl-0.5">
+                              <span className="w-4 h-4 rounded-full bg-blue-100 text-[#155DFC] text-[10px] font-bold flex items-center justify-center shrink-0 mt-0.5 shadow-2xs">
+                                {num}
+                              </span>
+                              <div className="text-[12px] text-neutral-800 leading-relaxed font-normal flex-1">
+                                {body.split(/(\*\*.*?\*\*)/g).map((part, pIdx) => {
+                                  if (part.startsWith('**') && part.endsWith('**')) {
+                                    return <strong key={pIdx} className="font-bold text-[#0D0C22]">{part.slice(2, -2)}</strong>;
+                                  }
+                                  return part;
+                                })}
+                              </div>
+                            </div>
+                          );
+                        }
+
+                        // Check Bullet item
+                        const bulletMatch = trimmed.match(/^[-*•]\s+(.*)$/);
+                        if (bulletMatch) {
+                          const body = bulletMatch[1];
+                          return (
+                            <div key={lIdx} className="flex items-start gap-2 my-0.5 pl-1">
+                              <span className="w-1.5 h-1.5 rounded-full bg-[#155DFC] shrink-0 mt-2" />
+                              <div className="text-[12px] text-neutral-800 leading-relaxed font-normal flex-1">
+                                {body.split(/(\*\*.*?\*\*)/g).map((part, pIdx) => {
+                                  if (part.startsWith('**') && part.endsWith('**')) {
+                                    return <strong key={pIdx} className="font-bold text-[#0D0C22]">{part.slice(2, -2)}</strong>;
+                                  }
+                                  return part;
+                                })}
+                              </div>
+                            </div>
+                          );
+                        }
+
+                        // Check Section Header
+                        if (trimmed.startsWith('###') || (trimmed.startsWith('**') && trimmed.endsWith('**') && trimmed.length < 50)) {
+                          const headerText = trimmed.replace(/^###\s*/, '').replace(/^\*\*|\*\*$/g, '');
+                          return (
+                            <div key={lIdx} className="text-[12px] font-bold text-[#0D0C22] mt-2 mb-1 pt-1 border-t border-black/5 flex items-center gap-1.5">
+                              <span className="w-1 h-3 rounded-full bg-[#155DFC]" />
+                              <span>{headerText}</span>
+                            </div>
+                          );
+                        }
+
+                        // Regular paragraph
+                        return (
+                          <p key={lIdx} className="text-[12px] text-neutral-800 leading-relaxed">
+                            {trimmed.split(/(\*\*.*?\*\*)/g).map((part, pIdx) => {
+                              if (part.startsWith('**') && part.endsWith('**')) {
+                                return <strong key={pIdx} className="font-bold text-[#0D0C22]">{part.slice(2, -2)}</strong>;
+                              }
+                              return part;
+                            })}
+                          </p>
+                        );
+                      })}
+
+                      {/* Copy message button */}
+                      <div className="pt-1.5 flex justify-end">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            navigator.clipboard.writeText(msg.content);
+                            setCopiedMessageId(msg.id);
+                            setTimeout(() => setCopiedMessageId(null), 2000);
+                          }}
+                          className="opacity-70 hover:opacity-100 text-[10px] text-neutral-500 hover:text-[#155DFC] inline-flex items-center gap-1 transition-all cursor-pointer"
+                          title="Salin jawaban"
+                        >
+                          {copiedMessageId === msg.id ? (
+                            <>
+                              <Check className="w-3 h-3 text-emerald-600" />
+                              <span className="text-emerald-600 font-semibold">Tersalin</span>
+                            </>
+                          ) : (
+                            <>
+                              <Copy className="w-3 h-3" />
+                              <span>Salin</span>
+                            </>
+                          )}
+                        </button>
+                      </div>
+                    </div>
+                  )}
 
                   {/* Sources & Navigation Links */}
                   {msg.sources && msg.sources.length > 0 && (
