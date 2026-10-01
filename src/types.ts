@@ -182,7 +182,7 @@ export interface AuthState {
   } | null;
 }
 
-export type ActivePage = 'home' | 'landing' | 'signup' | 'signin' | 'explore' | 'projects' | 'services' | 'creator-profile' | 'notifications' | 'chat' | 'briefs' | 'umkm-profile' | 'brief-detail' | 'invoice' | 'collaboration-room' | 'settings';
+export type ActivePage = 'home' | 'landing' | 'signup' | 'signin' | 'explore' | 'projects' | 'services' | 'creator-profile' | 'notifications' | 'chat' | 'briefs' | 'umkm-profile' | 'brief-detail' | 'invoice' | 'collaboration-room' | 'settings' | 'school-dashboard' | 'school-profile';
 
 export type CollabStage = 'brief' | 'in_progress' | 'review' | 'revision' | 'approval' | 'completed';
 
@@ -402,5 +402,173 @@ export interface ChatConversation {
   messages: ChatMessage[];
   category?: string;
   rate?: string;
+}
+
+// ==========================================
+// School Dashboard & Profile Interfaces
+// ==========================================
+export type SchoolStatus = 'pending' | 'approved' | 'rejected';
+export type AssessmentStatus = 'not_started' | 'draft' | 'completed';
+
+export interface SchoolInfo {
+  id: string;
+  name: string;
+  slug: string;
+  logoUrl?: string;
+  coverUrl?: string;
+  tagline?: string;
+  description?: string;
+  address?: string;
+  city?: string;
+  website?: string;
+  email?: string;
+  phone?: string;
+  picName?: string;
+  picContact?: string;
+  sectionOrder?: string[];
+  isVerified?: boolean;
+}
+
+export interface StudentActivity {
+  id: string;
+  studentId: string;
+  studentName: string;
+  avatarUrl?: string;
+  activityType: 'joined' | 'uploaded_project' | 'completed_project' | 'assessed';
+  description: string;
+  timestamp: string;
+}
+
+export interface SchoolDashboardOverview {
+  totalStudents: number;
+  activeStudents: number;
+  pendingApproval: number;
+  gradedStudents: number;
+  ungradedStudents: number;
+  totalProjects: number;
+  recentActivities: StudentActivity[];
+  assessmentProgress: {
+    graded: number;
+    draft: number;
+    ungraded: number;
+  };
+}
+
+export interface StudentApprovalItem {
+  id: string; // relation id
+  studentId: string;
+  name: string;
+  email: string;
+  major: string;
+  classGrade: string;
+  graduationYear: string;
+  requestDate: string;
+  status: SchoolStatus;
+  avatarUrl?: string;
+  nisn?: string;
+}
+
+export interface RubricCriterion {
+  id?: string;
+  name: string;
+  score: number; // 0 - 100
+  weight: number; // percentage e.g. 40
+  notes?: string;
+}
+
+export interface StudentAssessmentSummary {
+  studentId: string;
+  name: string;
+  email: string;
+  major: string;
+  classGrade: string;
+  graduationYear: string;
+  nisn?: string;
+  avatarUrl?: string;
+  projectCount: number;
+  status: AssessmentStatus;
+  finalScore: number | null;
+  updatedAt?: string;
+}
+
+export interface StudentAssessmentDetail {
+  student: {
+    id: string;
+    name: string;
+    email: string;
+    avatarUrl?: string;
+    major: string;
+    classGrade: string;
+    graduationYear: string;
+    nisn?: string;
+    projectCount: number;
+    skills: string[];
+    bio?: string;
+  };
+  projects: {
+    id: string;
+    title: string;
+    category: string;
+    coverImage?: string;
+    createdDate: string;
+    viewsCount?: string;
+    isFeaturedSchool?: boolean;
+  }[];
+  assessment: {
+    id?: string;
+    status: AssessmentStatus;
+    finalScore: number | null;
+    rubricItems: RubricCriterion[];
+    notes?: string;
+  };
+}
+
+export interface SchoolAchievement {
+  id: string;
+  title: string;
+  description: string;
+  year: string;
+  imageUrl?: string;
+  category: string;
+}
+
+export interface PublicSchoolProfile {
+  school: SchoolInfo;
+  stats: {
+    totalStudents: number;
+    totalProjects: number;
+    totalCollaborations: number;
+    totalAchievements: number;
+  };
+  featuredProjects: {
+    id: string;
+    title: string;
+    studentName: string;
+    studentAvatar?: string;
+    category: string;
+    thumbnail: string;
+    createdDate: string;
+  }[];
+  studentProjects: {
+    id: string;
+    title: string;
+    studentName: string;
+    studentAvatar?: string;
+    category: string;
+    thumbnail: string;
+    createdDate: string;
+    viewsCount?: string;
+  }[];
+  students: {
+    id: string;
+    name: string;
+    avatarUrl?: string;
+    role: string;
+    major: string;
+    projectCount: number;
+    careerScore: number;
+  }[];
+  achievements: SchoolAchievement[];
+  sectionOrder: string[];
 }
 

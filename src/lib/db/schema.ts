@@ -4,6 +4,8 @@ import { relations } from "drizzle-orm";
 export const roleEnum = pgEnum("user_role", ["creator", "business", "school"]);
 export const invoiceStatusEnum = pgEnum("invoice_status", ["unpaid", "paid", "cancelled"]);
 export const roomStatusEnum = pgEnum("room_status", ["in_progress", "review_pending", "revision_requested", "completed", "disputed"]);
+export const schoolStatusEnum = pgEnum("school_status", ["pending", "approved", "rejected"]);
+export const assessmentStatusEnum = pgEnum("assessment_status", ["not_started", "draft", "completed"]);
 
 // 1. Unified Profiles
 export const profiles = pgTable("profiles", {
@@ -28,7 +30,13 @@ export const creatorProfiles = pgTable("creator_profiles", {
   rating: decimal("rating", { precision: 3, scale: 1 }).default("5.0").notNull(),
   reviewsCount: integer("reviews_count").default(0).notNull(),
   followersCount: text("followers_count").default("0").notNull(),
+  schoolId: uuid("school_id"),
   schoolName: text("school_name"),
+  schoolStatus: schoolStatusEnum("school_status").default("pending"),
+  graduationYear: text("graduation_year").default("2026"),
+  major: text("major").default("RPL"),
+  classGrade: text("class_grade").default("XII"),
+  nisn: text("nisn"),
   startingPrice: text("starting_price").default("Mulai Rp100.000").notNull(),
   skills: jsonb("skills").$type<string[]>().default([]).notNull(),
   languages: jsonb("languages").$type<string[]>().default(["Indonesia", "English"]).notNull(),
@@ -49,13 +57,85 @@ export const businessProfiles = pgTable("business_profiles", {
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
-// 4. School Profiles
+// 4. Enhanced Schools & Partners
+export const schools = pgTable("schools", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  profileId: uuid("profile_id").references(() => profiles.id, { onDelete: "set null" }),
+  name: text("name").notNull(),
+  slug: text("slug").notNull().unique(),
+  logoUrl: text("logo_url"),
+  coverUrl: text("cover_url"),
+  tagline: text("tagline"),
+  description: text("description"),
+  address: text("address"),
+  city: text("city"),
+  website: text("website"),
+  email: text("email"),
+  phone: text("phone"),
+  picName: text("pic_name"),
+  picContact: text("pic_contact"),
+  sectionOrder: jsonb("section_order").$type<string[]>().default(["featured_projects", "students", "achievements", "about"]).notNull(),
+  isVerified: boolean("is_verified").default(false).notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+// 4b. Legacy School Profiles
 export const schoolProfiles = pgTable("school_profiles", {
   profileId: uuid("profile_id").primaryKey().references(() => profiles.id, { onDelete: "cascade" }),
   schoolName: text("school_name").notNull(),
   picName: text("pic_name").notNull(),
   picContact: text("pic_contact"),
   isVerified: boolean("is_verified").default(false).notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+// 4c. Student School Relations (Approval & Enrollment)
+export const studentSchoolRelations = pgTable("student_school_relations", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  studentId: uuid("student_id").references(() => profiles.id, { onDelete: "cascade" }).notNull(),
+  schoolId: uuid("school_id").references(() => schools.id, { onDelete: "cascade" }).notNull(),
+  schoolStatus: schoolStatusEnum("school_status").default("pending").notNull(),
+  graduationYear: text("graduation_year").notNull().default("2026"),
+  major: text("major").notNull().default("RPL"),
+  classGrade: text("class_grade").notNull().default("XII"),
+  nisn: text("nisn"),
+  requestDate: timestamp("request_date").defaultNow().notNull(),
+  approvedAt: timestamp("approved_at"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+// 4d. School Assessments
+export const schoolAssessments = pgTable("school_assessments", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  studentId: uuid("student_id").references(() => profiles.id, { onDelete: "cascade" }).notNull(),
+  schoolId: uuid("school_id").references(() => schools.id, { onDelete: "cascade" }).notNull(),
+  status: assessmentStatusEnum("status").default("not_started").notNull(),
+  finalScore: decimal("final_score", { precision: 5, scale: 2 }),
+  notes: text("notes"),
+  assessedBy: uuid("assessed_by").references(() => profiles.id),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+// 4e. Assessment Rubric Items
+export const assessmentItems = pgTable("assessment_items", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  assessmentId: uuid("assessment_id").references(() => schoolAssessments.id, { onDelete: "cascade" }).notNull(),
+  criterion: text("criterion").notNull(),
+  score: integer("score").notNull().default(0),
+  weight: integer("weight").notNull().default(20), // e.g. 40 for 40%
+  notes: text("notes"),
+});
+
+// 4f. School Achievements
+export const schoolAchievements = pgTable("school_achievements", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  schoolId: uuid("school_id").references(() => schools.id, { onDelete: "cascade" }).notNull(),
+  title: text("title").notNull(),
+  description: text("description"),
+  year: text("year").notNull(),
+  imageUrl: text("image_url"),
+  category: text("category").default("Kompetisi").notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
@@ -86,6 +166,7 @@ export const projects = pgTable("projects", {
   mediaUrl: text("media_url"),
   mediaType: text("media_type").default("shader").notNull(),
   externalLink: text("external_link"),
+  isFeaturedSchool: boolean("is_featured_school").default(false).notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
@@ -269,5 +350,52 @@ export const reviewsRelations = relations(reviews, ({ one }) => ({
   creator: one(profiles, {
     fields: [reviews.creatorId],
     references: [profiles.id],
+  }),
+}));
+
+export const schoolsRelations = relations(schools, ({ one, many }) => ({
+  profile: one(profiles, {
+    fields: [schools.profileId],
+    references: [profiles.id],
+  }),
+  studentRelations: many(studentSchoolRelations),
+  assessments: many(schoolAssessments),
+  achievements: many(schoolAchievements),
+}));
+
+export const studentSchoolRelationsRelations = relations(studentSchoolRelations, ({ one }) => ({
+  student: one(profiles, {
+    fields: [studentSchoolRelations.studentId],
+    references: [profiles.id],
+  }),
+  school: one(schools, {
+    fields: [studentSchoolRelations.schoolId],
+    references: [schools.id],
+  }),
+}));
+
+export const schoolAssessmentsRelations = relations(schoolAssessments, ({ one, many }) => ({
+  student: one(profiles, {
+    fields: [schoolAssessments.studentId],
+    references: [profiles.id],
+  }),
+  school: one(schools, {
+    fields: [schoolAssessments.schoolId],
+    references: [schools.id],
+  }),
+  items: many(assessmentItems),
+}));
+
+export const assessmentItemsRelations = relations(assessmentItems, ({ one }) => ({
+  assessment: one(schoolAssessments, {
+    fields: [assessmentItems.assessmentId],
+    references: [schoolAssessments.id],
+  }),
+}));
+
+export const schoolAchievementsRelations = relations(schoolAchievements, ({ one }) => ({
+  school: one(schools, {
+    fields: [schoolAchievements.schoolId],
+    references: [schools.id],
   }),
 }));

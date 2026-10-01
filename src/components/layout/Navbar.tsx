@@ -15,7 +15,8 @@ import {
   TrendingUp,
   Briefcase,
   Building2,
-  Settings
+  Settings,
+  GraduationCap
 } from 'lucide-react';
 import { ActivePage, AuthState } from '@/types';
 import { useAuth } from '@/providers/AuthProvider';
@@ -250,6 +251,20 @@ export const Navbar: React.FC<NavbarProps> = ({
                   <Briefcase className="w-4 h-4 text-neutral-800 group-hover/item:text-[#155DFC] transition-colors" />
                   <span>Katalog Layanan</span>
                 </button>
+
+                <button
+                  onClick={() => {
+                    setExploreDropdownOpen(false);
+                    navigateTo('school-profile', '/school/smk-kreatif-indonesia');
+                  }}
+                  className="w-full px-3.5 py-2.5 rounded-[8px] text-left text-sm font-bold text-[#0D0C22] hover:bg-[#F3F3F4] flex items-center gap-3 transition-colors cursor-pointer group/item"
+                >
+                  <GraduationCap className="w-4 h-4 text-neutral-800 group-hover/item:text-[#155DFC] transition-colors" />
+                  <div>
+                    <span className="block">Profil Sekolah & Vokasi</span>
+                    <span className="text-[10px] font-normal text-neutral-400">Showcase Portofolio Siswa SMK</span>
+                  </div>
+                </button>
               </div>
 
               {/* Bagian Bawah: Kategori Konten & Desain */}
@@ -366,6 +381,17 @@ export const Navbar: React.FC<NavbarProps> = ({
                   >
                     <Settings className="w-4 h-4 text-neutral-500" />
                     <span>Setting</span>
+                  </button>
+                  <button
+                    id="nav-user-school-dashboard-btn"
+                    onClick={() => {
+                      setUserDropdownOpen(false);
+                      navigateTo('school-dashboard', '/dashboard/school');
+                    }}
+                    className="w-full px-4 py-2.5 text-left text-xs font-semibold text-neutral-700 hover:bg-[#F3F3F4] hover:text-[#0D0C22] flex items-center gap-2.5 cursor-pointer transition-colors"
+                  >
+                    <GraduationCap className="w-4 h-4 text-neutral-500" />
+                    <span>Dashboard Sekolah</span>
                   </button>
                   <div className="my-1 border-t border-black/5" />
                   <button
