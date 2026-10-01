@@ -203,13 +203,39 @@ export const HomePage: React.FC<HomePageProps> = ({
   const [savedProjects, setSavedProjects] = useState<Record<string, boolean>>({});
   const [isBriefBannerVisible, setIsBriefBannerVisible] = useState(true);
   const [scrollY, setScrollY] = useState(0);
+  const [isReducedMotion, setIsReducedMotion] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
+    // Check reduced motion preference for accessibility
+    const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+    setIsReducedMotion(mediaQuery.matches);
+    const handleMotionChange = (e: MediaQueryListEvent) => setIsReducedMotion(e.matches);
+    mediaQuery.addEventListener('change', handleMotionChange);
+
+    // Responsive mobile breakpoint check
+    const checkMobile = () => setIsMobile(window.innerWidth < 768);
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+
+    // High performance 60fps scroll throttling with requestAnimationFrame
+    let rafId: number | null = null;
     const handleScroll = () => {
-      setScrollY(window.scrollY);
+      if (rafId) return;
+      rafId = window.requestAnimationFrame(() => {
+        setScrollY(window.scrollY);
+        rafId = null;
+      });
     };
+
     window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
+
+    return () => {
+      mediaQuery.removeEventListener('change', handleMotionChange);
+      window.removeEventListener('resize', checkMobile);
+      window.removeEventListener('scroll', handleScroll);
+      if (rafId) window.cancelAnimationFrame(rafId);
+    };
   }, []);
 
   // Lightbox modal state for project card click
@@ -357,29 +383,40 @@ export const HomePage: React.FC<HomePageProps> = ({
           
           {/* Clear & Visible Aesthetic Canvas Background Pattern */}
           <div className="absolute inset-0 pointer-events-none z-0 select-none overflow-hidden" aria-hidden="true">
-            {/* Soft Ambient Light Glow in Center */}
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] sm:w-[1100px] h-[360px] sm:h-[480px] bg-gradient-to-tr from-blue-100/35 via-indigo-50/40 to-blue-50/50 rounded-full blur-3xl pointer-events-none" />
-
-            {/* Clean & Elegant Architectural Grid Lines (No Dots) across full width */}
+            {/* Soft Ambient Light Glow in Center with Depth Parallax */}
             <div 
-              className="absolute inset-0"
+              className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] sm:w-[1100px] h-[360px] sm:h-[480px] bg-gradient-to-tr from-blue-100/35 via-indigo-50/40 to-blue-50/50 rounded-full blur-3xl pointer-events-none transition-transform duration-75 ease-out will-change-transform" 
+              style={{
+                transform: isReducedMotion ? 'translate(-50%, -50%)' : `translate3d(-50%, calc(-50% + ${Math.min(scrollY * 0.10, 50)}px), 0)`
+              }}
+            />
+
+            {/* Clean & Elegant Architectural Grid Lines (No Dots) across full width with Subtle Parallax */}
+            <div 
+              className="absolute inset-0 transition-transform duration-75 ease-out will-change-transform"
               style={{
                 backgroundImage: 'linear-gradient(to right, rgba(148, 163, 184, 0.18) 1px, transparent 1px), linear-gradient(to bottom, rgba(148, 163, 184, 0.18) 1px, transparent 1px)',
                 backgroundSize: '72px 72px',
                 maskImage: 'radial-gradient(ellipse 80% 70% at 50% 50%, black 35%, transparent 95%)',
-                WebkitMaskImage: 'radial-gradient(ellipse 80% 70% at 50% 50%, black 35%, transparent 95%)'
+                WebkitMaskImage: 'radial-gradient(ellipse 80% 70% at 50% 50%, black 35%, transparent 95%)',
+                transform: isReducedMotion ? 'none' : `translate3d(0, ${Math.min(scrollY * 0.05, 30)}px, 0)`
               }}
             />
 
             {/* Siluet Logo Creatorin di Kanan Bawah Hero dengan Brand Blue Gradient & Subtle Parallax Glow */}
             <div 
-              className="absolute -right-14 -bottom-16 sm:-right-8 sm:-bottom-12 md:right-4 md:-bottom-10 lg:right-12 lg:-bottom-8 w-[280px] h-[264px] sm:w-[360px] sm:h-[340px] md:w-[420px] md:h-[396px] lg:w-[460px] lg:h-[434px] transition-transform duration-100 ease-out pointer-events-none select-none z-0"
+              className="absolute -right-14 -bottom-16 sm:-right-8 sm:-bottom-12 md:right-4 md:-bottom-10 lg:right-12 lg:-bottom-8 w-[280px] h-[264px] sm:w-[360px] sm:h-[340px] md:w-[420px] md:h-[396px] lg:w-[460px] lg:h-[434px] transition-transform duration-100 ease-out pointer-events-none select-none z-0 will-change-transform"
               style={{
-                transform: `translate3d(0, ${Math.min(scrollY * 0.18, 55)}px, 0)`
+                transform: isReducedMotion ? 'none' : `translate3d(0, ${Math.min(scrollY * (isMobile ? 0.12 : 0.26), 115)}px, 0) scale(${1 + Math.min(scrollY * 0.00018, 0.035)})`
               }}
             >
               {/* Soft ambient back-glow behind logo silhouette */}
-              <div className="absolute inset-4 bg-gradient-to-br from-[#03ACFD]/25 to-[#155DFC]/20 rounded-full blur-3xl pointer-events-none" />
+              <div 
+                className="absolute inset-4 bg-gradient-to-br from-[#03ACFD]/25 to-[#155DFC]/20 rounded-full blur-3xl pointer-events-none transition-transform duration-100 ease-out will-change-transform" 
+                style={{
+                  transform: isReducedMotion ? 'none' : `translate3d(0, ${Math.min(scrollY * 0.16, 75)}px, 0)`
+                }}
+              />
 
               {/* Exact Vector Silhouette from /creatorin/logo.svg */}
               <svg 
@@ -413,8 +450,13 @@ export const HomePage: React.FC<HomePageProps> = ({
             </div>
           </div>
           
-          {/* Centered Hero Header Block */}
-          <div className="relative z-10 max-w-5xl mx-auto text-center space-y-6 sm:space-y-8 px-4 sm:px-6 lg:px-8">
+          {/* Centered Hero Header Block with Subtle Fore-Parallax */}
+          <div 
+            className="relative z-10 max-w-5xl mx-auto text-center space-y-6 sm:space-y-8 px-4 sm:px-6 lg:px-8 transition-transform duration-75 ease-out will-change-transform"
+            style={{
+              transform: isReducedMotion ? 'none' : `translate3d(0, ${Math.min(scrollY * (isMobile ? 0.02 : 0.045), 24)}px, 0)`
+            }}
+          >
             
             {/* Sleek, Modern Hero Badge */}
             <div className="inline-flex items-center gap-2 sm:gap-2.5 px-3.5 sm:px-4 py-1.5 rounded-full bg-white border border-neutral-200/80 shadow-2xs hover:border-neutral-300 transition-all">
@@ -661,20 +703,37 @@ export const HomePage: React.FC<HomePageProps> = ({
               ) : (
                 <>
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 animate-in fade-in duration-200">
-                    {displayProjects.map((proj) => (
-                      <ProjectCard
-                        key={proj.id}
-                        id={`feed-card-${proj.id}`}
-                        project={proj}
-                        isSaved={Boolean(savedProjects[proj.id])}
-                        onToggleSave={(id, e) => toggleSaveProject(id, e)}
-                        onClick={() => {
-                          setSelectedProject(proj);
-                          setCurrentCarouselIndex(0);
-                          setIsVideoPlaying(true);
-                        }}
-                      />
-                    ))}
+                    {displayProjects.map((proj, idx) => {
+                      const colIndex = idx % 4;
+                      const colMultiplier = colIndex === 0 ? -1 : colIndex === 1 ? 1 : colIndex === 2 ? -0.5 : 0.5;
+                      const cardOffset = isReducedMotion
+                        ? 0
+                        : isMobile
+                          ? (idx % 2 === 0 ? -3 : 3)
+                          : colMultiplier * Math.min(scrollY * 0.028, 16);
+
+                      return (
+                        <div
+                          key={proj.id}
+                          className="transition-transform duration-100 ease-out will-change-transform"
+                          style={{
+                            transform: cardOffset ? `translate3d(0, ${cardOffset}px, 0)` : undefined,
+                          }}
+                        >
+                          <ProjectCard
+                            id={`feed-card-${proj.id}`}
+                            project={proj}
+                            isSaved={Boolean(savedProjects[proj.id])}
+                            onToggleSave={(id, e) => toggleSaveProject(id, e)}
+                            onClick={() => {
+                              setSelectedProject(proj);
+                              setCurrentCarouselIndex(0);
+                              setIsVideoPlaying(true);
+                            }}
+                          />
+                        </div>
+                      );
+                    })}
                   </div>
 
                 {/* Tombol Aksi Lihat Semua Proyek */}
@@ -886,6 +945,12 @@ export const HomePage: React.FC<HomePageProps> = ({
                               const imageSrc = service.coverImage || 
                                 creator.portfolioSamples?.[srvIdx % (creator.portfolioSamples?.length || 1)]?.thumbnail ||
                                 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&auto=format&fit=crop&q=80';
+                              const colMultiplier = srvIdx === 0 ? -0.8 : srvIdx === 1 ? 0.8 : srvIdx === 2 ? -0.4 : 0.4;
+                              const serviceOffset = isReducedMotion
+                                ? 0
+                                : isMobile
+                                  ? 0
+                                  : colMultiplier * Math.min(scrollY * 0.02, 12);
 
                               return (
                                 <div
@@ -896,7 +961,10 @@ export const HomePage: React.FC<HomePageProps> = ({
                                     setTargetCreatorForBrief(creator);
                                     setIsBriefModalOpen(true);
                                   }}
-                                  className="group/srv flex flex-col cursor-pointer text-left select-none"
+                                  className="group/srv flex flex-col cursor-pointer text-left select-none transition-transform duration-100 ease-out will-change-transform"
+                                  style={{
+                                    transform: serviceOffset ? `translate3d(0, ${serviceOffset}px, 0)` : undefined,
+                                  }}
                                 >
                                   {/* Cover Image Preview (Clean Rounded) */}
                                   <div className="aspect-[4/3] w-full rounded-2xl overflow-hidden bg-[#171717] relative shadow-[0_1px_0_rgba(0,0,0,0.05)] group-hover/srv:shadow-md transition-all duration-300">
@@ -988,13 +1056,25 @@ export const HomePage: React.FC<HomePageProps> = ({
               ) : (
                 <>
                   <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-6 gap-y-8 animate-in fade-in duration-200">
-                  {displayServices.map((srv) => (
-                    <div
-                      key={srv.id}
-                      id={`service-shot-${srv.id}`}
-                      onClick={() => navigateTo('services', '/explore/services')}
-                      className="group flex flex-col text-left cursor-pointer select-none"
-                    >
+                  {displayServices.map((srv, idx) => {
+                    const colIndex = idx % 4;
+                    const colMultiplier = colIndex === 0 ? -1 : colIndex === 1 ? 1 : colIndex === 2 ? -0.5 : 0.5;
+                    const cardOffset = isReducedMotion
+                      ? 0
+                      : isMobile
+                        ? (idx % 2 === 0 ? -3 : 3)
+                        : colMultiplier * Math.min(scrollY * 0.026, 15);
+
+                    return (
+                      <div
+                        key={srv.id}
+                        id={`service-shot-${srv.id}`}
+                        onClick={() => navigateTo('services', '/explore/services')}
+                        className="group flex flex-col text-left cursor-pointer select-none transition-transform duration-100 ease-out will-change-transform"
+                        style={{
+                          transform: cardOffset ? `translate3d(0, ${cardOffset}px, 0)` : undefined,
+                        }}
+                      >
                       {/* Media Cover Image Card (Aspect 4:3 matching screenshot) */}
                       <div className="relative aspect-[4/3] rounded-2xl overflow-hidden bg-neutral-100 shadow-2xs group-hover:shadow-md transition-all duration-300">
                         <img
@@ -1065,8 +1145,9 @@ export const HomePage: React.FC<HomePageProps> = ({
                         </div>
                       </div>
 
-                    </div>
-                  ))}
+                      </div>
+                    );
+                  })}
                 </div>
 
                 {/* Tombol Aksi Lihat Semua Layanan */}
