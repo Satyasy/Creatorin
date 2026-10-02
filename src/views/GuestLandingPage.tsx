@@ -83,82 +83,145 @@ const CreatorinSilhouette: React.FC<{
   </div>
 );
 
-// Real UMKM Brands in the Digital Ecosystem for Card Badge Marquee Banner
-interface UMKMBrandBadge {
+// Combined Authentic Logos: Official Digital Ecosystem Partners & Leading Brands
+interface BrandLogoItem {
   id: string;
   name: string;
-  category: string;
-  initials: string;
-  avatar?: string;
-  accentBg: string;
-  accentText: string;
+  type: 'image' | 'svg';
+  imageSrc?: string;
+  svg?: React.ReactNode;
+  heightClass?: string;
 }
 
-const LOCAL_UMKM_BRANDS: UMKMBrandBadge[] = [
+const REAL_COMBINED_LOGOS: BrandLogoItem[] = [
   {
-    id: 'kopi-senja',
-    name: 'Kopi Senja Nusantara',
-    category: 'F&B Kuliner',
-    initials: 'KSN',
-    avatar: '/creatorin/umkm-kopi-brand-avatar.jpeg',
-    accentBg: 'bg-amber-50',
-    accentText: 'text-amber-700'
+    id: 'jagoan-hosting',
+    name: 'Jagoan Hosting',
+    type: 'image',
+    imageSrc: '/creatorin/logo-jagoan-hosting.png',
+    heightClass: 'h-6 sm:h-7'
   },
   {
-    id: 'sambal-juara',
-    name: 'Sambal Mak Juara',
-    category: 'Kuliner Nusantara',
-    initials: 'SMJ',
-    accentBg: 'bg-rose-50',
-    accentText: 'text-rose-700'
+    id: 'tokopedia',
+    name: 'Tokopedia',
+    type: 'svg',
+    heightClass: 'h-6 sm:h-7',
+    svg: (
+      <svg className="h-6 sm:h-7 w-auto" viewBox="0 0 140 32" fill="none">
+        <path d="M16 2C8.27 2 2 8.27 2 16s6.27 14 14 14 14-6.27 14-14S23.73 2 16 2zm-4.5 9.5a3.5 3.5 0 110 7 3.5 3.5 0 010-7zm9 0a3.5 3.5 0 110 7 3.5 3.5 0 010-7z" fill="#03AC0E"/>
+        <path d="M42 22h-3.2v-9.5H35V9.7h10.2v2.8h-3.2V22zm9.3.2c-3.5 0-5.8-2.3-5.8-6.3s2.3-6.3 5.8-6.3 5.8 2.3 5.8 6.3-2.3 6.3-5.8 6.3zm0-2.8c1.7 0 2.7-1.4 2.7-3.5s-1-3.5-2.7-3.5-2.7 1.4-2.7 3.5 1 3.5 2.7 3.5zm13.1 2.6l-4.1-5.6v5.6h-3.1V5.5h3.1v8.8l3.9-4.6h3.8l-4.7 5.3 5 7h-3.9zm9.3.2c-3.5 0-5.8-2.3-5.8-6.3s2.3-6.3 5.8-6.3 5.8 2.3 5.8 6.3-2.3 6.3-5.8 6.3zm0-2.8c1.7 0 2.7-1.4 2.7-3.5s-1-3.5-2.7-3.5-2.7 1.4-2.7 3.5 1 3.5 2.7 3.5zm12.9 2.6v-2.1c-.7 1.5-2.3 2.3-4.1 2.3-3.1 0-5.3-2.2-5.3-6.2 0-4 2.2-6.2 5.3-6.2 1.8 0 3.3.8 4.1 2.3V5.5h3.1V22h-3.1zm-3.9-2.7c1.7 0 2.8-1.3 2.8-3.5s-1.1-3.5-2.8-3.5-2.7 1.3-2.7 3.5 1 3.5 2.7 3.5zm15.4 2.7h-3.1V9.7h3.1V22zm0-14.2h-3.1V5.2h3.1v2.6zm10.7 14.4c-1.8 0-3.3-.8-4-2.2v2h-3.1V9.7h3.1v2.1c.7-1.4 2.2-2.2 4-2.2 3.1 0 5.4 2.2 5.4 6.2s-2.3 6.4-5.4 6.4zm-.8-2.7c1.7 0 2.8-1.3 2.8-3.5s-1.1-3.5-2.8-3.5-2.8 1.3-2.8 3.5 1.1 3.5 2.8 3.5z" fill="#222222"/>
+      </svg>
+    )
   },
   {
-    id: 'batik-parang',
-    name: 'Batik Parang Kencana',
-    category: 'Fashion & Etnik',
-    initials: 'BPK',
-    accentBg: 'bg-emerald-50',
-    accentText: 'text-emerald-700'
+    id: 'komdigi',
+    name: 'Komdigi Republik Indonesia',
+    type: 'image',
+    imageSrc: '/creatorin/logo-komdigi.png',
+    heightClass: 'h-8 sm:h-9'
   },
   {
-    id: 'herborist-glow',
-    name: 'Herborist Organics',
-    category: 'Skincare Herbal',
-    initials: 'HBO',
-    accentBg: 'bg-teal-50',
-    accentText: 'text-teal-700'
+    id: 'gojek',
+    name: 'Gojek',
+    type: 'svg',
+    heightClass: 'h-6 sm:h-7',
+    svg: (
+      <svg className="h-6 sm:h-7 w-auto" viewBox="0 0 115 32" fill="none">
+        <circle cx="16" cy="16" r="13" fill="#00AA13"/>
+        <circle cx="16" cy="16" r="6" fill="#FFFFFF"/>
+        <path d="M42 22.4c-4.4 0-7.3-3-7.3-7.5s2.9-7.5 7.3-7.5c3.8 0 6.3 2.3 6.9 5.8h-3.4c-.5-1.8-1.8-2.9-3.5-2.9-2.4 0-4 1.8-4 4.6s1.6 4.6 4 4.6c1.8 0 3.1-1.1 3.5-2.8h-3.5v-2.8h6.8v8.7h-3.2v-1.6c-.9 1-2.1 1.4-3.6 1.4zm16.5 0c-4.3 0-7.2-3.1-7.2-7.5s2.9-7.5 7.2-7.5 7.2 3.1 7.2 7.5-2.9 7.5-7.2 7.5zm0-3c2.4 0 3.9-1.9 3.9-4.5s-1.5-4.5-3.9-4.5-3.9 1.9-3.9 4.5 1.5 4.5 3.9 4.5zm11.9 8.2c-3.1 0-5.1-1.4-5.6-3.8h3.3c.3 1 1.2 1.5 2.3 1.5 1.5 0 2.5-.9 2.5-2.5V7.7h3.3v14.8c0 3.2-2.2 5.1-5.8 5.1zm4.7-22.8c0-1.1.9-2 2-2s2 .9 2 2-.9 2-2 2-2-.9-2-2zm16.1 14.6c-4.3 0-7.1-3.1-7.1-7.5s2.9-7.5 7.1-7.5c4.1 0 6.9 3 6.9 7.4v.9h-10.7c.2 2.3 1.8 3.8 4 3.8 1.7 0 3-1 3.5-2.2h3.3c-.7 3.1-3.2 5.1-7 5.1zm-3.8-8.2h7.4c-.2-2.1-1.7-3.4-3.7-3.4-2 0-3.5 1.3-3.7 3.4zm18.3 8h-3.3V2.4h3.3v10.3l4.6-5h4.1l-5.3 5.4 5.7 9.3h-4l-4.1-6.9-1.3 1.3V22.4z" fill="#111111"/>
+      </svg>
+    )
   },
   {
-    id: 'dapur-nenek',
-    name: 'Dapur Nenek Catering',
-    category: 'F&B Olahan',
-    initials: 'DNC',
-    accentBg: 'bg-orange-50',
-    accentText: 'text-orange-700'
+    id: 'maspion-it',
+    name: 'Maspion IT',
+    type: 'image',
+    imageSrc: '/creatorin/logo-maspion-it.png',
+    heightClass: 'h-6 sm:h-7'
   },
   {
-    id: 'tempe-barokah',
-    name: 'Kripik Tempe Barokah',
-    category: 'Camilan UMKM',
-    initials: 'KTB',
-    accentBg: 'bg-yellow-50',
-    accentText: 'text-yellow-800'
+    id: 'shopee',
+    name: 'Shopee',
+    type: 'svg',
+    heightClass: 'h-6 sm:h-7',
+    svg: (
+      <svg className="h-6 sm:h-7 w-auto" viewBox="0 0 120 32" fill="none">
+        <path d="M14 3a6 6 0 00-6 6v2H5a2 2 0 00-2 2l2 16a2 2 0 002 2h14a2 2 0 002-2l2-16a2 2 0 00-2-2h-3v-2a6 6 0 00-6-6zm-3.5 8a3.5 3.5 0 017 0v2h-7v-2z" fill="#EE4D2D"/>
+        <path d="M42 19.8c.8.6 1.9 1 3.1 1 1.8 0 2.8-.9 2.8-2.1 0-3.3-6.1-2-6.1-6.7 0-2.4 2-4.1 5.3-4.1 1.4 0 2.7.4 3.7 1.1l-1 2.3c-.7-.5-1.6-.9-2.7-.9-1.5 0-2.4.8-2.4 1.8 0 3.2 6.1 1.9 6.1 6.8 0 2.5-2 4.2-5.7 4.2-1.6 0-3.2-.5-4.3-1.3l1.2-2.1zm12.3 2.4V4.5h2.9v6.8c.9-1.1 2.2-1.6 3.7-1.6 2.8 0 4.7 2 4.7 5.5v7h-2.9v-6.6c0-2-1.1-3.2-2.7-3.2-1.6 0-2.8 1.2-2.8 3.2v6.6h-2.9zm17.9.2c-4 0-6.8-3-6.8-7.3s2.8-7.3 6.8-7.3 6.8 3 6.8 7.3-2.8 7.3-6.8 7.3zm0-2.6c2.3 0 3.8-1.9 3.8-4.7s-1.5-4.7-3.8-4.7-3.8 1.9-3.8 4.7 1.5 4.7 3.8 4.7zm11.7 8v-17h2.8v2c.9-1.4 2.4-2.2 4.1-2.2 3.3 0 5.6 2.6 5.6 7.2s-2.3 7.2-5.6 7.2c-1.7 0-3.2-.8-4.1-2.2v5h-2.8zm6.5-5.2c2.2 0 3.6-1.8 3.6-4.6s-1.4-4.6-3.6-4.6-3.6 1.8-3.6 4.6 1.4 4.6 3.6 4.6zm13.7.2c-3.9 0-6.6-2.9-6.6-7.2s2.7-7.2 6.6-7.2c3.9 0 6.5 2.8 6.5 7.1v.9h-10.2c.2 2.3 1.8 3.8 4 3.8 1.6 0 2.9-.8 3.4-2.1l2.6 1c-.8 2.4-3.1 3.7-6.3 3.7zm-3.7-7.8h7.2c-.2-2-1.6-3.3-3.5-3.3-1.9 0-3.4 1.3-3.7 3.3zm15.7 7.8c-3.9 0-6.6-2.9-6.6-7.2s2.7-7.2 6.6-7.2c3.9 0 6.5 2.8 6.5 7.1v.9h-10.2c.2 2.3 1.8 3.8 4 3.8 1.6 0 2.9-.8 3.4-2.1l2.6 1c-.8 2.4-3.1 3.7-6.3 3.7zm-3.7-7.8h7.2c-.2-2-1.6-3.3-3.5-3.3-1.9 0-3.4 1.3-3.7 3.3z" fill="#222222"/>
+      </svg>
+    )
   },
   {
-    id: 'madu-borneo',
-    name: 'Madu Rimba Borneo',
-    category: 'Produk Sehat',
-    initials: 'MRB',
-    accentBg: 'bg-amber-50',
-    accentText: 'text-amber-800'
+    id: 'garuda-spark',
+    name: 'Garuda Spark Innovation Hub',
+    type: 'image',
+    imageSrc: '/creatorin/logo-garuda-spark.png',
+    heightClass: 'h-7 sm:h-8'
   },
   {
-    id: 'urban-leather',
-    name: 'Urban Leather Craft',
-    category: 'Kerajinan Kulit',
-    initials: 'ULC',
-    accentBg: 'bg-blue-50',
-    accentText: 'text-blue-700'
+    id: 'grab',
+    name: 'Grab',
+    type: 'svg',
+    heightClass: 'h-6 sm:h-7',
+    svg: (
+      <svg className="h-6 sm:h-7 w-auto" viewBox="0 0 100 32" fill="none">
+        <path d="M7 16c0-5 4-9 9-9s9 4 9 9-4 9-9 9" stroke="#00B14F" strokeWidth="3" fill="none"/>
+        <path d="M12.5 16c0-2 1.8-3.5 3.5-3.5s3.5 1.5 3.5 3.5-1.5 3.5-3.5 3.5" stroke="#00B14F" strokeWidth="2.5" fill="none"/>
+        <path d="M40 21.5c-3.6 0-6-2.6-6-6.5s2.4-6.5 6-6.5c3.2 0 5.4 1.9 5.8 4.7h-2.9c-.3-1.4-1.4-2.3-2.9-2.3-2 0-3.2 1.6-3.2 4.1s1.2 4.1 3.2 4.1c1.5 0 2.6-.9 2.9-2.3h-2.9v-2.3h5.6v7.3H43v-1.3c-.8.8-1.8 1.3-3 1.3zm12.5 0v-9.3h2.6v1.6c.6-1.1 1.7-1.8 3-1.8.4 0 .7 0 1 .2v2.7c-.4-.1-.8-.2-1.2-.2-1.6 0-2.7 1.2-2.7 3v4h-2.7zm15.4.2c-1.5 0-2.8-.7-3.4-1.8v1.6h-2.6v-9.3h2.6v1.6c.6-1.1 1.9-1.8 3.4-1.8 2.8 0 4.8 2.2 4.8 5s-2 4.7-4.8 4.7zm-.6-2.4c1.7 0 2.8-1.4 2.8-3.2s-1.1-3.2-2.8-3.2-2.8 1.4-2.8 3.2 1.1 3.2 2.8 3.2zm14.3 2.2v-1.6c-.7 1.1-2 1.8-3.5 1.8-2.7 0-4.7-2.1-4.7-5s2-5 4.7-5c1.5 0 2.8.7 3.5 1.8V4.5h2.7v17h-2.7zm-2.8-2.4c1.7 0 2.8-1.4 2.8-3.2s-1.1-3.2-2.8-3.2-2.8 1.4-2.8 3.2 1.1 3.2 2.8 3.2z" fill="#00B14F"/>
+      </svg>
+    )
+  },
+  {
+    id: 'traveloka',
+    name: 'Traveloka',
+    type: 'svg',
+    heightClass: 'h-6 sm:h-7',
+    svg: (
+      <svg className="h-6 sm:h-7 w-auto" viewBox="0 0 130 28" fill="none">
+        <path d="M14 4c-5.5 0-10 4.5-10 10s4.5 10 10 10 10-4.5 10-10S19.5 4 14 4zm-1 5.5l7 4.5-7 4.5V9.5z" fill="#0194F3"/>
+        <path d="M37 20h-2.7v-9H31V8.5h9.3V11h-3.3V20zm8.3 0v-8.2h2.4v1.4c.5-1 1.6-1.6 2.7-1.6.4 0 .7 0 1 .1v2.5c-.4-.1-.7-.1-1-.1-1.5 0-2.4 1-2.4 2.7V20h-2.7zm13.7.2c-1.3 0-2.5-.6-3-1.6v1.4h-2.4v-8.2h2.4v1.4c.5-1 1.7-1.6 3-1.6 2.5 0 4.3 1.9 4.3 4.4s-1.8 4.6-4.3 4.6zm-.5-2.2c1.4 0 2.4-1.1 2.4-2.5s-1-2.5-2.4-2.5-2.4 1.1-2.4 2.5 1 2.5 2.4 2.5zm11.3 2.2l-3.8-8.2h2.8l2.3 5.4 2.3-5.4h2.7L70.3 20h-2.7zm14.6.2c-3.4 0-5.7-2.5-5.7-6.2 0-3.7 2.3-6.2 5.7-6.2 3.4 0 5.6 2.4 5.6 6.1v.7h-8.8c.2 2 1.6 3.2 3.4 3.2 1.4 0 2.5-.7 2.9-1.8l2.3.9c-.8 2-2.7 3.3-5.4 3.3zm-3.2-6.7h6.2c-.2-1.7-1.4-2.8-3-2.8-1.6 0-2.9 1.1-3.2 2.8zm11.5 6.5V3.8h2.6V20h-2.6zm10.7.2c-3.5 0-5.8-2.5-5.8-6.2s2.3-6.2 5.8-6.2 5.8 2.5 5.8 6.2-2.3 6.2-5.8 6.2zm0-2.3c1.9 0 3.2-1.6 3.2-3.9s-1.3-3.9-3.2-3.9-3.2 1.6-3.2 3.9 1.3 3.9 3.2 3.9zm13.1 2.1l-3.5-4.8v4.8h-2.6V3.8h2.6v9.4l3.4-3.9h3.3l-4.1 4.5 4.3 6.2h-3.4zm10.3.2c-1.3 0-2.5-.6-3-1.6v1.4h-2.4v-8.2h2.4v1.4c.5-1 1.7-1.6 3-1.6 2.5 0 4.3 1.9 4.3 4.4s-1.8 4.6-4.3 4.6zm-.5-2.2c1.4 0 2.4-1.1 2.4-2.5s-1-2.5-2.4-2.5-2.4 1.1-2.4 2.5 1 2.5 2.4 2.5z" fill="#111111"/>
+      </svg>
+    )
+  },
+  {
+    id: 'spotify',
+    name: 'Spotify',
+    type: 'svg',
+    heightClass: 'h-6 sm:h-7',
+    svg: (
+      <svg className="h-6 sm:h-7 w-auto" viewBox="0 0 110 32" fill="none">
+        <circle cx="16" cy="16" r="13" fill="#1DB954"/>
+        <path d="M10 13c4-1 9-.8 13 1M11 16.5c3-.8 7-.6 10 1M12 20c2.5-.6 5.5-.5 8 .8" stroke="#FFFFFF" strokeWidth="2.2" strokeLinecap="round" fill="none"/>
+        <path d="M38 19.8c.8.6 1.8 1 2.9 1 1.7 0 2.6-.9 2.6-2 0-3.1-5.8-1.9-5.8-6.4 0-2.3 1.9-4 5-4 1.3 0 2.5.4 3.5 1l-1 2.2c-.7-.5-1.5-.9-2.5-.9-1.4 0-2.3.8-2.3 1.7 0 3.1 5.8 1.8 5.8 6.5 0 2.4-1.9 4-5.4 4-1.5 0-3-.5-4.1-1.2l1.3-1.9zm13.1 2.4v-2c-.8 1.4-2.2 2.2-3.8 2.2-3.1 0-5.2-2.5-5.2-6.8s2.1-6.8 5.2-6.8c1.6 0 3 .8 3.8 2.2V4.8h2.6V22h-2.6zm-3.6-2.2c1.8 0 3.1-1.4 3.1-3.6s-1.3-3.6-3.1-3.6-3 1.4-3 3.6 1.2 3.6 3 3.6zm13.8 2.4c-3.3 0-5.5-2.4-5.5-6.8s2.2-6.8 5.5-6.8 5.5 2.4 5.5 6.8-2.2 6.8-5.5 6.8zm0-2.2c1.8 0 3-1.5 3-4.6s-1.2-4.6-3-4.6-3 1.5-3 4.6 1.2 4.6 3 4.6zm12.3 2.2h-2.6V11.2h-2.1V9h2.1V6.2h2.6V9h3.2v2.2h-3.2v8.6c0 1.2.6 1.8 1.7 1.8.5 0 1-.1 1.4-.3v2.2c-.6.3-1.4.5-2.2.5zm5.8 0h-2.6V9h2.6v13zm0-15.6h-2.6V4h2.6v2.8zm8.6 15.8c-1.8 0-3.3-.8-4.2-2.1V22h-2.6V9h2.6v2.1c.9-1.3 2.4-2.1 4.2-2.1.6 0 1.1.1 1.6.3l-.7 2.4c-.4-.2-.9-.3-1.4-.3-1.8 0-3.2 1.4-3.2 3.7V22h-2.6zm10.7-3.6l4 10.4h-2.8l-1.3-3.6h-4.8l-1.3 3.6h-2.8l4-10.4h2.4v-4.8h2.6v4.8z" fill="#111111"/>
+      </svg>
+    )
+  },
+  {
+    id: 'blibli',
+    name: 'Blibli',
+    type: 'svg',
+    heightClass: 'h-6 sm:h-7',
+    svg: (
+      <svg className="h-6 sm:h-7 w-auto" viewBox="0 0 100 32" fill="none">
+        <rect x="4" y="6" width="20" height="20" rx="5" fill="#0095DA"/>
+        <circle cx="14" cy="16" r="4.5" fill="#FFFFFF"/>
+        <path d="M36 22V6h3.2v6.6c.9-1.2 2.3-1.8 3.9-1.8 3.1 0 5.4 2.3 5.4 5.6s-2.3 5.6-5.4 5.6c-1.6 0-3-.6-3.9-1.8V22H36zm4.8-2.6c2 0 3.5-1.5 3.5-3.6s-1.5-3.6-3.5-3.6-3.4 1.5-3.4 3.6 1.4 3.6 3.4 3.6zm12.3 2.6V6h3.2V22h-3.2zm6.7 0V11h3.2V22h-3.2zm0-13.6V5.8h3.2v2.6h-3.2zm7.7 13.6V6h3.2v6.6c.9-1.2 2.3-1.8 3.9-1.8 3.1 0 5.4 2.3 5.4 5.6s-2.3 5.6-5.4 5.6c-1.6 0-3-.6-3.9-1.8V22h-3.2zm4.8-2.6c2 0 3.5-1.5 3.5-3.6s-1.5-3.6-3.5-3.6-3.4 1.5-3.4 3.6 1.4 3.6 3.4 3.6zm12.3 2.6V6h3.2V22h-3.2zm6.7 0V11h3.2V22h-3.2zm0-13.6V5.8h3.2v2.6h-3.2z" fill="#0095DA"/>
+      </svg>
+    )
+  },
+  {
+    id: 'tiket',
+    name: 'Tiket.com',
+    type: 'svg',
+    heightClass: 'h-6 sm:h-7',
+    svg: (
+      <svg className="h-6 sm:h-7 w-auto" viewBox="0 0 115 28" fill="none">
+        <circle cx="12" cy="14" r="10" fill="#FEDD00"/>
+        <circle cx="12" cy="14" r="5" fill="#0064D2"/>
+        <path d="M33 21h-2.5v-8.8H28v-2.3h7.5v2.3h-2.5V21zm5.7 0v-8.8h2.5V21h-2.5zm0-11V7.7h2.5V10h-2.5zm7.3 11l-3.2-5v5h-2.5V5.5h2.5v9.8l3.1-4.2h3.1l-3.7 4.7 4 5.2h-3.3zm9.6.2c-3 0-5.1-2.2-5.1-5.7s2.1-5.7 5.1-5.7c3 0 5 2.1 5 5.5v.7h-7.6c.2 1.8 1.4 2.9 3 2.9 1.2 0 2.2-.6 2.6-1.6l2.1.8c-.8 1.8-2.4 3.1-5.1 3.1zm-2.6-6.1h5.1c-.2-1.5-1.2-2.5-2.5-2.5-1.3 0-2.4 1-2.6 2.5zm10.7 5.9h-2.5V12.2h-1.8v-2.1h1.8V7.8h2.5v2.3h2.8v2.1h-2.8v6.8c0 .9.4 1.4 1.3 1.4.4 0 .8-.1 1.1-.2v2c-.5.3-1.1.4-1.9.4zm8 0c-.9 0-1.6-.7-1.6-1.6s.7-1.6 1.6-1.6 1.6.7 1.6 1.6-.7 1.6-1.6 1.6zm8.8.2c-3.1 0-5.3-2.3-5.3-5.7s2.2-5.7 5.3-5.7c2.8 0 4.7 1.8 5.1 4.3h-2.5c-.3-1.3-1.3-2.1-2.6-2.1-1.7 0-2.8 1.4-2.8 3.5s1.1 3.5 2.8 3.5c1.3 0 2.3-.8 2.6-2.1h2.5c-.4 2.5-2.3 4.3-5.1 4.3zm12.3 0c-3.2 0-5.4-2.4-5.4-5.7s2.2-5.7 5.4-5.7 5.4 2.4 5.4 5.7-2.2 5.7-5.4 5.7zm0-2.2c1.7 0 2.9-1.5 2.9-3.5s-1.2-3.5-2.9-3.5-2.9 1.5-2.9 3.5 1.2 3.5 2.9 3.5zm15.7 2.2v-8.8h2.4v1.3c.7-1 1.8-1.5 3-1.5 1.5 0 2.7.7 3.3 1.9.8-1.2 2-1.9 3.5-1.9 2.2 0 3.9 1.5 3.9 4.3V21h-2.5v-6.5c0-1.6-.8-2.3-2-2.3-1.2 0-2.1.8-2.1 2.3V21h-2.5v-6.5c0-1.6-.8-2.3-2-2.3-1.2 0-2.1.8-2.1 2.3V21h-2.5z" fill="#0064D2"/>
+      </svg>
+    )
   }
 ];
 
@@ -331,55 +394,51 @@ export const GuestLandingPage = () => {
 
 
       {/* ========================================================================= */}
-      {/* ROLLING BANNER (Card Badge Logo Brand Lokal/UMKM Riil Ekosistem Digital)  */}
+      {/* ROLLING BANNER (Logo Asli Partner Ekosistem & Brand Digital Nasional)     */}
       {/* ========================================================================= */}
-      <section className="w-full py-8 border-b border-zinc-200/80 bg-white overflow-hidden">
+      <section className="w-full py-7 border-b border-zinc-200/80 bg-white overflow-hidden">
         <div className="relative flex overflow-x-hidden group items-center">
           
-          <div className="animate-marquee flex space-x-5 items-center min-w-full shrink-0 pr-5">
-            {LOCAL_UMKM_BRANDS.map((brand, idx) => (
+          <div className="animate-marquee flex space-x-[24px] items-center shrink-0 pr-[24px]">
+            {REAL_COMBINED_LOGOS.map((logo, idx) => (
               <div 
-                key={`brand-a-${idx}`} 
-                className="flex items-center gap-3 px-4 py-2 rounded-xl bg-white border border-zinc-200/90 shadow-2xs hover:border-zinc-400 hover:shadow-xs transition-all duration-200 shrink-0 cursor-pointer"
+                key={`logo-a-${logo.id}-${idx}`} 
+                className="flex items-center justify-center shrink-0 grayscale opacity-70 hover:grayscale-0 hover:opacity-100 transition-all duration-300 cursor-pointer px-1"
+                title={logo.name}
               >
-                <div className={`w-8 h-8 rounded-lg overflow-hidden ${brand.accentBg} border border-zinc-200/60 flex items-center justify-center font-bold ${brand.accentText} text-[11px]`}>
-                  {brand.avatar ? (
-                    <img src={brand.avatar} alt={brand.name} className="w-full h-full object-cover" />
-                  ) : (
-                    <span>{brand.initials}</span>
-                  )}
-                </div>
-                <div className="text-left">
-                  <div className="flex items-center gap-1.5">
-                    <span className="text-xs font-semibold text-zinc-900 tracking-tight">{brand.name}</span>
-                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                {logo.type === 'image' && logo.imageSrc ? (
+                  <img 
+                    src={logo.imageSrc} 
+                    alt={logo.name} 
+                    className={`${logo.heightClass || 'h-7 sm:h-8'} w-auto max-w-[140px] sm:max-w-[180px] object-contain`} 
+                  />
+                ) : (
+                  <div className={`${logo.heightClass || 'h-6 sm:h-7'} flex items-center`}>
+                    {logo.svg}
                   </div>
-                  <span className="text-[10px] text-zinc-500 font-medium">{brand.category}</span>
-                </div>
+                )}
               </div>
             ))}
           </div>
 
-          <div className="animate-marquee flex space-x-5 items-center min-w-full shrink-0 absolute top-0 left-full pr-5">
-            {LOCAL_UMKM_BRANDS.map((brand, idx) => (
+          <div className="animate-marquee flex space-x-[24px] items-center shrink-0 absolute top-0 bottom-0 left-full pr-[24px]">
+            {REAL_COMBINED_LOGOS.map((logo, idx) => (
               <div 
-                key={`brand-b-${idx}`} 
-                className="flex items-center gap-3 px-4 py-2 rounded-xl bg-white border border-zinc-200/90 shadow-2xs hover:border-zinc-400 hover:shadow-xs transition-all duration-200 shrink-0 cursor-pointer"
+                key={`logo-b-${logo.id}-${idx}`} 
+                className="flex items-center justify-center shrink-0 grayscale opacity-70 hover:grayscale-0 hover:opacity-100 transition-all duration-300 cursor-pointer px-1"
+                title={logo.name}
               >
-                <div className={`w-8 h-8 rounded-lg overflow-hidden ${brand.accentBg} border border-zinc-200/60 flex items-center justify-center font-bold ${brand.accentText} text-[11px]`}>
-                  {brand.avatar ? (
-                    <img src={brand.avatar} alt={brand.name} className="w-full h-full object-cover" />
-                  ) : (
-                    <span>{brand.initials}</span>
-                  )}
-                </div>
-                <div className="text-left">
-                  <div className="flex items-center gap-1.5">
-                    <span className="text-xs font-semibold text-zinc-900 tracking-tight">{brand.name}</span>
-                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                {logo.type === 'image' && logo.imageSrc ? (
+                  <img 
+                    src={logo.imageSrc} 
+                    alt={logo.name} 
+                    className={`${logo.heightClass || 'h-7 sm:h-8'} w-auto max-w-[140px] sm:max-w-[180px] object-contain`} 
+                  />
+                ) : (
+                  <div className={`${logo.heightClass || 'h-6 sm:h-7'} flex items-center`}>
+                    {logo.svg}
                   </div>
-                  <span className="text-[10px] text-zinc-500 font-medium">{brand.category}</span>
-                </div>
+                )}
               </div>
             ))}
           </div>
