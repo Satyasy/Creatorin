@@ -9,24 +9,24 @@ import { FeedProject } from '@/types';
 import dynamic from 'next/dynamic';
 import { 
   ArrowRight, 
-  CheckCircle2, 
   ShieldCheck, 
   Star,
   PlayCircle,
-  ChevronDown,
-  Sparkles,
-  Lock,
   Clock,
   Award,
-  Layers,
   Check,
   Zap,
-  SlidersHorizontal,
   ChevronRight,
-  ExternalLink,
   MessageSquare,
   FileCheck,
-  Search
+  Search,
+  Tag,
+  FileText,
+  RefreshCw,
+  Sliders,
+  FolderCheck,
+  Layers,
+  Sparkles
 } from 'lucide-react';
 
 const ProjectDetailModal = dynamic(
@@ -34,7 +34,7 @@ const ProjectDetailModal = dynamic(
   { ssr: false }
 );
 
-// Real SVG Brand Logos for the Running Marquee (Tokopedia, Shopee, Gojek, Grab, Traveloka, Spotify, Blibli, Tiket)
+// Real SVG Brand Logos for Running Marquee (Monochrome clean SVG vectors)
 const REAL_BRAND_LOGOS = [
   {
     name: 'Tokopedia',
@@ -125,7 +125,7 @@ export const GuestLandingPage = () => {
     <div className="w-full bg-[#F4F4F6] text-[#0D0B0B] font-sans py-3 sm:py-6 px-2 sm:px-4 md:px-6 selection:bg-[#155DFC] selection:text-white">
       
       {/* Outer Floating Canvas Card (Matching lp-desain-1.png Layout & Padding) */}
-      <div className="max-w-[1360px] mx-auto bg-white rounded-[24px] sm:rounded-[36px] border border-neutral-200/80 shadow-2xs overflow-hidden">
+      <div className="max-w-[1360px] mx-auto bg-white rounded-[28px] sm:rounded-[36px] border border-neutral-200/80 shadow-2xs overflow-hidden">
         
         {/* ========================================================================= */}
         {/* 1. HERO SECTION (Persis Tipografi & Struktur lp-desain-1.png) */}
@@ -134,9 +134,9 @@ export const GuestLandingPage = () => {
           
           <div className="max-w-4xl mx-auto space-y-6 relative z-10">
             
-            {/* Top Micro-Pill (• 100K active users style) */}
+            {/* Top Micro-Pill (• +100K active users style in reference) */}
             <ScrollReveal distance={16} duration={500} immediate>
-              <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-neutral-100/90 border border-neutral-200/80 text-[12px] font-semibold text-neutral-600">
+              <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-[#F4F4F6] border border-neutral-200/80 text-[12px] font-semibold text-neutral-600">
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
                 <span>1.200+ Kreator Terverifikasi di Indonesia</span>
               </div>
@@ -144,9 +144,9 @@ export const GuestLandingPage = () => {
 
             {/* Display Headline (Ideas. Notes. Clarity. Wherever your mind goes. style) */}
             <ScrollReveal distance={20} duration={600} delay={60} immediate>
-              <h1 className="text-4xl sm:text-6xl md:text-[68px] font-extrabold text-[#0D0C22] tracking-tight leading-[1.08] max-w-3xl mx-auto">
+              <h1 className="text-4xl sm:text-6xl md:text-[68px] font-extrabold text-[#111827] tracking-[-0.03em] leading-[1.08] max-w-3xl mx-auto">
                 Ide. Kreator. Kolaborasi. <br />
-                <span className="text-[#0D0C22]">Wujudkan karya brand Anda.</span>
+                <span className="text-[#111827]">Wujudkan karya brand Anda.</span>
               </h1>
             </ScrollReveal>
 
@@ -159,26 +159,26 @@ export const GuestLandingPage = () => {
 
             {/* Creative Mode Selector Pill (Style 01 ⤹ B I ≡ ● in reference) */}
             <ScrollReveal distance={16} duration={600} delay={160} immediate>
-              <div className="inline-flex items-center gap-2 sm:gap-3 px-3.5 py-1.5 rounded-full bg-[#F3F3F4] border border-neutral-200 text-xs font-semibold text-neutral-700">
-                <span className="text-neutral-400 font-mono text-[11px]">Kategori</span>
-                <span className="text-neutral-300">|</span>
-                <span className="hover:text-blue-600 cursor-pointer">Reels & TikTok</span>
+              <div className="inline-flex items-center gap-2 sm:gap-3 px-4 py-1.5 rounded-full bg-[#F4F4F6] border border-neutral-200 text-xs font-semibold text-neutral-700 shadow-2xs">
+                <span className="text-neutral-400 font-mono text-[11px]">Style 01</span>
+                <span className="text-neutral-300">⤹</span>
+                <span className="hover:text-[#155DFC] cursor-pointer transition-colors">Video Reels</span>
                 <span className="w-1 h-1 rounded-full bg-neutral-300" />
-                <span className="hover:text-blue-600 cursor-pointer">Foto Studio</span>
+                <span className="hover:text-[#155DFC] cursor-pointer transition-colors">TikTok UGC</span>
                 <span className="w-1 h-1 rounded-full bg-neutral-300 hidden sm:inline" />
-                <span className="hover:text-blue-600 cursor-pointer hidden sm:inline">Desain Brand</span>
+                <span className="hover:text-[#155DFC] cursor-pointer transition-colors hidden sm:inline">Foto Studio</span>
                 <span className="w-1 h-1 rounded-full bg-neutral-300 hidden sm:inline" />
-                <span className="hover:text-blue-600 cursor-pointer hidden sm:inline">UI/UX Web</span>
+                <span className="hover:text-[#155DFC] cursor-pointer transition-colors hidden sm:inline">Brand Design</span>
               </div>
             </ScrollReveal>
 
             {/* Two Action Buttons (Download for Playstore & Start Free Trial style) */}
             <ScrollReveal distance={20} duration={600} delay={200} immediate>
-              <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
+              <div className="flex flex-col sm:flex-row items-center justify-center gap-3.5 pt-2">
                 <button
                   type="button"
                   onClick={() => router.push('/sign-up')}
-                  className="w-full sm:w-auto h-11 px-7 rounded-xl bg-[#0D0C22] hover:bg-neutral-800 text-white text-xs sm:text-sm font-semibold transition-all shadow-xs flex items-center justify-center gap-2 cursor-pointer"
+                  className="w-full sm:w-auto h-11 px-7 rounded-full bg-[#155DFC] hover:bg-[#0E4CD1] text-white text-xs sm:text-sm font-semibold transition-all shadow-sm flex items-center justify-center gap-2 cursor-pointer"
                 >
                   <span>Mulai Kolaborasi</span>
                   <ArrowRight className="w-4 h-4" />
@@ -188,7 +188,7 @@ export const GuestLandingPage = () => {
                   onClick={() => {
                     document.getElementById('workspace-section')?.scrollIntoView({ behavior: 'smooth' });
                   }}
-                  className="w-full sm:w-auto h-11 px-6 rounded-xl bg-transparent hover:bg-neutral-100 text-[#0D0C22] text-xs sm:text-sm font-semibold transition-all flex items-center justify-center gap-1.5 cursor-pointer"
+                  className="w-full sm:w-auto h-11 px-6 rounded-full bg-transparent hover:bg-neutral-100 text-[#0D0C22] text-xs sm:text-sm font-semibold transition-all flex items-center justify-center gap-1.5 cursor-pointer"
                 >
                   <span>Pelajari Cara Kerja</span>
                   <ChevronRight className="w-4 h-4 text-neutral-400" />
@@ -196,13 +196,14 @@ export const GuestLandingPage = () => {
               </div>
             </ScrollReveal>
 
-            {/* Hero Artwork Frame with Creatorin Logo Silhouette (Mountain cut-out style) */}
+            {/* Hero Artwork Frame with Creatorin Logo Silhouette (Mountain cut-out style in reference) */}
             <ScrollReveal distance={24} duration={700} delay={260} immediate>
-              <div className="mt-10 sm:mt-14 relative mx-auto max-w-4xl bg-gradient-to-b from-neutral-50 to-[#ECECED] rounded-2xl sm:rounded-3xl border border-neutral-200/90 p-4 sm:p-8 overflow-hidden shadow-2xs">
+              <div className="mt-10 sm:mt-14 relative mx-auto max-w-4xl bg-gradient-to-b from-neutral-50 via-neutral-100/60 to-[#EAEAEB] rounded-2xl sm:rounded-3xl border border-neutral-200/90 p-4 sm:p-8 overflow-hidden shadow-2xs">
                 
-                {/* Silhouette Logo Creatorin Background (Direct from public/creatorin/logo.svg) */}
-                <div className="absolute right-6 -bottom-10 sm:right-12 sm:-bottom-8 w-60 sm:w-80 h-60 sm:h-80 pointer-events-none select-none opacity-20">
-                  <svg className="w-full h-full" viewBox="0 0 34.0608 32.0987" fill="none">
+                {/* Silhouette Logo Creatorin Background (Direct Vector from logo.svg with soft blue glow) */}
+                <div className="absolute right-4 -bottom-10 sm:right-10 sm:-bottom-6 w-64 sm:w-80 h-64 sm:h-80 pointer-events-none select-none opacity-25">
+                  <div className="absolute inset-4 bg-gradient-to-tr from-[#03ACFD]/20 to-[#155DFC]/25 rounded-full blur-2xl pointer-events-none" />
+                  <svg className="w-full h-full drop-shadow-[0_8px_20px_rgba(21,93,252,0.15)]" viewBox="0 0 34.0608 32.0987" fill="none">
                     <defs>
                       <linearGradient id="heroSilhouetteGrad" x1="0" y1="0" x2="34.0946" y2="32.0625" gradientUnits="userSpaceOnUse">
                         <stop offset="0%" stopColor="#03ACFD" />
@@ -220,29 +221,29 @@ export const GuestLandingPage = () => {
                   </svg>
                 </div>
 
-                {/* Inner Canvas Content */}
+                {/* Inner Canvas Cards */}
                 <div className="relative z-10 grid grid-cols-1 md:grid-cols-3 gap-4 text-left">
                   {/* Card 1: Escrow Protection */}
                   <div className="bg-white/95 backdrop-blur-sm p-4 rounded-xl border border-neutral-200/90 shadow-2xs">
                     <div className="flex items-center justify-between mb-2">
-                      <span className="text-[11px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-100 flex items-center gap-1">
-                        <ShieldCheck className="w-3 h-3" /> Rekening Bersama
+                      <span className="text-[11px] font-bold text-[#155DFC] bg-blue-50 px-2 py-0.5 rounded-full border border-blue-100 flex items-center gap-1">
+                        <ShieldCheck className="w-3 h-3 text-[#155DFC]" /> Rekening Bersama
                       </span>
                       <span className="text-[11px] text-neutral-400 font-mono">100% Aman</span>
                     </div>
-                    <p className="text-xs font-semibold text-[#0D0C22]">Dana Rp1.500.000 Terkunci</p>
+                    <p className="text-xs font-bold text-[#0D0C22]">Dana Rp1.500.000 Terkunci</p>
                     <p className="text-[11px] text-neutral-500 mt-1">Dicairkan hanya setelah hasil Anda setujui.</p>
                   </div>
 
                   {/* Card 2: UGC Video Views */}
                   <div className="bg-white/95 backdrop-blur-sm p-4 rounded-xl border border-neutral-200/90 shadow-2xs">
                     <div className="flex items-center justify-between mb-2">
-                      <span className="text-[11px] font-bold text-blue-600 bg-blue-50 px-2 py-0.5 rounded-full border border-blue-100 flex items-center gap-1">
-                        <PlayCircle className="w-3 h-3" /> TikTok UGC
+                      <span className="text-[11px] font-bold text-[#155DFC] bg-blue-50 px-2 py-0.5 rounded-full border border-blue-100 flex items-center gap-1">
+                        <PlayCircle className="w-3 h-3 text-[#155DFC]" /> TikTok UGC
                       </span>
                       <span className="text-[11px] text-neutral-400 font-mono">Viral</span>
                     </div>
-                    <p className="text-xs font-semibold text-[#0D0C22]">840.500+ Tayangan Organik</p>
+                    <p className="text-xs font-bold text-[#0D0C22]">840.500+ Tayangan Organik</p>
                     <p className="text-[11px] text-neutral-500 mt-1">Hook 3 detik & format video vertikal 9:16.</p>
                   </div>
 
@@ -254,7 +255,7 @@ export const GuestLandingPage = () => {
                       </span>
                       <span className="text-[11px] font-bold text-[#0D0C22]">98/100</span>
                     </div>
-                    <p className="text-xs font-semibold text-[#0D0C22]">Kreator Terverifikasi</p>
+                    <p className="text-xs font-bold text-[#0D0C22]">Kreator Terverifikasi</p>
                     <p className="text-[11px] text-neutral-500 mt-1">100% ketepatan waktu & minim revisi.</p>
                   </div>
                 </div>
@@ -267,9 +268,37 @@ export const GuestLandingPage = () => {
 
 
         {/* ========================================================================= */}
-        {/* 2. REAL BRAND LOGO RUNNING MARQUEE (Bukan Teks, Full Logo SVG Asli!) */}
+        {/* TRUST BAR (Persis baris no setup fee / 100% legal compliance di lp-desain-1) */}
         {/* ========================================================================= */}
-        <section className="py-7 border-y border-neutral-100 bg-[#FAFAFB] overflow-hidden">
+        <section className="py-6 border-y border-neutral-200/70 bg-[#FAFAFB]">
+          <div className="max-w-5xl mx-auto px-4 flex flex-wrap items-center justify-center gap-6 sm:gap-10 text-xs font-medium text-neutral-600">
+            <span className="flex items-center gap-2">
+              <Tag className="w-4 h-4 text-neutral-400" />
+              <span>Bebas Biaya Registrasi</span>
+            </span>
+            <span className="w-1 h-1 rounded-full bg-neutral-300 hidden sm:inline" />
+            <span className="flex items-center gap-2">
+              <ShieldCheck className="w-4 h-4 text-[#155DFC]" />
+              <span>100% Rekening Bersama (Escrow)</span>
+            </span>
+            <span className="w-1 h-1 rounded-full bg-neutral-300 hidden sm:inline" />
+            <span className="flex items-center gap-2">
+              <FileCheck className="w-4 h-4 text-neutral-400" />
+              <span>Kontrak & Hak Cipta Resmi</span>
+            </span>
+            <span className="w-1 h-1 rounded-full bg-neutral-300 hidden sm:inline" />
+            <span className="flex items-center gap-2">
+              <RefreshCw className="w-4 h-4 text-neutral-400" />
+              <span>Garansi Revisi & Uang Kembali</span>
+            </span>
+          </div>
+        </section>
+
+
+        {/* ========================================================================= */}
+        {/* RUNNING MARQUEE LOGO ASLI (Vektor SVG Asli, Bukan Teks Chip!) */}
+        {/* ========================================================================= */}
+        <section className="py-7 border-b border-neutral-100 bg-white overflow-hidden">
           <div className="relative flex overflow-x-hidden group items-center">
             
             <div className="animate-marquee flex space-x-14 items-center min-w-full shrink-0">
@@ -293,11 +322,11 @@ export const GuestLandingPage = () => {
 
 
         {/* ========================================================================= */}
-        {/* 3. APPLICATION WINDOW (Notes that work the way you think style) */}
+        {/* 2. APPLICATION WINDOW (Notes that work the way you think style) */}
         {/* ========================================================================= */}
         <section id="workspace-section" className="py-16 sm:py-24 px-4 sm:px-8 border-b border-neutral-100">
-          <div className="max-w-4xl mx-auto text-center space-y-4 mb-10">
-            <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-[#0D0C22] tracking-tight">
+          <div className="max-w-4xl mx-auto text-center space-y-3 mb-10">
+            <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-[#111827] tracking-[-0.03em]">
               Kolaborasi yang bekerja sesuai caramu.
             </h2>
             <p className="text-sm sm:text-base text-neutral-500 max-w-xl mx-auto leading-relaxed">
@@ -306,7 +335,7 @@ export const GuestLandingPage = () => {
           </div>
 
           {/* Desktop App Window Frame (matching browser mockup in lp-desain-1.png) */}
-          <div className="max-w-4xl mx-auto bg-white rounded-2xl border border-neutral-200 shadow-sm overflow-hidden text-left">
+          <div className="max-w-4xl mx-auto bg-white rounded-2xl border border-neutral-200/90 shadow-2xs overflow-hidden text-left">
             {/* Window Title Bar */}
             <div className="bg-[#F8F8F9] px-4 py-3 border-b border-neutral-200 flex items-center justify-between">
               <div className="flex items-center gap-2">
@@ -317,7 +346,7 @@ export const GuestLandingPage = () => {
               <div className="px-4 py-1 rounded-md bg-white border border-neutral-200 text-[11px] font-mono text-neutral-500">
                 creatorin.id/collaboration-room/CR-92014
               </div>
-              <div className="text-[11px] font-semibold text-emerald-600 bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-100">
+              <div className="text-[11px] font-semibold text-[#155DFC] bg-blue-50 px-2.5 py-0.5 rounded-full border border-blue-100">
                 Active Escrow
               </div>
             </div>
@@ -327,7 +356,7 @@ export const GuestLandingPage = () => {
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-neutral-100">
                 <div>
                   <span className="text-[11px] font-bold text-neutral-400 uppercase tracking-wider">Project ID: #CR-92014</span>
-                  <h3 className="text-lg font-bold text-[#0D0C22] mt-0.5">Produksi 3x Video Reels Instagram & TikTok Launching Produk</h3>
+                  <h3 className="text-base sm:text-lg font-bold text-[#0D0C22] mt-0.5">Produksi 3x Video Reels Instagram & TikTok Launching Produk</h3>
                 </div>
                 <div className="text-right sm:shrink-0">
                   <span className="text-xs text-neutral-400">Total Settlement:</span>
@@ -355,20 +384,20 @@ export const GuestLandingPage = () => {
 
                 <div className="p-3.5 rounded-xl bg-blue-50/50 border border-blue-200">
                   <div className="flex items-center justify-between mb-1">
-                    <span className="text-[11px] font-bold text-blue-800">3. Penyerahan Final</span>
-                    <span className="w-2 h-2 rounded-full bg-blue-600 animate-pulse" />
+                    <span className="text-[11px] font-bold text-[#155DFC]">3. Penyerahan Final</span>
+                    <span className="w-2 h-2 rounded-full bg-[#155DFC] animate-pulse" />
                   </div>
-                  <p className="text-[11px] text-blue-600 font-medium">Siap untuk verifikasi dana</p>
+                  <p className="text-[11px] text-[#155DFC] font-medium">Siap untuk verifikasi dana</p>
                 </div>
               </div>
 
               {/* Action Bar */}
-              <div className="pt-2 flex items-center justify-between">
-                <span className="text-xs text-neutral-400">Pengerjaan dijamin oleh Creatorin Career Score</span>
+              <div className="pt-2 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                <span className="text-xs text-neutral-400">Pengerjaan dijamin oleh Creatorin Career Score & Escrow</span>
                 <button
                   type="button"
                   onClick={() => router.push('/sign-in')}
-                  className="px-4 py-2 rounded-lg bg-[#0D0C22] text-white text-xs font-semibold hover:bg-neutral-800 transition cursor-pointer"
+                  className="px-4 py-2 rounded-full bg-[#155DFC] text-white text-xs font-semibold hover:bg-[#0E4CD1] transition cursor-pointer"
                 >
                   Coba Demo Room
                 </button>
@@ -379,11 +408,11 @@ export const GuestLandingPage = () => {
 
 
         {/* ========================================================================= */}
-        {/* 4. 2X2 BENTO GRID (Ideas. Notes. Clarity. Wherever your mind goes style) */}
+        {/* 3. 2X2 BENTO GRID (Ideas. Notes. Clarity. Wherever your mind goes style) */}
         {/* ========================================================================= */}
         <section className="py-16 sm:py-24 px-4 sm:px-8 border-b border-neutral-100">
-          <div className="max-w-4xl mx-auto text-center space-y-4 mb-12">
-            <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-[#0D0C22] tracking-tight">
+          <div className="max-w-4xl mx-auto text-center space-y-3 mb-12">
+            <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-[#111827] tracking-[-0.03em]">
               Ide. Kreator. Kepastian. <br />
               <span className="text-neutral-400 font-semibold">Terkendali dari awal hingga selesai.</span>
             </h2>
@@ -391,25 +420,25 @@ export const GuestLandingPage = () => {
 
           <div className="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-6 text-left">
             
-            {/* Bento Card 1: Rekening Bersama */}
+            {/* Bento Card 1: Rekening Bersama (Keep it simple pill style) */}
             <div className="p-7 sm:p-8 rounded-2xl sm:rounded-3xl bg-[#F8F8F9] border border-neutral-200/90 flex flex-col justify-between">
               <div>
                 <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white border border-neutral-200 text-xs font-semibold text-neutral-700 mb-6 shadow-2xs">
-                  <ShieldCheck className="w-3.5 h-3.5 text-blue-600" />
+                  <ShieldCheck className="w-3.5 h-3.5 text-[#155DFC]" />
                   <span>Garansi Mutlak</span>
                 </div>
-                <h3 className="text-xl font-bold text-[#0D0C22] mb-2">Rekening Bersama (Escrow)</h3>
+                <h3 className="text-xl font-bold text-[#111827] mb-2">Rekening Bersama (Escrow)</h3>
                 <p className="text-xs sm:text-sm text-neutral-500 leading-relaxed">
                   Dana pembayaran Anda diamankan di sistem. Kreator baru menerima hak pencairan dana setelah Anda puas dan menyetujui penyerahan karya.
                 </p>
               </div>
               <div className="mt-8 pt-4 border-t border-neutral-200/60 flex items-center justify-between text-xs text-neutral-400">
                 <span>0% Risiko Penipuan</span>
-                <Lock className="w-4 h-4 text-neutral-400" />
+                <span className="font-semibold text-emerald-600">Proteksi 100%</span>
               </div>
             </div>
 
-            {/* Bento Card 2: Skor Karir & Checklist (Note taken / folders used style) */}
+            {/* Bento Card 2: Skor Karir & Checklist (Note taken / folders used style in reference) */}
             <div className="p-7 sm:p-8 rounded-2xl sm:rounded-3xl bg-[#F8F8F9] border border-neutral-200/90 flex flex-col justify-between">
               <div>
                 <div className="space-y-2 mb-6">
@@ -422,7 +451,7 @@ export const GuestLandingPage = () => {
                     <span className="text-amber-500 font-bold">⭐ 4.9 / 5.0</span>
                   </div>
                 </div>
-                <h3 className="text-xl font-bold text-[#0D0C22] mb-2">Skor Karir & Portofolio Asli</h3>
+                <h3 className="text-xl font-bold text-[#111827] mb-2">Skor Karir & Portofolio Asli</h3>
                 <p className="text-xs sm:text-sm text-neutral-500 leading-relaxed">
                   Bukan klaim sepihak. Seluruh statistik portofolio dihitung otomatis dari transaksi kolaborasi nyata yang telah selesai.
                 </p>
@@ -437,10 +466,10 @@ export const GuestLandingPage = () => {
             <div className="p-7 sm:p-8 rounded-2xl sm:rounded-3xl bg-[#F8F8F9] border border-neutral-200/90 flex flex-col justify-between">
               <div>
                 <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white border border-neutral-200 text-xs font-semibold text-neutral-700 mb-6 shadow-2xs">
-                  <MessageSquare className="w-3.5 h-3.5 text-indigo-600" />
+                  <MessageSquare className="w-3.5 h-3.5 text-[#155DFC]" />
                   <span>Workroom Digital</span>
                 </div>
-                <h3 className="text-xl font-bold text-[#0D0C22] mb-2">Collaboration Room Terstruktur</h3>
+                <h3 className="text-xl font-bold text-[#111827] mb-2">Collaboration Room Terstruktur</h3>
                 <p className="text-xs sm:text-sm text-neutral-500 leading-relaxed">
                   Pencatatan revisi bertahap, penyerahan file raw footage resolusi tinggi, dan persetujuan hak cipta komersial dalam satu alur kerja.
                 </p>
@@ -451,14 +480,14 @@ export const GuestLandingPage = () => {
               </div>
             </div>
 
-            {/* Bento Card 4: Kecepatan Eksekusi */}
+            {/* Bento Card 4: Kecepatan Eksekusi (Concentric badges style in reference) */}
             <div className="p-7 sm:p-8 rounded-2xl sm:rounded-3xl bg-[#F8F8F9] border border-neutral-200/90 flex flex-col justify-between">
               <div>
                 <div className="flex items-center gap-2 mb-6">
-                  <span className="px-3 py-1 rounded-full bg-[#0D0C22] text-white text-xs font-bold">Respons Cepat</span>
+                  <span className="px-3 py-1 rounded-full bg-[#155DFC] text-white text-xs font-bold">Respons Cepat</span>
                   <span className="px-3 py-1 rounded-full bg-white border border-neutral-200 text-xs font-semibold text-neutral-700">&lt; 2 Jam</span>
                 </div>
-                <h3 className="text-xl font-bold text-[#0D0C22] mb-2">Penawaran Proposal Instan</h3>
+                <h3 className="text-xl font-bold text-[#111827] mb-2">Penawaran Proposal Instan</h3>
                 <p className="text-xs sm:text-sm text-neutral-500 leading-relaxed">
                   Pasang brief proyek Anda sekarang, dan dapatkan proposal penawaran langsung dari kreator yang siap bekerja hari ini.
                 </p>
@@ -474,11 +503,11 @@ export const GuestLandingPage = () => {
 
 
         {/* ========================================================================= */}
-        {/* 5. PRICING / PACKAGE COMPARISON (Choose your pricing plan in reference) */}
+        {/* 4. PRICING / PACKAGE COMPARISON (Choose your pricing plan in reference) */}
         {/* ========================================================================= */}
         <section className="py-16 sm:py-24 px-4 sm:px-8 border-b border-neutral-100 bg-[#FAFAFB]">
-          <div className="max-w-4xl mx-auto text-center space-y-4 mb-12">
-            <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-[#0D0C22] tracking-tight">
+          <div className="max-w-4xl mx-auto text-center space-y-3 mb-12">
+            <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-[#111827] tracking-[-0.03em]">
               Pilihan Paket Kolaborasi UMKM
             </h2>
             <p className="text-sm sm:text-base text-neutral-500 max-w-xl mx-auto leading-relaxed">
@@ -492,7 +521,7 @@ export const GuestLandingPage = () => {
             <div className="bg-white rounded-2xl sm:rounded-3xl border border-neutral-200 p-7 flex flex-col justify-between shadow-2xs">
               <div>
                 <span className="text-xs font-bold text-neutral-400 uppercase tracking-wider">Uji Coba Campaign</span>
-                <h3 className="text-2xl sm:text-3xl font-bold text-[#0D0C22] mt-2 mb-1">Rp450.000</h3>
+                <h3 className="text-2xl sm:text-3xl font-bold text-[#111827] mt-2 mb-1">Rp450.000</h3>
                 <p className="text-xs text-neutral-400 mb-6">Paket Starter 1 Video</p>
                 
                 <ul className="space-y-3 text-xs text-neutral-600">
@@ -519,7 +548,7 @@ export const GuestLandingPage = () => {
                 <button
                   type="button"
                   onClick={() => router.push('/sign-in')}
-                  className="w-full py-2.5 rounded-xl border border-neutral-300 text-xs font-semibold text-[#0D0C22] hover:bg-neutral-50 transition cursor-pointer"
+                  className="w-full py-2.5 rounded-full border border-neutral-300 text-xs font-semibold text-[#0D0C22] hover:bg-neutral-50 transition cursor-pointer"
                 >
                   Pilih Paket Starter
                 </button>
@@ -527,7 +556,7 @@ export const GuestLandingPage = () => {
             </div>
 
             {/* Card 2: Growth (HIGHLIGHTED BLACK CARD in reference!) */}
-            <div className="bg-[#0D0C22] text-white rounded-2xl sm:rounded-3xl p-7 flex flex-col justify-between shadow-xl relative scale-102 border-2 border-neutral-800">
+            <div className="bg-[#0D0C22] text-white rounded-2xl sm:rounded-3xl p-7 flex flex-col justify-between shadow-xl relative scale-102 border-2 border-[#155DFC]">
               <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 bg-[#155DFC] text-white text-[11px] font-bold px-3.5 py-0.5 rounded-full uppercase tracking-wider shadow-sm">
                 Paling Populer
               </div>
@@ -565,7 +594,7 @@ export const GuestLandingPage = () => {
                 <button
                   type="button"
                   onClick={() => router.push('/sign-in')}
-                  className="w-full py-3 rounded-xl bg-[#155DFC] hover:bg-[#03ACFD] text-white text-xs font-bold transition shadow-sm cursor-pointer"
+                  className="w-full py-3 rounded-full bg-[#155DFC] hover:bg-[#03ACFD] text-white text-xs font-bold transition shadow-sm cursor-pointer"
                 >
                   Mulai Paket Growth
                 </button>
@@ -576,7 +605,7 @@ export const GuestLandingPage = () => {
             <div className="bg-white rounded-2xl sm:rounded-3xl border border-neutral-200 p-7 flex flex-col justify-between shadow-2xs">
               <div>
                 <span className="text-xs font-bold text-neutral-400 uppercase tracking-wider">Brand Scale-up</span>
-                <h3 className="text-2xl sm:text-3xl font-bold text-[#0D0C22] mt-2 mb-1">Rp3.500.000</h3>
+                <h3 className="text-2xl sm:text-3xl font-bold text-[#111827] mt-2 mb-1">Rp3.500.000</h3>
                 <p className="text-xs text-neutral-400 mb-6">Branding & Desain Lengkap</p>
                 
                 <ul className="space-y-3 text-xs text-neutral-600">
@@ -603,7 +632,7 @@ export const GuestLandingPage = () => {
                 <button
                   type="button"
                   onClick={() => router.push('/sign-in')}
-                  className="w-full py-2.5 rounded-xl border border-neutral-300 text-xs font-semibold text-[#0D0C22] hover:bg-neutral-50 transition cursor-pointer"
+                  className="w-full py-2.5 rounded-full border border-neutral-300 text-xs font-semibold text-[#0D0C22] hover:bg-neutral-50 transition cursor-pointer"
                 >
                   Pilih Paket Scale-up
                 </button>
@@ -615,7 +644,7 @@ export const GuestLandingPage = () => {
 
 
         {/* ========================================================================= */}
-        {/* 6. FEATURE ROW WITH CREATIVE BOX (Smarter Notes style in reference) */}
+        {/* 5. FEATURE ROW WITH CREATIVE BOX (Smarter Notes style in reference) */}
         {/* ========================================================================= */}
         <section className="py-16 sm:py-24 px-4 sm:px-8 border-b border-neutral-100">
           <div className="max-w-5xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
@@ -625,7 +654,7 @@ export const GuestLandingPage = () => {
               <div className="w-20 h-20 mx-auto bg-[#0D0C22] rounded-2xl flex items-center justify-center text-white text-3xl font-extrabold mb-4 shadow-sm">
                 📦
               </div>
-              <h4 className="text-base font-bold text-[#0D0C22]">Paket Deliverable Siap Pakai</h4>
+              <h4 className="text-base font-bold text-[#111827]">Paket Deliverable Siap Pakai</h4>
               <p className="text-xs text-neutral-500 mt-1 max-w-xs mx-auto">
                 File master MP4 High-Res 4K, mockup 3D, source file Figma, dan hak penggunaan komersial.
               </p>
@@ -638,22 +667,22 @@ export const GuestLandingPage = () => {
               </div>
             </div>
 
-            {/* Right: 3 Features List */}
+            {/* Right: 3 Features List with Custom Minimalist Line Icons */}
             <div className="lg:col-span-6 space-y-6 text-left">
               <div>
-                <span className="text-[11px] font-bold text-neutral-400 uppercase tracking-widest">Ekosistem Terpadu</span>
-                <h3 className="text-2xl sm:text-3xl font-extrabold text-[#0D0C22] tracking-tight mt-1">
+                <span className="text-[11px] font-bold text-[#155DFC] uppercase tracking-widest">Ekosistem Terpadu</span>
+                <h3 className="text-2xl sm:text-3xl font-extrabold text-[#111827] tracking-[-0.03em] mt-1">
                   Satu Tempat untuk Menemukan, Mengelola & Membayar Kreator.
                 </h3>
               </div>
 
               <div className="space-y-4">
                 <div className="flex items-start gap-3.5">
-                  <div className="w-8 h-8 rounded-lg bg-neutral-100 flex items-center justify-center shrink-0 mt-0.5">
-                    <Search className="w-4 h-4 text-neutral-700" />
+                  <div className="w-8 h-8 rounded-lg bg-blue-50 border border-blue-100 flex items-center justify-center shrink-0 mt-0.5">
+                    <Search className="w-4 h-4 text-[#155DFC]" />
                   </div>
                   <div>
-                    <h4 className="text-sm font-bold text-[#0D0C22]">Pencarian Tepat Sesuai Niche</h4>
+                    <h4 className="text-sm font-bold text-[#111827]">Pencarian Tepat Sesuai Niche</h4>
                     <p className="text-xs text-neutral-500 mt-0.5 leading-relaxed">
                       Temukan kreator yang spesifik menguasai industri FnB, kecantikan, fashion, hingga SaaS teknologi.
                     </p>
@@ -661,11 +690,11 @@ export const GuestLandingPage = () => {
                 </div>
 
                 <div className="flex items-start gap-3.5">
-                  <div className="w-8 h-8 rounded-lg bg-neutral-100 flex items-center justify-center shrink-0 mt-0.5">
-                    <FileCheck className="w-4 h-4 text-neutral-700" />
+                  <div className="w-8 h-8 rounded-lg bg-blue-50 border border-blue-100 flex items-center justify-center shrink-0 mt-0.5">
+                    <FileCheck className="w-4 h-4 text-[#155DFC]" />
                   </div>
                   <div>
-                    <h4 className="text-sm font-bold text-[#0D0C22]">Briefing Terstruktur & Kontrak Resmi</h4>
+                    <h4 className="text-sm font-bold text-[#111827]">Briefing Terstruktur & Kontrak Resmi</h4>
                     <p className="text-xs text-neutral-500 mt-0.5 leading-relaxed">
                       Format brief yang mudah dipahami kreator lengkap dengan perlindungan hak cipta komersial.
                     </p>
@@ -673,11 +702,11 @@ export const GuestLandingPage = () => {
                 </div>
 
                 <div className="flex items-start gap-3.5">
-                  <div className="w-8 h-8 rounded-lg bg-neutral-100 flex items-center justify-center shrink-0 mt-0.5">
-                    <ShieldCheck className="w-4 h-4 text-neutral-700" />
+                  <div className="w-8 h-8 rounded-lg bg-blue-50 border border-blue-100 flex items-center justify-center shrink-0 mt-0.5">
+                    <ShieldCheck className="w-4 h-4 text-[#155DFC]" />
                   </div>
                   <div>
-                    <h4 className="text-sm font-bold text-[#0D0C22]">Settlement Escrow Otomatis</h4>
+                    <h4 className="text-sm font-bold text-[#111827]">Settlement Escrow Otomatis</h4>
                     <p className="text-xs text-neutral-500 mt-0.5 leading-relaxed">
                       Satu kali bayar aman ke rekening bersama. Dana baru diteruskan setelah Anda menyatakan pekerjaan selesai.
                     </p>
@@ -691,14 +720,14 @@ export const GuestLandingPage = () => {
 
 
         {/* ========================================================================= */}
-        {/* 7. MINI PROJECT SHOWCASE (Clickable Cards with Lightbox Modal) */}
+        {/* 6. MINI PROJECT SHOWCASE (Clickable Cards with Lightbox Modal) */}
         {/* ========================================================================= */}
         <section className="py-16 sm:py-24 px-4 sm:px-8 border-b border-neutral-100">
           <div className="max-w-5xl mx-auto">
             <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-10 text-left">
               <div>
                 <span className="text-xs font-bold text-[#155DFC] uppercase tracking-wider">Portofolio Nyata</span>
-                <h3 className="text-2xl sm:text-3xl font-extrabold text-[#0D0C22] mt-1">Karya Unggulan Kreator</h3>
+                <h3 className="text-2xl sm:text-3xl font-extrabold text-[#111827] mt-1 tracking-[-0.02em]">Karya Unggulan Kreator</h3>
                 <p className="text-xs sm:text-sm text-neutral-500 mt-1">Klik karya di bawah untuk melihat detail video dan feed karya lengkap.</p>
               </div>
               <button
@@ -728,11 +757,11 @@ export const GuestLandingPage = () => {
 
 
         {/* ========================================================================= */}
-        {/* 8. HOW YOU TAKE ACTION? (Soft Sand CTA Card in reference) */}
+        {/* 7. HOW YOU TAKE ACTION? (Soft Sand CTA Card in reference) */}
         {/* ========================================================================= */}
         <section className="py-14 sm:py-20 px-4 sm:px-8">
           <div className="max-w-4xl mx-auto bg-[#F4F4F6] rounded-2xl sm:rounded-3xl p-8 sm:p-14 text-center border border-neutral-200/80">
-            <h2 className="text-2xl sm:text-4xl font-extrabold text-[#0D0C22] tracking-tight mb-3">
+            <h2 className="text-2xl sm:text-4xl font-extrabold text-[#111827] tracking-[-0.03em] mb-3">
               Siap Mengembangkan Brand Anda?
             </h2>
             <p className="text-xs sm:text-sm text-neutral-500 max-w-lg mx-auto leading-relaxed mb-8">
@@ -743,14 +772,14 @@ export const GuestLandingPage = () => {
               <button
                 type="button"
                 onClick={() => router.push('/sign-up')}
-                className="w-full sm:w-auto h-11 px-7 rounded-xl bg-[#0D0C22] hover:bg-neutral-800 text-white text-xs sm:text-sm font-semibold transition shadow-xs cursor-pointer"
+                className="w-full sm:w-auto h-11 px-7 rounded-full bg-[#155DFC] hover:bg-[#0E4CD1] text-white text-xs sm:text-sm font-semibold transition shadow-xs cursor-pointer"
               >
                 Daftar Sebagai UMKM
               </button>
               <button
                 type="button"
                 onClick={() => router.push('/sign-in')}
-                className="w-full sm:w-auto h-11 px-6 rounded-xl bg-transparent hover:bg-neutral-200/60 text-[#0D0C22] text-xs sm:text-sm font-semibold transition cursor-pointer"
+                className="w-full sm:w-auto h-11 px-6 rounded-full bg-transparent hover:bg-neutral-200/60 text-[#0D0C22] text-xs sm:text-sm font-semibold transition cursor-pointer"
               >
                 Gabung Sebagai Kreator ›
               </button>
