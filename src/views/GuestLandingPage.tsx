@@ -83,28 +83,18 @@ const CreatorinSilhouette: React.FC<{
   </div>
 );
 
-// Combined Authentic Logos: Official Digital Ecosystem Partners & Leading Brands
+// Pure Transparent Vector SVG Logos of Leading Digital Brands
 interface BrandLogoItem {
   id: string;
   name: string;
-  type: 'image' | 'svg';
-  imageSrc?: string;
-  svg?: React.ReactNode;
+  svg: React.ReactNode;
   heightClass?: string;
 }
 
-const REAL_COMBINED_LOGOS: BrandLogoItem[] = [
-  {
-    id: 'jagoan-hosting',
-    name: 'Jagoan Hosting',
-    type: 'image',
-    imageSrc: '/creatorin/logo-jagoan-hosting.png',
-    heightClass: 'h-6 sm:h-7'
-  },
+const TOP_DIGITAL_BRAND_LOGOS: BrandLogoItem[] = [
   {
     id: 'tokopedia',
     name: 'Tokopedia',
-    type: 'svg',
     heightClass: 'h-6 sm:h-7',
     svg: (
       <svg className="h-6 sm:h-7 w-auto" viewBox="0 0 140 32" fill="none">
@@ -114,16 +104,8 @@ const REAL_COMBINED_LOGOS: BrandLogoItem[] = [
     )
   },
   {
-    id: 'komdigi',
-    name: 'Komdigi Republik Indonesia',
-    type: 'image',
-    imageSrc: '/creatorin/logo-komdigi.png',
-    heightClass: 'h-8 sm:h-9'
-  },
-  {
     id: 'gojek',
     name: 'Gojek',
-    type: 'svg',
     heightClass: 'h-6 sm:h-7',
     svg: (
       <svg className="h-6 sm:h-7 w-auto" viewBox="0 0 115 32" fill="none">
@@ -134,16 +116,8 @@ const REAL_COMBINED_LOGOS: BrandLogoItem[] = [
     )
   },
   {
-    id: 'maspion-it',
-    name: 'Maspion IT',
-    type: 'image',
-    imageSrc: '/creatorin/logo-maspion-it.png',
-    heightClass: 'h-6 sm:h-7'
-  },
-  {
     id: 'shopee',
     name: 'Shopee',
-    type: 'svg',
     heightClass: 'h-6 sm:h-7',
     svg: (
       <svg className="h-6 sm:h-7 w-auto" viewBox="0 0 120 32" fill="none">
@@ -153,16 +127,8 @@ const REAL_COMBINED_LOGOS: BrandLogoItem[] = [
     )
   },
   {
-    id: 'garuda-spark',
-    name: 'Garuda Spark Innovation Hub',
-    type: 'image',
-    imageSrc: '/creatorin/logo-garuda-spark.png',
-    heightClass: 'h-7 sm:h-8'
-  },
-  {
     id: 'grab',
     name: 'Grab',
-    type: 'svg',
     heightClass: 'h-6 sm:h-7',
     svg: (
       <svg className="h-6 sm:h-7 w-auto" viewBox="0 0 100 32" fill="none">
@@ -175,7 +141,6 @@ const REAL_COMBINED_LOGOS: BrandLogoItem[] = [
   {
     id: 'traveloka',
     name: 'Traveloka',
-    type: 'svg',
     heightClass: 'h-6 sm:h-7',
     svg: (
       <svg className="h-6 sm:h-7 w-auto" viewBox="0 0 130 28" fill="none">
@@ -187,7 +152,6 @@ const REAL_COMBINED_LOGOS: BrandLogoItem[] = [
   {
     id: 'spotify',
     name: 'Spotify',
-    type: 'svg',
     heightClass: 'h-6 sm:h-7',
     svg: (
       <svg className="h-6 sm:h-7 w-auto" viewBox="0 0 110 32" fill="none">
@@ -200,7 +164,6 @@ const REAL_COMBINED_LOGOS: BrandLogoItem[] = [
   {
     id: 'blibli',
     name: 'Blibli',
-    type: 'svg',
     heightClass: 'h-6 sm:h-7',
     svg: (
       <svg className="h-6 sm:h-7 w-auto" viewBox="0 0 100 32" fill="none">
@@ -213,7 +176,6 @@ const REAL_COMBINED_LOGOS: BrandLogoItem[] = [
   {
     id: 'tiket',
     name: 'Tiket.com',
-    type: 'svg',
     heightClass: 'h-6 sm:h-7',
     svg: (
       <svg className="h-6 sm:h-7 w-auto" viewBox="0 0 115 28" fill="none">
@@ -394,51 +356,35 @@ export const GuestLandingPage = () => {
 
 
       {/* ========================================================================= */}
-      {/* ROLLING BANNER (Logo Asli Partner Ekosistem & Brand Digital Nasional)     */}
+      {/* ROLLING BANNER (Logo Vektor Asli Brand Digital Ternama dengan Jarak Lebar) */}
       {/* ========================================================================= */}
-      <section className="w-full py-7 border-b border-zinc-200/80 bg-white overflow-hidden">
+      <section className="w-full py-8 border-b border-zinc-200/80 bg-white overflow-hidden">
         <div className="relative flex overflow-x-hidden group items-center">
           
-          <div className="animate-marquee flex space-x-[24px] items-center shrink-0 pr-[24px]">
-            {REAL_COMBINED_LOGOS.map((logo, idx) => (
+          <div className="animate-marquee flex space-x-16 sm:space-x-20 items-center shrink-0 pr-16 sm:pr-20">
+            {TOP_DIGITAL_BRAND_LOGOS.map((logo, idx) => (
               <div 
                 key={`logo-a-${logo.id}-${idx}`} 
-                className="flex items-center justify-center shrink-0 grayscale opacity-70 hover:grayscale-0 hover:opacity-100 transition-all duration-300 cursor-pointer px-1"
+                className="flex items-center justify-center shrink-0 grayscale opacity-70 hover:grayscale-0 hover:opacity-100 transition-all duration-300 cursor-pointer"
                 title={logo.name}
               >
-                {logo.type === 'image' && logo.imageSrc ? (
-                  <img 
-                    src={logo.imageSrc} 
-                    alt={logo.name} 
-                    className={`${logo.heightClass || 'h-7 sm:h-8'} w-auto max-w-[140px] sm:max-w-[180px] object-contain`} 
-                  />
-                ) : (
-                  <div className={`${logo.heightClass || 'h-6 sm:h-7'} flex items-center`}>
-                    {logo.svg}
-                  </div>
-                )}
+                <div className={`${logo.heightClass || 'h-6 sm:h-7'} flex items-center`}>
+                  {logo.svg}
+                </div>
               </div>
             ))}
           </div>
 
-          <div className="animate-marquee flex space-x-[24px] items-center shrink-0 absolute top-0 bottom-0 left-full pr-[24px]">
-            {REAL_COMBINED_LOGOS.map((logo, idx) => (
+          <div className="animate-marquee flex space-x-16 sm:space-x-20 items-center shrink-0 absolute top-0 bottom-0 left-full pr-16 sm:pr-20">
+            {TOP_DIGITAL_BRAND_LOGOS.map((logo, idx) => (
               <div 
                 key={`logo-b-${logo.id}-${idx}`} 
-                className="flex items-center justify-center shrink-0 grayscale opacity-70 hover:grayscale-0 hover:opacity-100 transition-all duration-300 cursor-pointer px-1"
+                className="flex items-center justify-center shrink-0 grayscale opacity-70 hover:grayscale-0 hover:opacity-100 transition-all duration-300 cursor-pointer"
                 title={logo.name}
               >
-                {logo.type === 'image' && logo.imageSrc ? (
-                  <img 
-                    src={logo.imageSrc} 
-                    alt={logo.name} 
-                    className={`${logo.heightClass || 'h-7 sm:h-8'} w-auto max-w-[140px] sm:max-w-[180px] object-contain`} 
-                  />
-                ) : (
-                  <div className={`${logo.heightClass || 'h-6 sm:h-7'} flex items-center`}>
-                    {logo.svg}
-                  </div>
-                )}
+                <div className={`${logo.heightClass || 'h-6 sm:h-7'} flex items-center`}>
+                  {logo.svg}
+                </div>
               </div>
             ))}
           </div>
@@ -448,133 +394,133 @@ export const GuestLandingPage = () => {
 
 
       {/* ========================================================================= */}
-      {/* 2. RUANG KOLABORASI (Tahapan Pengerjaan & Mockup Hover Lift)               */}
+      {/* 2. RUANG KOLABORASI (Tanpa Dekorasi Card, Langsung di Background Section) */}
       {/* ========================================================================= */}
       <section id="workspace-section" className="w-full py-20 sm:py-28 px-4 sm:px-6 lg:px-8 border-b border-zinc-200/80 bg-white relative overflow-hidden">
         
-        {/* Creatorin Logo Silhouette in Left Background with Parallax */}
-        <div className="absolute -left-12 top-10 w-80 h-80 pointer-events-none z-0">
+        {/* Siluet Logo Creatorin di Sudut Kanan Bawah Latar (Tidak Menabrak Teks) */}
+        <div className="absolute -right-8 -bottom-12 w-[340px] h-[320px] sm:w-[420px] sm:h-[396px] pointer-events-none z-0">
           <CreatorinSilhouette 
             id="appSilGrad" 
             className="w-full h-full" 
-            opacity="opacity-18" 
+            opacity="opacity-12" 
             parallaxStyle={{
-              transform: isReducedMotion ? 'none' : `translate3d(0, ${Math.min((scrollY - 400) * 0.12, 60)}px, 0)`
+              transform: isReducedMotion ? 'none' : `translate3d(0, ${Math.min((scrollY - 400) * 0.10, 60)}px, 0)`
             }}
           />
         </div>
 
-        <div className="max-w-4xl mx-auto relative z-10">
+        <div className="max-w-4xl mx-auto relative z-10 text-left">
+          
+          {/* Section Heading & Subhead */}
           <ScrollReveal distance={20} duration={500}>
-            <div className="mb-10 text-left">
-              <h2 className="text-2xl md:text-3xl font-medium tracking-[-0.025em] leading-[1.18] text-zinc-900 mb-2">
+            <div className="mb-10">
+              <h2 className="text-2xl md:text-3xl font-medium tracking-[-0.025em] leading-[1.18] text-zinc-900 mb-3">
                 Ruang Kolaborasi yang Bekerja Sesuai Standar Kreatifmu.
               </h2>
-              <p className="text-xs md:text-sm font-normal leading-relaxed text-zinc-500 max-w-lg">
+              <p className="text-xs md:text-sm font-normal leading-relaxed text-zinc-500 max-w-xl">
                 Tinggalkan koordinasi yang tercecer di obrolan chat. Di Creatorin, setiap tahapan mulai dari brief, progres produksi, hingga serah terima tertata rapi dalam satu alur kerja transparan.
               </p>
             </div>
           </ScrollReveal>
 
-          {/* Desktop Application Frame Mockup with Interactive Hover Lift */}
-          <ScrollReveal distance={24} duration={600} delay={100}>
-            <div className="bg-white rounded-2xl border border-zinc-200/90 shadow-[0_4px_24px_-2px_rgba(0,0,0,0.04)] hover:shadow-[0_16px_40px_-6px_rgba(0,0,0,0.08)] hover:border-zinc-300 transition-all duration-300 ease-out overflow-hidden text-left cursor-default">
-              
-              {/* Window Toolbar Header */}
-              <div className="bg-[#FAFAFA] px-4 py-3 border-b border-zinc-200/80 flex flex-wrap items-center justify-between gap-3">
-                <div className="flex items-center gap-2.5 text-[11px] font-medium text-zinc-700">
-                  <span className="font-mono text-zinc-400">Proyek #CR-92014</span>
-                  <span className="text-zinc-300">/</span>
-                  <span className="font-semibold text-zinc-900">Kopi Senja Cold Brew × Bagus W.</span>
-                </div>
-                
-                <div className="flex items-center gap-2">
-                  <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-blue-50 text-blue-700 border border-blue-200 text-[10px] font-medium">
-                    <span className="w-1.5 h-1.5 rounded-full bg-blue-600 animate-pulse" />
-                    <span>Tahap 3 dari 4: Tinjauan Akhir Klien</span>
-                  </span>
-                  <div className="hidden sm:flex items-center gap-1 pl-2">
-                    <span className="w-2 h-2 rounded-full bg-zinc-900 inline-block" />
-                    <span className="w-2 h-2 rounded-full border border-zinc-300 inline-block" />
-                  </div>
-                </div>
+          {/* Baris Status Proyek Aktif (Clean Divider Border-Y) */}
+          <ScrollReveal distance={20} duration={500} delay={50}>
+            <div className="border-y border-zinc-200/80 py-4 flex flex-wrap items-center justify-between gap-3">
+              <div className="flex items-center gap-2.5 text-xs sm:text-[13px] font-medium text-zinc-800">
+                <span className="font-mono text-zinc-400">Proyek #CR-92014</span>
+                <span className="text-zinc-300">/</span>
+                <span className="font-semibold text-zinc-900">Kopi Senja Cold Brew × Bagus W.</span>
               </div>
-
-              {/* Document Content Area */}
-              <div className="p-6 sm:p-8 space-y-5">
-                
-                {/* Scope & Brief Summary */}
-                <div className="space-y-2">
-                  <div className="text-[11px] font-semibold uppercase tracking-wider text-zinc-400">Rincian Brief Disepakati</div>
-                  <p className="text-xs sm:text-[13px] leading-relaxed text-zinc-700 font-normal">
-                    Produksi 3x Video Reels TikTok UGC untuk peluncuran varian Cold Brew Caramel. Konsep video mencakup hook 3 detik unboxing, aesthetic pouring shot dengan lighting natural, dan review rasa otentik. Seluruh file master 4K dan hak komersial diserahkan penuh kepada klien.
-                  </p>
-                </div>
-
-                {/* 4 Tahapan Standar Visual Stepper */}
-                <div className="pt-2 border-t border-zinc-100 space-y-2.5">
-                  <div className="text-[11px] font-semibold uppercase tracking-wider text-zinc-400">4 Tahapan Kolaborasi Terstruktur</div>
-                  <div className="grid grid-cols-1 sm:grid-cols-4 gap-2 text-[11px]">
-                    <div className="p-2.5 rounded-lg bg-zinc-50 border border-zinc-200/80 flex items-center gap-2 text-zinc-800">
-                      <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
-                      <div>
-                        <span className="block font-semibold text-[10px] text-zinc-400">Tahap 1</span>
-                        <span>Sepakati Brief</span>
-                      </div>
-                    </div>
-                    <div className="p-2.5 rounded-lg bg-zinc-50 border border-zinc-200/80 flex items-center gap-2 text-zinc-800">
-                      <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
-                      <div>
-                        <span className="block font-semibold text-[10px] text-zinc-400">Tahap 2</span>
-                        <span>Produksi Kreator</span>
-                      </div>
-                    </div>
-                    <div className="p-2.5 rounded-lg bg-blue-50/70 border border-blue-200/90 flex items-center gap-2 text-blue-900 font-medium">
-                      <Clock className="w-3.5 h-3.5 text-blue-600 shrink-0" />
-                      <div>
-                        <span className="block font-semibold text-[10px] text-blue-500">Tahap 3 (Aktif)</span>
-                        <span>Tinjauan &amp; Revisi</span>
-                      </div>
-                    </div>
-                    <div className="p-2.5 rounded-lg bg-zinc-50/50 border border-dashed border-zinc-200 flex items-center gap-2 text-zinc-400">
-                      <span className="w-3.5 h-3.5 rounded-full border border-zinc-300 flex items-center justify-center text-[9px] font-mono shrink-0">4</span>
-                      <div>
-                        <span className="block font-semibold text-[10px] text-zinc-400">Tahap 4</span>
-                        <span>Serah Terima Aset</span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Bottom Action Bar inside Document */}
-                <div className="pt-4 flex flex-wrap items-center justify-between gap-3 border-t border-zinc-100">
-                  <div className="text-[11px] text-zinc-500 font-normal flex items-center gap-1.5">
-                    <ShieldCheck className="w-3.5 h-3.5 text-zinc-400" />
-                    <span>Perlindungan garansi revisi aktif hingga seluruh hasil kerja disetujui</span>
-                  </div>
-
-                  <div className="flex items-center gap-2.5">
-                    <button 
-                      type="button" 
-                      onClick={() => router.push('/sign-in')}
-                      className="rounded-full bg-zinc-100 hover:bg-zinc-200 text-zinc-800 text-[11px] font-medium px-3.5 py-1.5 transition cursor-pointer"
-                    >
-                      Tinjau Draft Video
-                    </button>
-                    <button 
-                      type="button" 
-                      onClick={() => router.push('/sign-in')}
-                      className="rounded-full bg-zinc-900 text-white text-[11px] font-medium px-4 py-1.5 flex items-center gap-1.5 shadow-[inset_0_1px_0_rgba(255,255,255,0.2)] cursor-pointer hover:bg-black transition"
-                    >
-                      <span>Setujui & Selesaikan Tahap Ini</span>
-                      <ArrowUpRight className="w-3 h-3 text-zinc-300" />
-                    </button>
-                  </div>
-                </div>
-
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 text-blue-700 border border-blue-200/80 text-[11px] font-medium">
+                <span className="w-1.5 h-1.5 rounded-full bg-blue-600 animate-pulse" />
+                <span>Tahap 3 dari 4: Tinjauan Akhir Klien</span>
               </div>
             </div>
           </ScrollReveal>
+
+          {/* Rincian Brief Disepakati (Langsung di Canvas, Border-B) */}
+          <ScrollReveal distance={20} duration={500} delay={100}>
+            <div className="py-6 border-b border-zinc-200/80 space-y-2">
+              <span className="text-[11px] font-semibold uppercase tracking-wider text-zinc-400 block">
+                Rincian Brief Disepakati
+              </span>
+              <p className="text-xs sm:text-[13px] leading-relaxed text-zinc-700 font-normal max-w-3xl">
+                Produksi 3x Video Reels TikTok UGC untuk peluncuran varian Cold Brew Caramel. Konsep video mencakup hook 3 detik unboxing, aesthetic pouring shot dengan lighting natural, dan review rasa otentik. Seluruh file master 4K dan hak komersial diserahkan penuh kepada klien.
+              </p>
+            </div>
+          </ScrollReveal>
+
+          {/* 4 Tahapan Kolaborasi Terstruktur (Clean Stepper Langsung di Canvas, Border-B) */}
+          <ScrollReveal distance={20} duration={500} delay={150}>
+            <div className="py-6 border-b border-zinc-200/80 space-y-3">
+              <span className="text-[11px] font-semibold uppercase tracking-wider text-zinc-400 block">
+                4 Tahapan Kolaborasi Terstruktur
+              </span>
+              <div className="grid grid-cols-1 sm:grid-cols-4 gap-3 text-[12px]">
+                <div className="p-3 rounded-xl bg-zinc-50 border border-zinc-200/80 flex items-center gap-2.5 text-zinc-800">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                  <div>
+                    <span className="block font-semibold text-[10px] text-zinc-400 uppercase">Tahap 1</span>
+                    <span className="font-medium text-zinc-900">Sepakati Brief</span>
+                  </div>
+                </div>
+
+                <div className="p-3 rounded-xl bg-zinc-50 border border-zinc-200/80 flex items-center gap-2.5 text-zinc-800">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                  <div>
+                    <span className="block font-semibold text-[10px] text-zinc-400 uppercase">Tahap 2</span>
+                    <span className="font-medium text-zinc-900">Produksi Kreator</span>
+                  </div>
+                </div>
+
+                <div className="p-3 rounded-xl bg-blue-50/70 border border-blue-200/90 flex items-center gap-2.5 text-blue-900 font-medium">
+                  <Clock className="w-4 h-4 text-blue-600 shrink-0" />
+                  <div>
+                    <span className="block font-semibold text-[10px] text-blue-500 uppercase">Tahap 3 (Aktif)</span>
+                    <span className="font-medium text-blue-950">Tinjauan &amp; Revisi</span>
+                  </div>
+                </div>
+
+                <div className="p-3 rounded-xl bg-zinc-50/50 border border-dashed border-zinc-200 flex items-center gap-2.5 text-zinc-400">
+                  <span className="w-4 h-4 rounded-full border border-zinc-300 flex items-center justify-center text-[10px] font-mono shrink-0">4</span>
+                  <div>
+                    <span className="block font-semibold text-[10px] text-zinc-400 uppercase">Tahap 4</span>
+                    <span className="font-medium text-zinc-500">Serah Terima Aset</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </ScrollReveal>
+
+          {/* Action & Garansi Bar di Bawah */}
+          <ScrollReveal distance={20} duration={500} delay={200}>
+            <div className="pt-6 flex flex-wrap items-center justify-between gap-4">
+              <div className="text-[12px] text-zinc-500 font-normal flex items-center gap-2">
+                <ShieldCheck className="w-4 h-4 text-zinc-400 shrink-0" />
+                <span>Perlindungan garansi revisi aktif hingga seluruh hasil kerja disetujui</span>
+              </div>
+
+              <div className="flex items-center gap-3">
+                <button 
+                  type="button" 
+                  onClick={() => router.push('/sign-in')}
+                  className="rounded-full bg-zinc-100 hover:bg-zinc-200 text-zinc-800 text-xs font-medium px-4 py-2 transition cursor-pointer"
+                >
+                  Tinjau Draft Video
+                </button>
+                <button 
+                  type="button" 
+                  onClick={() => router.push('/sign-in')}
+                  className="rounded-full bg-zinc-900 text-white text-xs font-medium px-5 py-2 flex items-center gap-1.5 shadow-[inset_0_1px_0_rgba(255,255,255,0.2)] cursor-pointer hover:bg-black transition"
+                >
+                  <span>Setujui & Selesaikan Tahap Ini</span>
+                  <ArrowUpRight className="w-3.5 h-3.5 text-zinc-300" />
+                </button>
+              </div>
+            </div>
+          </ScrollReveal>
+
         </div>
       </section>
 
