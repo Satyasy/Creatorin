@@ -26,7 +26,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
   const hideFooter = isChat || pathname?.startsWith('/collaboration') || isDashboard;
 
   return (
-    <div className={`min-h-screen flex flex-col overflow-x-hidden bg-[#F8FAFC] text-[#171717] font-sans selection:bg-[#0B1F3A] selection:text-white ${isChat ? 'h-screen max-h-screen overflow-hidden' : ''} ${isDashboard ? 'md:h-screen md:max-h-screen md:overflow-hidden' : ''}`}>
+    <div className={`min-h-screen flex flex-col overflow-x-clip bg-[#F8FAFC] text-[#171717] font-sans selection:bg-[#0B1F3A] selection:text-white ${isChat ? 'h-screen max-h-screen overflow-hidden' : ''} ${isDashboard ? 'md:h-screen md:max-h-screen md:overflow-hidden' : ''}`}>
       <Navbar />
       <main className={`flex-1 w-full flex flex-col ${isChat ? 'min-h-0 overflow-hidden' : ''} ${isDashboard ? 'md:min-h-0 md:overflow-hidden' : ''}`}>
         {children}

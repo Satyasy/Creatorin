@@ -97,7 +97,7 @@ const jsonLd = {
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="id" className="overflow-x-hidden" suppressHydrationWarning>
+    <html lang="id" className="overflow-x-clip" suppressHydrationWarning>
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
@@ -124,7 +124,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
       </head>
-      <body className="antialiased font-sans overflow-x-hidden" suppressHydrationWarning>
+      <body className="antialiased font-sans overflow-x-clip" suppressHydrationWarning>
         <AuthProvider>
           {children}
         </AuthProvider>
