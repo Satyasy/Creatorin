@@ -416,18 +416,18 @@ export const Navbar: React.FC<NavbarProps> = ({
               )}
             </div>
           ) : (
-            <div className="flex items-center gap-1.5 sm:gap-2">
+            <div className="flex items-center gap-2">
               <button
                 id="nav-signin-btn"
                 onClick={() => navigateTo('signin', '/sign-in')}
-                className="hidden sm:inline-flex h-10 px-4 text-xs sm:text-sm font-semibold text-[#0D0B0B] hover:text-[#155DFC] hover:bg-[#F3F3F4] rounded-[8px] transition-colors cursor-pointer"
+                className="hidden sm:inline-flex h-10 px-4 text-xs sm:text-sm font-semibold text-[#0D0B0B] hover:text-[#155DFC] hover:bg-[#F3F3F4] rounded-xl transition-colors cursor-pointer items-center justify-center shrink-0 border border-transparent"
               >
                 Masuk
               </button>
               <button
                 id="nav-signup-btn"
                 onClick={() => navigateTo('signup', '/sign-up')}
-                className="h-9 sm:h-10 px-3 sm:px-4 text-xs sm:text-sm font-semibold text-white bg-[#155DFC] hover:bg-[#0E4CD1] rounded-[8px] transition-colors cursor-pointer flex items-center justify-center shrink-0"
+                className="inline-flex h-10 px-4 sm:px-5 text-xs sm:text-sm font-semibold text-white bg-[#155DFC] hover:bg-[#0E4CD1] rounded-xl transition-colors cursor-pointer items-center justify-center shrink-0 shadow-2xs"
               >
                 Daftar
               </button>
