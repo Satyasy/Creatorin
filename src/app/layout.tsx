@@ -124,7 +124,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
       </head>
-      <body className="antialiased font-sans overflow-x-clip" suppressHydrationWarning>
+      <body className="antialiased font-sans overflow-x-clip tracking-[0.01em] text-[15px] leading-relaxed" suppressHydrationWarning>
         <AuthProvider>
           {children}
         </AuthProvider>

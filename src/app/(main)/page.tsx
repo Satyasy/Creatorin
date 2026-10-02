@@ -1,4 +1,4 @@
-import { HomePage } from '@/views/HomePage';
+import { RootRouter } from '@/views/RootRouter';
 
 export const metadata = {
   title: 'Creatorin - Kolaborasi Kreator & UMKM Tanpa Ribet',
@@ -6,5 +6,5 @@ export const metadata = {
 };
 
 export default function HomeRoute() {
-  return <HomePage />;
+  return <RootRouter />;
 }
