@@ -315,8 +315,22 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, onOpenBrief }) => {
           </svg>
         </div>
 
+        {/* Official Ecosystem & Partner Endorsement Strip */}
+        <div className="mt-10 pt-8 pb-4 border-t border-neutral-200/80 text-center">
+          <p className="text-xs font-bold text-neutral-400 uppercase tracking-widest mb-5">
+            Didukung & Berkolaborasi Bersama Ekosistem Industri Digital Nasional
+          </p>
+          <div className="flex items-center justify-center">
+            <img 
+              src="/creatorin/partners.png" 
+              alt="Didukung & Berkolaborasi Bersama: Jagoan Hosting, Komdigi, Maspion IT, Garuda Spark"
+              className="max-h-12 sm:max-h-14 w-auto object-contain filter grayscale hover:grayscale-0 transition-all opacity-85 hover:opacity-100 duration-300"
+            />
+          </div>
+        </div>
+
         {/* Bagian Bawah: Copyright & Informasi Tambahan */}
-        <div className="pt-8 border-t border-neutral-200/80 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-neutral-500">
+        <div className="pt-6 border-t border-neutral-200/80 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-neutral-500">
           <p className="text-neutral-700 font-medium text-center sm:text-left">
             © 2026 Creatorin. All rights reserved.
           </p>
