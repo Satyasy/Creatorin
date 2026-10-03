@@ -93,6 +93,7 @@ export const CreatorProfilePage: React.FC<CreatorProfilePageProps> = ({
   const { user: authUser } = useAuth();
   const currentUser = propUser !== undefined ? propUser : authUser;
   const isEffectiveOwner = Boolean(isOwnProfile);
+  const isCreatorShell = currentUser?.role === 'creator';
 
   const navigateTo = (page: ActivePage, path: string) => {
     if (onNavigate) onNavigate(page);
@@ -753,7 +754,10 @@ export const CreatorProfilePage: React.FC<CreatorProfilePageProps> = ({
       {/* ==================================================================== */}
       {/* TAB NAVIGATION BAR (Work, Services, Reviews, Collections, Liked Shots, About) */}
       {/* ==================================================================== */}
-      <div className="sticky top-20 z-30 border-b border-[#eaeaea] bg-white/95 backdrop-blur-md">
+      <div 
+        className={`sticky ${isCreatorShell ? 'top-0' : 'top-16 lg:top-[72px]'} z-30 border-b border-[#eaeaea] bg-white/95 backdrop-blur-md transition-[top]`}
+        style={{ top: isCreatorShell ? 0 : 'var(--navbar-height, 64px)' }}
+      >
         <div className="mx-auto flex max-w-[1440px] flex-col items-stretch justify-between gap-4 px-4 sm:px-6 lg:px-8 py-3 sm:flex-row sm:items-center">
           
           {/* Tabs Group */}

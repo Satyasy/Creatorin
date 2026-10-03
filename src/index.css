@@ -82,6 +82,17 @@
     --card-border: rgba(13, 11, 11, 0.10);
     --radius-card: 12px;
     --radius-btn: 8px;
+    --navbar-height: 0px;
+  }
+
+  :root:has(header.sticky) {
+    --navbar-height: 64px;
+  }
+
+  @media (min-width: 1024px) {
+    :root:has(header.sticky) {
+      --navbar-height: 72px;
+    }
   }
 
   body {

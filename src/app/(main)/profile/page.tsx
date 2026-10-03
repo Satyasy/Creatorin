@@ -13,19 +13,16 @@ export default function MyProfilePage() {
   const { user, isAuthenticated } = useAuth();
   const router = useRouter();
 
-  // Redirect unauthenticated users to sign-in
+  // Redirect unauthenticated users to sign-in or school users to school dashboard
   useEffect(() => {
     if (!isAuthenticated) {
       router.replace('/sign-in');
+    } else if (user?.role === 'school') {
+      router.replace('/dashboard/school');
     }
-  }, [isAuthenticated, router]);
+  }, [isAuthenticated, user?.role, router]);
 
-  if (!isAuthenticated || !user) {
-    return null;
-  }
-
-  if (user.role === 'school') {
-    router.replace('/dashboard/school');
+  if (!isAuthenticated || !user || user.role === 'school') {
     return null;
   }
 

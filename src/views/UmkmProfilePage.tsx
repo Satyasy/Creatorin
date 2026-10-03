@@ -82,6 +82,7 @@ export const UmkmProfilePage: React.FC<UmkmProfilePageProps> = ({
   const router = useRouter();
   const { user: authUser } = useAuth();
   const currentUser = propUser !== undefined ? propUser : authUser;
+  const isCreatorShell = currentUser?.role === 'creator';
 
   const navigateTo = (page: ActivePage, path?: string) => {
     if (onNavigate) {
@@ -696,7 +697,10 @@ export const UmkmProfilePage: React.FC<UmkmProfilePageProps> = ({
       {/* ==================================================================== */}
       {/* TAB NAVIGATION BAR (Sticky, Exact Match to Creator Profile Style) */}
       {/* ==================================================================== */}
-      <div className="sticky top-20 z-30 bg-white/95 backdrop-blur-md border-b border-neutral-200/80">
+      <div 
+        className={`sticky ${isCreatorShell ? 'top-0' : 'top-16 lg:top-[72px]'} z-30 bg-white/95 backdrop-blur-md border-b border-neutral-200/80 transition-[top]`}
+        style={{ top: isCreatorShell ? 0 : 'var(--navbar-height, 64px)' }}
+      >
         <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 py-3">
           
           {/* Tabs Group */}

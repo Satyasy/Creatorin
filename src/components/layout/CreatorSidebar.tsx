@@ -1,9 +1,9 @@
 'use client';
 
 import Link from 'next/link';
-import { Bell, Bot, BriefcaseBusiness, CircleHelp, House, MessageSquareText, Search, SlidersHorizontal, Wallet } from 'lucide-react';
+import { Bell, BriefcaseBusiness, CircleHelp, House, LogOut, MessageSquareText, Search, SlidersHorizontal, Wallet } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { useAuth } from '@/providers/AuthProvider';
 
 type CreatorLink = {
@@ -18,7 +18,6 @@ const primaryLinks = [
   { label: 'Messages', href: '/chat', icon: MessageSquareText },
   { label: 'Contracts', href: '/contracts', icon: BriefcaseBusiness },
   { label: 'Finances', href: '/wallet', icon: Wallet },
-  { label: 'Uma', href: '/settings', icon: Bot },
 ] satisfies CreatorLink[];
 
 const utilityLinks = [
@@ -29,8 +28,14 @@ const utilityLinks = [
 
 export function CreatorSidebar() {
   const pathname = usePathname();
-  const { user } = useAuth();
+  const router = useRouter();
+  const { user, signOut } = useAuth();
   const isActive = (href: string) => href === '/' ? pathname === '/' : pathname.startsWith(href);
+
+  const handleLogout = () => {
+    signOut();
+    router.push('/');
+  };
 
   const renderMainLink = ({ label, href, icon: Icon }: CreatorLink) => {
     const active = isActive(href);
@@ -82,6 +87,17 @@ export function CreatorSidebar() {
 
         <nav aria-label="Navigasi kreator" className="flex min-w-0 flex-1 items-center gap-1 overflow-x-auto lg:w-full lg:flex-col lg:items-stretch lg:gap-1 lg:overflow-visible">
           {primaryLinks.map(renderMainLink)}
+
+          <button
+            type="button"
+            onClick={handleLogout}
+            title="Logout"
+            aria-label="Logout"
+            className="flex h-[52px] min-w-[58px] shrink-0 flex-col items-center justify-center gap-1 rounded-md px-1.5 text-[10px] font-normal leading-none transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary lg:h-[58px] lg:w-full text-[#121212] hover:bg-[#FEE4E2] hover:text-[#D92D20] cursor-pointer"
+          >
+            <LogOut className="h-5 w-5 shrink-0" strokeWidth={1.35} aria-hidden="true" />
+            <span className="max-w-[88px] whitespace-nowrap">Logout</span>
+          </button>
 
           <div className="ml-auto flex items-center gap-1 lg:ml-0 lg:mt-auto lg:w-full lg:flex-col lg:items-center lg:gap-2">
             {utilityLinks.map(renderUtilityLink)}

@@ -62,8 +62,8 @@ export const Navbar: React.FC<NavbarProps> = ({ currentUser: suppliedUser, onNav
   const exit = () => { if (onSignOut) onSignOut(); else signOut(); router.push('/'); };
 
   return (
-    <header className="sticky top-0 z-50 border-b border-[var(--outline)] bg-white/95 backdrop-blur-sm">
-      <div className="container-creatorin flex min-h-16 items-center gap-3 py-2 lg:min-h-18">
+    <header className="sticky top-0 z-50 h-16 lg:h-[72px] border-b border-[var(--outline)] bg-white/95 backdrop-blur-sm">
+      <div className="container-creatorin flex h-full items-center gap-3 py-2">
         <button onClick={() => navigate('home', '/')} className="flex min-h-11 shrink-0 items-center gap-2 rounded-md pr-2" aria-label="Buka beranda Creatorin">
           <img src="/creatorin/logo.svg" alt="" className="h-8 w-9" />
           <span className="font-display text-xl font-bold tracking-[-0.03em] text-[var(--ink)]">Creatorin</span>
