@@ -96,7 +96,7 @@ export const UmkmProfilePage: React.FC<UmkmProfilePageProps> = ({
         'explore-projects': '/explore/projects',
         'explore-services': '/explore/services',
         'chat': '/chat',
-        'collaboration': '/collaboration',
+        'collaboration': '/contracts',
         'notifications': '/notifications',
         'briefs': '/briefs',
         'signin': '/sign-in',

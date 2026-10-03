@@ -1026,7 +1026,7 @@ export const ChatPage: React.FC<ChatPageProps> = ({
                                 <span>Rincian Tagihan</span>
                               </button>
                               <button
-                                onClick={() => navigateTo('collaboration-room', '/collaboration')}
+                                onClick={() => navigateTo('collaboration-room', '/contracts')}
                                 className="w-full py-2 px-2.5 rounded-xl text-xs font-semibold text-white bg-[#0B1F3A] hover:bg-[#123B8C] transition-colors cursor-pointer flex items-center justify-center gap-1.5 shadow-2xs"
                               >
                                 <span>Masuk Room</span>
@@ -1405,7 +1405,7 @@ export const ChatPage: React.FC<ChatPageProps> = ({
             onSignOut={onSignOut}
             onNavigate={(page) => {
               setActiveInvoiceDetail(null);
-              navigateTo(page, page === 'collaboration-room' ? '/collaboration' : `/${page}`);
+              navigateTo(page, page === 'collaboration-room' ? '/contracts' : `/${page}`);
             }}
             invoiceData={{
               id: activeInvoiceDetail.invoice.id,

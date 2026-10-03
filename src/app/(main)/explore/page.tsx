@@ -1,8 +1,8 @@
 import { ExplorePage } from '@/views/ExplorePage';
 
 export const metadata = {
-  title: 'Jelajah Kreator - Creatorin',
-  description: 'Eksplorasi portofolio kreator konten terverifikasi di Indonesia.',
+  title: 'Jelajah UMKM & Video Kreator - Creatorin',
+  description: 'Temukan profil UMKM terdaftar dan video portofolio kreator di Creatorin.',
 };
 
 export default function ExploreRoute() {

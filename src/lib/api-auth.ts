@@ -63,7 +63,7 @@ export async function getAuthenticatedUser(req: NextRequest): Promise<AuthUser |
         if (profile) {
           return {
             id: profile.id,
-            email: `${profile.fullName.toLowerCase().replace(/\s+/g, "")}@creatorin.id`,
+            email: profile.email || `${profile.fullName.toLowerCase().replace(/\s+/g, "")}@creatorin.id`,
             role: profile.role,
             fullName: profile.fullName,
           };

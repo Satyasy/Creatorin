@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getAuthenticatedUser } from "@/lib/api-auth";
 import { getDb } from "@/lib/db";
-import { collaborationRooms, invoices, creatorWallets, walletTransactions, submissions } from "@/lib/db/schema";
+import { collaborationRooms, invoices, creatorWallets, walletTransactions, submissions, creatorProfiles, notifications, profiles } from "@/lib/db/schema";
+import { sendCriticalEmail } from '@/lib/email';
 import { eq, sql } from "drizzle-orm";
 
 export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
@@ -20,10 +21,13 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     if (room.status === "completed") {
       return NextResponse.json({ error: "Proyek sudah selesai" }, { status: 400 });
     }
+    if (user.id !== room.businessId) return NextResponse.json({ error: "Hanya UMKM pemilik proyek yang dapat menyetujui hasil." }, { status: 403 });
 
     // 1. Get invoice amount
     const [invoice] = await db.select().from(invoices).where(eq(invoices.id, room.invoiceId)).limit(1);
-    const payoutAmount = invoice ? invoice.totalAmount : 0;
+    const grossAmount = invoice ? invoice.totalAmount : 0;
+    const platformFee = Math.round(grossAmount * 0.075);
+    const payoutAmount = grossAmount - platformFee;
 
     // 2. Mark room completed
     await db
@@ -68,9 +72,22 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
       }
     }
 
+    const [creator] = await db.select().from(creatorProfiles).where(eq(creatorProfiles.profileId, room.creatorId)).limit(1);
+    if (creator) {
+      const completed = creator.completedProjectsCount + 1;
+      const ratingScore = Math.round(Number(creator.rating) * 16);
+      const careerScore = Math.min(100, ratingScore + Math.min(20, completed));
+      await db.update(creatorProfiles).set({ completedProjectsCount: completed, careerScore }).where(eq(creatorProfiles.profileId, room.creatorId));
+    }
+
+    await db.insert(notifications).values({ userId: room.creatorId, type: 'approval', title: 'Hasil disetujui', body: `${Math.floor(payoutAmount / 1000)} koin telah masuk ke dompet Anda.`, linkUrl: '/wallet' });
+    const [creatorContact] = await db.select({ email: profiles.email }).from(profiles).where(eq(profiles.id, room.creatorId)).limit(1);
+    await sendCriticalEmail(creatorContact?.email, 'Hasil proyek disetujui', `${Math.floor(payoutAmount / 1000)} koin telah masuk ke dompet Creatorin Anda setelah fee platform.`);
+
     return NextResponse.json({
       success: true,
-      message: "Proyek berhasil disetujui. Dana sebesar " + payoutAmount + " telah masuk ke dompet kreator.",
+      message: `Proyek disetujui. ${Math.floor(payoutAmount / 1000)} koin masuk ke dompet creator setelah fee platform 7,5%.`,
+      settlement: { grossAmount, platformFee, payoutAmount },
     });
   } catch (err: any) {
     return NextResponse.json({ error: err.message }, { status: 500 });

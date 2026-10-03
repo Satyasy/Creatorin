@@ -32,7 +32,7 @@ Creatorin memfasilitasi pembuatan brief proyek, kolaborasi produksi konten (vide
 1. Beranda (/): Menampilkan feed tren, kreator unggulan, dan ringkasan platform.
 2. Jelajah Proyek (/explore/projects): Menjelajahi portofolio konten kreatif, video UGC, TikTok/Reels feed, dan desain dari para kreator.
 3. Katalog Layanan (/explore/services): Melihat paket jasa kreatif yang ditawarkan kreator lengkap dengan estimasi harga dan waktu pengerjaan.
-4. Collaboration Room (/collaboration): Ruang kerja resmi antara UMKM dan Kreator untuk meninjau hasil karya, mengirim revisi, dan menyetujui approval akhir.
+4. Contracts (/contracts): Daftar brief yang dilamar kreator, termasuk status accepted atau menunggu review.
 5. Brief Proyek (/briefs): Tempat UMKM memasang brief proyek baru dan melihat daftar brief yang sedang aktif.
 6. Chat & Obrolan (/chat): Ruang percakapan pesan langsung antara UMKM, Kreator, dan mitra sekolah.
 7. Dashboard Sekolah (/dashboard/school): Khusus institusi pendidikan SMK/Vokasi untuk mengelola approval pendaftaran siswa, penilaian rubrik kompetensi, dan profil sekolah.
@@ -65,7 +65,7 @@ Creatorin memfasilitasi pembuatan brief proyek, kolaborasi produksi konten (vide
 3. Pengajuan Revisi: UMKM dapat menulis catatan feedback revisi spesifik. Kreator akan mendapat notifikasi untuk mengunggah revisi terbaru.
 4. Approval Akhir: Begitu hasil karya memuaskan, UMKM menekan tombol 'Setujui Proyek' (Approve).
 5. Pasca-Approval: Dana otomatis cair ke kreator, proyek resmi tercatat di riwayat selesai, dan UMKM dapat memberikan rating & ulasan bintang.`,
-    relatedRoute: '/collaboration',
+    relatedRoute: '/contracts',
   },
   {
     id: 'kb-umkm-guide',
@@ -77,7 +77,7 @@ Creatorin memfasilitasi pembuatan brief proyek, kolaborasi produksi konten (vide
 2. Menerima Pelamar: Kreator yang tertarik akan mengajukan proposal dan portofolio mereka.
 3. Memilih Kreator: Tinjau profil, Career Score, dan ulasan kreator, lalu klik 'Terima Pelamar'.
 4. Pembayaran Escrow: Lakukan pembayaran invoice aman.
-5. Pantau di Collaboration Room: Masuk ke /collaboration untuk berkomunikasi dan menerima hasil karya.`,
+5. Pantau status di Contracts: Masuk ke /contracts untuk melihat lamaran brief yang diterima atau masih menunggu review.`,
     relatedRoute: '/briefs',
   },
   {
@@ -89,7 +89,7 @@ Creatorin memfasilitasi pembuatan brief proyek, kolaborasi produksi konten (vide
 1. Lengkapi Profil: Masuk ke /profile dan tambahkan link media sosial, keahlian, tarif mulai, dan karya terbaik.
 2. Jelajahi Brief Proyek: Buka /briefs untuk melihat tawaran kerja dari UMKM aktif.
 3. Kirim Lamaran (Pitch): Sertakan ide konten dan harga yang Anda tawarkan ke UMKM.
-4. Mulai Pengerjaan: Setelah UMKM membayar escrow, ruangan kolaborasi /collaboration akan terbuka. Unggah draf karya Anda ke tab Deliverables.
+4. Mulai Pengerjaan: Setelah lamaran diterima, lanjutkan diskusi dan pembayaran melalui chat. Pantau status lamaran di /contracts.
 5. Terima Pembayaran: Setelah disetujui UMKM, dana langsung masuk ke saldo akun Anda.`,
     relatedRoute: '/profile',
   },

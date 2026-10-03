@@ -92,7 +92,7 @@ export const CreatorProfilePage: React.FC<CreatorProfilePageProps> = ({
   const router = useRouter();
   const { user: authUser } = useAuth();
   const currentUser = propUser !== undefined ? propUser : authUser;
-  const isEffectiveOwner = isOwnProfile || currentUser?.role === 'creator';
+  const isEffectiveOwner = Boolean(isOwnProfile);
 
   const navigateTo = (page: ActivePage, path: string) => {
     if (onNavigate) onNavigate(page);
@@ -1820,7 +1820,7 @@ export const CreatorProfilePage: React.FC<CreatorProfilePageProps> = ({
                 'explore-projects': '/explore/projects',
                 'explore-services': '/explore/services',
                 'chat': '/chat',
-                'collaboration': '/collaboration',
+                'collaboration': '/contracts',
                 'notifications': '/notifications',
                 'briefs': '/briefs',
                 'signin': '/sign-in',
@@ -1906,7 +1906,7 @@ export const CreatorProfilePage: React.FC<CreatorProfilePageProps> = ({
                 'explore-projects': '/explore/projects',
                 'explore-services': '/explore/services',
                 'chat': '/chat',
-                'collaboration': '/collaboration',
+                'collaboration': '/contracts',
                 'notifications': '/notifications',
                 'briefs': '/briefs',
                 'signin': '/sign-in',

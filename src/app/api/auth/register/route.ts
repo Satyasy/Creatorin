@@ -36,6 +36,7 @@ export async function POST(req: NextRequest) {
         id: userId,
         role: role as any,
         fullName,
+        email,
       }).onConflictDoNothing();
 
       if (role === "creator") {

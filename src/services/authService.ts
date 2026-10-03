@@ -1,4 +1,5 @@
-import { AuthState, UserRole } from '@/types';
+import { UserRole } from '@/types';
+import { createClient } from '@/lib/supabase/client';
 
 export interface UserSession {
   id: string;
@@ -13,6 +14,7 @@ export interface UserSession {
 
 export function mapRoleToFrontend(dbRole: string): UserRole {
   if (dbRole === 'business') return 'umkm';
+  if (dbRole === 'school') return 'school';
   return 'creator';
 }
 
@@ -22,6 +24,17 @@ export function mapRoleToBackend(feRole: UserRole): 'creator' | 'business' {
 }
 
 export const authService = {
+  async signInWithGoogle(role: Exclude<UserRole, 'school'> = 'umkm'): Promise<{ success: boolean; error?: string }> {
+    const supabase = createClient();
+    localStorage.setItem('creatorin_oauth_role', mapRoleToBackend(role));
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: {
+        redirectTo: `${window.location.origin}/auth/callback`,
+      },
+    });
+    return error ? { success: false, error: error.message } : { success: true };
+  },
   async getCurrentUser(): Promise<UserSession | null> {
     try {
       const res = await fetch('/api/auth/me', {

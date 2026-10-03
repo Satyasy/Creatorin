@@ -27,23 +27,7 @@ const AuthContext = createContext<AuthContextType>({
 });
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [authState, setAuthState] = useState<AuthState>(() => {
-    if (typeof window !== 'undefined') {
-      try {
-        const saved = localStorage.getItem(AUTH_STORAGE_KEY);
-        if (saved) {
-          return {
-            isAuthenticated: true,
-            user: JSON.parse(saved),
-          };
-        }
-      } catch {}
-    }
-    return {
-      isAuthenticated: false,
-      user: null,
-    };
-  });
+  const [authState, setAuthState] = useState<AuthState>({ isAuthenticated: false, user: null });
 
   const syncServerSession = useCallback(async () => {
     try {
@@ -81,7 +65,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, []);
 
   useEffect(() => {
-    syncServerSession();
+    const sync = async () => { await syncServerSession(); };
+    void sync();
   }, [syncServerSession]);
 
   const login = (user: NonNullable<AuthState['user']>) => {

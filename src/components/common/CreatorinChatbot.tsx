@@ -8,7 +8,6 @@ import {
   Send,
   Sparkles,
   ExternalLink,
-  ChevronDown,
   RotateCcw,
   CheckCircle2,
   Copy,
@@ -49,15 +48,20 @@ export function CreatorinChatbot() {
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const messageIdRef = useRef(0);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
 
+  const nextMessageId = (prefix: string) => {
+    messageIdRef.current += 1;
+    return `${prefix}-${messageIdRef.current}`;
+  };
+
   useEffect(() => {
     if (isOpen) {
       scrollToBottom();
-      setHasUnreadNotice(false);
       setTimeout(() => inputRef.current?.focus(), 150);
     }
   }, [isOpen, messages]);
@@ -67,7 +71,7 @@ export function CreatorinChatbot() {
     if (!query || isLoading) return;
 
     const userMsg: ChatMessage = {
-      id: `user-${Date.now()}`,
+      id: nextMessageId('user'),
       role: 'user',
       content: query,
       timestamp: new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }),
@@ -88,7 +92,7 @@ export function CreatorinChatbot() {
         const json = await res.json();
         if (json.success && json.answer) {
           const botMsg: ChatMessage = {
-            id: `bot-${Date.now()}`,
+            id: nextMessageId('bot'),
             role: 'assistant',
             content: json.answer,
             sources: json.sources,
@@ -102,10 +106,10 @@ export function CreatorinChatbot() {
       throw new Error('Gagal mendapatkan respon');
     } catch {
       const fallbackMsg: ChatMessage = {
-        id: `bot-err-${Date.now()}`,
+        id: nextMessageId('bot-err'),
         role: 'assistant',
         content:
-          'Creatorin menyediakan fitur Collaboration Room (/collaboration) untuk pengerjaan proyek bergaransi Escrow, halaman Brief (/briefs) untuk UMKM, dan Dashboard Sekolah (/dashboard/school) untuk asesmen kompetensi siswa. Anda dapat mengakses seluruh menu ini melalui Navbar atas.',
+          'Creatorin menyediakan halaman Contracts (/contracts) untuk memantau status lamaran brief, halaman Brief (/briefs) untuk UMKM, dan Dashboard Sekolah (/dashboard/school) untuk asesmen kompetensi siswa. Anda dapat mengakses menu utama lewat navigasi aplikasi.',
         timestamp: new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }),
       };
       setMessages(prev => [...prev, fallbackMsg]);
@@ -131,7 +135,10 @@ export function CreatorinChatbot() {
       {/* 1. Floating Action Button (Toggle) */}
       {!isOpen && (
         <button
-          onClick={() => setIsOpen(true)}
+          onClick={() => {
+            setIsOpen(true);
+            setHasUnreadNotice(false);
+          }}
           className="relative group w-14 h-14 rounded-full bg-[#0B1F3A] hover:bg-[#155DFC] text-white flex items-center justify-center shadow-xl hover:shadow-2xl transition-all duration-300 cursor-pointer focus:outline-hidden"
           title="Tanya Creatorin AI Assistant"
           aria-label="AI Guide - Buka Chatbot Creatorin"

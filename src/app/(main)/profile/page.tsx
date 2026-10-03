@@ -1,7 +1,9 @@
 'use client';
 
 import { CreatorProfilePage } from '@/views/CreatorProfilePage';
+import { UmkmProfilePage } from '@/views/UmkmProfilePage';
 import { MOCK_CREATORS } from '@/data/mockCreators';
+import { MOCK_PRIMARY_UMKM } from '@/data/mockUmkm';
 import { useAuth } from '@/providers/AuthProvider';
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
@@ -20,6 +22,29 @@ export default function MyProfilePage() {
 
   if (!isAuthenticated || !user) {
     return null;
+  }
+
+  if (user.role === 'school') {
+    router.replace('/dashboard/school');
+    return null;
+  }
+
+  if (user.role === 'umkm') {
+    const umkmProfile = {
+      ...MOCK_PRIMARY_UMKM,
+      id: `user-${user.email.replace(/[^a-z0-9]/gi, '-')}`,
+      name: user.name,
+      brandName: user.name,
+      logo: user.avatar || MOCK_PRIMARY_UMKM.logo,
+      bio: user.bio || MOCK_PRIMARY_UMKM.bio,
+      location: user.location || MOCK_PRIMARY_UMKM.location,
+    };
+    return (
+      <UmkmProfilePage
+        initialProfile={umkmProfile}
+        currentUser={user}
+      />
+    );
   }
 
   // Build a Creator object from the logged-in user's auth state.
