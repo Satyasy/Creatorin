@@ -242,6 +242,189 @@ let fallbackStudentRubrics: Record<string, RubricCriterion[]> = {
   ]
 };
 
+export interface SchoolStudentProjectItem {
+  id: string;
+  studentId: string;
+  title: string;
+  studentName: string;
+  studentAvatar?: string;
+  category: string;
+  thumbnail: string;
+  createdDate: string;
+  viewsCount?: string;
+  isFeaturedSchool?: boolean;
+}
+
+export interface SchoolStudentItem {
+  id: string;
+  name: string;
+  email: string;
+  avatarUrl?: string;
+  role: string;
+  major: string;
+  classGrade: string;
+  graduationYear: string;
+  projectCount: number;
+  careerScore: number;
+  isFeatured?: boolean;
+}
+
+let fallbackAllStudentProjects: SchoolStudentProjectItem[] = [
+  {
+    id: 'sp-1',
+    studentId: 'std-1',
+    title: 'UI Design UMKM Fashion & Coffee Shop',
+    studentName: 'Andi Pratama',
+    studentAvatar: 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=200&auto=format&fit=crop&q=80',
+    category: 'UI/UX Design',
+    thumbnail: 'https://images.unsplash.com/photo-1507238691740-187a5b1d37b8?w=800&auto=format&fit=crop&q=80',
+    createdDate: '12 Sep 2026',
+    viewsCount: '1.4K',
+    isFeaturedSchool: true,
+  },
+  {
+    id: 'sp-2',
+    studentId: 'std-2',
+    title: 'Smart Farming IoT Sensor Dashboard',
+    studentName: 'Nabila Putri',
+    studentAvatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=200&auto=format&fit=crop&q=80',
+    category: 'Web App',
+    thumbnail: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&auto=format&fit=crop&q=80',
+    createdDate: '20 Sep 2026',
+    viewsCount: '2.8K',
+    isFeaturedSchool: true,
+  },
+  {
+    id: 'sp-3',
+    studentId: 'std-4',
+    title: 'Brand Identity & Kemasan UMKM Rempah',
+    studentName: 'Rizky Ramadhan',
+    studentAvatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&auto=format&fit=crop&q=80',
+    category: 'Branding',
+    thumbnail: 'https://images.unsplash.com/photo-1626785774573-4b799315345d?w=800&auto=format&fit=crop&q=80',
+    createdDate: '18 Agu 2026',
+    viewsCount: '890',
+    isFeaturedSchool: true,
+  },
+  {
+    id: 'sp-4',
+    studentId: 'std-6',
+    title: 'Reels Review Skincare Lokal Natural',
+    studentName: 'Siti Nurhaliza',
+    studentAvatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&auto=format&fit=crop&q=80',
+    category: 'Video UGC',
+    thumbnail: 'https://images.unsplash.com/photo-1556228720-195a672e8a03?w=800&auto=format&fit=crop&q=80',
+    createdDate: '24 Sep 2026',
+    viewsCount: '5.2K',
+    isFeaturedSchool: false,
+  },
+  {
+    id: 'sp-5',
+    studentId: 'std-1',
+    title: 'E-Commerce Mobile App Wireframe & Design System',
+    studentName: 'Andi Pratama',
+    studentAvatar: 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=200&auto=format&fit=crop&q=80',
+    category: 'UI/UX Design',
+    thumbnail: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&auto=format&fit=crop&q=80',
+    createdDate: '26 Sep 2026',
+    viewsCount: '3.1K',
+    isFeaturedSchool: false,
+  },
+  {
+    id: 'sp-6',
+    studentId: 'std-2',
+    title: 'Ilustrasi Maskot & Katalog Produk Madu Hutan',
+    studentName: 'Nabila Putri',
+    studentAvatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=200&auto=format&fit=crop&q=80',
+    category: 'Branding',
+    thumbnail: 'https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?w=800&auto=format&fit=crop&q=80',
+    createdDate: '28 Sep 2026',
+    viewsCount: '1.9K',
+    isFeaturedSchool: false,
+  }
+];
+
+let fallbackAllSchoolStudents: SchoolStudentItem[] = [
+  {
+    id: 'std-1',
+    name: 'Andi Pratama',
+    email: 'andi.p@student.smk.id',
+    avatarUrl: 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=200&auto=format&fit=crop&q=80',
+    role: 'UI/UX Designer',
+    major: 'RPL',
+    classGrade: 'XII RPL 1',
+    graduationYear: '2026',
+    projectCount: 12,
+    careerScore: 94,
+    isFeatured: true,
+  },
+  {
+    id: 'std-2',
+    name: 'Nabila Putri',
+    email: 'nabila.putri@student.smk.id',
+    avatarUrl: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=200&auto=format&fit=crop&q=80',
+    role: 'Graphic Designer',
+    major: 'DKV',
+    classGrade: 'XI RPL 2',
+    graduationYear: '2027',
+    projectCount: 8,
+    careerScore: 91,
+    isFeatured: true,
+  },
+  {
+    id: 'std-4',
+    name: 'Rizky Ramadhan',
+    email: 'rizky.r@student.smk.id',
+    avatarUrl: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&auto=format&fit=crop&q=80',
+    role: 'Cloud & Network Specialist',
+    major: 'TKJ',
+    classGrade: 'XII TKJ 1',
+    graduationYear: '2026',
+    projectCount: 14,
+    careerScore: 95,
+    isFeatured: true,
+  },
+  {
+    id: 'std-6',
+    name: 'Siti Nurhaliza',
+    email: 'siti.nur@student.smk.id',
+    avatarUrl: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&auto=format&fit=crop&q=80',
+    role: '3D Animator & Video Creator',
+    major: 'Animasi',
+    classGrade: 'XII Animasi',
+    graduationYear: '2026',
+    projectCount: 11,
+    careerScore: 92,
+    isFeatured: true,
+  },
+  {
+    id: 'std-5',
+    name: 'Farhan Maulana',
+    email: 'farhan.m@student.smk.id',
+    avatarUrl: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=200&auto=format&fit=crop&q=80',
+    role: 'Illustrator & 2D Artist',
+    major: 'DKV',
+    classGrade: 'XII DKV 2',
+    graduationYear: '2026',
+    projectCount: 6,
+    careerScore: 88,
+    isFeatured: false,
+  },
+  {
+    id: 'std-2-budi',
+    name: 'Budi Santoso',
+    email: 'budi.s@student.smk.id',
+    avatarUrl: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=200&auto=format&fit=crop&q=80',
+    role: 'Visual Designer',
+    major: 'DKV',
+    classGrade: 'XII DKV 1',
+    graduationYear: '2026',
+    projectCount: 8,
+    careerScore: 82,
+    isFeatured: false,
+  }
+];
+
 // ==========================================
 // School Service Methods (Client & Universal Safe)
 // ==========================================
@@ -346,6 +529,22 @@ export const schoolService = {
             status: 'not_started',
             finalScore: null,
             updatedAt: new Date().toISOString().split('T')[0],
+          });
+        }
+        const existsInSchool = fallbackAllSchoolStudents.some(s => s.id === item.studentId);
+        if (!existsInSchool) {
+          fallbackAllSchoolStudents.unshift({
+            id: item.studentId,
+            name: item.name,
+            email: item.email,
+            avatarUrl: item.avatarUrl,
+            role: `${item.major} Student Creator`,
+            major: item.major,
+            classGrade: item.classGrade,
+            graduationYear: item.graduationYear,
+            projectCount: 0,
+            careerScore: 88,
+            isFeatured: false,
           });
         }
       }
@@ -571,123 +770,49 @@ export const schoolService = {
     }
 
     const school = { ...fallbackSchool, slug };
+    const featuredProjects = fallbackAllStudentProjects
+      .filter(p => p.isFeaturedSchool)
+      .map(p => ({
+        id: p.id,
+        title: p.title,
+        studentName: p.studentName,
+        studentAvatar: p.studentAvatar,
+        category: p.category,
+        thumbnail: p.thumbnail,
+        createdDate: p.createdDate,
+      }));
+
+    const featuredStudents = fallbackAllSchoolStudents.filter(s => s.isFeatured);
+    const displayStudents = featuredStudents.length > 0 ? featuredStudents : fallbackAllSchoolStudents;
+
     return {
       school,
       stats: {
-        totalStudents: 42,
+        totalStudents: fallbackAllSchoolStudents.length + 36,
         totalProjects: 126,
         totalCollaborations: 18,
         totalAchievements: fallbackAchievements.length,
       },
-      featuredProjects: [
-        {
-          id: 'fp-1',
-          title: 'UI Design UMKM Fashion & Coffee Shop',
-          studentName: 'Andi Pratama',
-          studentAvatar: 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=200&auto=format&fit=crop&q=80',
-          category: 'UI/UX Design',
-          thumbnail: 'https://images.unsplash.com/photo-1507238691740-187a5b1d37b8?w=800&auto=format&fit=crop&q=80',
-          createdDate: 'Sep 2026',
-        },
-        {
-          id: 'fp-2',
-          title: 'Smart Farming IoT Sensor Dashboard',
-          studentName: 'Nabila Putri',
-          studentAvatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=200&auto=format&fit=crop&q=80',
-          category: 'Web App',
-          thumbnail: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&auto=format&fit=crop&q=80',
-          createdDate: 'Sep 2026',
-        },
-        {
-          id: 'fp-3',
-          title: 'Brand Identity & Kemasan UMKM Rempah',
-          studentName: 'Rizky Ramadhan',
-          studentAvatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&auto=format&fit=crop&q=80',
-          category: 'Branding',
-          thumbnail: 'https://images.unsplash.com/photo-1626785774573-4b799315345d?w=800&auto=format&fit=crop&q=80',
-          createdDate: 'Agu 2026',
-        }
-      ],
-      studentProjects: [
-        {
-          id: 'sp-1',
-          title: 'UI Design UMKM Fashion & Coffee Shop',
-          studentName: 'Andi Pratama',
-          studentAvatar: 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=200&auto=format&fit=crop&q=80',
-          category: 'UI/UX Design',
-          thumbnail: 'https://images.unsplash.com/photo-1507238691740-187a5b1d37b8?w=800&auto=format&fit=crop&q=80',
-          createdDate: '12 Sep 2026',
-          viewsCount: '1.4K',
-        },
-        {
-          id: 'sp-2',
-          title: 'Smart Farming IoT Sensor Dashboard',
-          studentName: 'Nabila Putri',
-          studentAvatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=200&auto=format&fit=crop&q=80',
-          category: 'Web App',
-          thumbnail: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&auto=format&fit=crop&q=80',
-          createdDate: '20 Sep 2026',
-          viewsCount: '2.8K',
-        },
-        {
-          id: 'sp-3',
-          title: 'Brand Identity & Kemasan UMKM Rempah',
-          studentName: 'Rizky Ramadhan',
-          studentAvatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&auto=format&fit=crop&q=80',
-          category: 'Branding',
-          thumbnail: 'https://images.unsplash.com/photo-1626785774573-4b799315345d?w=800&auto=format&fit=crop&q=80',
-          createdDate: '18 Agu 2026',
-          viewsCount: '890',
-        },
-        {
-          id: 'sp-4',
-          title: 'Reels Review Skincare Lokal Natural',
-          studentName: 'Siti Nurhaliza',
-          studentAvatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&auto=format&fit=crop&q=80',
-          category: 'Video UGC',
-          thumbnail: 'https://images.unsplash.com/photo-1556228720-195a672e8a03?w=800&auto=format&fit=crop&q=80',
-          createdDate: '24 Sep 2026',
-          viewsCount: '5.2K',
-        },
-      ],
-      students: [
-        {
-          id: 'std-1',
-          name: 'Andi Pratama',
-          avatarUrl: 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=200&auto=format&fit=crop&q=80',
-          role: 'UI/UX Designer',
-          major: 'RPL',
-          projectCount: 12,
-          careerScore: 94,
-        },
-        {
-          id: 'std-2',
-          name: 'Nabila Putri',
-          avatarUrl: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=200&auto=format&fit=crop&q=80',
-          role: 'Graphic Designer',
-          major: 'DKV',
-          projectCount: 8,
-          careerScore: 91,
-        },
-        {
-          id: 'std-4',
-          name: 'Rizky Ramadhan',
-          avatarUrl: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&auto=format&fit=crop&q=80',
-          role: 'Cloud & Network Specialist',
-          major: 'TKJ',
-          projectCount: 14,
-          careerScore: 95,
-        },
-        {
-          id: 'std-6',
-          name: 'Siti Nurhaliza',
-          avatarUrl: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&auto=format&fit=crop&q=80',
-          role: '3D Animator & Video Creator',
-          major: 'Animasi',
-          projectCount: 11,
-          careerScore: 92,
-        }
-      ],
+      featuredProjects,
+      studentProjects: fallbackAllStudentProjects.map(p => ({
+        id: p.id,
+        title: p.title,
+        studentName: p.studentName,
+        studentAvatar: p.studentAvatar,
+        category: p.category,
+        thumbnail: p.thumbnail,
+        createdDate: p.createdDate,
+        viewsCount: p.viewsCount,
+      })),
+      students: displayStudents.map(s => ({
+        id: s.id,
+        name: s.name,
+        avatarUrl: s.avatarUrl,
+        role: s.role,
+        major: s.major,
+        projectCount: s.projectCount,
+        careerScore: s.careerScore,
+      })),
       achievements: fallbackAchievements,
       sectionOrder: fallbackSchool.sectionOrder || ['featured_projects', 'students', 'achievements', 'about'],
     };
@@ -775,5 +900,41 @@ export const schoolService = {
     const initialLen = fallbackAchievements.length;
     fallbackAchievements = fallbackAchievements.filter(a => a.id !== achievementId);
     return fallbackAchievements.length < initialLen;
+  },
+
+  // 11. Toggle Featured Project (is_featured_school)
+  async toggleFeaturedProject(projectId: string, isFeatured: boolean): Promise<boolean> {
+    const proj = fallbackAllStudentProjects.find(p => p.id === projectId);
+    if (proj) {
+      proj.isFeaturedSchool = isFeatured;
+      return true;
+    }
+    return false;
+  },
+
+  // 12. Toggle Featured Student
+  async toggleFeaturedStudent(studentId: string, isFeatured: boolean): Promise<boolean> {
+    const std = fallbackAllSchoolStudents.find(s => s.id === studentId);
+    if (std) {
+      std.isFeatured = isFeatured;
+      return true;
+    }
+    return false;
+  },
+
+  // 13. Update Section Order for Public School Profile
+  async updateSectionOrder(sectionOrder: string[]): Promise<boolean> {
+    fallbackSchool.sectionOrder = sectionOrder;
+    return true;
+  },
+
+  // 14. Get All School Student Projects
+  async getAllStudentProjects(): Promise<SchoolStudentProjectItem[]> {
+    return fallbackAllStudentProjects;
+  },
+
+  // 15. Get All Approved School Students
+  async getSchoolStudents(): Promise<SchoolStudentItem[]> {
+    return fallbackAllSchoolStudents;
   }
 };

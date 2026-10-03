@@ -26,21 +26,36 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
   const isChat = pathname?.startsWith('/chat');
   const isDashboard = pathname?.startsWith('/dashboard');
   const isStandaloneExplore = pathname === '/explore';
+  const isPublicSchoolProfile = pathname?.startsWith('/school/');
   const isCreatorShell = user?.role === 'creator';
+  const isSchoolShell = user?.role === 'school' && !isPublicSchoolProfile;
+
   // Hide footer on full workspace views to maintain SaaS cleanliness
-  const hideFooter = isChat || pathname?.startsWith('/contracts') || isDashboard;
+  const hideFooter = isChat || pathname?.startsWith('/contracts') || isDashboard || isSchoolShell;
 
   return (
-    <div className={`min-h-screen flex flex-col overflow-x-clip bg-[var(--surface-low)] text-[var(--ink)] font-sans selection:bg-primary selection:text-white ${isChat ? 'h-screen max-h-screen overflow-hidden' : ''} ${isDashboard ? 'md:h-screen md:max-h-screen md:overflow-hidden' : ''}`}>
-      {!isCreatorShell && <Navbar />}
-      <div className={`flex flex-1 flex-col lg:flex-row ${isChat || isDashboard ? 'min-h-0 overflow-hidden' : ''}`}>
+    <div
+      className={`min-h-screen flex flex-col overflow-x-clip bg-[var(--surface-low)] text-[var(--ink)] font-sans selection:bg-primary selection:text-white ${
+        isChat ? 'h-screen max-h-screen overflow-hidden' : ''
+      } ${isDashboard || isSchoolShell ? 'md:h-screen md:max-h-screen md:overflow-hidden' : ''}`}
+    >
+      {!isCreatorShell && !isSchoolShell && <Navbar />}
+      <div
+        className={`flex flex-1 flex-col lg:flex-row ${
+          isChat || isDashboard || isSchoolShell ? 'min-h-0 overflow-hidden' : ''
+        }`}
+      >
         {isCreatorShell && <CreatorSidebar />}
-        <main className={`min-w-0 flex-1 w-full flex flex-col ${isChat ? 'min-h-0 overflow-hidden' : ''} ${isDashboard ? 'md:min-h-0 md:overflow-hidden' : ''}`}>
+        <main
+          className={`min-w-0 flex-1 w-full flex flex-col ${
+            isChat ? 'min-h-0 overflow-hidden' : ''
+          } ${isDashboard || isSchoolShell ? 'md:min-h-0 md:overflow-hidden' : ''}`}
+        >
           {children}
         </main>
       </div>
-      {!hideFooter && !isCreatorShell && !isStandaloneExplore && <Footer />}
-      {!isCreatorShell && !isStandaloneExplore && <CreatorinChatbot />}
+      {!hideFooter && !isCreatorShell && !isSchoolShell && !isStandaloneExplore && <Footer />}
+      {!isCreatorShell && !isSchoolShell && !isStandaloneExplore && <CreatorinChatbot />}
       <RoleSwitcher />
     </div>
   );

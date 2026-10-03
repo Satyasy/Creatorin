@@ -92,6 +92,203 @@ export function SchoolPublicProfilePage({ slug = 'smk-kreatif-indonesia' }: Scho
 
   const displayedStudents = showAllStudents ? students : students.slice(0, 4);
 
+
+  // 16. Featured Projects (Pilihan Sekolah)
+  const renderFeaturedProjects = () => {
+    if (featuredProjects.length === 0) return null;
+    return (
+      <section key="featured_projects" className="space-y-4">
+        <div className="flex items-center justify-between">
+          <div>
+            <div className="inline-flex items-center gap-1 text-[11px] font-bold text-amber-600 uppercase tracking-wider mb-1">
+              <Sparkles className="w-3.5 h-3.5" />
+              <span>Kurasi Portofolio</span>
+            </div>
+            <h2 className="text-lg sm:text-xl font-bold text-[#0D0C22]">Featured Projects</h2>
+          </div>
+          <span className="text-xs text-neutral-400 font-medium">Pilihan Sekolah</span>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {featuredProjects.map(proj => (
+            <div
+              key={proj.id}
+              className="bg-white rounded-[12px] border border-black/10 overflow-hidden shadow-xs hover:border-[#155DFC] hover:shadow-md transition-all group"
+            >
+              <div className="aspect-video w-full overflow-hidden bg-neutral-100 relative">
+                <img
+                  src={proj.thumbnail}
+                  alt={proj.title}
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                />
+                <div className="absolute top-2.5 left-2.5 bg-black/60 backdrop-blur-xs text-white text-[10px] font-bold px-2 py-0.5 rounded-full">
+                  {proj.category}
+                </div>
+              </div>
+              <div className="p-4 space-y-3">
+                <h3 className="text-sm font-bold text-[#0D0C22] group-hover:text-[#155DFC] transition-colors line-clamp-1">
+                  {proj.title}
+                </h3>
+                <div className="flex items-center justify-between pt-2 border-t border-black/5 text-xs text-neutral-500">
+                  <div className="flex items-center gap-2">
+                    {proj.studentAvatar && (
+                      <img
+                        src={proj.studentAvatar}
+                        alt={proj.studentName}
+                        className="w-5 h-5 rounded-full object-cover border border-black/10"
+                      />
+                    )}
+                    <span className="font-semibold text-[#0D0C22]">{proj.studentName}</span>
+                  </div>
+                  <span>{proj.createdDate}</span>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+    );
+  };
+
+  // 13. Students Section
+  const renderStudents = () => (
+    <section key="students" className="space-y-4">
+      <div className="flex items-center justify-between">
+        <div>
+          <h2 className="text-lg sm:text-xl font-bold text-[#0D0C22]">Siswa & Talenta Kreator</h2>
+          <p className="text-xs text-neutral-500 mt-0.5">
+            Daftar siswa vokasi SMK aktif terverifikasi dengan portofolio terakreditasi sekolah.
+          </p>
+        </div>
+        <button
+          onClick={() => setShowAllStudents(!showAllStudents)}
+          className="inline-flex items-center gap-1 text-xs font-bold text-[#155DFC] hover:underline cursor-pointer"
+        >
+          <span>{showAllStudents ? 'Sembunyikan Sebagian' : 'View All Students'}</span>
+          <ChevronRight className={`w-3.5 h-3.5 transition-transform ${showAllStudents ? 'rotate-90' : ''}`} />
+        </button>
+      </div>
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        {displayedStudents.map(std => (
+          <div
+            key={std.id}
+            className="bg-white rounded-[12px] p-5 border border-black/10 shadow-xs hover:border-[#155DFC]/40 transition-all flex flex-col justify-between"
+          >
+            <div className="space-y-3">
+              <div className="flex items-center gap-3">
+                <img
+                  src={std.avatarUrl}
+                  alt={std.name}
+                  className="w-12 h-12 rounded-full object-cover border border-black/10 shrink-0"
+                />
+                <div className="min-w-0">
+                  <h4 className="text-xs font-bold text-[#0D0C22] truncate">{std.name}</h4>
+                  <p className="text-[11px] text-neutral-500 truncate">{std.role}</p>
+                  <span className="inline-block text-[10px] font-bold text-[#155DFC] bg-blue-50 px-1.5 py-0.2 rounded-xs mt-0.5">
+                    {std.major}
+                  </span>
+                </div>
+              </div>
+
+              <div className="flex items-center justify-between pt-2 border-t border-black/5 text-xs text-neutral-500">
+                <span className="flex items-center gap-1 text-[11px]">
+                  <FolderGit2 className="w-3.5 h-3.5 text-neutral-400" />
+                  {std.projectCount} Projects
+                </span>
+                {std.careerScore && <CareerScoreBadge score={std.careerScore} size="sm" />}
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+
+  // 17. Achievements Section
+  const renderAchievements = () => {
+    if (achievements.length === 0) return null;
+    return (
+      <section key="achievements" className="space-y-4">
+        <div>
+          <h2 className="text-lg sm:text-xl font-bold text-[#0D0C22]">Prestasi & Penghargaan</h2>
+          <p className="text-xs text-neutral-500 mt-0.5">
+            Rekam jejak kompetisi dan karya inovatif yang diraih siswa dan sekolah.
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {achievements.map(ach => (
+            <div
+              key={ach.id}
+              className="bg-white rounded-[12px] border border-black/10 overflow-hidden shadow-xs p-5 space-y-3"
+            >
+              <div className="flex items-center justify-between">
+                <span className="text-[10px] font-bold text-[#155DFC] bg-blue-50 px-2 py-0.5 rounded-full">
+                  {ach.category}
+                </span>
+                <span className="text-xs font-bold text-neutral-400">{ach.year}</span>
+              </div>
+              <h3 className="text-sm font-bold text-[#0D0C22] leading-snug">{ach.title}</h3>
+              <p className="text-xs text-neutral-600 leading-relaxed">{ach.description}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+    );
+  };
+
+  // About Section
+  const renderAbout = () => (
+    <section key="about" className="bg-white rounded-[16px] border border-black/10 p-6 sm:p-8 shadow-xs grid grid-cols-1 md:grid-cols-3 gap-8">
+      <div className="md:col-span-2 space-y-4">
+        <h2 className="text-lg font-bold text-[#0D0C22]">Tentang {school.name}</h2>
+        <p className="text-xs sm:text-sm text-neutral-600 leading-relaxed">
+          {school.description ||
+            'SMK Kreatif Indonesia berfokus pada kurikulum vokasi berbasis proyek industri nyata. Siswa dibekali keterampilan praktis mulai dari UI/UX, software development, hingga multimedia branding.'}
+        </p>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-4 border-t border-black/10 text-xs">
+          <div>
+            <span className="font-bold text-[#0D0C22] block mb-1">Penanggung Jawab Kemitraan (Hubin)</span>
+            <p className="text-neutral-600">{school.picName || 'Drs. Hendro Wibowo, M.Kom'}</p>
+            <p className="text-neutral-500 text-[11px]">{school.picContact || '+62 812-9876-5432'}</p>
+          </div>
+          <div>
+            <span className="font-bold text-[#0D0C22] block mb-1">Lokasi Kampus Vokasi</span>
+            <p className="text-neutral-600">{school.address || 'Jl. Pemuda No. 45, Embong Kaliasin'}</p>
+            <p className="text-neutral-500 text-[11px]">{school.city}</p>
+          </div>
+        </div>
+      </div>
+
+      <div className="p-5 bg-[#F8FAFC] rounded-[12px] border border-black/10 space-y-4 flex flex-col justify-between">
+        <div>
+          <span className="text-xs font-bold text-[#0D0C22] block mb-1">Tertarik Merekrut atau Kolaborasi?</span>
+          <p className="text-xs text-neutral-500 leading-relaxed">
+            Kreatorin menghubungkan UMKM & Brand dengan siswa SMK untuk magang, proyek lepas, dan rekrutmen talenta muda.
+          </p>
+        </div>
+        <button
+          onClick={() => setIsModalOpen(true)}
+          className="w-full py-2.5 bg-[#155DFC] hover:bg-[#0E4CD1] text-white text-xs font-bold rounded-[8px] transition-colors flex items-center justify-center gap-2 cursor-pointer shadow-xs"
+        >
+          <Send className="w-3.5 h-3.5" />
+          <span>Hubungi Sekolah Sekarang</span>
+        </button>
+      </div>
+    </section>
+  );
+
+  const sectionMap: Record<string, () => React.ReactNode> = {
+    featured_projects: renderFeaturedProjects,
+    students: renderStudents,
+    achievements: renderAchievements,
+    about: renderAbout,
+  };
+
+  const dynamicOrder = school.sectionOrder || ['featured_projects', 'students', 'achievements', 'about'];
+
   return (
     <div className="min-h-screen bg-[#F8FAFC] pb-24">
       {/* 11. Hero School Profile */}
@@ -207,116 +404,14 @@ export function SchoolPublicProfilePage({ slug = 'smk-kreatif-indonesia' }: Scho
         </div>
       </section>
 
-      {/* Main Body */}
+      {/* Main Body with Dynamic Section Order */}
       <main className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 mt-10 space-y-12">
-        {/* 16. Featured Projects (Pilihan Sekolah) */}
-        {featuredProjects.length > 0 && (
-          <section className="space-y-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <div className="inline-flex items-center gap-1 text-[11px] font-bold text-amber-600 uppercase tracking-wider mb-1">
-                  <Sparkles className="w-3.5 h-3.5" />
-                  <span>Kurasi Portofolio</span>
-                </div>
-                <h2 className="text-lg sm:text-xl font-bold text-[#0D0C22]">Featured Projects</h2>
-              </div>
-              <span className="text-xs text-neutral-400 font-medium">Pilihan Sekolah</span>
-            </div>
+        {dynamicOrder.map(key => {
+          const renderFn = sectionMap[key];
+          return renderFn ? <React.Fragment key={key}>{renderFn()}</React.Fragment> : null;
+        })}
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {featuredProjects.map(proj => (
-                <div
-                  key={proj.id}
-                  className="bg-white rounded-[12px] border border-black/10 overflow-hidden shadow-xs hover:border-[#155DFC] hover:shadow-md transition-all group"
-                >
-                  <div className="aspect-video w-full overflow-hidden bg-neutral-100 relative">
-                    <img
-                      src={proj.thumbnail}
-                      alt={proj.title}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                    />
-                    <div className="absolute top-2.5 left-2.5 bg-black/60 backdrop-blur-xs text-white text-[10px] font-bold px-2 py-0.5 rounded-full">
-                      {proj.category}
-                    </div>
-                  </div>
-                  <div className="p-4 space-y-3">
-                    <h3 className="text-sm font-bold text-[#0D0C22] group-hover:text-[#155DFC] transition-colors line-clamp-1">
-                      {proj.title}
-                    </h3>
-                    <div className="flex items-center justify-between pt-2 border-t border-black/5 text-xs text-neutral-500">
-                      <div className="flex items-center gap-2">
-                        {proj.studentAvatar && (
-                          <img
-                            src={proj.studentAvatar}
-                            alt={proj.studentName}
-                            className="w-5 h-5 rounded-full object-cover border border-black/10"
-                          />
-                        )}
-                        <span className="font-semibold text-[#0D0C22]">{proj.studentName}</span>
-                      </div>
-                      <span>{proj.createdDate}</span>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </section>
-        )}
-
-        {/* 13. Students Section */}
-        <section className="space-y-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <h2 className="text-lg sm:text-xl font-bold text-[#0D0C22]">Siswa & Talenta Kreator</h2>
-              <p className="text-xs text-neutral-500 mt-0.5">
-                Daftar siswa vokasi SMK aktif terverifikasi dengan portofolio terakreditasi sekolah.
-              </p>
-            </div>
-            <button
-              onClick={() => setShowAllStudents(!showAllStudents)}
-              className="inline-flex items-center gap-1 text-xs font-bold text-[#155DFC] hover:underline cursor-pointer"
-            >
-              <span>{showAllStudents ? 'Sembunyikan Sebagian' : 'View All Students'}</span>
-              <ChevronRight className={`w-3.5 h-3.5 transition-transform ${showAllStudents ? 'rotate-90' : ''}`} />
-            </button>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            {displayedStudents.map(std => (
-              <div
-                key={std.id}
-                className="bg-white rounded-[12px] p-5 border border-black/10 shadow-xs hover:border-[#155DFC]/40 transition-all flex flex-col justify-between"
-              >
-                <div className="space-y-3">
-                  <div className="flex items-center gap-3">
-                    <img
-                      src={std.avatarUrl}
-                      alt={std.name}
-                      className="w-12 h-12 rounded-full object-cover border border-black/10 shrink-0"
-                    />
-                    <div className="min-w-0">
-                      <h4 className="text-xs font-bold text-[#0D0C22] truncate">{std.name}</h4>
-                      <p className="text-[11px] text-neutral-500 truncate">{std.role}</p>
-                      <span className="inline-block text-[10px] font-bold text-[#155DFC] bg-blue-50 px-1.5 py-0.2 rounded-xs mt-0.5">
-                        {std.major}
-                      </span>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center justify-between pt-2 border-t border-black/5 text-xs text-neutral-500">
-                    <span className="flex items-center gap-1 text-[11px]">
-                      <FolderGit2 className="w-3.5 h-3.5 text-neutral-400" />
-                      {std.projectCount} Projects
-                    </span>
-                    {std.careerScore && <CareerScoreBadge score={std.careerScore} size="sm" />}
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </section>
-
-        {/* 15. Student Projects Showcase */}
+        {/* 15. Student Projects Showcase (Always Available on School Profile) */}
         <section className="space-y-4">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div>
@@ -371,76 +466,6 @@ export function SchoolPublicProfilePage({ slug = 'smk-kreatif-indonesia' }: Scho
                 </div>
               </div>
             ))}
-          </div>
-        </section>
-
-        {/* 17. Achievements Section */}
-        {achievements.length > 0 && (
-          <section className="space-y-4">
-            <div>
-              <h2 className="text-lg sm:text-xl font-bold text-[#0D0C22]">Prestasi & Penghargaan</h2>
-              <p className="text-xs text-neutral-500 mt-0.5">
-                Rekam jejak kompetisi dan karya inovatif yang diraih siswa dan sekolah.
-              </p>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {achievements.map(ach => (
-                <div
-                  key={ach.id}
-                  className="bg-white rounded-[12px] border border-black/10 overflow-hidden shadow-xs p-5 space-y-3"
-                >
-                  <div className="flex items-center justify-between">
-                    <span className="text-[10px] font-bold text-[#155DFC] bg-blue-50 px-2 py-0.5 rounded-full">
-                      {ach.category}
-                    </span>
-                    <span className="text-xs font-bold text-neutral-400">{ach.year}</span>
-                  </div>
-                  <h3 className="text-sm font-bold text-[#0D0C22] leading-snug">{ach.title}</h3>
-                  <p className="text-xs text-neutral-600 leading-relaxed">{ach.description}</p>
-                </div>
-              ))}
-            </div>
-          </section>
-        )}
-
-        {/* About & School Information Footer Section */}
-        <section className="bg-white rounded-[16px] border border-black/10 p-6 sm:p-8 shadow-xs grid grid-cols-1 md:grid-cols-3 gap-8">
-          <div className="md:col-span-2 space-y-4">
-            <h2 className="text-lg font-bold text-[#0D0C22]">Tentang {school.name}</h2>
-            <p className="text-xs sm:text-sm text-neutral-600 leading-relaxed">
-              {school.description ||
-                'SMK Kreatif Indonesia berfokus pada kurikulum vokasi berbasis proyek industri nyata. Siswa dibekali keterampilan praktis mulai dari UI/UX, software development, hingga multimedia branding.'}
-            </p>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-4 border-t border-black/10 text-xs">
-              <div>
-                <span className="font-bold text-[#0D0C22] block mb-1">Penanggung Jawab Kemitraan (Hubin)</span>
-                <p className="text-neutral-600">{school.picName || 'Drs. Hendro Wibowo, M.Kom'}</p>
-                <p className="text-neutral-500 text-[11px]">{school.picContact || '+62 812-9876-5432'}</p>
-              </div>
-              <div>
-                <span className="font-bold text-[#0D0C22] block mb-1">Lokasi Kampus Vokasi</span>
-                <p className="text-neutral-600">{school.address || 'Jl. Pemuda No. 45, Embong Kaliasin'}</p>
-                <p className="text-neutral-500 text-[11px]">{school.city}</p>
-              </div>
-            </div>
-          </div>
-
-          <div className="p-5 bg-[#F8FAFC] rounded-[12px] border border-black/10 space-y-4 flex flex-col justify-between">
-            <div>
-              <span className="text-xs font-bold text-[#0D0C22] block mb-1">Tertarik Merekrut atau Kolaborasi?</span>
-              <p className="text-xs text-neutral-500 leading-relaxed">
-                Kreatorin menghubungkan UMKM & Brand dengan siswa SMK untuk magang, proyek lepas, dan rekrutmen talenta muda.
-              </p>
-            </div>
-            <button
-              onClick={() => setIsModalOpen(true)}
-              className="w-full py-2.5 bg-[#155DFC] hover:bg-[#0E4CD1] text-white text-xs font-bold rounded-[8px] transition-colors flex items-center justify-center gap-2 cursor-pointer shadow-xs"
-            >
-              <Send className="w-3.5 h-3.5" />
-              <span>Hubungi Sekolah Sekarang</span>
-            </button>
           </div>
         </section>
       </main>
