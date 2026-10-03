@@ -26,7 +26,6 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, onOpenBrief }) => {
             <button onClick={() => go('services', '/explore/services')} className="min-h-11 hover:text-primary">Layanan creator</button>
             <button onClick={() => go('briefs', '/briefs')} className="min-h-11 hover:text-primary">Brief proyek</button>
             <button onClick={() => onOpenBrief ? onOpenBrief() : go('briefs', '/briefs')} className="min-h-11 hover:text-primary">Buat brief</button>
-            <button onClick={() => go('school-profile', '/school/smk-kreatif-indonesia')} className="min-h-11 hover:text-primary">Mitra sekolah</button>
           </nav>
 
           <p className="text-sm text-[var(--muted)]">Dibuat untuk ekosistem kreatif Indonesia.</p>

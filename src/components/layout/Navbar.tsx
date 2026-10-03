@@ -16,7 +16,6 @@ const links = [
   { label: 'Beranda', path: '/', page: 'home' as ActivePage },
   { label: 'Layanan', path: '/explore/services', page: 'services' as ActivePage },
   { label: 'Brief proyek', path: '/briefs', page: 'briefs' as ActivePage },
-  { label: 'Mitra sekolah', path: '/school/smk-kreatif-indonesia', page: 'school-profile' as ActivePage },
 ];
 
 export const Navbar: React.FC<NavbarProps> = ({ currentUser: suppliedUser, onNavigate, onSignOut, onSearch, showSearch = false }) => {
