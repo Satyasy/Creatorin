@@ -61,8 +61,8 @@ export const SettingsPage: React.FC = () => {
       : null;
 
     try {
-      // Call account settings API
-      const res = await fetch('/api/account/settings', {
+      // Call account settings API for preferences/password
+      await fetch('/api/account/settings', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -74,6 +74,18 @@ export const SettingsPage: React.FC = () => {
           notifyPush,
           language,
           ...(newPassword && newPassword === confirmPassword ? { newPassword } : {})
+        })
+      });
+
+      // Also ensure profile & creator bio are updated
+      await fetch('/api/profile', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          fullName,
+          location,
+          phone,
+          bio,
         })
       });
 

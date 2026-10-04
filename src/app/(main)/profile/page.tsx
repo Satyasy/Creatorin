@@ -8,7 +8,7 @@ import { useEffect } from 'react';
 import type { Creator } from '@/types';
 
 export default function MyProfilePage() {
-  const { user, isAuthenticated } = useAuth();
+  const { user, isAuthenticated, refreshUser } = useAuth();
   const router = useRouter();
 
   // Redirect unauthenticated users to sign-in
@@ -18,13 +18,19 @@ export default function MyProfilePage() {
     }
   }, [isAuthenticated, router]);
 
+  // Sync latest user details from server on mount
+  useEffect(() => {
+    if (isAuthenticated) {
+      refreshUser();
+    }
+  }, [isAuthenticated, refreshUser]);
+
   if (!isAuthenticated || !user) {
     return null;
   }
 
   // Build a Creator object from the logged-in user's auth state.
-  // We use the mock creator's portfolio/services as a template but override
-  // all identity fields with the actual user data.
+  // Real user identity takes priority over template data.
   const template = MOCK_CREATORS[0];
 
   const userCreator: Creator = {
@@ -34,11 +40,11 @@ export default function MyProfilePage() {
     avatar:
       user.avatar ||
       'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=240&auto=format&fit=crop&q=80',
-    bio: user.bio || template.bio,
+    bio: user.bio || 'Kreator kreatif di platform Creatorin.',
     roleTitle:
       user.roleTitle ||
       (user.role === 'creator' ? 'Kreator Konten' : 'Brand / UMKM'),
-    location: user.location || template.location,
+    location: user.location || 'Indonesia',
     handle:
       user.handle ||
       `@${user.name.toLowerCase().replace(/[^a-z0-9]/g, '')}`,
