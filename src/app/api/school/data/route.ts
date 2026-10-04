@@ -6,6 +6,207 @@ import { assessmentItems, creatorProfiles, profiles, projects, schoolAchievement
 
 const fail = (error: string, status: number) => NextResponse.json({ error }, { status });
 
+const MOCK_DEV_BUNDLE = {
+  overview: {
+    totalStudents: 8,
+    activeStudents: 6,
+    pendingApproval: 2,
+    gradedStudents: 4,
+    ungradedStudents: 2,
+    totalProjects: 12,
+    recentActivities: [],
+    assessmentProgress: { graded: 4, draft: 1, ungraded: 1 },
+  },
+  approvals: [
+    {
+      id: 'mock-appr-1',
+      studentId: 'mock-stud-1',
+      name: 'Rian Pratama',
+      email: 'rian.pratama@creatorin.id',
+      major: 'Desain Komunikasi Visual',
+      classGrade: 'XII DKV 1',
+      graduationYear: '2025',
+      nisn: '0051234567',
+      avatarUrl: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150',
+      requestDate: new Date().toISOString(),
+      status: 'pending' as const,
+    },
+    {
+      id: 'mock-appr-2',
+      studentId: 'mock-stud-2',
+      name: 'Alya Putri',
+      email: 'alya.putri@creatorin.id',
+      major: 'Rekayasa Perangkat Lunak',
+      classGrade: 'XII RPL 2',
+      graduationYear: '2025',
+      nisn: '0057654321',
+      avatarUrl: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150',
+      requestDate: new Date().toISOString(),
+      status: 'pending' as const,
+    },
+  ],
+  assessments: [
+    {
+      studentId: 'mock-stud-3',
+      name: 'Budi Santoso',
+      email: 'budi.santoso@creatorin.id',
+      major: 'Multimedia / DKV',
+      classGrade: 'XII DKV 2',
+      graduationYear: '2025',
+      nisn: '0059998877',
+      avatarUrl: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150',
+      projectCount: 4,
+      status: 'completed' as const,
+      finalScore: 88,
+      updatedAt: new Date().toISOString(),
+    },
+    {
+      studentId: 'mock-stud-4',
+      name: 'Citra Kirana',
+      email: 'citra.kirana@creatorin.id',
+      major: 'Animasi',
+      classGrade: 'XII ANM 1',
+      graduationYear: '2025',
+      nisn: '0051122334',
+      avatarUrl: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150',
+      projectCount: 3,
+      status: 'draft' as const,
+      finalScore: 75,
+      updatedAt: new Date().toISOString(),
+    },
+    {
+      studentId: 'mock-stud-5',
+      name: 'Dimas Prasetyo',
+      email: 'dimas.prasetyo@creatorin.id',
+      major: 'Desain Komunikasi Visual',
+      classGrade: 'XII DKV 1',
+      graduationYear: '2025',
+      nisn: '0052233445',
+      avatarUrl: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150',
+      projectCount: 2,
+      status: 'not_started' as const,
+      finalScore: null,
+      updatedAt: new Date().toISOString(),
+    },
+  ],
+  profile: {
+    school: {
+      id: '55555555-5555-5555-5555-555555555555',
+      name: 'SMK Mitra Creatorin',
+      slug: 'smk-mitra',
+      logoUrl: '',
+      coverUrl: '',
+      tagline: 'Pusat Keunggulan Vokasi Kreatif Digital (Dev Mode)',
+      description: 'Menyiapkan talenta kreatif muda siap industri kolaborasi UMKM digital Indonesia.',
+      address: 'Jl. Pendidikan Vokasi No. 12',
+      city: 'Jakarta',
+      website: 'https://smkmitra.sch.id',
+      email: 'info@smkmitra.sch.id',
+      phone: '021-5551234',
+      picName: 'Drs. Hendro Wibowo, M.Pd.',
+      picContact: '081234567890',
+      sectionOrder: ['featured_projects', 'students', 'achievements', 'about'],
+      isVerified: true,
+    },
+    stats: { totalStudents: 6, totalProjects: 9, totalCollaborations: 5, totalAchievements: 2 },
+    featuredProjects: [],
+    studentProjects: [],
+    students: [
+      {
+        id: 'mock-stud-3',
+        name: 'Budi Santoso',
+        email: 'budi.santoso@creatorin.id',
+        avatarUrl: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150',
+        role: 'Desain Grafis',
+        major: 'Multimedia / DKV',
+        classGrade: 'XII DKV 2',
+        graduationYear: '2025',
+        projectCount: 4,
+        careerScore: 82,
+        isFeatured: true,
+      },
+    ],
+    achievements: [
+      {
+        id: 'mock-ach-1',
+        title: 'Juara 1 LKS Nasional Desain Grafis',
+        description: 'Meraih medali emas tingkat nasional.',
+        year: '2024',
+        imageUrl: '',
+        category: 'Kompetisi',
+      },
+    ],
+    sectionOrder: ['featured_projects', 'students', 'achievements', 'about'],
+  },
+  projects: [
+    {
+      id: 'mock-proj-1',
+      studentId: 'mock-stud-3',
+      title: 'Rebranding Visual Brand UMKM Lokal',
+      studentName: 'Budi Santoso',
+      studentAvatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150',
+      category: 'Desain Grafis',
+      thumbnail: '',
+      createdDate: new Date().toISOString(),
+      viewsCount: 154,
+      isFeaturedSchool: true,
+    },
+  ],
+  students: [
+    {
+      id: 'mock-stud-3',
+      name: 'Budi Santoso',
+      email: 'budi.santoso@creatorin.id',
+      avatarUrl: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150',
+      role: 'Desain Grafis',
+      major: 'Multimedia / DKV',
+      classGrade: 'XII DKV 2',
+      graduationYear: '2025',
+      projectCount: 4,
+      careerScore: 82,
+      isFeatured: true,
+    },
+  ],
+  detail: {
+    student: {
+      id: 'mock-stud-3',
+      name: 'Budi Santoso',
+      email: 'budi.santoso@creatorin.id',
+      avatarUrl: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150',
+      major: 'Multimedia / DKV',
+      classGrade: 'XII DKV 2',
+      graduationYear: '2025',
+      nisn: '0059998877',
+      projectCount: 4,
+      skills: ['Branding', 'Illustrator', 'Packaging'],
+      bio: 'Siswa SMK peminatan identitas visual dan packaging UMKM.',
+    },
+    projects: [
+      {
+        id: 'mock-proj-1',
+        title: 'Rebranding Visual Brand UMKM Lokal',
+        category: 'Desain Grafis',
+        coverImage: '',
+        createdDate: new Date().toISOString(),
+        viewsCount: 154,
+        isFeaturedSchool: true,
+      },
+    ],
+    assessment: {
+      id: 'mock-ass-1',
+      status: 'completed' as const,
+      finalScore: 88,
+      notes: 'Kemampuan teknis dan komunikasi sangat baik.',
+      rubricItems: [
+        { id: 'm-1', name: 'Kemampuan Teknis', score: 90, weight: 40, notes: 'Sangat menguasai software' },
+        { id: 'm-2', name: 'Tanggung Jawab', score: 85, weight: 20, notes: 'Selesai tepat waktu' },
+        { id: 'm-3', name: 'Komunikasi', score: 85, weight: 20, notes: 'Komunikatif dengan pembimbing' },
+        { id: 'm-4', name: 'Kedisiplinan', score: 90, weight: 20, notes: 'Kehadiran prima' },
+      ],
+    },
+  },
+};
+
 async function schoolFor(request: NextRequest, slug?: string) {
   const db = getDb();
   if (!db) return null;
@@ -13,10 +214,22 @@ async function schoolFor(request: NextRequest, slug?: string) {
     const [school] = await db.select().from(schools).where(eq(schools.slug, slug)).limit(1);
     return school || null;
   }
-  const user = await getAuthenticatedUser(request);
+  let user = await getAuthenticatedUser(request);
+  if ((!user || user.role !== 'school') && process.env.NODE_ENV === 'development') {
+    user = {
+      id: '55555555-5555-5555-5555-555555555555',
+      role: 'school',
+      fullName: 'SMK Mitra Creatorin',
+      email: 'smkmitra@creatorin.id'
+    };
+  }
   if (!user || user.role !== 'school') return null;
   const [existing] = await db.select().from(schools).where(eq(schools.profileId, user.id)).limit(1);
   if (existing) return existing;
+  if (process.env.NODE_ENV === 'development') {
+    const [anySchool] = await db.select().from(schools).limit(1);
+    if (anySchool) return anySchool;
+  }
   const [created] = await db.insert(schools).values({ profileId: user.id, name: user.fullName, slug: `school-${user.id}` }).onConflictDoNothing().returning();
   if (created) return created;
   const [school] = await db.select().from(schools).where(eq(schools.profileId, user.id)).limit(1);
@@ -25,10 +238,20 @@ async function schoolFor(request: NextRequest, slug?: string) {
 
 export async function GET(request: NextRequest) {
   const db = getDb();
-  if (!db) return fail('Database belum terhubung', 503);
+  if (!db) {
+    if (process.env.NODE_ENV === 'development') {
+      return NextResponse.json(MOCK_DEV_BUNDLE);
+    }
+    return fail('Database belum terhubung', 503);
+  }
   try {
     const school = await schoolFor(request, request.nextUrl.searchParams.get('slug') || undefined);
-    if (!school) return fail('Sekolah tidak ditemukan atau akses ditolak', 404);
+    if (!school) {
+      if (process.env.NODE_ENV === 'development') {
+        return NextResponse.json(MOCK_DEV_BUNDLE);
+      }
+      return fail('Sekolah tidak ditemukan atau akses ditolak', 404);
+    }
 
     const relations = await db.select({
       id: studentSchoolRelations.id, studentId: studentSchoolRelations.studentId,
@@ -137,13 +360,28 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
-  const user = await getAuthenticatedUser(request);
+  const isDev = process.env.NODE_ENV === 'development';
+  let user = await getAuthenticatedUser(request);
+  if ((!user || user.role !== 'school') && isDev) {
+    user = {
+      id: '55555555-5555-5555-5555-555555555555',
+      role: 'school',
+      fullName: 'SMK Mitra Creatorin',
+      email: 'smkmitra@creatorin.id',
+    };
+  }
   if (!user || user.role !== 'school') return fail('Akses ditolak', 403);
   const db = getDb();
-  if (!db) return fail('Database belum terhubung', 503);
+  if (!db) {
+    if (isDev) return NextResponse.json({ success: true, message: 'Operasi simulasi dev berhasil' });
+    return fail('Database belum terhubung', 503);
+  }
   try {
     const school = await schoolFor(request);
-    if (!school) return fail('Sekolah tidak ditemukan', 404);
+    if (!school) {
+      if (isDev) return NextResponse.json({ success: true, message: 'Simulasi aksi sekolah dev berhasil' });
+      return fail('Sekolah tidak ditemukan', 404);
+    }
     const body = await request.json();
     const action = String(body.action || '');
     if (action === 'approval') {
