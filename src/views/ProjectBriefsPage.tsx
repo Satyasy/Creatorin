@@ -103,7 +103,7 @@ export const ProjectBriefsPage: React.FC<ProjectBriefsPageProps> = ({
         'explore-projects': '/explore/projects',
         'explore-services': '/explore/services',
         'chat': '/chat',
-        'collaboration': '/collaboration',
+        'collaboration': '/contracts',
         'notifications': '/notifications',
         'briefs': '/briefs',
         'signin': '/sign-in',

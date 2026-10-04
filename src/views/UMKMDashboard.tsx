@@ -1,22 +1,13 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
-import { useRouter } from 'next/navigation';
-import { useAuth } from '@/providers/AuthProvider';
-import { MOCK_FEED_PROJECTS } from '@/data/mockFeedProjects';
-import { FeedProject } from '@/types';
-import { ProjectCard } from '@/components/common/ProjectCard';
-import { 
-  Sparkles, 
-  Search, 
-  PlusCircle, 
-  ArrowRight, 
-  SlidersHorizontal,
-  ChevronDown,
-  X,
-  Check
-} from 'lucide-react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import dynamic from 'next/dynamic';
+import { useRouter } from 'next/navigation';
+import { ArrowRight, Check, ChevronDown, Plus, Search, X } from 'lucide-react';
+import { ProjectCard } from '@/components/common/ProjectCard';
+import { MOCK_FEED_PROJECTS } from '@/data/mockFeedProjects';
+import { useAuth } from '@/providers/AuthProvider';
+import { FeedProject } from '@/types';
 
 const ProjectDetailModal = dynamic(
   () => import('@/components/modals/ProjectDetailModal').then((mod) => mod.ProjectDetailModal),
@@ -28,254 +19,192 @@ const ProjectBriefModal = dynamic(
   { ssr: false }
 );
 
+const CATEGORIES = [
+  'Semua karya',
+  'Reels Instagram',
+  'Foto Produk',
+  'Video Tiktok',
+  'UI/UX Design',
+  'Branding & Logo',
+  'Feed Instagram',
+];
+
+const CATEGORY_PREVIEWS = [
+  { label: 'Video pendek', category: 'Video Tiktok', projectIndex: 3 },
+  { label: 'Foto produk', category: 'Foto Produk', projectIndex: 1 },
+  { label: 'Desain digital', category: 'UI/UX Design', projectIndex: 2 },
+  { label: 'Branding', category: 'Branding & Logo', projectIndex: 7 },
+  { label: 'Konten sosial', category: 'Reels Instagram', projectIndex: 8 },
+];
+
 export const UMKMDashboard = () => {
   const router = useRouter();
   const { user } = useAuth();
-
-  // State
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedTag, setSelectedTag] = useState<string | null>(null);
   const [sortBy, setSortBy] = useState<'populer' | 'likes' | 'views'>('populer');
   const [isSortDropdownOpen, setIsSortDropdownOpen] = useState(false);
   const [savedProjects, setSavedProjects] = useState<Record<string, boolean>>({});
-  
-  // Modals state
-  const [selectedProjectForDetail, setSelectedProjectForDetail] = useState<FeedProject | null>(null);
+  const [visibleCount, setVisibleCount] = useState(8);
+  const [selectedProject, setSelectedProject] = useState<FeedProject | null>(null);
   const [isBriefModalOpen, setIsBriefModalOpen] = useState(false);
+  const sortButtonRef = useRef<HTMLButtonElement>(null);
 
-  const POPULAR_TAGS = [
-    'Reels Instagram',
-    'Foto Produk',
-    'Video Tiktok',
-    'UI/UX Design',
-    'Branding & Logo',
-    'Feed Instagram'
-  ];
+  useEffect(() => {
+    if (!isSortDropdownOpen) return;
+    const closeOnEscape = (event: KeyboardEvent) => {
+      if (event.key !== 'Escape') return;
+      setIsSortDropdownOpen(false);
+      sortButtonRef.current?.focus();
+    };
+    document.addEventListener('keydown', closeOnEscape);
+    return () => document.removeEventListener('keydown', closeOnEscape);
+  }, [isSortDropdownOpen]);
 
   const filteredProjects = useMemo(() => {
-    let list = [...MOCK_FEED_PROJECTS];
-    if (searchQuery.trim()) {
-      const q = searchQuery.toLowerCase();
-      list = list.filter(p => 
-        (p.title?.toLowerCase() || '').includes(q) ||
-        (p.creator?.name?.toLowerCase() || '').includes(q) ||
-        (p.category?.toLowerCase() || '').includes(q) ||
-        (p.tags || []).some(t => (t?.toLowerCase() || '').includes(q))
+    let projects = [...MOCK_FEED_PROJECTS];
+    const query = searchQuery.trim().toLowerCase();
+
+    if (query) {
+      projects = projects.filter((project) =>
+        [project.title, project.creator?.name, project.category, ...(project.tags || [])]
+          .some((value) => value?.toLowerCase().includes(query))
       );
     }
+
     if (selectedTag) {
-      const tagQuery = selectedTag.toLowerCase();
-      list = list.filter(p => 
-        (p.title?.toLowerCase() || '').includes(tagQuery) ||
-        (p.category?.toLowerCase() || '').includes(tagQuery) ||
-        (p.tags || []).some(t => (t?.toLowerCase() || '').includes(tagQuery))
+      const tag = selectedTag.toLowerCase();
+      projects = projects.filter((project) =>
+        [project.title, project.category, ...(project.tags || [])]
+          .some((value) => value?.toLowerCase().includes(tag))
       );
     }
-    if (sortBy === 'likes') {
-      list.sort((a, b) => b.likesCount - a.likesCount);
-    } else if (sortBy === 'views') {
-      const parseV = (v?: string | number) => {
-        if (!v) return 0;
-        const str = String(v).toLowerCase();
-        const n = parseFloat(str.replace(/[^0-9.]/g, ''));
-        if (str.includes('k')) return n * 1000;
-        if (str.includes('m')) return n * 1000000;
-        return n || 0;
+
+    if (sortBy === 'likes') projects.sort((a, b) => b.likesCount - a.likesCount);
+    if (sortBy === 'views') {
+      const views = (value?: string | number) => {
+        const text = String(value || '0').toLowerCase();
+        const amount = Number.parseFloat(text.replace(/[^0-9.]/g, '')) || 0;
+        return text.includes('m') ? amount * 1_000_000 : text.includes('k') ? amount * 1_000 : amount;
       };
-      list.sort((a, b) => parseV(b.viewsCount) - parseV(a.viewsCount));
-    } else {
-      list.sort((a, b) => ((b.sharesCount || 0) + b.likesCount) - ((a.sharesCount || 0) + a.likesCount));
+      projects.sort((a, b) => views(b.viewsCount) - views(a.viewsCount));
     }
-    return list;
+    if (sortBy === 'populer') {
+      projects.sort((a, b) => (b.sharesCount || 0) + b.likesCount - ((a.sharesCount || 0) + a.likesCount));
+    }
+
+    return projects;
   }, [searchQuery, selectedTag, sortBy]);
 
-  const toggleSaveProject = (id: string, e: React.MouseEvent) => {
-    e.stopPropagation();
-    setSavedProjects(prev => ({
-      ...prev,
-      [id]: !prev[id]
-    }));
+  const selectCategory = (category: string) => {
+    setSelectedTag(category === 'Semua karya' ? null : category);
+    setVisibleCount(8);
   };
 
   return (
-    <div className="w-full min-h-screen bg-[#FDFDFD] text-[#0F172A] font-sans pb-24">
-      
-      {/* 1. Sapaan / Simpler Hero Banner for Logged-in UMKM */}
-      <section className="bg-gradient-to-r from-[#0D0C22] to-[#1E293B] text-white py-12 px-4 sm:px-6 lg:px-8 relative overflow-hidden border-b border-neutral-200">
-        <div className="absolute right-0 top-0 w-96 h-96 bg-[#155DFC]/10 rounded-full blur-3xl pointer-events-none" />
-        <div className="max-w-[1440px] mx-auto flex flex-col md:flex-row md:items-center justify-between gap-6 relative z-10">
-          <div>
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 text-blue-200 text-xs font-semibold mb-3">
-              <Sparkles className="w-3.5 h-3.5" /> Dashboard Klien UMKM
-            </div>
-            <h1 className="text-3xl sm:text-4xl font-bold tracking-tight mb-2">
-              Halo, {user?.name || 'Sahabat UMKM'}! 👋
+    <div className="min-h-screen bg-white text-[var(--ink)]">
+      <section className="border-b border-[var(--outline)] bg-white">
+        <div className="container-creatorin grid gap-10 pb-12 pt-14 lg:grid-cols-[1fr_420px] lg:items-end lg:pb-16 lg:pt-20">
+          <div className="max-w-3xl">
+            <p className="mb-4 text-sm font-semibold text-primary">Selamat datang, {user?.name || 'pemilik usaha'}</p>
+            <h1 className="max-w-[760px] text-[40px] font-semibold leading-[1.04] tracking-[-0.045em] text-[var(--ink)] sm:text-5xl lg:text-[64px]">
+              Cari karya yang membuat brandmu terlihat serius.
             </h1>
-            <p className="text-neutral-300 text-sm sm:text-base max-w-xl leading-relaxed">
-              Jelajahi portofolio terbaik dari kreator pilihan, atau buat brief pekerjaan baru dengan sistem proteksi rekening bersama (escrow).
+            <p className="mt-5 max-w-2xl text-base leading-7 text-[var(--muted)] sm:text-lg">
+              Lihat hasil kerja creator, bandingkan gaya visualnya, lalu kirim brief saat kamu sudah menemukan yang cocok.
             </p>
+            <form className="mt-8 flex max-w-2xl items-center rounded-2xl border border-[#B7BBC9] bg-[#F8F9FC] p-2 focus-within:border-primary focus-within:bg-white focus-within:shadow-[var(--focus-ring)]" onSubmit={(event) => event.preventDefault()}>
+              <Search className="ml-3 h-5 w-5 shrink-0 text-[#6F7285]" />
+              <label htmlFor="umkm-work-search" className="sr-only">Cari karya atau creator</label>
+              <input id="umkm-work-search" value={searchQuery} onChange={(event) => { setSearchQuery(event.target.value); setVisibleCount(8); }} placeholder="Cari video, foto produk, branding, atau creator" className="min-w-0 flex-1 bg-transparent px-3 py-2.5 text-sm outline-none placeholder:text-[#6F7285] sm:text-base" />
+              {searchQuery && <button type="button" onClick={() => setSearchQuery('')} aria-label="Hapus pencarian" className="grid h-11 w-11 place-items-center rounded-xl text-[#55576A] hover:bg-white hover:text-[var(--ink)]"><X className="h-4 w-4" /></button>}
+              <button type="submit" className="hidden h-12 rounded-xl bg-primary px-5 text-sm font-semibold text-white hover:bg-primary-hover sm:block">Cari karya</button>
+            </form>
           </div>
 
-          <div className="flex flex-wrap items-center gap-3 shrink-0">
-            <button
-              onClick={() => setIsBriefModalOpen(true)}
-              className="h-11 px-5 rounded-xl bg-[#155DFC] hover:bg-[#03ACFD] text-white text-xs sm:text-sm font-semibold transition-colors flex items-center gap-2 cursor-pointer shadow-sm"
-            >
-              <PlusCircle className="w-4 h-4" />
-              <span>Buat Brief Proyek</span>
+          <aside className="border-l-0 border-[var(--outline)] lg:border-l lg:pl-10" aria-label="Mulai proyek baru">
+            <p className="text-sm font-semibold text-[var(--ink)]">Sudah punya kebutuhan?</p>
+            <p className="mt-2 max-w-sm text-sm leading-6 text-[var(--muted)]">Tulis kebutuhan sekali. Creator yang relevan dapat mengirim proposal dan contoh kerja.</p>
+            <button onClick={() => setIsBriefModalOpen(true)} className="mt-5 inline-flex h-12 items-center gap-2 rounded-xl bg-[#0D0C22] px-5 text-sm font-semibold text-white hover:bg-[#29283D]">
+              <Plus className="h-4 w-4" /> Buat brief proyek
             </button>
-            <button
-              onClick={() => router.push('/explore')}
-              className="h-11 px-5 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs sm:text-sm font-semibold transition-colors flex items-center gap-2 cursor-pointer"
-            >
-              <span>Jelajah Kreator</span>
-              <ArrowRight className="w-4 h-4" />
-            </button>
-          </div>
+          </aside>
         </div>
       </section>
 
-      {/* 2. Main Focus: Project Showcase Grid */}
-      <section className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 pt-8">
-        
-        {/* Search & Filter Header */}
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
-          {/* Search Bar */}
-          <div className="relative flex-1 max-w-md">
-            <Search className="w-4 h-4 text-neutral-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
-            <input
-              type="text"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Cari ide desain, video TikTok, foto produk..."
-              className="w-full pl-10 pr-9 py-2.5 bg-neutral-50 hover:bg-white focus:bg-white border border-neutral-200 rounded-xl text-xs sm:text-sm text-[#0F172A] placeholder:text-neutral-400 focus:outline-none focus:border-[#155DFC] transition-all"
-            />
-            {searchQuery && (
-              <button
-                onClick={() => setSearchQuery('')}
-                className="absolute right-3 top-1/2 -translate-y-1/2 p-0.5 text-neutral-400 hover:text-neutral-600"
-              >
-                <X className="w-3.5 h-3.5" />
+      <section className="container-creatorin py-10 sm:py-12" aria-labelledby="category-heading">
+        <div className="mb-5 flex items-end justify-between gap-4">
+          <div>
+            <p className="text-sm font-semibold text-primary">Pilih dari hasil nyata</p>
+            <h2 id="category-heading" className="mt-1 text-2xl font-semibold sm:text-3xl">Mulai dari format yang kamu butuhkan</h2>
+          </div>
+          <button onClick={() => router.push('/explore/projects')} className="hidden items-center gap-2 text-sm font-semibold text-[var(--ink)] hover:text-primary sm:flex">Semua karya <ArrowRight className="h-4 w-4" /></button>
+        </div>
+
+        <div className="grid grid-cols-[repeat(5,minmax(220px,1fr))] gap-4 overflow-x-auto pb-3" role="list">
+          {CATEGORY_PREVIEWS.map(({ label, category, projectIndex }) => {
+            const project = MOCK_FEED_PROJECTS[projectIndex];
+            return (
+              <button key={label} onClick={() => selectCategory(category)} className="group min-w-0 text-left" role="listitem">
+                <span className="block aspect-[16/10] overflow-hidden rounded-xl bg-[#F3F3F4]"><img src={project.coverImage} alt="" className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.025]" loading="lazy" /></span>
+                <span className="mt-3 block text-sm font-semibold text-[var(--ink)] group-hover:text-primary">{label}</span>
               </button>
-            )}
+            );
+          })}
+        </div>
+      </section>
+
+      <section className="container-creatorin pb-20 pt-4" aria-labelledby="work-heading">
+        <div className="border-t border-[var(--outline)] pt-10">
+          <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
+            <div>
+              <p className="text-sm font-semibold text-primary">Kurasi untuk usahamu</p>
+              <h2 id="work-heading" className="mt-1 text-2xl font-semibold sm:text-3xl">Karya terbaru dari creator</h2>
+              <p className="mt-2 text-sm text-[var(--muted)]">{filteredProjects.length} karya cocok dengan pencarian ini. Data karya dan metrik masih berupa contoh.</p>
+            </div>
+
+            <div className="flex items-center gap-3 self-stretch overflow-x-auto lg:self-auto">
+              <div className="flex gap-2" aria-label="Filter kategori">
+                {CATEGORIES.slice(0, 4).map((category) => {
+                  const active = category === 'Semua karya' ? !selectedTag : selectedTag === category;
+                  return <button key={category} onClick={() => selectCategory(category)} aria-pressed={active} className={`h-11 shrink-0 rounded-xl border px-4 text-sm font-semibold ${active ? 'border-[#0D0C22] bg-[#0D0C22] text-white' : 'border-[var(--outline)] bg-white text-[#55576A] hover:border-[#B7BBC9] hover:text-[var(--ink)]'}`}>{category}</button>;
+                })}
+              </div>
+
+              <div className="relative shrink-0">
+                <button ref={sortButtonRef} onClick={() => setIsSortDropdownOpen((open) => !open)} aria-expanded={isSortDropdownOpen} className="flex h-11 items-center gap-2 rounded-xl border border-[var(--outline)] bg-white px-4 text-sm font-semibold text-[var(--ink)] hover:border-[#B7BBC9]">
+                  {sortBy === 'populer' ? 'Populer' : sortBy === 'likes' ? 'Paling disukai' : 'Paling dilihat'} <ChevronDown className="h-4 w-4" />
+                </button>
+                {isSortDropdownOpen && (
+                  <div className="absolute right-0 z-30 mt-2 w-52 rounded-xl border border-[var(--outline)] bg-white p-2 shadow-[0_16px_40px_rgba(13,12,34,.14)]">
+                    {([['populer', 'Populer'], ['likes', 'Paling disukai'], ['views', 'Paling dilihat']] as const).map(([value, label]) => (
+                      <button key={value} onClick={() => { setSortBy(value); setIsSortDropdownOpen(false); }} className="flex min-h-11 w-full items-center justify-between rounded-lg px-3 text-left text-sm font-medium hover:bg-[#F8F9FC]">{label}{sortBy === value && <Check className="h-4 w-4 text-primary" />}</button>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
           </div>
 
-          {/* Sort Dropdown */}
-          <div className="relative shrink-0 self-end md:self-auto">
-            <button
-              onClick={() => setIsSortDropdownOpen(!isSortDropdownOpen)}
-              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl border border-neutral-200 bg-white hover:border-neutral-300 text-xs font-semibold text-neutral-700 transition cursor-pointer shadow-2xs"
-            >
-              <span>
-                {sortBy === 'populer' && 'Terpopuler'}
-                {sortBy === 'likes' && 'Terbanyak Disukai'}
-                {sortBy === 'views' && 'Paling Banyak Dilihat'}
-              </span>
-              <ChevronDown className="w-3.5 h-3.5 text-neutral-400" />
-            </button>
-
-            {isSortDropdownOpen && (
-              <div className="absolute right-0 mt-1.5 w-48 bg-white rounded-xl border border-neutral-200 shadow-xl py-2 z-30 animate-in fade-in">
-                {[
-                  { id: 'populer', label: 'Terpopuler' },
-                  { id: 'likes', label: 'Terbanyak Disukai' },
-                  { id: 'views', label: 'Paling Banyak Dilihat' },
-                ].map((s) => (
-                  <button
-                    key={s.id}
-                    onClick={() => {
-                      setSortBy(s.id as any);
-                      setIsSortDropdownOpen(false);
-                    }}
-                    className={`w-full px-4 py-2 text-left text-xs font-medium hover:bg-neutral-50 flex items-center justify-between cursor-pointer ${
-                      sortBy === s.id ? 'font-bold text-[#0D0C22]' : 'text-neutral-600'
-                    }`}
-                  >
-                    <span>{s.label}</span>
-                    {sortBy === s.id && <Check className="w-3.5 h-3.5 text-[#0D0C22]" />}
-                  </button>
+          {filteredProjects.length ? (
+            <>
+              <div className="mt-8 grid grid-cols-1 gap-x-5 gap-y-7 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4">
+                {filteredProjects.slice(0, visibleCount).map((project) => (
+                  <ProjectCard key={project.id} id={`umkm-feed-${project.id}`} project={project} isSaved={Boolean(savedProjects[project.id])} onToggleSave={(id, event) => { event.stopPropagation(); setSavedProjects((saved) => ({ ...saved, [id]: !saved[id] })); }} onClick={() => setSelectedProject(project)} />
                 ))}
               </div>
-            )}
-          </div>
+              <div className="mt-10 flex justify-center">
+                {visibleCount < filteredProjects.length ? <button onClick={() => setVisibleCount((count) => count + 8)} className="h-12 rounded-xl border border-[#B7BBC9] bg-white px-6 text-sm font-semibold text-[var(--ink)] hover:border-primary hover:text-primary">Muat karya berikutnya</button> : <p className="text-sm text-[var(--muted)]">Semua karya yang tersedia sudah ditampilkan.</p>}
+              </div>
+            </>
+          ) : (
+            <div className="mt-8 border-y border-[var(--outline)] py-16 text-center"><p className="font-semibold">Belum ada karya yang cocok.</p><button onClick={() => { setSearchQuery(''); selectCategory('Semua karya'); }} className="mt-3 text-sm font-semibold text-primary hover:text-primary-hover">Hapus filter</button></div>
+          )}
         </div>
-
-        {/* Popular Tags Pills */}
-        <div className="flex items-center gap-2 overflow-x-auto pb-4 scrollbar-none mb-4">
-          <button
-            onClick={() => setSelectedTag(null)}
-            className={`px-3.5 py-1.5 rounded-full text-xs font-semibold shrink-0 transition-colors cursor-pointer ${
-              selectedTag === null
-                ? 'bg-[#0D0C22] text-white'
-                : 'bg-neutral-100 text-neutral-600 hover:bg-neutral-200'
-            }`}
-          >
-            Semua Kategori
-          </button>
-          {POPULAR_TAGS.map((tag) => (
-            <button
-              key={tag}
-              onClick={() => setSelectedTag(selectedTag === tag ? null : tag)}
-              className={`px-3.5 py-1.5 rounded-full text-xs font-medium shrink-0 transition-colors cursor-pointer ${
-                selectedTag === tag
-                  ? 'bg-[#0D0C22] text-white font-semibold'
-                  : 'bg-neutral-100 text-neutral-600 hover:bg-neutral-200'
-              }`}
-            >
-              {tag}
-            </button>
-          ))}
-        </div>
-
-        {/* Project Cards Grid */}
-        {filteredProjects.length === 0 ? (
-          <div className="py-20 text-center bg-white rounded-2xl border border-neutral-200 p-8">
-            <p className="text-sm font-semibold text-neutral-600">Tidak ada proyek yang sesuai dengan filter.</p>
-            <button
-              onClick={() => { setSearchQuery(''); setSelectedTag(null); }}
-              className="mt-3 text-xs font-bold text-[#155DFC] hover:underline cursor-pointer"
-            >
-              Reset Filter
-            </button>
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-            {filteredProjects.map((proj) => (
-              <ProjectCard
-                key={proj.id}
-                id={`umkm-feed-${proj.id}`}
-                project={proj}
-                isSaved={Boolean(savedProjects[proj.id])}
-                onToggleSave={(id, e) => toggleSaveProject(id, e)}
-                onClick={() => setSelectedProjectForDetail(proj)}
-              />
-            ))}
-          </div>
-        )}
       </section>
 
-      {/* Lightbox / Project Detail Modal */}
-      {selectedProjectForDetail && (
-        <ProjectDetailModal
-          project={selectedProjectForDetail}
-          onClose={() => setSelectedProjectForDetail(null)}
-          onViewCreatorProfile={(creator) => {
-            setSelectedProjectForDetail(null);
-            router.push(`/creator/${creator.id}`);
-          }}
-          onGetInTouch={(creator) => {
-            setSelectedProjectForDetail(null);
-            router.push(`/chat?creatorId=${creator.id}`);
-          }}
-          allProjects={filteredProjects}
-        />
-      )}
-
-      {/* Create Brief Modal */}
-      <ProjectBriefModal
-        isOpen={isBriefModalOpen}
-        onClose={() => setIsBriefModalOpen(false)}
-      />
+      {selectedProject && <ProjectDetailModal project={selectedProject} onClose={() => setSelectedProject(null)} onViewCreatorProfile={(creator) => { setSelectedProject(null); router.push(`/creator/${creator.id}`); }} onGetInTouch={(creator) => { setSelectedProject(null); router.push(`/chat?creatorId=${creator.id}`); }} allProjects={filteredProjects} />}
+      <ProjectBriefModal isOpen={isBriefModalOpen} onClose={() => setIsBriefModalOpen(false)} />
     </div>
   );
 };

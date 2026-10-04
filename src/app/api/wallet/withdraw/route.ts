@@ -16,7 +16,7 @@ export async function POST(req: NextRequest) {
 
   const withdrawAmount = Number(amount);
   if (!withdrawAmount || withdrawAmount < 50000) {
-    return NextResponse.json({ error: "Jumlah penarikan minimal Rp50.000." }, { status: 400 });
+    return NextResponse.json({ error: "Penarikan minimal 50 koin atau Rp50.000." }, { status: 400 });
   }
 
   try {
@@ -25,11 +25,14 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Saldo tidak mencukupi untuk melakukan penarikan." }, { status: 400 });
     }
 
-    // Deduct balance
+    const fee = Math.max(Math.round(withdrawAmount * 0.02), 2500);
+    const totalDebit = withdrawAmount + fee;
+    if (wallet.balance < totalDebit) return NextResponse.json({ error: `Saldo harus mencakup biaya penarikan Rp${fee.toLocaleString("id-ID")}.` }, { status: 400 });
+
     await db
       .update(creatorWallets)
       .set({
-        balance: sql`${creatorWallets.balance} - ${withdrawAmount}`,
+        balance: sql`${creatorWallets.balance} - ${totalDebit}`,
         updatedAt: new Date(),
       })
       .where(eq(creatorWallets.creatorId, user.id));
@@ -40,15 +43,16 @@ export async function POST(req: NextRequest) {
       .values({
         walletId: wallet.id,
         type: "withdrawal",
-        amount: withdrawAmount,
-        description: `Penarikan ke ${bankName || "Rekening"} (${accountNumber || "-"}) an ${accountHolder || user.fullName}`,
+        amount: -totalDebit,
+        description: `Penarikan ke ${bankName || "Rekening"} (${accountNumber || "-"}) a.n. ${accountHolder || user.fullName}, termasuk biaya Rp${fee.toLocaleString("id-ID")}`,
         status: "completed",
       })
       .returning();
 
     return NextResponse.json({
       success: true,
-      message: `Permintaan penarikan dana sebesar Rp${withdrawAmount.toLocaleString("id-ID")} berhasil diproses.`,
+      message: `Penarikan Rp${withdrawAmount.toLocaleString("id-ID")} diproses dengan biaya Rp${fee.toLocaleString("id-ID")}.`,
+      fee,
       transaction: tx,
     });
   } catch (err: any) {

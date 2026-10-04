@@ -19,20 +19,20 @@ Creatorin is a creative collaboration platform and digital service marketplace c
 
 ## Positioning
 
-Curated Indonesian creators with built-in Collaboration Rooms, standardized two-way project briefs (service listings and open client briefs), upfront secure single-payment invoicing, and verified career score tracking.
+Curated Indonesian creators with built-in Collaboration Rooms, standardized two-way project briefs (service listings and open client briefs), coin-based payment system and escrow, and verified career score tracking.
 
 ## Operating Context
 
 - Web application built on Next.js 16 (App Router), React 19, and Tailwind CSS v4.
-- Established UI prototype and comprehensive page structure covering 42 pages specified in [daftar_halaman_web_app_creatorin.md](file:///C:/Users/Netra%20Ops/Documents/www/creatorin/daftar_halaman_web_app_creatorin.md).
-- Immediate engineering focus is backend architecture, database integration, authentication, and API implementation while preserving the existing frontend layout.
+- Established UI prototype and comprehensive page structure covering 44 pages specified in [daftar_halaman_web_app_creatorin.md](./daftar_halaman_web_app_creatorin.md).
+- Immediate engineering focus is a working prototype for JHIC 2026 with both frontend redesign and backend completion.
 
 ## Capabilities and Constraints
 
-- **Scope & Hierarchy**: 42 pages spanning 15 functional modules: Public pages, Onboarding, Logged-in Home, Profile, Services, Projects, Project Briefs, Messaging, Invoice & Payment, Collaboration Room, Rating & Review, Notifications, Points & Wallet, School Dashboard, and Account Settings.
-- **Frontend Invariance Constraint**: Do not alter frontend page layouts; UI changes are restricted strictly to micro-refinements (border radii, card surfaces, and typography polish).
-- **Separation of Collaboration Phases**: Pre-deal negotiation occurs in direct messaging with quotation/invoice generation; the official Collaboration Room activates only after upfront single payment confirmation.
-- **Undecided Product Facts**: School verification requirements and student data visibility boundaries (ASSUMPTION in spec); creator balance withdrawal fees and minimum thresholds (ASSUMPTION in spec); specific multi-criteria weighting for rating calculations.
+- **Scope & Hierarchy**: 44 pages spanning 15 functional modules: Public pages, Onboarding, Logged-in Home, Profile, Services, Projects, Project Briefs, Messaging, Invoice & Payment, Collaboration Room, Rating & Review, Notifications, Coin & Wallet, School Dashboard, and Account Settings.
+- **Design Evolution Principle**: Redesign of layout and components is allowed, but brand identity must be preserved including colors (primary blue #155DFC, secondary light blue #03ACFD), logo, name "Creatorin", and the sitemap structure.
+- **Separation of Collaboration Phases**: Pre-deal negotiation occurs in direct messaging with quotation/invoice generation; the official Collaboration Room activates only after coin-based escrow confirmation.
+- **Undecided Product Facts**: Sertifikat accreditation partners.
 
 ## Brand Commitments
 
@@ -43,15 +43,16 @@ Curated Indonesian creators with built-in Collaboration Rooms, standardized two-
 ## Evidence on Hand
 
 - Functional Next.js App Router codebase with working UI routes (`/`, `/pesan`, `/profile`, `/proyek/...`).
-- Project documentation [daftar_halaman_web_app_creatorin.md](file:///C:/Users/Netra%20Ops/Documents/www/creatorin/daftar_halaman_web_app_creatorin.md) detailing all 42 pages, roles, and components.
+- Project documentation [daftar_halaman_web_app_creatorin.md](./daftar_halaman_web_app_creatorin.md) detailing all 44 pages, roles, and components.
 - Static assets and logos located in `public/creatorin/`.
 
 ## Product Principles
 
-1. **Preserve Frontend Structure**: The layout and component structure defined in the design and page list are authoritative; backend development conforms to these interfaces without restructuring layouts.
+1. **Design Evolution**: Redesign of layout and components is allowed while preserving brand identity (colors, logo, sitemap structure).
 2. **Two-Way Marketplace Flexibility**: Enable both creator-led offerings (direct service catalog) and client-led hiring (custom project briefs).
-3. **Structured Milestone Governance**: Transition cleanly from negotiation to execution via single-payment invoice settlement and milestone-driven Collaboration Rooms.
+3. **Structured Milestone Governance**: Transition cleanly from negotiation to execution via coin-based escrow settlement and milestone-driven Collaboration Rooms.
 4. **Verifiable Reputation**: Creator career scores and showcases derive from completed Collaboration Room deliverables and verified client reviews.
+5. **Coin Economy**: A transparent coin system (1 coin = Rp1,000) enables secure escrow, reduces payment gateway overhead, and creates platform stickiness.
 
 ## Accessibility & Inclusion
 

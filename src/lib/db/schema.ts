@@ -12,6 +12,7 @@ export const profiles = pgTable("profiles", {
   id: uuid("id").primaryKey(), // matches Supabase auth.users.id
   role: roleEnum("role").notNull().default("creator"),
   fullName: text("full_name").notNull(),
+  email: text("email"),
   avatarUrl: text("avatar_url"),
   phone: text("phone"),
   location: text("location"),

@@ -3,10 +3,28 @@ import { getAuthenticatedUser } from "@/lib/api-auth";
 import { getDb } from "@/lib/db";
 import { projectBriefs, profiles, businessProfiles } from "@/lib/db/schema";
 import { eq, desc } from "drizzle-orm";
+import { MOCK_ALL_UMKM } from "@/data/mockUmkm";
 
 export async function GET(req: NextRequest) {
   const db = getDb();
-  if (!db) return NextResponse.json({ error: "Database not connected" }, { status: 503 });
+  if (!db) {
+    const fallbackListings = MOCK_ALL_UMKM.flatMap((u) => u.activeBriefsList || []);
+    const mockBriefs = fallbackListings.map((b) => ({
+      id: b.id,
+      title: b.title,
+      category: b.category,
+      description: b.description,
+      expectedOutput: b.deliverables?.[0] || "Output sesuai kesepakatan",
+      budget: b.formattedBudget,
+      deadline: b.deadline,
+      status: "open",
+      createdAt: new Date().toISOString(),
+      businessId: "mock-biz-id",
+      businessName: b.clientName,
+      businessAvatar: b.clientAvatar,
+    }));
+    return NextResponse.json({ briefs: mockBriefs });
+  }
 
   try {
     const briefs = await db

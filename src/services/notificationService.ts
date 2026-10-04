@@ -48,7 +48,6 @@ export const notificationService = {
     location?: string;
     phone?: string;
     fullName?: string;
-    notifyEmail?: boolean;
     notifyPush?: boolean;
   }): Promise<{ success: boolean; error?: string }> {
     try {

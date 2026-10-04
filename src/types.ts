@@ -572,3 +572,30 @@ export interface PublicSchoolProfile {
   sectionOrder: string[];
 }
 
+export interface SchoolStudentProjectItem {
+  id: string;
+  studentId: string;
+  title: string;
+  studentName: string;
+  studentAvatar?: string;
+  category: string;
+  thumbnail: string;
+  createdDate: string;
+  viewsCount?: string;
+  isFeaturedSchool?: boolean;
+}
+
+export interface SchoolStudentItem {
+  id: string;
+  name: string;
+  email: string;
+  avatarUrl?: string;
+  role: string;
+  major: string;
+  classGrade: string;
+  graduationYear: string;
+  projectCount: number;
+  careerScore: number;
+  isFeatured?: boolean;
+}
+

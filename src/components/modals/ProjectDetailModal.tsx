@@ -27,6 +27,7 @@ import {
 } from 'lucide-react';
 import { FeedProject, Creator } from '@/types';
 import { MOCK_FEED_PROJECTS } from '@/data/mockFeedProjects';
+import { MOCK_CREATORS } from '@/data/mockCreators';
 import { ProjectCard } from '@/components/common/ProjectCard';
 import { Footer } from '@/components/layout/Footer';
 
@@ -214,8 +215,9 @@ export const ProjectDetailModal: React.FC<ProjectDetailModalProps> = ({
       ? currentProject.additionalMedia
       : [currentProject.coverImage || currentProject.mediaUrl || ''];
 
-  const creator = currentProject.creator;
-  const normalizedName = creator.name.toLowerCase().replace(/[^a-z0-9]/g, '');
+  const creator = currentProject.creator || MOCK_CREATORS[0];
+  const creatorName = creator?.name || 'Creator Creatorin';
+  const normalizedName = creatorName.toLowerCase().replace(/[^a-z0-9]/g, '');
   const creatorHandle = currentProject.socialHandle || `@${normalizedName}`;
   const creatorDomain = `${normalizedName}.creatorin.id`;
   const creatorEmail = `inquiry@${normalizedName}.com`;
@@ -228,8 +230,9 @@ export const ProjectDetailModal: React.FC<ProjectDetailModalProps> = ({
     categoryLabel.toLowerCase().includes('instagram') ||
     categoryLabel.toLowerCase().includes('reels');
 
+  const creatorId = creator?.id || '';
   const creatorOtherProjects = allProjects.filter(
-    project => (project.creatorId === creator.id || project.creator?.id === creator.id) && project.id !== currentProject.id
+    project => (project.creatorId === creatorId || project.creator?.id === creatorId) && project.id !== currentProject.id
   ).slice(0, 8);
 
   const displayOtherProjects = creatorOtherProjects.length >= 4
@@ -517,24 +520,24 @@ export const ProjectDetailModal: React.FC<ProjectDetailModalProps> = ({
         <div className="absolute inset-x-0 top-0 border-t border-black/10" />
         <button
           type="button"
-          onClick={() => onViewCreatorProfile?.(creator)}
+          onClick={() => creator && onViewCreatorProfile?.(creator)}
           className="absolute left-1/2 top-[-24px] size-14 -translate-x-1/2 rounded-full bg-white p-1 ring-1 ring-black/10 cursor-pointer"
-          title={`Lihat profil ${creator.name}`}
+          title={`Lihat profil ${creator?.name || 'Kreator'}`}
         >
-          <img src={creator.avatar} alt={creator.name} className="size-full rounded-full object-cover" />
+          <img src={creator?.avatar || '/creatorin/avatar.png'} alt={creator?.name || 'Kreator'} className="size-full rounded-full object-cover" />
         </button>
       </div>
 
       <div className="mx-auto flex max-w-[576px] flex-col items-center pt-4">
         <button
           type="button"
-          onClick={() => onViewCreatorProfile?.(creator)}
+          onClick={() => creator && onViewCreatorProfile?.(creator)}
           className="text-center text-[20px] font-bold leading-7 tracking-[0.2px] text-[#0D0C22] hover:underline cursor-pointer"
         >
-          {creator.name}
+          {creator?.name || 'Kreator'}
         </button>
         <p className="pt-3 text-center text-[14px] font-medium leading-5 tracking-[-0.15px] text-neutral-600">
-          {creator.bio || 'Kreator UGC autentik dengan engagement tinggi. Spesialis review skincare, makeup tutorial, dan unboxing estetik.'}
+          {creator?.bio || 'Kreator UGC autentik dengan engagement tinggi. Spesialis review skincare, makeup tutorial, dan unboxing estetik.'}
         </p>
 
         <div className="flex flex-wrap items-center justify-center gap-3 pt-5">
@@ -577,7 +580,7 @@ export const ProjectDetailModal: React.FC<ProjectDetailModalProps> = ({
         </h3>
         <button
           type="button"
-          onClick={() => onViewCreatorProfile?.(creator)}
+          onClick={() => creator && onViewCreatorProfile?.(creator)}
           className="inline-flex items-center gap-1 text-[12px] font-bold leading-4 text-[#155DFC] hover:underline cursor-pointer"
         >
           Lihat Proyek Lainnya
@@ -680,7 +683,7 @@ export const ProjectDetailModal: React.FC<ProjectDetailModalProps> = ({
               </div>
               <div className="flex justify-between">
                 <span className="font-medium text-neutral-400">Kreator:</span>
-                <span className="font-semibold text-neutral-800">{creator.name}</span>
+                <span className="font-semibold text-neutral-800">{creator?.name || 'Kreator'}</span>
               </div>
               <div className="flex justify-between">
                 <span className="font-medium text-neutral-400">Kategori:</span>

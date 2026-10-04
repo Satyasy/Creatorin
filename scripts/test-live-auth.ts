@@ -24,7 +24,7 @@ async function testAuthAndRoutes() {
     "/explore",
     "/chat",
     "/briefs",
-    "/collaboration",
+    "/contracts",
     "/notifications",
     "/settings"
   ];

@@ -9,7 +9,9 @@ export async function POST(
   try {
     const { id } = await params;
     const body = await req.json();
-    const status: SchoolStatus = body.status;
+    const status: SchoolStatus =
+      body.status ||
+      (body.action === 'approve' ? 'approved' : body.action === 'reject' ? 'rejected' : undefined);
 
     if (!status || !['approved', 'rejected', 'pending'].includes(status)) {
       return NextResponse.json({ error: "Status tidak valid" }, { status: 400 });
@@ -25,3 +27,6 @@ export async function POST(
     return NextResponse.json({ error: err.message }, { status: 500 });
   }
 }
+
+export const PATCH = POST;
+

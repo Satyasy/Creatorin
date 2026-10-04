@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getAuthenticatedUser } from "@/lib/api-auth";
 import { getDb } from "@/lib/db";
-import { invoices, collaborationRooms } from "@/lib/db/schema";
-import { eq } from "drizzle-orm";
+import { invoices, collaborationRooms, creatorWallets, walletTransactions, notifications } from "@/lib/db/schema";
+import { eq, sql } from "drizzle-orm";
 
 export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const { id: invoiceId } = await params;
@@ -20,6 +20,17 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     if (invoice.status === "paid") {
       return NextResponse.json({ error: "Invoice sudah dibayar" }, { status: 400 });
     }
+    if (user.id !== invoice.businessId) {
+      return NextResponse.json({ error: "Hanya UMKM pemilik invoice yang dapat membayar." }, { status: 403 });
+    }
+
+    const [wallet] = await db.select().from(creatorWallets).where(eq(creatorWallets.creatorId, user.id)).limit(1);
+    if (!wallet || wallet.balance < invoice.totalAmount) {
+      return NextResponse.json({ error: "Saldo koin tidak cukup. Lakukan top up sebelum membayar invoice." }, { status: 400 });
+    }
+
+    await db.update(creatorWallets).set({ balance: sql`${creatorWallets.balance} - ${invoice.totalAmount}`, updatedAt: new Date() }).where(eq(creatorWallets.creatorId, user.id));
+    await db.insert(walletTransactions).values({ walletId: wallet.id, type: "escrow_hold", amount: -invoice.totalAmount, description: `Koin ditahan untuk invoice ${invoice.invoiceNumber}`, status: "completed" });
 
     // 1. Mark invoice as paid
     await db
@@ -44,12 +55,15 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
       })
       .returning();
 
+    await db.insert(notifications).values({ userId: invoice.creatorId, type: 'invoice', title: 'Invoice dibayar', body: `Koin untuk "${invoice.title}" sudah masuk escrow.`, linkUrl: '/contracts' });
+
     return NextResponse.json({
       success: true,
-      message: "Pembayaran berhasil. Collaboration Room otomatis dibuat.",
+      message: "Pembayaran berhasil. Koin ditahan di escrow dan status proyek dapat dipantau di Contracts.",
       room,
     });
-  } catch (err: any) {
-    return NextResponse.json({ error: err.message }, { status: 500 });
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : 'Gagal memproses pembayaran.';
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 }

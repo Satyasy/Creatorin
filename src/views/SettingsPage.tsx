@@ -32,7 +32,6 @@ export const SettingsPage: React.FC = () => {
   const [bio, setBio] = useState(user?.bio || 'Spesialis antarmuka UI/UX modern, visual website konversi tinggi, dan sistem desain komersial.');
   
   // Notification states
-  const [notifyEmail, setNotifyEmail] = useState(true);
   const [notifyPush, setNotifyPush] = useState(true);
   const [language, setLanguage] = useState<'id' | 'en'>('id');
 
@@ -70,7 +69,6 @@ export const SettingsPage: React.FC = () => {
           location,
           phone,
           bio,
-          notifyEmail,
           notifyPush,
           language,
           ...(newPassword && newPassword === confirmPassword ? { newPassword } : {})
@@ -281,19 +279,6 @@ export const SettingsPage: React.FC = () => {
               <h3 className="text-sm font-bold text-[#171717]">Preferensi Notifikasi</h3>
               
               <div className="space-y-4">
-                <div className="flex items-center justify-between p-4 rounded-xl border border-[#E2E8F0] bg-neutral-50/50">
-                  <div>
-                    <h4 className="text-xs sm:text-sm font-semibold text-[#171717]">Notifikasi Email</h4>
-                    <p className="text-xs text-neutral-500 mt-0.5">Terima pembaruan brief, pembayaran escrow, dan pesan baru via email.</p>
-                  </div>
-                  <input
-                    type="checkbox"
-                    checked={notifyEmail}
-                    onChange={(e) => setNotifyEmail(e.target.checked)}
-                    className="w-5 h-5 accent-[#0B1F3A] cursor-pointer"
-                  />
-                </div>
-
                 <div className="flex items-center justify-between p-4 rounded-xl border border-[#E2E8F0] bg-neutral-50/50">
                   <div>
                     <h4 className="text-xs sm:text-sm font-semibold text-[#171717]">Notifikasi Push & Browser</h4>

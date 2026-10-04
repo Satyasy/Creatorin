@@ -10,11 +10,11 @@ export async function PUT(req: NextRequest) {
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const body = await req.json();
-  const { newPassword, newEmail, location, phone, fullName, notifyEmail, notifyPush, language } = body;
+  const { newPassword, newEmail, location, phone, fullName, notifyPush, language } = body;
 
   const hasAuthUpdates = Boolean(newPassword || newEmail);
   const hasProfileUpdates = Boolean(location !== undefined || phone !== undefined || fullName !== undefined);
-  const hasPrefUpdates = Boolean(notifyEmail !== undefined || notifyPush !== undefined || language !== undefined);
+  const hasPrefUpdates = Boolean(notifyPush !== undefined || language !== undefined);
 
   if (!hasAuthUpdates && !hasProfileUpdates && !hasPrefUpdates) {
     return NextResponse.json({ error: "Tidak ada data perubahan yang dikirim." }, { status: 400 });
@@ -56,7 +56,6 @@ export async function PUT(req: NextRequest) {
       settings: {
         location,
         phone,
-        notifyEmail: notifyEmail ?? true,
         notifyPush: notifyPush ?? true,
         language: language || "id",
       },

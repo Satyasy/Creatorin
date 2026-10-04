@@ -27,6 +27,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     if (room.status === "completed") {
       return NextResponse.json({ error: "Proyek sudah selesai, revisi tidak dapat diajukan." }, { status: 400 });
     }
+    if (user.id !== room.businessId) return NextResponse.json({ error: 'Hanya UMKM pemilik proyek yang dapat meminta revisi.' }, { status: 403 });
 
     // 1. Check current submission
     const [latestSub] = await db
@@ -80,7 +81,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
       type: "submission",
       title: "Permintaan Revisi Proyek",
       body: `Klien meminta revisi pada proyek "${room.title}": "${feedback.slice(0, 80)}..."`,
-      linkUrl: `/collaboration/${roomId}`,
+      linkUrl: '/contracts',
     });
 
     return NextResponse.json({
@@ -88,7 +89,8 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
       message: `Permintaan revisi ke-${currentRevisions + 1} berhasil dikirim ke kreator.`,
       revision: newRev,
     }, { status: 201 });
-  } catch (err: any) {
-    return NextResponse.json({ error: err.message }, { status: 500 });
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : 'Gagal mengirim permintaan revisi.';
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 }

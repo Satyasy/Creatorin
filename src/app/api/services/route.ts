@@ -3,6 +3,7 @@ import { getAuthenticatedUser } from "@/lib/api-auth";
 import { getDb } from "@/lib/db";
 import { services, profiles, creatorProfiles } from "@/lib/db/schema";
 import { eq, desc, ilike, and } from "drizzle-orm";
+import { MOCK_CREATORS } from "@/data/mockCreators";
 import { getCache, setCache, deleteCache } from "@/lib/redis";
 
 export async function GET(req: NextRequest) {
@@ -19,7 +20,35 @@ export async function GET(req: NextRequest) {
 
   const db = getDb();
   if (!db) {
-    return NextResponse.json({ error: "Database not connected" }, { status: 503 });
+    let allServices = MOCK_CREATORS.flatMap((c) =>
+      (c.services || []).map((s, idx) => ({
+        id: s.id,
+        title: s.title,
+        category: s.tag || s.category || c.category || "Desain",
+        description: s.description || "Layanan kreatif profesional oleh " + c.name,
+        price: s.formattedPrice || "Rp" + s.price.toLocaleString("id-ID"),
+        priceNumeric: s.price,
+        estimatedDays: parseInt(s.deliveryDays?.replace(/[^0-9]/g, "") || "3"),
+        shapeIdx: idx,
+        imageUrl: s.coverImage || c.avatar,
+        isActive: true,
+        createdAt: new Date().toISOString(),
+        creatorId: c.id,
+        creatorName: c.name,
+        creatorAvatar: c.avatar,
+        creatorSlug: c.username || c.id,
+      }))
+    );
+    if (category) {
+      allServices = allServices.filter(s => s.category.toLowerCase().includes(category.toLowerCase()));
+    }
+    if (creatorId) {
+      allServices = allServices.filter(s => s.creatorId === creatorId);
+    }
+    if (search) {
+      allServices = allServices.filter(s => s.title.toLowerCase().includes(search.toLowerCase()) || s.creatorName.toLowerCase().includes(search.toLowerCase()));
+    }
+    return NextResponse.json({ services: allServices });
   }
 
   try {
