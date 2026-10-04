@@ -32,9 +32,9 @@ export function CreatorSidebar() {
   const { user, signOut } = useAuth();
   const isActive = (href: string) => href === '/' ? pathname === '/' : pathname.startsWith(href);
 
-  const handleLogout = () => {
-    signOut();
-    router.push('/');
+  const handleLogout = async () => {
+    await signOut();
+    window.location.href = '/';
   };
 
   const renderMainLink = ({ label, href, icon: Icon }: CreatorLink) => {
