@@ -23,13 +23,15 @@ export function mapRoleToFrontend(dbRole: string): UserRole {
   return 'creator';
 }
 
-export function mapRoleToBackend(feRole: UserRole): 'creator' | 'business' {
+export function mapRoleToBackend(feRole: UserRole): 'creator' | 'business' | 'school' {
   if (feRole === 'umkm') return 'business';
+  if (feRole === 'school') return 'school';
   return 'creator';
 }
 
 export const authService = {
-  async signInWithGoogle(role: UserRole = 'creator'): Promise<{ success: boolean; error?: string }> {
+  async signInWithGoogle(_role: UserRole = 'creator'): Promise<{ success: boolean; error?: string }> {
+    void _role;
     return { success: false, error: 'Login Google sedang dalam pemeliharaan. Silakan masuk menggunakan email dan kata sandi.' };
   },
 
