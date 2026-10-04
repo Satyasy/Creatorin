@@ -76,6 +76,9 @@ npm run build
 # Standalone assets requirement
 if [ -d "${NEW_RELEASE_DIR}/.next/standalone" ]; then
     echo "📋 Copying static and public assets to standalone bundle..."
+    if [ -d "${NEW_RELEASE_DIR}/.next/standalone/releases" ]; then
+        cp -rn "${NEW_RELEASE_DIR}/.next/standalone/releases/"*/* "${NEW_RELEASE_DIR}/.next/standalone/" 2>/dev/null || true
+    fi
     mkdir -p "${NEW_RELEASE_DIR}/.next/standalone/.next"
     cp -rn "${NEW_RELEASE_DIR}/.next/static" "${NEW_RELEASE_DIR}/.next/standalone/.next/" 2>/dev/null || true
     if [ -d "${NEW_RELEASE_DIR}/public" ]; then
