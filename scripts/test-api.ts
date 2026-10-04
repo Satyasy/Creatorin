@@ -399,7 +399,6 @@ async function main() {
       headers: { "x-user-id": CREATOR_ID },
       body: JSON.stringify({
         location: "Surabaya, Jawa Timur",
-        notifyEmail: true,
         notifyPush: true,
       }),
     });

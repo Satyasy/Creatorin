@@ -1,8 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getAuthenticatedUser } from "@/lib/api-auth";
 import { getDb } from "@/lib/db";
-import { invoices, collaborationRooms, creatorWallets, walletTransactions, notifications, profiles } from "@/lib/db/schema";
-import { sendCriticalEmail } from '@/lib/email';
+import { invoices, collaborationRooms, creatorWallets, walletTransactions, notifications } from "@/lib/db/schema";
 import { eq, sql } from "drizzle-orm";
 
 export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
@@ -57,8 +56,6 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
       .returning();
 
     await db.insert(notifications).values({ userId: invoice.creatorId, type: 'invoice', title: 'Invoice dibayar', body: `Koin untuk "${invoice.title}" sudah masuk escrow.`, linkUrl: '/contracts' });
-    const [creator] = await db.select({ email: profiles.email }).from(profiles).where(eq(profiles.id, invoice.creatorId)).limit(1);
-    await sendCriticalEmail(creator?.email, 'Invoice Creatorin sudah dibayar', `Koin untuk proyek ${invoice.title} sudah masuk escrow. Buka Contracts untuk memantau pekerjaan.`);
 
     return NextResponse.json({
       success: true,

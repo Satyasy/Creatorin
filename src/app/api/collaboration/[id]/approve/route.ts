@@ -1,8 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getAuthenticatedUser } from "@/lib/api-auth";
 import { getDb } from "@/lib/db";
-import { collaborationRooms, invoices, creatorWallets, walletTransactions, submissions, creatorProfiles, notifications, profiles } from "@/lib/db/schema";
-import { sendCriticalEmail } from '@/lib/email';
+import { collaborationRooms, invoices, creatorWallets, walletTransactions, submissions, creatorProfiles, notifications } from "@/lib/db/schema";
 import { eq, sql } from "drizzle-orm";
 
 export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
@@ -81,8 +80,6 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     }
 
     await db.insert(notifications).values({ userId: room.creatorId, type: 'approval', title: 'Hasil disetujui', body: `${Math.floor(payoutAmount / 1000)} koin telah masuk ke dompet Anda.`, linkUrl: '/wallet' });
-    const [creatorContact] = await db.select({ email: profiles.email }).from(profiles).where(eq(profiles.id, room.creatorId)).limit(1);
-    await sendCriticalEmail(creatorContact?.email, 'Hasil proyek disetujui', `${Math.floor(payoutAmount / 1000)} koin telah masuk ke dompet Creatorin Anda setelah fee platform.`);
 
     return NextResponse.json({
       success: true,

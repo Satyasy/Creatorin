@@ -1,8 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getAuthenticatedUser } from "@/lib/api-auth";
 import { getDb } from "@/lib/db";
-import { submissions, collaborationRooms, notifications, profiles } from "@/lib/db/schema";
-import { sendCriticalEmail } from '@/lib/email';
+import { submissions, collaborationRooms, notifications } from "@/lib/db/schema";
 import { eq, desc } from "drizzle-orm";
 
 export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
@@ -47,8 +46,6 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
       .where(eq(collaborationRooms.id, roomId));
 
     await db.insert(notifications).values({ userId: room.businessId, type: 'submission', title: 'Hasil baru siap ditinjau', body: `Creator mengirim versi ${nextVersion} untuk "${room.title}".`, linkUrl: '/contracts' });
-    const [business] = await db.select({ email: profiles.email }).from(profiles).where(eq(profiles.id, room.businessId)).limit(1);
-    await sendCriticalEmail(business?.email, 'Hasil proyek siap ditinjau', `Creator mengirim versi ${nextVersion} untuk ${room.title}. Buka daftar Contracts untuk meninjau status proyek.`);
 
     return NextResponse.json({ success: true, submission: sub }, { status: 201 });
   } catch (err: unknown) {

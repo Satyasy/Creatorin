@@ -1,8 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getAuthenticatedUser } from "@/lib/api-auth";
 import { getDb } from "@/lib/db";
-import { collaborationRooms, revisions, submissions, notifications, profiles } from "@/lib/db/schema";
-import { sendCriticalEmail } from '@/lib/email';
+import { collaborationRooms, revisions, submissions, notifications } from "@/lib/db/schema";
 import { eq, desc, count } from "drizzle-orm";
 
 export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
@@ -84,8 +83,6 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
       body: `Klien meminta revisi pada proyek "${room.title}": "${feedback.slice(0, 80)}..."`,
       linkUrl: '/contracts',
     });
-    const [creator] = await db.select({ email: profiles.email }).from(profiles).where(eq(profiles.id, room.creatorId)).limit(1);
-    await sendCriticalEmail(creator?.email, 'Permintaan revisi proyek', `UMKM meminta revisi untuk ${room.title}. Buka daftar Contracts untuk memantau status proyek.`);
 
     return NextResponse.json({
       success: true,
