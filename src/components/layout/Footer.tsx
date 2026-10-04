@@ -22,11 +22,11 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, onOpenBrief }) => {
   };
 
   return (
-    <footer className="w-full relative overflow-hidden bg-white border-t border-neutral-200/80 pt-12 sm:pt-16 pb-10 sm:pb-14 font-sans text-[#0d0c22]">
+    <footer className="w-full relative overflow-hidden bg-white border-t border-neutral-200/80 pt-8 sm:pt-10 pb-8 sm:pb-10 font-sans text-[#0d0c22]">
       <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 relative">
         
         {/* Top Bar: Brand Logo di Kiri & Social Media di Kanan */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 pb-8 border-b border-neutral-200/80">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-neutral-200/80">
           <div
             className="inline-flex items-center gap-1.5 cursor-pointer select-none group w-fit"
             onClick={() => navigateTo('home', '/')}
@@ -73,7 +73,7 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, onOpenBrief }) => {
         </div>
 
         {/* Middle Section: Area Brand & Deskripsi di Kiri, 4 Kolom Navigasi di Kanan */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 mt-10 sm:mt-12 relative">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 mt-6 sm:mt-8 relative">
           
           {/* Siluet Logo Creatorin di Sisi Kiri Footer (Di Belakang Kolom Tentang Platform) */}
           <div 
@@ -315,25 +315,16 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, onOpenBrief }) => {
 
         </div>
 
-        {/* Elemen Visual Branding Creatorin di Bagian Bawah */}
-        <div className="mt-14 sm:mt-20 pt-4 select-none pointer-events-none text-center overflow-hidden" aria-hidden="true">
-          <svg className="w-full h-24 sm:h-36 lg:h-44 -mb-6 sm:-mb-10 block mx-auto" viewBox="0 0 1200 180" fill="none" aria-hidden="true">
-            <text x="50%" y="80%" textAnchor="middle" fill="#E5E5E5" fontSize="180" fontWeight="900" letterSpacing="-0.05em" fontFamily="system-ui, -apple-system, sans-serif">
-              CREATORIN
-            </text>
-          </svg>
-        </div>
-
         {/* Official Ecosystem & Partner Endorsement Strip */}
-        <div className="mt-10 pt-8 pb-4 border-t border-neutral-200/80 text-center">
-          <p className="text-xs font-bold text-neutral-400 uppercase tracking-widest mb-5">
+        <div className="mt-8 pt-6 pb-2 border-t border-neutral-200/80 text-center">
+          <p className="text-[11px] font-bold text-neutral-400 uppercase tracking-widest mb-4">
             Didukung & Berkolaborasi Bersama Ekosistem Industri Digital Nasional
           </p>
           <div className="flex items-center justify-center">
             <img 
               src="/creatorin/partners.png" 
               alt="Didukung & Berkolaborasi Bersama: Jagoan Hosting, Komdigi, Maspion IT, Garuda Spark"
-              className="max-h-12 sm:max-h-14 w-auto object-contain filter grayscale hover:grayscale-0 transition-all opacity-85 hover:opacity-100 duration-300"
+              className="max-h-10 sm:max-h-12 w-auto object-contain filter grayscale hover:grayscale-0 transition-all opacity-85 hover:opacity-100 duration-300"
             />
           </div>
         </div>

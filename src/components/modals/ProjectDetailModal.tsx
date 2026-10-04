@@ -404,8 +404,7 @@ export const ProjectDetailModal: React.FC<ProjectDetailModalProps> = ({
           </button>
 
           <div className="mt-1 flex flex-wrap items-center gap-2">
-            <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-200/70 bg-emerald-50 px-2.5 py-0.5 text-[11px] font-semibold leading-[14.7px] tracking-[0.06px] text-emerald-700">
-              <span className="size-1.5 rounded-full bg-emerald-500" />
+            <span className="inline-flex items-center rounded-full border border-emerald-200/70 bg-emerald-50 px-2.5 py-0.5 text-[11px] font-semibold leading-[14.7px] tracking-[0.06px] text-emerald-700">
               Available for work
             </span>
             <button

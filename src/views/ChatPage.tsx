@@ -378,9 +378,6 @@ export const ChatPage: React.FC<ChatPageProps> = ({
                         alt={conv.name}
                         className="w-10 h-10 rounded-full object-cover"
                       />
-                      {conv.online && (
-                        <span className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-emerald-500 rounded-full ring-2 ring-white"></span>
-                      )}
                     </div>
 
                     {/* Informasi Teks */}
@@ -471,9 +468,6 @@ export const ChatPage: React.FC<ChatPageProps> = ({
                     alt={activeConversation.name}
                     className="w-9 h-9 rounded-full object-cover"
                   />
-                  {activeConversation.online && (
-                    <span className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-emerald-500 rounded-full ring-2 ring-white"></span>
-                  )}
                 </div>
 
                 <div className="min-w-0">

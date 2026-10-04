@@ -55,12 +55,12 @@ export const Navbar: React.FC<NavbarProps> = ({
     router.push(path);
   };
 
-  const handleSignOutAction = () => {
+  const handleSignOutAction = async () => {
     if (onSignOut) {
       onSignOut();
     } else {
-      authSignOut();
-      router.push('/');
+      await authSignOut();
+      window.location.href = '/';
     }
   };
 
