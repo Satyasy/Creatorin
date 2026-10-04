@@ -9,10 +9,11 @@ export const assessmentStatusEnum = pgEnum("assessment_status", ["not_started", 
 
 // 1. Unified Profiles
 export const profiles = pgTable("profiles", {
-  id: uuid("id").primaryKey(), // matches Supabase auth.users.id
+  id: uuid("id").primaryKey(), // matches unique user uuid
   role: roleEnum("role").notNull().default("creator"),
   fullName: text("full_name").notNull(),
   email: text("email"),
+  passwordHash: text("password_hash"),
   avatarUrl: text("avatar_url"),
   phone: text("phone"),
   location: text("location"),

@@ -1,5 +1,5 @@
 import { UserRole } from '@/types';
-import { createClient } from '@/lib/supabase/client';
+import { apiUrl } from '@/lib/api-config';
 
 export interface UserSession {
   id: string;
@@ -11,6 +11,10 @@ export interface UserSession {
   location?: string;
   phone?: string;
   bio?: string;
+  roleTitle?: string;
+  handle?: string;
+  skills?: string[];
+  startingPrice?: string;
 }
 
 export function mapRoleToFrontend(dbRole: string): UserRole {
@@ -25,47 +29,48 @@ export function mapRoleToBackend(feRole: UserRole): 'creator' | 'business' {
 }
 
 export const authService = {
-  async signInWithGoogle(role: Exclude<UserRole, 'school'> = 'umkm'): Promise<{ success: boolean; error?: string }> {
-    const supabase = createClient();
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider: 'google',
-      options: {
-        redirectTo: `${window.location.origin}/auth/callback?role=${mapRoleToBackend(role)}`,
-      },
-    });
-    return error ? { success: false, error: error.message } : { success: true };
+  async signInWithGoogle(role: UserRole = 'creator'): Promise<{ success: boolean; error?: string }> {
+    return { success: false, error: 'Login Google sedang dalam pemeliharaan. Silakan masuk menggunakan email dan kata sandi.' };
   },
+
   async getCurrentUser(): Promise<UserSession | null> {
     try {
-      const res = await fetch('/api/auth/me', {
-        headers: { credentials: 'include' },
+      const res = await fetch(apiUrl('/api/auth/me'), {
+        credentials: 'include',
         cache: 'no-store',
       });
       if (!res.ok) return null;
       const data = await res.json();
       if (!data.user) return null;
 
+      const details = data.details || {};
+      const fallbackName = data.user.fullName || data.user.email?.split('@')[0] || 'User';
       return {
         id: data.user.id,
-        name: data.user.fullName || data.user.email.split('@')[0],
+        name: fallbackName,
         email: data.user.email,
         role: mapRoleToFrontend(data.user.role),
         dbRole: data.user.role,
-        avatar: data.user.avatarUrl || '',
+        avatar: data.user.avatarUrl || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=240&auto=format&fit=crop&q=80',
         location: data.user.location,
         phone: data.user.phone,
-        bio: data.details?.bio || data.details?.description || '',
+        bio: details.bio || details.description || data.user.bio || '',
+        roleTitle: details.headline || (data.user.role === 'creator' ? 'Kreator Konten' : 'Brand / UMKM'),
+        handle: details.slug ? `@${details.slug}` : `@${fallbackName.toLowerCase().replace(/[^a-z0-9]/g, '')}`,
+        skills: details.skills || [],
+        startingPrice: details.startingPrice,
       };
     } catch {
       return null;
     }
   },
 
-  async signIn(email: string, password: string):Promise<{ success: boolean; user?: UserSession; error?: string }> {
+  async signIn(email: string, password: string): Promise<{ success: boolean; user?: UserSession; error?: string }> {
     try {
-      const res = await fetch('/api/auth/login', {
+      const res = await fetch(apiUrl('/api/auth/login'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body: JSON.stringify({ email, password }),
       });
       const data = await res.json();
@@ -73,13 +78,16 @@ export const authService = {
         return { success: false, error: data.error || 'Gagal masuk akun.' };
       }
 
+      const fallbackName = data.user.fullName || data.user.email?.split('@')[0] || 'User';
       const user: UserSession = {
         id: data.user.id,
-        name: data.user.fullName || data.user.email.split('@')[0],
+        name: fallbackName,
         email: data.user.email,
         role: mapRoleToFrontend(data.user.role),
         dbRole: data.user.role,
-        avatar: data.user.avatarUrl || '',
+        avatar: data.user.avatarUrl || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=240&auto=format&fit=crop&q=80',
+        location: data.user.location,
+        phone: data.user.phone,
       };
 
       return { success: true, user };
@@ -97,9 +105,10 @@ export const authService = {
   }): Promise<{ success: boolean; user?: UserSession; requiresConfirmation?: boolean; error?: string }> {
     try {
       const dbRole = mapRoleToBackend(params.role);
-      const res = await fetch('/api/auth/register', {
+      const res = await fetch(apiUrl('/api/auth/register'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body: JSON.stringify({
           email: params.email,
           password: params.password,
@@ -118,7 +127,7 @@ export const authService = {
         email: data.user.email,
         role: params.role,
         dbRole,
-        avatar: '',
+        avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=240&auto=format&fit=crop&q=80',
       };
 
       return { success: true, user, requiresConfirmation: Boolean(data.requiresConfirmation) };
@@ -130,9 +139,10 @@ export const authService = {
 
   async completeOnboarding(payload: Record<string, unknown>): Promise<{ success: boolean; error?: string }> {
     try {
-      const res = await fetch('/api/onboarding', {
+      const res = await fetch(apiUrl('/api/onboarding'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body: JSON.stringify(payload),
       });
       const data = await res.json();
@@ -142,6 +152,34 @@ export const authService = {
       return { success: true };
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : 'Gagal menghubungi server.';
+      return { success: false, error: msg };
+    }
+  },
+
+  async updateProfile(payload: {
+    fullName?: string;
+    phone?: string;
+    location?: string;
+    avatarUrl?: string;
+    headline?: string;
+    bio?: string;
+    skills?: string[];
+    startingPrice?: string;
+  }): Promise<{ success: boolean; message?: string; error?: string }> {
+    try {
+      const res = await fetch(apiUrl('/api/profile'), {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify(payload),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        return { success: false, error: data.error || 'Gagal memperbarui profil.' };
+      }
+      return { success: true, message: data.message || 'Profil berhasil diperbarui.' };
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Terjadi kendala saat memperbarui profil.';
       return { success: false, error: msg };
     }
   },
