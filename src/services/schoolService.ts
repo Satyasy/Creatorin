@@ -10,6 +10,7 @@ import {
   SchoolStatus, 
   AssessmentStatus 
 } from '@/types';
+import { apiUrl } from '@/lib/api-config';
 
 // Default Rubric Template
 export const DEFAULT_RUBRIC: RubricCriterion[] = [

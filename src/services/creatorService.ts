@@ -1,6 +1,7 @@
 import { Creator, CreatorService, FeedProject } from '@/types';
 import { MOCK_CREATORS } from '@/data/mockCreators';
 import { MOCK_FEED_PROJECTS } from '@/data/mockFeedProjects';
+import { apiUrl } from '@/lib/api-config';
 
 function transformDbCreatorToFrontend(c: any): Creator {
   return {
@@ -43,7 +44,10 @@ export const creatorService = {
       if (params?.search) searchParams.set('search', params.search);
       if (params?.location) searchParams.set('location', params.location);
 
-      const res = await fetch(`/api/creators?${searchParams.toString()}`, { cache: 'no-store' });
+      const res = await fetch(apiUrl(`/api/creators?${searchParams.toString()}`), {
+        credentials: 'include',
+        cache: 'no-store',
+      });
       if (!res.ok) throw new Error('API failed');
 
       const data = await res.json();
@@ -58,7 +62,10 @@ export const creatorService = {
 
   async getCreatorDetail(idOrSlug: string): Promise<Creator | null> {
     try {
-      const res = await fetch(`/api/creators/${encodeURIComponent(idOrSlug)}`, { cache: 'no-store' });
+      const res = await fetch(apiUrl(`/api/creators/${encodeURIComponent(idOrSlug)}`), {
+        credentials: 'include',
+        cache: 'no-store',
+      });
       if (res.ok) {
         const data = await res.json();
         if (data.creator) {
@@ -88,7 +95,10 @@ export const creatorService = {
 
   async getFeedProjects(): Promise<FeedProject[]> {
     try {
-      const res = await fetch('/api/projects', { cache: 'no-store' });
+      const res = await fetch(apiUrl('/api/projects'), {
+        credentials: 'include',
+        cache: 'no-store',
+      });
       if (res.ok) {
         const data = await res.json();
         if (Array.isArray(data.projects) && data.projects.length > 0) {

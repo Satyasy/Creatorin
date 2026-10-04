@@ -1,10 +1,14 @@
 import { ProjectListing } from '@/types';
 import { MOCK_ALL_UMKM } from '@/data/mockUmkm';
+import { apiUrl } from '@/lib/api-config';
 
 export const briefService = {
   async getBriefs(): Promise<ProjectListing[]> {
     try {
-      const res = await fetch('/api/briefs', { cache: 'no-store' });
+      const res = await fetch(apiUrl('/api/briefs'), {
+        credentials: 'include',
+        cache: 'no-store',
+      });
       if (res.ok) {
         const data = await res.json();
         if (Array.isArray(data.briefs) && data.briefs.length > 0) {
@@ -38,7 +42,10 @@ export const briefService = {
 
   async getBriefDetail(id: string) {
     try {
-      const res = await fetch(`/api/briefs/${id}`, { cache: 'no-store' });
+      const res = await fetch(apiUrl(`/api/briefs/${id}`), {
+        credentials: 'include',
+        cache: 'no-store',
+      });
       if (res.ok) {
         return await res.json();
       }
@@ -57,9 +64,10 @@ export const briefService = {
     deadline?: string;
   }): Promise<{ success: boolean; brief?: any; error?: string }> {
     try {
-      const res = await fetch('/api/briefs', {
+      const res = await fetch(apiUrl('/api/briefs'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body: JSON.stringify(payload),
       });
       const data = await res.json();
@@ -73,9 +81,10 @@ export const briefService = {
 
   async applyToBrief(briefId: string, pitch: string, proposedPrice: string): Promise<{ success: boolean; error?: string }> {
     try {
-      const res = await fetch(`/api/briefs/${briefId}/apply`, {
+      const res = await fetch(apiUrl(`/api/briefs/${briefId}/apply`), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body: JSON.stringify({ pitch, proposedPrice }),
       });
       const data = await res.json();
@@ -89,8 +98,9 @@ export const briefService = {
 
   async acceptApplication(briefId: string, applicationId: string): Promise<{ success: boolean; conversationId?: string; error?: string }> {
     try {
-      const res = await fetch(`/api/briefs/${briefId}/applications/${applicationId}/accept`, {
+      const res = await fetch(apiUrl(`/api/briefs/${briefId}/applications/${applicationId}/accept`), {
         method: 'POST',
+        credentials: 'include',
       });
       const data = await res.json();
       if (!res.ok) return { success: false, error: data.error || 'Gagal menerima pelamar' };

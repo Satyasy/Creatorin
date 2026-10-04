@@ -1,6 +1,7 @@
 import { CollaborationItem } from '@/types';
 import { MOCK_COLLABORATIONS } from '@/data/mockCollaborations';
 import { createClient } from '@/lib/supabase/client';
+import { apiUrl } from '@/lib/api-config';
 
 export const collabService = {
   async getCollaborations(): Promise<CollaborationItem[]> {
@@ -9,7 +10,10 @@ export const collabService = {
 
   async getRoomDetail(roomId: string) {
     try {
-      const res = await fetch(`/api/collaboration/${roomId}`, { cache: 'no-store' });
+      const res = await fetch(apiUrl(`/api/collaboration/${roomId}`), {
+        credentials: 'include',
+        cache: 'no-store',
+      });
       if (res.ok) {
         return await res.json();
       }
@@ -21,9 +25,10 @@ export const collabService = {
 
   async submitDraft(roomId: string, notes: string, fileUrls: string[]): Promise<{ success: boolean; submission?: any; error?: string }> {
     try {
-      const res = await fetch(`/api/collaboration/${roomId}/submit`, {
+      const res = await fetch(apiUrl(`/api/collaboration/${roomId}/submit`), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body: JSON.stringify({ notes, fileUrls }),
       });
       const data = await res.json();
@@ -37,9 +42,10 @@ export const collabService = {
 
   async requestRevision(roomId: string, feedback: string): Promise<{ success: boolean; revision?: any; error?: string }> {
     try {
-      const res = await fetch(`/api/collaboration/${roomId}/revision`, {
+      const res = await fetch(apiUrl(`/api/collaboration/${roomId}/revision`), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body: JSON.stringify({ feedback }),
       });
       const data = await res.json();
@@ -53,7 +59,10 @@ export const collabService = {
 
   async approveCollab(roomId: string): Promise<{ success: boolean; error?: string }> {
     try {
-      const res = await fetch(`/api/collaboration/${roomId}/approve`, { method: 'POST' });
+      const res = await fetch(apiUrl(`/api/collaboration/${roomId}/approve`), {
+        method: 'POST',
+        credentials: 'include',
+      });
       const data = await res.json();
       if (!res.ok) return { success: false, error: data.error || 'Persetujuan gagal diproses' };
       return { success: true };
@@ -71,9 +80,10 @@ export const collabService = {
     comment: string;
   }): Promise<{ success: boolean; review?: any; error?: string }> {
     try {
-      const res = await fetch('/api/reviews', {
+      const res = await fetch(apiUrl('/api/reviews'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body: JSON.stringify(payload),
       });
       const data = await res.json();

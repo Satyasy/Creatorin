@@ -1,4 +1,5 @@
 import { AuthState, UserRole } from '@/types';
+import { apiUrl } from '@/lib/api-config';
 
 export interface UserSession {
   id: string;
@@ -24,8 +25,8 @@ export function mapRoleToBackend(feRole: UserRole): 'creator' | 'business' {
 export const authService = {
   async getCurrentUser(): Promise<UserSession | null> {
     try {
-      const res = await fetch('/api/auth/me', {
-        headers: { credentials: 'include' },
+      const res = await fetch(apiUrl('/api/auth/me'), {
+        credentials: 'include',
         cache: 'no-store',
       });
       if (!res.ok) return null;
@@ -49,9 +50,10 @@ export const authService = {
 
   async signIn(email: string, password: string):Promise<{ success: boolean; user?: UserSession; error?: string }> {
     try {
-      const res = await fetch('/api/auth/login', {
+      const res = await fetch(apiUrl('/api/auth/login'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body: JSON.stringify({ email, password }),
       });
       const data = await res.json();
@@ -83,9 +85,10 @@ export const authService = {
   }): Promise<{ success: boolean; user?: UserSession; error?: string }> {
     try {
       const dbRole = mapRoleToBackend(params.role);
-      const res = await fetch('/api/auth/register', {
+      const res = await fetch(apiUrl('/api/auth/register'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body: JSON.stringify({
           email: params.email,
           password: params.password,
@@ -116,9 +119,10 @@ export const authService = {
 
   async completeOnboarding(payload: Record<string, unknown>): Promise<{ success: boolean; error?: string }> {
     try {
-      const res = await fetch('/api/onboarding', {
+      const res = await fetch(apiUrl('/api/onboarding'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body: JSON.stringify(payload),
       });
       const data = await res.json();

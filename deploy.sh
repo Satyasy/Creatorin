@@ -56,17 +56,12 @@ else
     echo "⚠️ Warning: ${SHARED_DIR}/.env.production not found!"
 fi
 
-# Use shared node_modules cache if present to speed up installs
-if [ -d "${SHARED_DIR}/node_modules" ]; then
-    cp -r "${SHARED_DIR}/node_modules" "${NEW_RELEASE_DIR}/node_modules" 2>/dev/null || true
-fi
+# Use shared node_modules via atomic symlink (instant, no disk copying)
+mkdir -p "${SHARED_DIR}/node_modules"
+ln -sfn "${SHARED_DIR}/node_modules" "${NEW_RELEASE_DIR}/node_modules"
 
 echo "📦 Installing dependencies..."
 npm install --no-audit --prefer-offline
-
-# Cache node_modules back to shared
-rm -rf "${SHARED_DIR}/node_modules"
-cp -r "${NEW_RELEASE_DIR}/node_modules" "${SHARED_DIR}/node_modules" 2>/dev/null || true
 
 # 4. Database Schema Sync / Migrations (Drizzle ORM)
 echo "🗄️ 4/6. Synchronizing database schema to PostgreSQL 17..."

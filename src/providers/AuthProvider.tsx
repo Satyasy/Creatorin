@@ -26,6 +26,29 @@ const AuthContext = createContext<AuthContextType>({
   switchRole: () => {},
 });
 
+// Automatically proxy relative /api/* requests to NEXT_PUBLIC_API_URL (e.g. https://api.creatorin.my.id) when deployed on CDN
+if (typeof window !== 'undefined' && process.env.NEXT_PUBLIC_API_URL) {
+  const apiBase = process.env.NEXT_PUBLIC_API_URL.replace(/\/$/, '');
+  if (!(window as any).__creatorinFetchPatched && apiBase) {
+    (window as any).__creatorinFetchPatched = true;
+    const originalFetch = window.fetch;
+    window.fetch = async (input: RequestInfo | URL, init?: RequestInit) => {
+      let url = input;
+      const targetInit: RequestInit = init ? { ...init } : {};
+
+      if (typeof input === 'string' && input.startsWith('/api/')) {
+        url = `${apiBase}${input}`;
+        targetInit.credentials = targetInit.credentials || 'include';
+      } else if (input instanceof URL && input.pathname.startsWith('/api/')) {
+        url = `${apiBase}${input.pathname}${input.search}`;
+        targetInit.credentials = targetInit.credentials || 'include';
+      }
+
+      return originalFetch(url, targetInit);
+    };
+  }
+}
+
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [authState, setAuthState] = useState<AuthState>(() => {
     if (typeof window !== 'undefined') {
