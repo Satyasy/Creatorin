@@ -1,7 +1,7 @@
 import { pgTable, text, timestamp, uuid, integer, decimal, boolean, jsonb, pgEnum } from "drizzle-orm/pg-core";
 import { relations } from "drizzle-orm";
 
-export const roleEnum = pgEnum("user_role", ["creator", "business", "school"]);
+export const roleEnum = pgEnum("user_role", ["admin", "creator", "business", "school"]);
 export const invoiceStatusEnum = pgEnum("invoice_status", ["unpaid", "paid", "cancelled"]);
 export const roomStatusEnum = pgEnum("room_status", ["in_progress", "review_pending", "revision_requested", "completed", "disputed"]);
 export const schoolStatusEnum = pgEnum("school_status", ["pending", "approved", "rejected"]);

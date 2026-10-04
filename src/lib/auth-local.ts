@@ -34,7 +34,7 @@ export function verifyPassword(password: string, storedHash: string): boolean {
 export type TokenPayload = {
   id: string;
   email: string;
-  role: "creator" | "business" | "school";
+  role: "admin" | "creator" | "business" | "school";
   fullName: string;
 };
 

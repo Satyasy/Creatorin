@@ -7,7 +7,7 @@ import { verifyJwtToken } from "./auth-local";
 export type AuthUser = {
   id: string;
   email: string;
-  role: "creator" | "business" | "school";
+  role: "admin" | "creator" | "business" | "school";
   fullName: string;
   avatarUrl?: string | null;
   location?: string | null;
