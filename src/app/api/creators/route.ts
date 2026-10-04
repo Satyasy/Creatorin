@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getDb } from "@/lib/db";
 import { profiles, creatorProfiles } from "@/lib/db/schema";
 import { eq, desc } from "drizzle-orm";
+import { getCache, setCache } from "@/lib/redis";
 
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
@@ -9,6 +10,13 @@ export async function GET(req: NextRequest) {
   const category = searchParams.get("category")?.toLowerCase();
   const location = searchParams.get("location")?.toLowerCase();
   const limit = Math.min(parseInt(searchParams.get("limit") || "50", 10), 100);
+
+  // 1. Check Redis Cache
+  const cacheKey = `creators:${search || "none"}:${category || "none"}:${location || "none"}:${limit}`;
+  const cached = await getCache<{ creators: any[]; total: number }>(cacheKey);
+  if (cached) {
+    return NextResponse.json({ ...cached, _source: "redis" });
+  }
 
   const db = getDb();
   if (!db) {
@@ -70,7 +78,12 @@ export async function GET(req: NextRequest) {
       filtered = filtered.filter((c) => c.location?.toLowerCase().includes(location));
     }
 
-    return NextResponse.json({ creators: filtered, total: filtered.length });
+    const result = { creators: filtered, total: filtered.length };
+
+    // 2. Save to Redis Cache (TTL 180s)
+    await setCache(cacheKey, result, 180);
+
+    return NextResponse.json(result);
   } catch (err: any) {
     return NextResponse.json({ error: err.message }, { status: 500 });
   }

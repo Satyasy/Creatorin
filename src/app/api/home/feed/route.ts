@@ -3,10 +3,17 @@ import { getAuthenticatedUser } from "@/lib/api-auth";
 import { getDb } from "@/lib/db";
 import { collaborationRooms, projectBriefs, briefApplications, messages, conversations, creatorWallets, profiles, creatorProfiles } from "@/lib/db/schema";
 import { eq, or, and, desc, count, sql } from "drizzle-orm";
+import { getCache, setCache } from "@/lib/redis";
 
 export async function GET(req: NextRequest) {
   const user = await getAuthenticatedUser(req);
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+  const cacheKey = `feed:${user.id}:${user.role}`;
+  const cached = await getCache<any>(cacheKey);
+  if (cached) {
+    return NextResponse.json({ ...cached, _source: "redis" });
+  }
 
   const db = getDb();
   if (!db) return NextResponse.json({ error: "Database not connected" }, { status: 503 });
@@ -48,7 +55,7 @@ export async function GET(req: NextRequest) {
         .where(eq(creatorWallets.creatorId, user.id))
         .limit(1);
 
-      return NextResponse.json({
+      const data = {
         role: "creator",
         user,
         feed: {
@@ -62,7 +69,9 @@ export async function GET(req: NextRequest) {
             activeProjectsCount: activeRooms.length,
           },
         },
-      });
+      };
+      await setCache(cacheKey, data, 60);
+      return NextResponse.json(data);
     } else {
       // Business role
       // 1. My open briefs with applicants count
@@ -108,7 +117,7 @@ export async function GET(req: NextRequest) {
         .orderBy(desc(creatorProfiles.careerScore))
         .limit(4);
 
-      return NextResponse.json({
+      const data = {
         role: "business",
         user,
         feed: {
@@ -120,7 +129,9 @@ export async function GET(req: NextRequest) {
             runningProjectsCount: runningProjects.length,
           },
         },
-      });
+      };
+      await setCache(cacheKey, data, 60);
+      return NextResponse.json(data);
     }
   } catch (err: any) {
     return NextResponse.json({ error: err.message }, { status: 500 });
