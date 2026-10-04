@@ -11,9 +11,6 @@ import {
   X, 
   User, 
   LogOut,
-  UserCheck,
-  TrendingUp,
-  Briefcase,
   Settings,
   GraduationCap,
   WalletCards,
@@ -38,7 +35,6 @@ export const Navbar: React.FC<NavbarProps> = ({
   onNavigate, 
   onSignOut,
   onSearch,
-  onSelectTag,
   activePage,
   showSearch = false
 }) => {
@@ -124,17 +120,6 @@ export const Navbar: React.FC<NavbarProps> = ({
     }
   };
 
-  const CATEGORY_ITEMS = [
-    'Reels Instagram',
-    'Video Tiktok',
-    'Feed Instagram',
-    'Poster',
-    'Banner',
-    'Brosur',
-    'Logo',
-    'Foto Produk'
-  ];
-
   return (
     <header 
       id="main-header" 
@@ -199,7 +184,7 @@ export const Navbar: React.FC<NavbarProps> = ({
 
         </div>
 
-        {/* Tengah: Nav Link (Beranda, Jelajah, Kontrak & Brief) */}
+        {/* Tengah: Nav Link (Beranda, Jelajah & Brief) */}
         <nav className="hidden lg:flex items-center gap-8 xl:gap-9 text-sm font-semibold text-[#0D0B0B]">
           
           {/* Nav Link Beranda */}
@@ -245,27 +230,27 @@ export const Navbar: React.FC<NavbarProps> = ({
 
               {exploreDropdownOpen && (
                 <div 
-                  className="absolute top-full -left-20 w-[300px] bg-white rounded-[16px] border border-black/10 shadow-xl py-2 z-50 animate-in fade-in zoom-in-95 duration-150"
+                  className="absolute top-full -left-8 w-48 bg-white rounded-[12px] border border-black/10 shadow-lg py-2 z-50 animate-in fade-in zoom-in-95 duration-150"
                 >
-                  <div className="px-3 py-1.5">
-                    <p className="text-[11px] font-bold text-neutral-400 uppercase tracking-wider px-3 mb-1">
-                      Eksplorasi Talenta & Jasa
-                    </p>
-                    
+                  <div className="px-2">
+                    <button
+                      onClick={() => {
+                        setExploreDropdownOpen(false);
+                        navigateTo('creator-profile', '/jelajah/kreator');
+                      }}
+                      className="w-full rounded-[8px] px-3 py-2.5 text-left text-sm font-semibold text-[#0D0C22] transition-colors hover:bg-[#F3F3F4] hover:text-[#155DFC] cursor-pointer"
+                    >
+                      Profil
+                    </button>
+
                     <button
                       onClick={() => {
                         setExploreDropdownOpen(false);
                         navigateTo('services', '/jelajah/layanan');
                       }}
-                      className="w-full px-3 py-2 text-left rounded-[10px] hover:bg-[#F3F3F4] text-xs font-semibold text-[#0D0C22] flex items-center gap-2.5 transition-colors group cursor-pointer"
+                      className="w-full rounded-[8px] px-3 py-2.5 text-left text-sm font-semibold text-[#0D0C22] transition-colors hover:bg-[#F3F3F4] hover:text-[#155DFC] cursor-pointer"
                     >
-                      <div className="w-7 h-7 rounded-[8px] bg-blue-50 text-[#155DFC] flex items-center justify-center group-hover:bg-[#155DFC] group-hover:text-white transition-colors">
-                        <Briefcase className="w-3.5 h-3.5" />
-                      </div>
-                      <div>
-                        <p className="font-bold">Layanan Kreator</p>
-                        <p className="text-[10px] text-neutral-500 font-normal">Temukan paket jasa siap kerja</p>
-                      </div>
+                      Layanan
                     </button>
 
                     <button
@@ -273,55 +258,10 @@ export const Navbar: React.FC<NavbarProps> = ({
                         setExploreDropdownOpen(false);
                         navigateTo('projects', '/jelajah/proyek');
                       }}
-                      className="w-full px-3 py-2 text-left rounded-[10px] hover:bg-[#F3F3F4] text-xs font-semibold text-[#0D0C22] flex items-center gap-2.5 transition-colors group cursor-pointer"
+                      className="w-full rounded-[8px] px-3 py-2.5 text-left text-sm font-semibold text-[#0D0C22] transition-colors hover:bg-[#F3F3F4] hover:text-[#155DFC] cursor-pointer"
                     >
-                      <div className="w-7 h-7 rounded-[8px] bg-indigo-50 text-indigo-600 flex items-center justify-center group-hover:bg-indigo-600 group-hover:text-white transition-colors">
-                        <TrendingUp className="w-3.5 h-3.5" />
-                      </div>
-                      <div>
-                        <p className="font-bold">Portofolio Project</p>
-                        <p className="text-[10px] text-neutral-500 font-normal">Inspirasi karya kreator terverifikasi</p>
-                      </div>
+                      Proyek
                     </button>
-
-                    <button
-                      onClick={() => {
-                        setExploreDropdownOpen(false);
-                        navigateTo('creator-profile', '/jelajah/kreator');
-                      }}
-                      className="w-full px-3 py-2 text-left rounded-[10px] hover:bg-[#F3F3F4] text-xs font-semibold text-[#0D0C22] flex items-center gap-2.5 transition-colors group cursor-pointer"
-                    >
-                      <div className="w-7 h-7 rounded-[8px] bg-emerald-50 text-emerald-600 flex items-center justify-center group-hover:bg-emerald-600 group-hover:text-white transition-colors">
-                        <UserCheck className="w-3.5 h-3.5" />
-                      </div>
-                      <div>
-                        <p className="font-bold">Profil Kreator</p>
-                        <p className="text-[10px] text-neutral-500 font-normal">Temukan kreator terverifikasi</p>
-                      </div>
-                    </button>
-                  </div>
-
-                  <div className="border-t border-black/5 my-1.5" />
-
-                  <div className="px-3 py-1">
-                    <p className="text-[11px] font-bold text-neutral-400 uppercase tracking-wider px-3 mb-1.5">
-                      Kategori Populer
-                    </p>
-                    <div className="grid grid-cols-2 gap-1 px-1">
-                      {CATEGORY_ITEMS.slice(0, 4).map((cat) => (
-                        <button
-                          key={cat}
-                          onClick={() => {
-                            setExploreDropdownOpen(false);
-                            if (onSelectTag) onSelectTag(cat);
-                            router.push(`/jelajah/layanan?tag=${encodeURIComponent(cat)}`);
-                          }}
-                          className="px-2 py-1.5 text-left rounded-[6px] hover:bg-[#F3F3F4] text-[11px] font-medium text-neutral-600 hover:text-[#155DFC] truncate transition cursor-pointer"
-                        >
-                          {cat}
-                        </button>
-                      ))}
-                    </div>
                   </div>
                 </div>
               )}
@@ -339,16 +279,6 @@ export const Navbar: React.FC<NavbarProps> = ({
             <span>Brief Proyek</span>
           </button>
 
-          {/* Nav Link Kontrak & Kolaborasi */}
-          <button
-            id="nav-contracts-link"
-            onClick={() => navigateTo('collaboration-room', '/contracts')}
-            className={`transition-colors flex items-center gap-1.5 cursor-pointer ${
-              pathname?.startsWith('/contracts') ? 'text-[#155DFC] font-bold' : 'text-neutral-600 hover:text-[#155DFC]'
-            }`}
-          >
-            <span>Kontrak Kerja</span>
-          </button>
         </nav>
 
         {/* Sisi Kanan: Action Buttons & User Profile */}
@@ -433,17 +363,19 @@ export const Navbar: React.FC<NavbarProps> = ({
                     <span>Dompet & Saldo</span>
                   </button>
 
-                  <button
-                    id="nav-user-contracts-btn"
-                    onClick={() => {
-                      setUserDropdownOpen(false);
-                      router.push('/contracts');
-                    }}
-                    className="w-full px-4 py-2.5 text-left text-xs font-semibold text-neutral-700 hover:bg-[#F3F3F4] hover:text-[#0D0C22] flex items-center gap-2.5 cursor-pointer transition-colors"
-                  >
-                    <FileCheck2 className="w-4 h-4 text-neutral-500" />
-                    <span>Kontrak Saya</span>
-                  </button>
+                  {currentUser.role === 'creator' && (
+                    <button
+                      id="nav-user-contracts-btn"
+                      onClick={() => {
+                        setUserDropdownOpen(false);
+                        router.push('/contracts');
+                      }}
+                      className="w-full px-4 py-2.5 text-left text-xs font-semibold text-neutral-700 hover:bg-[#F3F3F4] hover:text-[#0D0C22] flex items-center gap-2.5 cursor-pointer transition-colors"
+                    >
+                      <FileCheck2 className="w-4 h-4 text-neutral-500" />
+                      <span>Kontrak Saya</span>
+                    </button>
+                  )}
 
                   {currentUser.role === 'school' && (
                     <button
@@ -567,13 +499,24 @@ export const Navbar: React.FC<NavbarProps> = ({
                 <button
                   onClick={() => {
                     setMobileMenuOpen(false);
+                    navigateTo('creator-profile', '/jelajah/kreator');
+                  }}
+                  className={`py-2 text-left hover:text-blue-600 ${
+                    pathname?.startsWith('/jelajah/kreator') ? 'text-blue-600 font-bold' : 'text-neutral-600'
+                  }`}
+                >
+                  Profil
+                </button>
+                <button
+                  onClick={() => {
+                    setMobileMenuOpen(false);
                     navigateTo('services', '/jelajah/layanan');
                   }}
                   className={`py-2 text-left hover:text-blue-600 ${
                     pathname?.startsWith('/jelajah/layanan') ? 'text-blue-600 font-bold' : 'text-neutral-600'
                   }`}
                 >
-                  Layanan Kreator
+                  Layanan
                 </button>
                 <button
                   onClick={() => {
@@ -584,18 +527,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                     pathname?.startsWith('/jelajah/proyek') ? 'text-blue-600 font-bold' : 'text-neutral-600'
                   }`}
                 >
-                  Portofolio Project
-                </button>
-                <button
-                  onClick={() => {
-                    setMobileMenuOpen(false);
-                    navigateTo('creator-profile', '/jelajah/kreator');
-                  }}
-                  className={`py-2 text-left hover:text-blue-600 ${
-                    pathname?.startsWith('/jelajah/kreator') ? 'text-blue-600 font-bold' : 'text-neutral-600'
-                  }`}
-                >
-                  Profil Kreator
+                  Proyek
                 </button>
               </>
             )}
@@ -607,15 +539,6 @@ export const Navbar: React.FC<NavbarProps> = ({
               className="py-2 text-left hover:text-blue-600 text-neutral-600"
             >
               Brief Proyek
-            </button>
-            <button
-              onClick={() => {
-                setMobileMenuOpen(false);
-                navigateTo('collaboration-room', '/contracts');
-              }}
-              className="py-2 text-left hover:text-blue-600 text-neutral-600"
-            >
-              Kontrak Kerja
             </button>
           </div>
 
