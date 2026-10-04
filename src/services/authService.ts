@@ -36,6 +36,9 @@ export const authService = {
   async getCurrentUser(): Promise<UserSession | null> {
     try {
       const token = typeof window !== 'undefined' ? localStorage.getItem('creatorin_token') : null;
+      if (typeof window !== 'undefined' && !token) {
+        return null;
+      }
       const headers: Record<string, string> = {};
       if (token) headers['Authorization'] = `Bearer ${token}`;
 
