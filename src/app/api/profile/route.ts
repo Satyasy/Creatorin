@@ -95,17 +95,39 @@ export async function PUT(req: NextRequest) {
 
     if (user.role === "creator" && (headline !== undefined || bio !== undefined || skills !== undefined || startingPrice !== undefined)) {
       await db
-        .update(creatorProfiles)
-        .set({
-          headline: headline !== undefined ? headline : undefined,
-          bio: bio !== undefined ? bio : undefined,
-          skills: skills !== undefined ? skills : undefined,
-          startingPrice: startingPrice !== undefined ? startingPrice : undefined,
+        .insert(creatorProfiles)
+        .values({
+          profileId: user.id,
+          slug: `creator-${user.id.slice(0, 8)}`,
+          headline: headline || "Kreator Konten",
+          bio,
+          skills: skills || [],
+          startingPrice: startingPrice || "",
         })
-        .where(eq(creatorProfiles.profileId, user.id));
+        .onConflictDoUpdate({
+          target: creatorProfiles.profileId,
+          set: {
+            headline: headline !== undefined ? headline : undefined,
+            bio: bio !== undefined ? bio : undefined,
+            skills: skills !== undefined ? skills : undefined,
+            startingPrice: startingPrice !== undefined ? startingPrice : undefined,
+          },
+        });
     }
+
     if (user.role === "business" && bio !== undefined) {
-      await db.update(businessProfiles).set({ description: bio }).where(eq(businessProfiles.profileId, user.id));
+      await db
+        .insert(businessProfiles)
+        .values({
+          profileId: user.id,
+          companyName: user.fullName || "Perusahaan",
+          businessCategory: "Umum",
+          description: bio,
+        })
+        .onConflictDoUpdate({
+          target: businessProfiles.profileId,
+          set: { description: bio },
+        });
     }
 
     // Invalidate cached profiles, creator listings, and user session details

@@ -57,8 +57,10 @@ else
 fi
 
 # Use shared node_modules via atomic symlink (instant, no disk copying)
-mkdir -p "${SHARED_DIR}/node_modules"
+mkdir -p "${SHARED_DIR}/node_modules" "${SHARED_DIR}/uploads"
 ln -sfn "${SHARED_DIR}/node_modules" "${NEW_RELEASE_DIR}/node_modules"
+mkdir -p "${NEW_RELEASE_DIR}/public"
+ln -sfn "${SHARED_DIR}/uploads" "${NEW_RELEASE_DIR}/public/uploads"
 
 echo "📦 Installing dependencies..."
 npm install --no-audit --prefer-offline
@@ -76,6 +78,9 @@ npm run build
 # Standalone assets requirement
 if [ -d "${NEW_RELEASE_DIR}/.next/standalone" ]; then
     echo "📋 Copying static and public assets to standalone bundle..."
+    if [ -d "${NEW_RELEASE_DIR}/.next/standalone/releases" ]; then
+        cp -rn "${NEW_RELEASE_DIR}/.next/standalone/releases/"*/* "${NEW_RELEASE_DIR}/.next/standalone/" 2>/dev/null || true
+    fi
     mkdir -p "${NEW_RELEASE_DIR}/.next/standalone/.next"
     cp -rn "${NEW_RELEASE_DIR}/.next/static" "${NEW_RELEASE_DIR}/.next/standalone/.next/" 2>/dev/null || true
     if [ -d "${NEW_RELEASE_DIR}/public" ]; then

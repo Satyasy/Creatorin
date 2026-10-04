@@ -1,7 +1,7 @@
 import { pgTable, text, timestamp, uuid, integer, decimal, boolean, jsonb, pgEnum } from "drizzle-orm/pg-core";
 import { relations } from "drizzle-orm";
 
-export const roleEnum = pgEnum("user_role", ["creator", "business", "school"]);
+export const roleEnum = pgEnum("user_role", ["admin", "creator", "business", "school"]);
 export const invoiceStatusEnum = pgEnum("invoice_status", ["unpaid", "paid", "cancelled"]);
 export const roomStatusEnum = pgEnum("room_status", ["in_progress", "review_pending", "revision_requested", "completed", "disputed"]);
 export const schoolStatusEnum = pgEnum("school_status", ["pending", "approved", "rejected"]);
@@ -9,10 +9,11 @@ export const assessmentStatusEnum = pgEnum("assessment_status", ["not_started", 
 
 // 1. Unified Profiles
 export const profiles = pgTable("profiles", {
-  id: uuid("id").primaryKey(), // matches Supabase auth.users.id
+  id: uuid("id").primaryKey(), // matches unique user uuid
   role: roleEnum("role").notNull().default("creator"),
   fullName: text("full_name").notNull(),
   email: text("email"),
+  passwordHash: text("password_hash"),
   avatarUrl: text("avatar_url"),
   phone: text("phone"),
   location: text("location"),

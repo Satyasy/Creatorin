@@ -1,14 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createClient } from "@/lib/supabase/server";
 import { getDb } from "@/lib/db";
 import { profiles } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
 import { checkRateLimit } from "@/lib/redis";
+import { verifyPassword, signJwtToken } from "@/lib/auth-local";
 
 export async function POST(req: NextRequest) {
   try {
     const ip = req.headers.get("cf-connecting-ip") || req.headers.get("x-forwarded-for")?.split(",")[0].trim() || "127.0.0.1";
-    const { allowed, reset } = await checkRateLimit(`login:${ip}`, 10, 60);
+    const { allowed, reset } = await checkRateLimit(`login:${ip}`, 15, 60);
     if (!allowed) {
       return NextResponse.json(
         { error: "Terlalu banyak percobaan login. Silakan coba beberapa saat lagi." },
@@ -23,37 +23,67 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Email dan kata sandi wajib diisi." }, { status: 400 });
     }
 
-    const supabase = await createClient();
-    const { data, error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
+    const db = getDb();
+    if (!db) {
+      return NextResponse.json({ error: "Database not connected" }, { status: 503 });
+    }
+
+    const cleanEmail = email.trim().toLowerCase();
+
+    // 1. Cari user di tabel profiles berdasarkan email
+    const [userProfile] = await db
+      .select()
+      .from(profiles)
+      .where(eq(profiles.email, cleanEmail))
+      .limit(1);
+
+    if (!userProfile) {
+      return NextResponse.json({ error: "Email atau kata sandi tidak sesuai." }, { status: 401 });
+    }
+
+    // 2. Verifikasi kata sandi
+    if (!userProfile.passwordHash || !verifyPassword(password, userProfile.passwordHash)) {
+      return NextResponse.json({ error: "Email atau kata sandi tidak sesuai." }, { status: 401 });
+    }
+
+    // 3. Generate token JWT lokal
+    const token = await signJwtToken({
+      id: userProfile.id,
+      email: userProfile.email || cleanEmail,
+      role: userProfile.role,
+      fullName: userProfile.fullName,
     });
 
-    if (error) {
-      return NextResponse.json({ error: error.message }, { status: 401 });
-    }
-
-    const db = getDb();
-    let profileData = null;
-    if (db && data.user) {
-      const [profile] = await db.select().from(profiles).where(eq(profiles.id, data.user.id)).limit(1);
-      profileData = profile;
-    }
-
-    return NextResponse.json({
+    const response = NextResponse.json({
       success: true,
       message: "Login berhasil.",
       session: {
-        accessToken: data.session?.access_token,
-        expiresAt: data.session?.expires_at,
+        accessToken: token,
       },
       user: {
-        id: data.user?.id,
-        email: data.user?.email,
-        role: profileData?.role || data.user?.user_metadata?.role || "creator",
-        fullName: profileData?.fullName || data.user?.user_metadata?.full_name,
+        id: userProfile.id,
+        email: userProfile.email,
+        role: userProfile.role,
+        fullName: userProfile.fullName,
+        avatarUrl: userProfile.avatarUrl,
+        location: userProfile.location,
+        phone: userProfile.phone,
       },
     });
+
+    // Set HTTP-Only Cookie untuk persistensi browser cross-subdomain (creatorin.my.id <-> api.creatorin.my.id)
+    const isProd = process.env.NODE_ENV === "production";
+    const cookieDomain = isProd ? ".creatorin.my.id" : undefined;
+    response.cookies.set("creatorin_token", token, {
+      httpOnly: true,
+      secure: isProd,
+      sameSite: isProd ? "none" : "lax",
+      path: "/",
+      domain: cookieDomain,
+      maxAge: 7 * 24 * 60 * 60,
+    });
+
+    return response;
   } catch (err: any) {
     return NextResponse.json({ error: err.message || "Internal server error" }, { status: 500 });
   }
