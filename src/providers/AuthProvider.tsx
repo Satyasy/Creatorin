@@ -77,6 +77,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [isLoading, setIsLoading] = useState(true);
 
   const syncServerSession = useCallback(async () => {
+    if (typeof window !== 'undefined') {
+      const hasLocalToken = Boolean(localStorage.getItem('creatorin_token') || localStorage.getItem('creatorin_access_token'));
+      const hasLocalUser = Boolean(localStorage.getItem(AUTH_STORAGE_KEY));
+      if (!hasLocalToken && !hasLocalUser) {
+        setAuthState({ isAuthenticated: false, user: null });
+        setIsLoading(false);
+        return;
+      }
+    }
+
     try {
       const serverUser = await authService.getCurrentUser();
       if (serverUser) {

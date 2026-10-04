@@ -440,9 +440,9 @@ export const Navbar: React.FC<NavbarProps> = ({
 
                   <button
                     id="nav-user-logout-btn"
-                    onClick={() => {
+                    onClick={async () => {
                       setUserDropdownOpen(false);
-                      handleSignOutAction();
+                      await handleSignOutAction();
                     }}
                     className="w-full px-4 py-2.5 text-left text-xs font-semibold text-rose-600 hover:bg-rose-50 flex items-center gap-2.5 cursor-pointer transition-colors"
                   >
