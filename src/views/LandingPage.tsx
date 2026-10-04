@@ -1,9 +1,9 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/providers/AuthProvider';
-import { MOCK_CREATORS } from '@/data/mockCreators';
+import { creatorService } from '@/services/creatorService';
 import { Creator, CreatorCategory, AuthState, ActivePage } from '@/types';
 import { ProfileModal } from '@/components/modals/ProfileModal';
 import { ProjectBriefModal } from '@/components/modals/ProjectBriefModal';
@@ -76,6 +76,8 @@ export const LandingPage: React.FC<LandingPageProps> = ({ currentUser: propUser,
 
   // Saved Creators set
   const [savedCreators, setSavedCreators] = useState<Set<string>>(new Set());
+  const [creators, setCreators] = useState<Creator[]>([]);
+  useEffect(() => { creatorService.getCreators().then(setCreators).catch(() => setCreators([])); }, []);
 
   // Modals state
   const [selectedCreatorForModal, setSelectedCreatorForModal] = useState<Creator | null>(null);
@@ -105,7 +107,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ currentUser: propUser,
 
   // Filtered Creators list
   const filteredCreators = useMemo(() => {
-    return MOCK_CREATORS.filter((creator) => {
+    return creators.filter((creator) => {
       // Search input filter
       if (searchQuery.trim()) {
         const q = searchQuery.toLowerCase();
@@ -183,7 +185,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ currentUser: propUser,
 
       return true;
     });
-  }, [searchQuery, selectedTag, selectedCategory, selectedBudget, selectedLocation, selectedScore]);
+  }, [searchQuery, selectedTag, selectedCategory, selectedBudget, selectedLocation, selectedScore, creators]);
 
   return (
     <div className="w-full bg-[#F8FAFC] flex flex-col font-sans selection:bg-[#0B1F3A] selection:text-white text-[#171717]">
@@ -592,60 +594,17 @@ export const LandingPage: React.FC<LandingPageProps> = ({ currentUser: propUser,
 
                   </div>
 
-                  {/* BARIS 2: Card Layanan Kreator (Minimal 4 Card Layanan: Cover Image, Judul Layanan, & Harga Bersih) */}
+                  {/* Layanan yang benar-benar diterbitkan kreator */}
                   {(() => {
-                    const defaultServices = [
-                      {
-                        id: `srv-${creator.id}-1`,
-                        title: `1x Layanan Konten ${creator.category === 'Video' ? 'Reels & TikTok UGC' : 'Feed & Desain Visual'}`,
-                        formattedPrice: creator.formattedRate.replace('/proyek', '').replace('/video', '').replace('/sesi', ''),
-                        price: creator.startingRate,
-                        coverImage: creator.portfolioSamples?.[0]?.thumbnail || 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&auto=format&fit=crop&q=80',
-                        tag: creator.category === 'Video' ? 'UGC Video' : 'Design',
-                        deliveryDays: '2 Hari Kerja'
-                      },
-                      {
-                        id: `srv-${creator.id}-2`,
-                        title: `Paket Lengkap Promosi Brand UMKM`,
-                        formattedPrice: `Rp${(creator.startingRate * 2).toLocaleString('id-ID')}`,
-                        price: creator.startingRate * 2,
-                        coverImage: creator.portfolioSamples?.[1]?.thumbnail || 'https://images.unsplash.com/photo-1581291518857-4e27b48ff24e?w=800&auto=format&fit=crop&q=80',
-                        tag: 'Paket Brand',
-                        deliveryDays: '3 Hari Kerja'
-                      },
-                      {
-                        id: `srv-${creator.id}-3`,
-                        title: `Campaign Visual & Konten Prioritas`,
-                        formattedPrice: `Rp${(creator.startingRate * 3).toLocaleString('id-ID')}`,
-                        price: creator.startingRate * 3,
-                        coverImage: creator.portfolioSamples?.[2]?.thumbnail || 'https://images.unsplash.com/photo-1626785774573-4b799315345d?w=800&auto=format&fit=crop&q=80',
-                        tag: 'Campaign',
-                        deliveryDays: '5 Hari Kerja'
-                      },
-                      {
-                        id: `srv-${creator.id}-4`,
-                        title: `Layanan Custom & Retainer Bulanan`,
-                        formattedPrice: `Rp${(creator.startingRate * 4).toLocaleString('id-ID')}`,
-                        price: creator.startingRate * 4,
-                        coverImage: creator.portfolioSamples?.[3]?.thumbnail || 'https://images.unsplash.com/photo-1551650975-87deedd944c3?w=800&auto=format&fit=crop&q=80',
-                        tag: 'Custom Retainer',
-                        deliveryDays: '7 Hari Kerja'
-                      }
-                    ];
+                    const servicesList = creator.services?.slice(0, 4) || [];
 
-                    const servicesList = (creator.services && creator.services.length >= 4)
-                      ? creator.services.slice(0, 4)
-                      : (creator.services && creator.services.length > 0)
-                        ? [...creator.services, ...defaultServices.slice(creator.services.length)].slice(0, 4)
-                        : defaultServices;
+                    if (!servicesList.length) return null;
 
                     return (
                       <div className="mt-5 pt-4 border-t border-neutral-100">
                         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-3.5 lg:gap-4">
-                          {servicesList.map((service, srvIdx) => {
-                            const imageSrc = service.coverImage || 
-                              creator.portfolioSamples?.[srvIdx % (creator.portfolioSamples?.length || 1)]?.thumbnail ||
-                              'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&auto=format&fit=crop&q=80';
+                          {servicesList.map((service) => {
+                            const imageSrc = service.coverImage || '';
 
                             return (
                               <div
@@ -659,12 +618,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ currentUser: propUser,
                               >
                                 {/* Cover Image Preview (Clean Rounded, No Outer Stroke) */}
                                 <div className="aspect-[4/3] w-full rounded-2xl overflow-hidden bg-neutral-900 relative shadow-2xs group-hover/srv:shadow-md transition-all duration-300">
-                                  <img
-                                    src={imageSrc}
-                                    alt={service.title}
-                                    className="w-full h-full object-cover "
-                                    loading="lazy"
-                                  />
+                                  {imageSrc && <img src={imageSrc} alt={service.title} className="w-full h-full object-cover" loading="lazy" />}
                                   
                                   {service.tag && (
                                     <div className="absolute top-2.5 left-2.5 bg-black/60 backdrop-blur-md text-white text-[10px] font-semibold px-2.5 py-0.5 rounded-full tracking-wide">

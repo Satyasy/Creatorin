@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getAuthenticatedUser } from "@/lib/api-auth";
 import { getDb } from "@/lib/db";
-import { invoices, profiles } from "@/lib/db/schema";
-import { eq, or, desc } from "drizzle-orm";
+import { invoices, profiles, conversations } from "@/lib/db/schema";
+import { and, eq, or, desc } from "drizzle-orm";
 
 export async function GET(req: NextRequest) {
   const user = await getAuthenticatedUser(req);
@@ -49,12 +49,24 @@ export async function POST(req: NextRequest) {
   const body = await req.json();
   const { businessId, conversationId, title, scopeDescription, totalAmount, deadlineDays = 3, revisionRules } = body;
 
-  if (!businessId || !title || !scopeDescription || !totalAmount) {
+  if (user.role !== 'creator' || !businessId || !title || !scopeDescription || !Number.isSafeInteger(Number(totalAmount)) || Number(totalAmount) <= 0 || !Number.isInteger(Number(deadlineDays)) || Number(deadlineDays) < 1) {
     return NextResponse.json({ error: "Data invoice belum lengkap." }, { status: 400 });
   }
 
   try {
-    const invoiceNumber = `INV-${Date.now().toString().slice(-6)}`;
+    const [business] = await db.select({ id: profiles.id }).from(profiles).where(and(eq(profiles.id, businessId), eq(profiles.role, 'business'))).limit(1);
+    if (!business) return NextResponse.json({ error: 'Akun UMKM tidak ditemukan.' }, { status: 404 });
+    if (conversationId) {
+      const [conversation] = await db.select({ id: conversations.id }).from(conversations).where(and(
+        eq(conversations.id, conversationId),
+        or(
+          and(eq(conversations.participant1Id, user.id), eq(conversations.participant2Id, businessId)),
+          and(eq(conversations.participant1Id, businessId), eq(conversations.participant2Id, user.id))
+        )
+      )).limit(1);
+      if (!conversation) return NextResponse.json({ error: 'Percakapan tidak valid.' }, { status: 403 });
+    }
+    const invoiceNumber = `INV-${crypto.randomUUID().slice(0, 8).toUpperCase()}`;
     const [invoice] = await db
       .insert(invoices)
       .values({

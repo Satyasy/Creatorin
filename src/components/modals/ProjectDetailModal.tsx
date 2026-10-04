@@ -1,11 +1,9 @@
 'use client';
 
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import {
   X,
   Heart,
-  Globe,
-  Mail,
   Play,
   Pause,
   Volume2,
@@ -25,9 +23,8 @@ import {
   Pencil,
   Trash2
 } from 'lucide-react';
-import { FeedProject, Creator } from '@/types';
-import { MOCK_FEED_PROJECTS } from '@/data/mockFeedProjects';
-import { MOCK_CREATORS } from '@/data/mockCreators';
+import { FeedProject, Creator, ActivePage } from '@/types';
+import { useAuth } from '@/providers/AuthProvider';
 import { ProjectCard } from '@/components/common/ProjectCard';
 import { Footer } from '@/components/layout/Footer';
 
@@ -38,7 +35,7 @@ export interface ProjectDetailModalProps {
   onViewCreatorProfile?: (creator: Creator) => void;
   onGetInTouch?: (creator: Creator) => void;
   onScheduleCall?: (creator: Creator, project?: FeedProject) => void;
-  onNavigate?: (page: any) => void;
+  onNavigate?: (page: ActivePage) => void;
   allProjects?: FeedProject[];
 }
 
@@ -53,55 +50,6 @@ interface CommentItem {
   isOwner?: boolean;
 }
 
-const DEFAULT_COMMENTS: CommentItem[] = [
-  {
-    id: 'c-mine',
-    name: 'Anda (Kreator)',
-    avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80',
-    text: 'Sangat suka dengan komposisi warna dan tipografi di proyek ini!',
-    time: '2 menit lalu',
-    createdAt: Date.now() - 2 * 60 * 1000,
-    isOwner: true,
-    hasBadge: true
-  },
-  {
-    id: 'c-1',
-    name: 'Mukhlasur Rahman',
-    avatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100&auto=format&fit=crop&q=80',
-    text: 'Impressive work!',
-    time: 'about 1 hour'
-  },
-  {
-    id: 'c-2',
-    name: 'Bhautik Domadiya',
-    avatar: 'https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?w=100&auto=format&fit=crop&q=80',
-    text: 'Framing the main headline ("THE ART OF CRAFTED LUXURY JEWELRY") with that delicate script overlay gives this hero section such an high-end editorial feel! It balances modern luxury web design with Cartier\'s heritage so beautifully. Fantastic work, Halo UI/UX!',
-    time: 'about 1 hour'
-  },
-  {
-    id: 'c-3',
-    name: 'Rifat Jahangir Ony',
-    avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&auto=format&fit=crop&q=80',
-    text: 'superb work!',
-    time: 'about 3 hours'
-  },
-  {
-    id: 'c-4',
-    name: 'Minu Vi',
-    avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&auto=format&fit=crop&q=80',
-    text: 'Cool font 🔥',
-    time: 'about 4 hours'
-  },
-  {
-    id: 'c-5',
-    name: 'Abdur Rouf',
-    avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&auto=format&fit=crop&q=80',
-    text: 'Professional and impressive design work ! Good job',
-    time: 'about 4 hours',
-    hasBadge: true
-  }
-];
-
 export const ProjectDetailModal: React.FC<ProjectDetailModalProps> = ({
   project: initialProject,
   onClose,
@@ -109,8 +57,9 @@ export const ProjectDetailModal: React.FC<ProjectDetailModalProps> = ({
   onViewCreatorProfile,
   onGetInTouch,
   onNavigate,
-  allProjects = MOCK_FEED_PROJECTS
+  allProjects = []
 }) => {
+  const { user } = useAuth();
   const [currentProject, setCurrentProject] = useState<FeedProject>(initialProject);
   const [isPlaying, setIsPlaying] = useState(false);
   const [isMuted, setIsMuted] = useState(true);
@@ -122,21 +71,42 @@ export const ProjectDetailModal: React.FC<ProjectDetailModalProps> = ({
   // Comment & Sidebar states matching Figma
   const [isCommentOpen, setIsCommentOpen] = useState(false);
   const [isInfoOpen, setIsInfoOpen] = useState(false);
-  const [comments, setComments] = useState<CommentItem[]>(DEFAULT_COMMENTS);
+  const [comments, setComments] = useState<CommentItem[]>([]);
   const [newCommentText, setNewCommentText] = useState('');
   const [editingCommentId, setEditingCommentId] = useState<string | null>(null);
   const [editingCommentText, setEditingCommentText] = useState('');
   const [toastMessage, setToastMessage] = useState<string | null>(null);
+  const [commentEditCutoff] = useState(() => Date.now() - 10 * 60 * 1000);
 
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const modalContainerRef = useRef<HTMLDivElement | null>(null);
 
+  const showToast = useCallback((msg: string) => {
+    setToastMessage(msg);
+    setTimeout(() => setToastMessage(null), 3000);
+  }, []);
+
   useEffect(() => {
-    setCurrentProject(initialProject);
-    setIsPlaying(false);
-    setVideoProgress(0);
-    setCurrentSlideIndex(0);
-  }, [initialProject]);
+    let active = true;
+    fetch(`/api/projects/${currentProject.id}/comments`, { cache: 'no-store' })
+      .then(async response => {
+        if (!response.ok) throw new Error('Gagal memuat komentar');
+        return response.json();
+      })
+      .then(({ comments: rows }) => {
+        if (active) setComments(rows.map((row: { id: string; userId: string; name: string; avatar: string | null; text: string; createdAt: string }) => ({
+          id: row.id,
+          name: row.name,
+          avatar: row.avatar || '/creatorin/avatar.png',
+          text: row.text,
+          time: new Date(row.createdAt).toLocaleDateString('id-ID'),
+          createdAt: new Date(row.createdAt).getTime(),
+          isOwner: row.userId === user?.id,
+        })));
+      })
+      .catch(() => { if (active) showToast('Komentar belum dapat dimuat'); });
+    return () => { active = false; };
+  }, [currentProject.id, showToast, user?.id]);
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -147,11 +117,6 @@ export const ProjectDetailModal: React.FC<ProjectDetailModalProps> = ({
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [onClose]);
 
-  const showToast = (msg: string) => {
-    setToastMessage(msg);
-    setTimeout(() => setToastMessage(null), 3000);
-  };
-
   const handleShare = () => {
     if (typeof window !== 'undefined' && navigator.clipboard) {
       navigator.clipboard.writeText(window.location.href);
@@ -159,24 +124,19 @@ export const ProjectDetailModal: React.FC<ProjectDetailModalProps> = ({
     }
   };
 
-  const handleAddComment = (e: React.FormEvent) => {
+  const handleAddComment = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newCommentText.trim()) return;
-
-    const newComment: CommentItem = {
-      id: `comm-${Date.now()}`,
-      name: 'Anda (Kreator)',
-      avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80',
-      text: newCommentText.trim(),
-      time: 'Baru saja',
-      createdAt: Date.now(),
-      isOwner: true,
-      hasBadge: true
-    };
-
-    setComments(prev => [newComment, ...prev]);
-    setNewCommentText('');
-    showToast('Komentar berhasil dikirim!');
+    try {
+      const response = await fetch(`/api/projects/${currentProject.id}/comments`, {
+        method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ content: newCommentText.trim() }),
+      });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error || 'Gagal mengirim komentar');
+      setComments(prev => [{ id: data.comment.id, name: user?.name || 'Anda', avatar: user?.avatar || '/creatorin/avatar.png', text: data.comment.content, time: 'Baru saja', createdAt: new Date(data.comment.createdAt).getTime(), isOwner: true }, ...prev]);
+      setNewCommentText('');
+      showToast('Komentar berhasil dikirim!');
+    } catch (error) { showToast(error instanceof Error ? error.message : 'Gagal mengirim komentar'); }
   };
 
   const handleStartEdit = (item: CommentItem) => {
@@ -184,29 +144,27 @@ export const ProjectDetailModal: React.FC<ProjectDetailModalProps> = ({
     setEditingCommentText(item.text);
   };
 
-  const handleSaveEdit = (commentId: string) => {
+  const handleSaveEdit = async (commentId: string) => {
     if (!editingCommentText.trim()) return;
-    setComments(prev => prev.map(c => {
-      if (c.id === commentId) {
-        return {
-          ...c,
-          text: editingCommentText.trim(),
-          time: 'Diedit baru saja'
-        };
-      }
-      return c;
-    }));
-    setEditingCommentId(null);
-    setEditingCommentText('');
-    showToast('Komentar berhasil diperbarui!');
+    try {
+      const response = await fetch(`/api/projects/${currentProject.id}/comments/${commentId}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ content: editingCommentText.trim() }) });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error || 'Gagal memperbarui komentar');
+      setComments(prev => prev.map(c => c.id === commentId ? { ...c, text: data.comment.content, time: 'Diedit baru saja' } : c));
+      setEditingCommentId(null);
+      setEditingCommentText('');
+      showToast('Komentar berhasil diperbarui!');
+    } catch (error) { showToast(error instanceof Error ? error.message : 'Gagal memperbarui komentar'); }
   };
 
-  const handleDeleteComment = (commentId: string) => {
-    setComments(prev => prev.filter(c => c.id !== commentId));
-    if (editingCommentId === commentId) {
-      setEditingCommentId(null);
-    }
-    showToast('Komentar berhasil dihapus!');
+  const handleDeleteComment = async (commentId: string) => {
+    try {
+      const response = await fetch(`/api/projects/${currentProject.id}/comments/${commentId}`, { method: 'DELETE' });
+      if (!response.ok) throw new Error((await response.json()).error || 'Gagal menghapus komentar');
+      setComments(prev => prev.filter(c => c.id !== commentId));
+      if (editingCommentId === commentId) setEditingCommentId(null);
+      showToast('Komentar berhasil dihapus!');
+    } catch (error) { showToast(error instanceof Error ? error.message : 'Gagal menghapus komentar'); }
   };
 
   const mediaList = currentProject.carouselImages && currentProject.carouselImages.length > 0
@@ -215,12 +173,10 @@ export const ProjectDetailModal: React.FC<ProjectDetailModalProps> = ({
       ? currentProject.additionalMedia
       : [currentProject.coverImage || currentProject.mediaUrl || ''];
 
-  const creator = currentProject.creator || MOCK_CREATORS[0];
+  const creator = currentProject.creator;
   const creatorName = creator?.name || 'Creator Creatorin';
   const normalizedName = creatorName.toLowerCase().replace(/[^a-z0-9]/g, '');
   const creatorHandle = currentProject.socialHandle || `@${normalizedName}`;
-  const creatorDomain = `${normalizedName}.creatorin.id`;
-  const creatorEmail = `inquiry@${normalizedName}.com`;
   const description = currentProject.description || currentProject.caption || '';
   const categoryLabel = currentProject.category || 'Portofolio Kreator';
 
@@ -272,6 +228,7 @@ export const ProjectDetailModal: React.FC<ProjectDetailModalProps> = ({
 
   const handleSwitchProject = (newProject: FeedProject) => {
     setCurrentProject(newProject);
+    setComments([]);
     setIsPlaying(false);
     setVideoProgress(0);
     setCurrentSlideIndex(0);
@@ -320,7 +277,7 @@ export const ProjectDetailModal: React.FC<ProjectDetailModalProps> = ({
         <div className="relative flex aspect-[960/540.875] max-h-[640px] min-h-[260px] w-full items-center justify-center bg-black">
           <video
             ref={videoRef}
-            src={currentProject.videoUrl || 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4'}
+            src={currentProject.videoUrl || currentProject.mediaUrl}
             poster={currentProject.coverImage}
             loop
             muted={isMuted}
@@ -367,7 +324,7 @@ export const ProjectDetailModal: React.FC<ProjectDetailModalProps> = ({
             </div>
 
             <span className="whitespace-nowrap font-mono text-[12px] leading-4 text-[#d4d4d4]">
-              {currentProject.viewsCount || '710.0K'} views
+              {currentProject.viewsCount || '0'} views
             </span>
           </div>
         </div>
@@ -460,17 +417,6 @@ export const ProjectDetailModal: React.FC<ProjectDetailModalProps> = ({
             </button>
           </div>
 
-          <div className="mt-1.5 flex min-w-0 flex-wrap items-center gap-x-2.5 gap-y-1 text-[12px] font-medium leading-4 text-[#737373]">
-            <a href={`https://${creatorDomain}`} target="_blank" rel="noreferrer" className="inline-flex min-w-0 items-center gap-1 hover:text-[#1D4ED8]">
-              <Globe className="size-3.5 shrink-0 text-neutral-500" />
-              <span className="truncate">{creatorDomain}</span>
-            </a>
-            <span className="hidden sm:inline">•</span>
-            <a href={`mailto:${creatorEmail}`} className="inline-flex min-w-0 items-center gap-1 hover:text-[#1D4ED8]">
-              <Mail className="size-3.5 shrink-0 text-neutral-500" />
-              <span className="truncate">{creatorEmail}</span>
-            </a>
-          </div>
         </div>
       </div>
 
@@ -499,7 +445,7 @@ export const ProjectDetailModal: React.FC<ProjectDetailModalProps> = ({
         >
           <MessageSquare className="size-4" />
           <span className="absolute -top-1 -right-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-[#171717] text-white px-1 text-[9px] font-bold">
-            {23 + (comments.length - DEFAULT_COMMENTS.length)}
+            {comments.length}
           </span>
         </button>
 
@@ -537,7 +483,7 @@ export const ProjectDetailModal: React.FC<ProjectDetailModalProps> = ({
           {creator?.name || 'Kreator'}
         </button>
         <p className="pt-3 text-center text-[14px] font-medium leading-5 tracking-[-0.15px] text-neutral-600">
-          {creator?.bio || 'Kreator UGC autentik dengan engagement tinggi. Spesialis review skincare, makeup tutorial, dan unboxing estetik.'}
+          {creator?.bio || 'Belum ada deskripsi kreator.'}
         </p>
 
         <div className="flex flex-wrap items-center justify-center gap-3 pt-5">
@@ -557,17 +503,6 @@ export const ProjectDetailModal: React.FC<ProjectDetailModalProps> = ({
           </button>
         </div>
 
-        <div className="flex max-w-full flex-wrap items-center justify-center gap-x-4 gap-y-2 pt-4 text-[12px] font-medium leading-4 text-neutral-500">
-          <a href={`https://${creatorDomain}`} target="_blank" rel="noreferrer" className="inline-flex min-w-0 items-center gap-1 hover:text-[#155DFC]">
-            <Globe className="size-3.5 shrink-0" />
-            <span className="truncate">{creatorDomain}</span>
-          </a>
-          <span>•</span>
-          <a href={`mailto:${creatorEmail}`} className="inline-flex min-w-0 items-center gap-1 hover:text-[#155DFC]">
-            <Mail className="size-3.5 shrink-0" />
-            <span className="truncate">{creatorEmail}</span>
-          </a>
-        </div>
       </div>
     </section>
   );
@@ -633,7 +568,7 @@ export const ProjectDetailModal: React.FC<ProjectDetailModalProps> = ({
         >
           <MessageSquare className="size-5" />
           <span className="absolute -top-1.5 -right-1.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-[#171717] px-1 text-[10px] font-bold text-white shadow-xs">
-            {23 + (comments.length - DEFAULT_COMMENTS.length)}
+            {comments.length}
           </span>
         </button>
 
@@ -695,7 +630,7 @@ export const ProjectDetailModal: React.FC<ProjectDetailModalProps> = ({
               </div>
               <div className="flex justify-between">
                 <span className="font-medium text-neutral-400">Total Tayangan:</span>
-                <span className="font-semibold text-neutral-800">{currentProject.viewsCount || '710.0K'}</span>
+                <span className="font-semibold text-neutral-800">{currentProject.viewsCount || '0'}</span>
               </div>
               <div className="flex justify-between">
                 <span className="font-medium text-neutral-400">Total Komentar:</span>
@@ -823,7 +758,7 @@ export const ProjectDetailModal: React.FC<ProjectDetailModalProps> = ({
             <div className="flex items-center gap-2">
               <h3 className="text-[15px] font-bold text-[#171717]">Komentar</h3>
               <span className="text-[11px] px-2 py-0.5 rounded-full bg-neutral-100 text-neutral-600 font-semibold">
-                {23 + (comments.length - DEFAULT_COMMENTS.length)}
+                {comments.length}
               </span>
             </div>
 
@@ -837,7 +772,7 @@ export const ProjectDetailModal: React.FC<ProjectDetailModalProps> = ({
               >
                 <MessageSquare className="size-4.5" />
                 <span className="absolute -top-1 -right-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-white text-[#171717] px-1 text-[9px] font-bold shadow-xs border border-neutral-200">
-                  {23 + (comments.length - DEFAULT_COMMENTS.length)}
+                  {comments.length}
                 </span>
               </button>
 
@@ -868,7 +803,7 @@ export const ProjectDetailModal: React.FC<ProjectDetailModalProps> = ({
           {/* Scrollable Comments Feed */}
           <div className="flex-1 overflow-y-auto px-6 py-5 space-y-6">
             {comments.map((item) => {
-              const canEditOrDelete = item.isOwner && item.createdAt && (Date.now() - item.createdAt < 10 * 60 * 1000);
+              const canEditOrDelete = item.isOwner && item.createdAt && item.createdAt >= commentEditCutoff;
               const isEditing = editingCommentId === item.id;
 
               return (

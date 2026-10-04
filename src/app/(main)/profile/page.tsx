@@ -2,76 +2,90 @@
 
 import { CreatorProfilePage } from '@/views/CreatorProfilePage';
 import { UmkmProfilePage } from '@/views/UmkmProfilePage';
-import { MOCK_CREATORS } from '@/data/mockCreators';
-import { MOCK_PRIMARY_UMKM } from '@/data/mockUmkm';
+import { creatorService } from '@/services/creatorService';
 import { useAuth } from '@/providers/AuthProvider';
 import { useRouter } from 'next/navigation';
-import { useEffect } from 'react';
-import type { Creator } from '@/types';
+import { useEffect, useMemo, useState } from 'react';
+import type { Creator, UMKMProfile } from '@/types';
 
 export default function MyProfilePage() {
-  const { user, isAuthenticated } = useAuth();
+  const { user, isAuthenticated, isLoading } = useAuth();
   const router = useRouter();
+  const [creator, setCreator] = useState<Creator | null>(null);
+  const [businessData, setBusinessData] = useState<{ details?: { companyName?: string; businessCategory?: string; description?: string; website?: string }; briefs?: Array<{ id: string; title: string; category: string; description: string; budget: string; deadline: string; businessName: string }> }>({});
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (user?.role !== 'creator' || !user.id) { setLoading(false); return; }
+    creatorService.getCreatorDetail(user.id)
+      .then(setCreator)
+      .catch(() => setCreator(null))
+      .finally(() => setLoading(false));
+  }, [user?.id, user?.role]);
+
+  useEffect(() => {
+    if (user?.role !== 'umkm' || !user.id) return;
+    Promise.all([
+      fetch('/api/auth/me', { cache: 'no-store' }).then((res) => res.json()),
+      fetch(`/api/briefs?businessId=${encodeURIComponent(user.id)}`, { cache: 'no-store' }).then((res) => res.json()),
+    ]).then(([account, listings]) => setBusinessData({ details: account.details, briefs: listings.briefs || [] })).catch(() => {});
+  }, [user?.id, user?.role]);
+
+  const umkmProfile = useMemo<UMKMProfile | null>(() => {
+    if (!user || user.role !== 'umkm') return null;
+    const briefs = businessData.briefs || [];
+    return {
+      id: user.id || '', name: user.name,
+      brandName: businessData.details?.companyName || user.name,
+      logo: user.avatar || '', coverBanner: '',
+      industry: businessData.details?.businessCategory || '',
+      category: businessData.details?.businessCategory || '',
+      tagline: '', bio: businessData.details?.description || '',
+      location: user.location || '', website: businessData.details?.website || '',
+      verified: false, joinedDate: '',
+      stats: { activeBriefs: briefs.length, completedProjects: 0, totalPaidFormatted: 'Rp0', ratingFromCreators: 0, reviewCount: 0, paymentOnTimeRate: 0, avgResponseHours: 0 },
+      activeBriefsList: briefs.map((brief) => ({
+        id: brief.id, title: brief.title, clientName: brief.businessName,
+        clientLocation: user.location || '', category: brief.category,
+        budgetMin: Number(String(brief.budget || '').replace(/\D/g, '')) || 0,
+        budgetMax: Number(String(brief.budget || '').replace(/\D/g, '')) || 0,
+        formattedBudget: brief.budget, deadline: brief.deadline,
+        description: brief.description,
+        deliverables: [], requiredSkills: [], proposalsCount: 0, postedTimeAgo: '',
+      })),
+      completedCollaborations: [], creatorReviews: [],
+    };
+  }, [user, businessData]);
 
   // Redirect unauthenticated users to sign-in or school users to school dashboard
   useEffect(() => {
+    if (isLoading) return;
     if (!isAuthenticated) {
       router.replace('/sign-in');
     } else if (user?.role === 'school') {
       router.replace('/dashboard/school');
     }
-  }, [isAuthenticated, user?.role, router]);
+  }, [isAuthenticated, isLoading, user?.role, router]);
 
   if (!isAuthenticated || !user || user.role === 'school') {
     return null;
   }
 
   if (user.role === 'umkm') {
-    const umkmProfile = {
-      ...MOCK_PRIMARY_UMKM,
-      id: `user-${user.email.replace(/[^a-z0-9]/gi, '-')}`,
-      name: user.name,
-      brandName: user.name,
-      logo: user.avatar || MOCK_PRIMARY_UMKM.logo,
-      bio: user.bio || MOCK_PRIMARY_UMKM.bio,
-      location: user.location || MOCK_PRIMARY_UMKM.location,
-    };
     return (
       <UmkmProfilePage
-        initialProfile={umkmProfile}
+        initialProfile={umkmProfile!}
         currentUser={user}
       />
     );
   }
 
-  // Build a Creator object from the logged-in user's auth state.
-  // We use the mock creator's portfolio/services as a template but override
-  // all identity fields with the actual user data.
-  const template = MOCK_CREATORS[0];
-
-  const userCreator: Creator = {
-    ...template,
-    id: `user-${user.email.replace(/[^a-z0-9]/gi, '-')}`,
-    name: user.name,
-    avatar:
-      user.avatar ||
-      'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=240&auto=format&fit=crop&q=80',
-    bio: user.bio || template.bio,
-    roleTitle:
-      user.roleTitle ||
-      (user.role === 'creator' ? 'Kreator Konten' : 'Brand / UMKM'),
-    location: user.location || template.location,
-    handle:
-      user.handle ||
-      `@${user.name.toLowerCase().replace(/[^a-z0-9]/g, '')}`,
-    verified: true,
-    proBadge: false,
-    careerScore: template.careerScore,
-  };
+  if (loading) return <p className="p-8">Memuat profil...</p>;
+  if (!creator) return <p className="p-8">Profil belum tersedia. Coba muat ulang halaman.</p>;
 
   return (
     <CreatorProfilePage
-      creator={userCreator}
+      creator={creator}
       currentUser={user}
       isOwnProfile={true}
     />

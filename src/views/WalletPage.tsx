@@ -1,31 +1,40 @@
 'use client';
 
-import React, { useCallback, useEffect, useState } from 'react';
-import { ArrowDownLeft, ArrowUpRight, Coins, ShieldCheck, WalletCards } from 'lucide-react';
+import { useEffect, useState } from 'react';
 import { useAuth } from '@/providers/AuthProvider';
 
 type Transaction = { id: string; type: string; amount: number; description?: string; status: string; createdAt: string };
-type WalletData = { wallet: { balance: number; points: number; updatedAt: string }; transactions: Transaction[] };
+type WalletData = { wallet: { balance: number; points: number }; transactions: Transaction[] };
 
-export const WalletPage = () => {
-  const { user } = useAuth(); const [data, setData] = useState<WalletData | null>(null); const [error, setError] = useState(''); const [busy, setBusy] = useState(false);
-  const [coins, setCoins] = useState(100); const [withdraw, setWithdraw] = useState(50000); const [bank, setBank] = useState(''); const [account, setAccount] = useState('');
-  const load = useCallback(async () => { const response = await fetch('/api/wallet', { cache: 'no-store' }); if (!response.ok) { setError(response.status === 401 ? 'Masuk untuk melihat dompet koin Anda.' : 'Dompet belum dapat dimuat.'); return; } setData(await response.json()); }, []);
-  useEffect(() => { const run = async () => { await load(); }; void run(); }, [load]);
-  const post = async (path: string, body: object) => { setBusy(true); setError(''); const response = await fetch(path, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) }); const result = await response.json(); setBusy(false); if (!response.ok) { setError(result.error || 'Transaksi gagal diproses.'); return; } await load(); };
-  const balanceCoins = Math.floor((data?.wallet.balance || 0) / 1000);
-
-  if (!user) return <div className="min-h-[65vh] bg-[#F8F9FC] py-16"><div className="container-creatorin max-w-2xl"><div className="rounded-2xl border border-[var(--outline)] bg-white p-8 text-center shadow-[0_1px_2px_rgba(13,12,34,.06)]"><WalletCards className="mx-auto h-8 w-8 text-primary" /><h1 className="mt-5 text-3xl font-semibold">Masuk untuk membuka dompet</h1><p className="mt-3 text-[#55576A]">Saldo, top up, penarikan, dan riwayat transaksi hanya tersedia untuk pemilik akun.</p><a href="/sign-in" className="mt-6 inline-flex min-h-12 items-center rounded-xl bg-primary px-5 text-sm font-semibold text-white hover:bg-[#1248C7]">Masuk ke Creatorin</a></div></div></div>;
-
-  return <div className="min-h-[70vh] bg-[#F8F9FC] py-8 sm:py-12"><div className="container-creatorin max-w-6xl">
-    <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-end"><div><p className="text-sm font-semibold text-primary">Dompet koin</p><h1 className="mt-1 text-3xl font-semibold sm:text-[40px]">Kelola saldo dan transaksi</h1><p className="mt-2 max-w-2xl text-[#55576A]">Satu koin bernilai Rp1.000. Pembayaran proyek ditahan di escrow sampai UMKM menyetujui hasil.</p></div><div className="flex items-center gap-2 rounded-xl border border-[#A9C3FF] bg-[#E8F0FF] px-4 py-3 text-sm text-[#0D2A75]"><ShieldCheck className="h-5 w-5" /> Pembayaran dilindungi escrow</div></div>
-    {error && <div role="alert" className="mt-6 rounded-lg border border-[#FCA5A5] bg-[#FEE4E2] p-3 text-sm text-[#912018]">{error}</div>}
-    <section className="mt-8 grid gap-5 md:grid-cols-[1.1fr_.9fr]">
-      <div className="rounded-2xl bg-[#0D0C22] p-6 text-white shadow-[0_4px_12px_rgba(13,12,34,.10)] sm:p-8"><WalletCards className="h-7 w-7 text-[#8CB7FF]" /><p className="mt-8 text-sm text-[#DDE0E8]">Saldo tersedia</p><p className="mt-1 font-display text-4xl font-semibold text-white sm:text-5xl">{balanceCoins.toLocaleString('id-ID')} koin</p><p className="mt-2 text-sm text-[#DDE0E8]">Setara Rp{(data?.wallet.balance || 0).toLocaleString('id-ID')}</p></div>
-      <div className="rounded-2xl border border-[var(--outline)] bg-white p-6 shadow-[0_1px_2px_rgba(13,12,34,.06)]">
-        {user?.role === 'umkm' ? <><h2 className="text-xl font-semibold">Top up sandbox</h2><p className="mt-1 text-sm text-[#55576A]">Tambah saldo untuk membayar invoice.</p><label htmlFor="topup" className="mt-5 block text-sm font-semibold">Jumlah koin</label><input id="topup" type="number" min={10} max={10000} value={coins} onChange={(e) => setCoins(Number(e.target.value))} className="mt-2 h-12 w-full rounded-lg border border-[#B7BBC9] px-3 focus:border-primary focus:outline-none focus:shadow-[var(--focus-ring)]" /><p className="mt-2 text-sm text-[#55576A]">Total Rp{(coins * 1000).toLocaleString('id-ID')}</p><button disabled={busy} onClick={() => post('/api/wallet/top-up', { coins, paymentMethod: 'payment-gateway-sandbox' })} className="mt-5 h-12 w-full rounded-xl bg-primary font-semibold text-white hover:bg-[#1248C7]">{busy ? 'Memproses…' : 'Top up koin'}</button></> : <><h2 className="text-xl font-semibold">Tarik penghasilan</h2><p className="mt-1 text-sm text-[#55576A]">Minimum 50 koin. Biaya 2 persen atau minimal Rp2.500.</p><div className="mt-5 grid gap-3"><input aria-label="Jumlah penarikan dalam rupiah" type="number" min={50000} step={1000} value={withdraw} onChange={(e) => setWithdraw(Number(e.target.value))} className="h-11 rounded-lg border border-[#B7BBC9] px-3" /><input aria-label="Nama bank" value={bank} onChange={(e) => setBank(e.target.value)} placeholder="Nama bank" className="h-11 rounded-lg border border-[#B7BBC9] px-3" /><input aria-label="Nomor rekening" value={account} onChange={(e) => setAccount(e.target.value)} placeholder="Nomor rekening" className="h-11 rounded-lg border border-[#B7BBC9] px-3" /></div><button disabled={busy || !bank || !account} onClick={() => post('/api/wallet/withdraw', { amount: withdraw, bankName: bank, accountNumber: account, accountHolder: user?.name })} className="mt-5 h-12 w-full rounded-xl bg-primary font-semibold text-white hover:bg-[#1248C7]">{busy ? 'Memproses…' : 'Ajukan penarikan'}</button></>}
-      </div>
-    </section>
-    <section className="mt-8"><div className="flex items-center justify-between"><h2 className="text-2xl font-semibold">Riwayat transaksi</h2><span className="text-sm text-[#55576A]">20 transaksi terbaru</span></div><div className="mt-4 overflow-hidden rounded-2xl border border-[var(--outline)] bg-white">{data?.transactions.length ? data.transactions.map((tx) => <div key={tx.id} className="flex items-center gap-3 border-b border-[var(--outline)] p-4 last:border-0"><div className={`grid h-10 w-10 shrink-0 place-items-center rounded-lg ${tx.amount >= 0 ? 'bg-[#DCFCE7] text-[#16803C]' : 'bg-[#FEE4E2] text-[#D92D20]'}`}>{tx.amount >= 0 ? <ArrowDownLeft className="h-5 w-5" /> : <ArrowUpRight className="h-5 w-5" />}</div><div className="min-w-0 flex-1"><p className="truncate text-sm font-semibold">{tx.description || tx.type}</p><p className="mt-1 text-xs text-[#55576A]">{new Date(tx.createdAt).toLocaleDateString('id-ID', { dateStyle: 'medium' })}</p></div><p className={`text-sm font-semibold ${tx.amount >= 0 ? 'text-[#16803C]' : 'text-[#D92D20]'}`}>{tx.amount >= 0 ? '+' : ''}{Math.trunc(tx.amount / 1000)} koin</p></div>) : <div className="p-8 text-center"><Coins className="mx-auto h-7 w-7 text-[#6F7285]" /><p className="mt-3 font-semibold">Belum ada transaksi</p><p className="mt-1 text-sm text-[#55576A]">Top up atau selesaikan proyek untuk mengisi riwayat.</p></div>}</div></section>
-  </div></div>;
-};
+export function WalletPage() {
+  const { user } = useAuth();
+  const [data, setData] = useState<WalletData | null>(null);
+  const [error, setError] = useState('');
+  useEffect(() => {
+    if (!user) return;
+    let active = true;
+    fetch('/api/wallet', { cache: 'no-store' }).then(async response => {
+      const body = await response.json();
+      if (!response.ok) throw new Error(body.error || 'Gagal memuat dompet');
+      return body as WalletData;
+    }).then(body => { if (active) setData(body); }).catch(caught => { if (active) setError(caught instanceof Error ? caught.message : 'Gagal memuat dompet'); });
+    return () => { active = false; };
+  }, [user]);
+  if (!user) return <div className="container-creatorin py-16 text-center">Masuk untuk melihat dompet Anda.</div>;
+  return <main className="container-creatorin max-w-4xl py-10 sm:py-16">
+    <h1 className="text-3xl font-semibold">Dompet koin</h1>
+    {error && <p className="mt-5 rounded-xl bg-red-50 p-4 text-sm text-red-700" role="alert">{error}</p>}
+    <div className="mt-8 rounded-2xl bg-[#0D0C22] p-8 text-white">
+      <p className="text-sm text-white/70">Saldo tercatat</p>
+      <p className="mt-3 text-4xl font-semibold">{Math.floor((data?.wallet.balance || 0) / 1000).toLocaleString('id-ID')} koin</p>
+    </div>
+    <p className="mt-5 text-sm text-[var(--muted)]">Top up dan penarikan belum tersedia karena kanal pembayaran belum terhubung.</p>
+    <h2 className="mt-10 text-xl font-semibold">Riwayat transaksi</h2>
+    <div className="mt-4 divide-y divide-[var(--outline)] rounded-2xl border border-[var(--outline)] bg-white">
+      {data?.transactions.length ? data.transactions.map(transaction => <div key={transaction.id} className="flex items-center justify-between gap-4 p-5 text-sm">
+        <div><p className="font-semibold">{transaction.description || transaction.type}</p><p className="mt-1 text-[var(--muted)]">{new Date(transaction.createdAt).toLocaleDateString('id-ID')}</p></div>
+        <strong>{transaction.amount >= 0 ? '+' : ''}{Math.trunc(transaction.amount / 1000)} koin</strong>
+      </div>) : <p className="p-8 text-center text-sm text-[var(--muted)]">Belum ada transaksi.</p>}
+    </div>
+  </main>;
+}

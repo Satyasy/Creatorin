@@ -36,7 +36,7 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({
 
   const viewsFormatted =
     project.viewsCount ||
-    (project.stats?.views ? `${Math.round(project.stats.views / 1000)}K` : '710.0K');
+    (project.stats?.views ? String(project.stats.views) : '0');
 
   return (
     <div

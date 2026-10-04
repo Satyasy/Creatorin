@@ -2,7 +2,6 @@ import { NextRequest, NextResponse } from "next/server";
 import { getDb } from "@/lib/db";
 import { profiles, creatorProfiles } from "@/lib/db/schema";
 import { eq, desc } from "drizzle-orm";
-import { MOCK_CREATORS } from "@/data/mockCreators";
 
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
@@ -12,34 +11,7 @@ export async function GET(req: NextRequest) {
   const limit = Math.min(parseInt(searchParams.get("limit") || "50", 10), 100);
 
   const db = getDb();
-  if (!db) {
-    let list = MOCK_CREATORS;
-    if (search) {
-      list = list.filter(c => c.name.toLowerCase().includes(search) || c.skills.some(s => s.toLowerCase().includes(search)));
-    }
-    if (category) {
-      list = list.filter(c => c.category?.toLowerCase() === category || c.skills.some(s => s.toLowerCase().includes(category)));
-    }
-    return NextResponse.json({
-      creators: list.slice(0, limit).map(c => ({
-        id: c.id,
-        fullName: c.name,
-        avatarUrl: c.avatar,
-        location: c.location,
-        slug: c.username || c.id,
-        headline: c.roleTitle,
-        bio: c.bio,
-        careerScore: c.careerScore?.overall || 90,
-        completedProjectsCount: c.careerScore?.completedProjects || 10,
-        rating: c.rating || 5.0,
-        reviewsCount: c.reviewCount || 12,
-        followersCount: c.followersCount || 1000,
-        startingPrice: c.formattedRate,
-        skills: c.skills,
-        isPro: c.proBadge,
-      }))
-    });
-  }
+  if (!db) return NextResponse.json({ error: "Database not connected" }, { status: 503 });
 
   try {
     const rows = await db

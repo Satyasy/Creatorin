@@ -3,7 +3,7 @@ import { getAuthenticatedUser } from "@/lib/api-auth";
 import { getDb } from "@/lib/db";
 import { services, profiles, creatorProfiles } from "@/lib/db/schema";
 import { eq, desc, ilike, and } from "drizzle-orm";
-import { MOCK_CREATORS } from "@/data/mockCreators";
+import { createClient } from "@/lib/supabase/server";
 
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
@@ -12,37 +12,7 @@ export async function GET(req: NextRequest) {
   const search = searchParams.get("search");
 
   const db = getDb();
-  if (!db) {
-    let allServices = MOCK_CREATORS.flatMap((c) =>
-      (c.services || []).map((s, idx) => ({
-        id: s.id,
-        title: s.title,
-        category: s.tag || s.category || c.category || "Desain",
-        description: s.description || "Layanan kreatif profesional oleh " + c.name,
-        price: s.formattedPrice || "Rp" + s.price.toLocaleString("id-ID"),
-        priceNumeric: s.price,
-        estimatedDays: parseInt(s.deliveryDays?.replace(/[^0-9]/g, "") || "3"),
-        shapeIdx: idx,
-        imageUrl: s.coverImage || c.avatar,
-        isActive: true,
-        createdAt: new Date().toISOString(),
-        creatorId: c.id,
-        creatorName: c.name,
-        creatorAvatar: c.avatar,
-        creatorSlug: c.username || c.id,
-      }))
-    );
-    if (category) {
-      allServices = allServices.filter(s => s.category.toLowerCase().includes(category.toLowerCase()));
-    }
-    if (creatorId) {
-      allServices = allServices.filter(s => s.creatorId === creatorId);
-    }
-    if (search) {
-      allServices = allServices.filter(s => s.title.toLowerCase().includes(search.toLowerCase()) || s.creatorName.toLowerCase().includes(search.toLowerCase()));
-    }
-    return NextResponse.json({ services: allServices });
-  }
+  if (!db) return NextResponse.json({ error: "Database not connected" }, { status: 503 });
 
   try {
     let query = db
@@ -94,22 +64,42 @@ export async function POST(req: NextRequest) {
   if (!user) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
+  if (user.role !== "creator") return NextResponse.json({ error: "Hanya kreator dapat membuat layanan." }, { status: 403 });
 
   const db = getDb();
   if (!db) {
     return NextResponse.json({ error: "Database not connected" }, { status: 503 });
   }
 
-  const body = await req.json();
-  const { title, category, description, price, estimatedDays, shapeIdx = 0, imageUrl } = body;
+  const form = await req.formData();
+  const title = String(form.get("title") || "").trim();
+  const category = String(form.get("category") || "").trim();
+  const description = String(form.get("description") || "").trim();
+  const price = String(form.get("price") || "").trim();
+  const estimatedDays = String(form.get("estimatedDays") || "").trim();
+  const file = form.get("file");
 
   if (!title || !category || !price) {
     return NextResponse.json({ error: "Judul, kategori, dan harga wajib diisi." }, { status: 400 });
   }
 
   try {
+    let imageUrl: string | undefined;
+    let uploadedPath: string | undefined;
+    const supabase = await createClient();
+    if (file instanceof File && file.size > 0) {
+      if (file.size > 20 * 1024 * 1024 || !["image/jpeg", "image/png", "image/webp"].includes(file.type)) {
+        return NextResponse.json({ error: "Gunakan JPG, PNG, atau WebP maksimal 20 MB." }, { status: 400 });
+      }
+      uploadedPath = `${user.id}/${crypto.randomUUID()}.${file.type === "image/jpeg" ? "jpg" : file.type.split("/")[1]}`;
+      const { error } = await supabase.storage.from("project-media").upload(uploadedPath, file, { contentType: file.type });
+      if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+      imageUrl = supabase.storage.from("project-media").getPublicUrl(uploadedPath).data.publicUrl;
+    }
     const numeric = parseInt(price.replace(/[^0-9]/g, ""), 10) || 0;
-    const [newService] = await db
+    let newService;
+    try {
+      [newService] = await db
       .insert(services)
       .values({
         creatorId: user.id,
@@ -118,12 +108,16 @@ export async function POST(req: NextRequest) {
         description: description || "",
         price,
         priceNumeric: numeric,
-        estimatedDays: estimatedDays || "2 Hari Kerja",
-        shapeIdx: Number(shapeIdx),
+        estimatedDays,
+        shapeIdx: 0,
         imageUrl,
         isActive: true,
       })
       .returning();
+    } catch (error) {
+      if (uploadedPath) await supabase.storage.from("project-media").remove([uploadedPath]);
+      throw error;
+    }
 
     return NextResponse.json({ success: true, service: newService }, { status: 201 });
   } catch (err: any) {

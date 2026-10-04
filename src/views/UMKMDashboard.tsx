@@ -5,7 +5,7 @@ import dynamic from 'next/dynamic';
 import { useRouter } from 'next/navigation';
 import { ArrowRight, Check, ChevronDown, Plus, Search, X } from 'lucide-react';
 import { ProjectCard } from '@/components/common/ProjectCard';
-import { MOCK_FEED_PROJECTS } from '@/data/mockFeedProjects';
+import { creatorService } from '@/services/creatorService';
 import { useAuth } from '@/providers/AuthProvider';
 import { FeedProject } from '@/types';
 
@@ -29,14 +29,6 @@ const CATEGORIES = [
   'Feed Instagram',
 ];
 
-const CATEGORY_PREVIEWS = [
-  { label: 'Video pendek', category: 'Video Tiktok', projectIndex: 3 },
-  { label: 'Foto produk', category: 'Foto Produk', projectIndex: 1 },
-  { label: 'Desain digital', category: 'UI/UX Design', projectIndex: 2 },
-  { label: 'Branding', category: 'Branding & Logo', projectIndex: 7 },
-  { label: 'Konten sosial', category: 'Reels Instagram', projectIndex: 8 },
-];
-
 export const UMKMDashboard = () => {
   const router = useRouter();
   const { user } = useAuth();
@@ -47,6 +39,11 @@ export const UMKMDashboard = () => {
   const [savedProjects, setSavedProjects] = useState<Record<string, boolean>>({});
   const [visibleCount, setVisibleCount] = useState(8);
   const [selectedProject, setSelectedProject] = useState<FeedProject | null>(null);
+  const [projectsData, setProjects] = useState<FeedProject[]>([]);
+  const [loadError, setLoadError] = useState('');
+  useEffect(() => {
+    creatorService.getFeedProjects().then(setProjects).catch(() => setLoadError('Gagal memuat karya. Coba muat ulang halaman.'));
+  }, []);
   const [isBriefModalOpen, setIsBriefModalOpen] = useState(false);
   const sortButtonRef = useRef<HTMLButtonElement>(null);
 
@@ -62,7 +59,7 @@ export const UMKMDashboard = () => {
   }, [isSortDropdownOpen]);
 
   const filteredProjects = useMemo(() => {
-    let projects = [...MOCK_FEED_PROJECTS];
+    let projects = [...projectsData];
     const query = searchQuery.trim().toLowerCase();
 
     if (query) {
@@ -94,7 +91,8 @@ export const UMKMDashboard = () => {
     }
 
     return projects;
-  }, [searchQuery, selectedTag, sortBy]);
+  }, [searchQuery, selectedTag, sortBy, projectsData]);
+  const categoryPreviews = useMemo(() => Array.from(new Map(projectsData.map(project => [project.category, project])).entries()).slice(0, 5), [projectsData]);
 
   const selectCategory = (category: string) => {
     setSelectedTag(category === 'Semua karya' ? null : category);
@@ -142,12 +140,11 @@ export const UMKMDashboard = () => {
         </div>
 
         <div className="grid grid-cols-[repeat(5,minmax(220px,1fr))] gap-4 overflow-x-auto pb-3" role="list">
-          {CATEGORY_PREVIEWS.map(({ label, category, projectIndex }) => {
-            const project = MOCK_FEED_PROJECTS[projectIndex];
+          {categoryPreviews.map(([category, project]) => {
             return (
-              <button key={label} onClick={() => selectCategory(category)} className="group min-w-0 text-left" role="listitem">
+              <button key={category} onClick={() => selectCategory(category)} className="group min-w-0 text-left" role="listitem">
                 <span className="block aspect-[16/10] overflow-hidden rounded-xl bg-[#F3F3F4]"><img src={project.coverImage} alt="" className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.025]" loading="lazy" /></span>
-                <span className="mt-3 block text-sm font-semibold text-[var(--ink)] group-hover:text-primary">{label}</span>
+                <span className="mt-3 block text-sm font-semibold text-[var(--ink)] group-hover:text-primary">{category}</span>
               </button>
             );
           })}
@@ -160,7 +157,7 @@ export const UMKMDashboard = () => {
             <div>
               <p className="text-sm font-semibold text-primary">Kurasi untuk usahamu</p>
               <h2 id="work-heading" className="mt-1 text-2xl font-semibold sm:text-3xl">Karya terbaru dari creator</h2>
-              <p className="mt-2 text-sm text-[var(--muted)]">{filteredProjects.length} karya cocok dengan pencarian ini. Data karya dan metrik masih berupa contoh.</p>
+              <p className="mt-2 text-sm text-[var(--muted)]">{filteredProjects.length} karya cocok dengan pencarian ini.</p>
             </div>
 
             <div className="flex items-center gap-3 self-stretch overflow-x-auto lg:self-auto">
@@ -186,6 +183,7 @@ export const UMKMDashboard = () => {
             </div>
           </div>
 
+          {loadError && <p role="alert" className="mt-8 text-sm text-red-600">{loadError}</p>}
           {filteredProjects.length ? (
             <>
               <div className="mt-8 grid grid-cols-1 gap-x-5 gap-y-7 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4">

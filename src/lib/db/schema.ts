@@ -26,25 +26,25 @@ export const creatorProfiles = pgTable("creator_profiles", {
   slug: text("slug").unique().notNull(),
   headline: text("headline").notNull(),
   bio: text("bio"),
-  careerScore: integer("career_score").default(92).notNull(),
+  careerScore: integer("career_score").default(0).notNull(),
   completedProjectsCount: integer("completed_projects_count").default(0).notNull(),
-  rating: decimal("rating", { precision: 3, scale: 1 }).default("5.0").notNull(),
+  rating: decimal("rating", { precision: 3, scale: 1 }).default("0.0").notNull(),
   reviewsCount: integer("reviews_count").default(0).notNull(),
   followersCount: text("followers_count").default("0").notNull(),
   schoolId: uuid("school_id"),
   schoolName: text("school_name"),
   schoolStatus: schoolStatusEnum("school_status").default("pending"),
-  graduationYear: text("graduation_year").default("2026"),
-  major: text("major").default("RPL"),
-  classGrade: text("class_grade").default("XII"),
+  graduationYear: text("graduation_year"),
+  major: text("major"),
+  classGrade: text("class_grade"),
   nisn: text("nisn"),
-  startingPrice: text("starting_price").default("Mulai Rp100.000").notNull(),
+  startingPrice: text("starting_price").default("").notNull(),
   skills: jsonb("skills").$type<string[]>().default([]).notNull(),
-  languages: jsonb("languages").$type<string[]>().default(["Indonesia", "English"]).notNull(),
+  languages: jsonb("languages").$type<string[]>().default([]).notNull(),
   isPro: boolean("is_pro").default(false).notNull(),
   isPromoted: boolean("is_promoted").default(false).notNull(),
-  responseTime: text("response_time").default("< 1 Jam").notNull(),
-  onTimeRate: integer("on_time_rate").default(95).notNull(),
+  responseTime: text("response_time").default("").notNull(),
+  onTimeRate: integer("on_time_rate").default(0).notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
@@ -96,9 +96,10 @@ export const studentSchoolRelations = pgTable("student_school_relations", {
   studentId: uuid("student_id").references(() => profiles.id, { onDelete: "cascade" }).notNull(),
   schoolId: uuid("school_id").references(() => schools.id, { onDelete: "cascade" }).notNull(),
   schoolStatus: schoolStatusEnum("school_status").default("pending").notNull(),
-  graduationYear: text("graduation_year").notNull().default("2026"),
-  major: text("major").notNull().default("RPL"),
-  classGrade: text("class_grade").notNull().default("XII"),
+  isFeatured: boolean("is_featured").default(false).notNull(),
+  graduationYear: text("graduation_year").notNull().default(""),
+  major: text("major").notNull().default(""),
+  classGrade: text("class_grade").notNull().default(""),
   nisn: text("nisn"),
   requestDate: timestamp("request_date").defaultNow().notNull(),
   approvedAt: timestamp("approved_at"),
@@ -162,12 +163,21 @@ export const projects = pgTable("projects", {
   creatorId: uuid("creator_id").references(() => profiles.id, { onDelete: "cascade" }).notNull(),
   title: text("title").notNull(),
   description: text("description"),
+  category: text("category").default("Karya Kreatif").notNull(),
   creatorHandle: text("creator_handle").notNull(),
   viewsCount: text("views_count").default("0").notNull(),
   mediaUrl: text("media_url"),
   mediaType: text("media_type").default("shader").notNull(),
   externalLink: text("external_link"),
   isFeaturedSchool: boolean("is_featured_school").default(false).notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export const projectComments = pgTable("project_comments", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  projectId: uuid("project_id").references(() => projects.id, { onDelete: "cascade" }).notNull(),
+  userId: uuid("user_id").references(() => profiles.id, { onDelete: "cascade" }).notNull(),
+  content: text("content").notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
@@ -276,7 +286,7 @@ export const reviews = pgTable("reviews", {
   reviewerRole: text("reviewer_role").notNull(),
   reviewerAvatar: text("reviewer_avatar").default("/creatorin/avatar.png").notNull(),
   projectTitle: text("project_title").notNull(),
-  rating: decimal("rating", { precision: 2, scale: 1 }).default("5.0").notNull(),
+  rating: decimal("rating", { precision: 2, scale: 1 }).notNull(),
   comment: text("comment").notNull(),
   completedDate: text("completed_date").notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
@@ -292,6 +302,13 @@ export const notifications = pgTable("notifications", {
   linkUrl: text("link_url"),
   isRead: boolean("is_read").default(false).notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export const userSettings = pgTable("user_settings", {
+  userId: uuid("user_id").primaryKey().references(() => profiles.id, { onDelete: "cascade" }),
+  notifyPush: boolean("notify_push").default(true).notNull(),
+  language: text("language").default("id").notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
 
 // 14. Creator Wallet & Transactions

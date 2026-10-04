@@ -15,9 +15,12 @@ export const UploadProjectModal: React.FC<UploadProjectModalProps> = ({
   onSuccess,
 }) => {
   const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [error, setError] = useState('');
   const [caption, setCaption] = useState('');
+  const [category, setCategory] = useState('Karya Kreatif');
   const [hashtagInput, setHashtagInput] = useState('');
-  const [hashtags, setHashtags] = useState<string[]>(['kreatorindonesia', 'ugcvideo', 'branding']);
+  const [hashtags, setHashtags] = useState<string[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [successToast, setSuccessToast] = useState(false);
 
@@ -26,8 +29,10 @@ export const UploadProjectModal: React.FC<UploadProjectModalProps> = ({
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
+      if (imagePreview) URL.revokeObjectURL(imagePreview);
       const url = URL.createObjectURL(file);
       setImagePreview(url);
+      setSelectedFile(file);
     }
   };
 
@@ -46,29 +51,36 @@ export const UploadProjectModal: React.FC<UploadProjectModalProps> = ({
     setHashtags(hashtags.filter(t => t !== tagToRemove));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!selectedFile) { setError('Pilih file karya terlebih dahulu.'); return; }
     setIsSubmitting(true);
-
-    setTimeout(() => {
+    setError('');
+    try {
+      const form = new FormData();
+      form.set('title', caption.trim().slice(0, 80));
+      form.set('category', category);
+      form.set('description', `${caption.trim()}${hashtags.length ? `\n\n${hashtags.map(tag => `#${tag}`).join(' ')}` : ''}`);
+      form.set('file', selectedFile);
+      const response = await fetch('/api/projects', { method: 'POST', body: form });
+      const result = await response.json();
+      if (!response.ok) throw new Error(result.error || 'Gagal mengunggah karya.');
       setIsSubmitting(false);
       setSuccessToast(true);
-      if (onSuccess) {
-        onSuccess({
-          id: `proj-${Date.now()}`,
-          title: caption.slice(0, 30) || 'Karya Baru Kreator',
-          caption,
-          coverImage: imagePreview || 'https://images.unsplash.com/photo-1542744094-3a31f272c490?w=800&auto=format&fit=crop&q=80',
-          tags: hashtags,
-          likesCount: 1,
-          commentsCount: 0,
-        });
-      }
+      onSuccess?.(result.project);
       setTimeout(() => {
         setSuccessToast(false);
+        if (imagePreview) URL.revokeObjectURL(imagePreview);
+        setImagePreview(null);
+        setSelectedFile(null);
+        setCaption('');
+        setHashtags([]);
         onClose();
       }, 900);
-    }, 1000);
+    } catch (caught) {
+      setError(caught instanceof Error ? caught.message : 'Gagal mengunggah karya.');
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -111,11 +123,7 @@ export const UploadProjectModal: React.FC<UploadProjectModalProps> = ({
             <div className="relative aspect-[4/3] rounded-xl border-2 border-dashed border-neutral-200 hover:border-blue-500 transition-colors bg-neutral-50/80 overflow-hidden flex flex-col items-center justify-center group cursor-pointer">
               {imagePreview ? (
                 <>
-                  <img
-                    src={imagePreview}
-                    alt="Preview"
-                    className="w-full h-full object-cover"
-                  />
+                  {selectedFile?.type.startsWith('video/') ? <video src={imagePreview} className="w-full h-full object-cover" muted /> : <img src={imagePreview} alt="Preview" className="w-full h-full object-cover" />}
                   <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white text-xs font-semibold">
                     Klik untuk ganti media
                   </div>
@@ -133,11 +141,18 @@ export const UploadProjectModal: React.FC<UploadProjectModalProps> = ({
               )}
               <input
                 type="file"
-                accept="image/*,video/*"
+                accept="image/jpeg,image/png,image/webp,video/mp4,video/webm"
                 onChange={handleImageChange}
                 className="absolute inset-0 opacity-0 cursor-pointer"
               />
             </div>
+          </div>
+
+          <div>
+            <label htmlFor="project-category" className="text-xs font-semibold text-neutral-700 block mb-1.5">Kategori karya</label>
+            <select id="project-category" value={category} onChange={(event) => setCategory(event.target.value)} className="w-full rounded-xl border border-neutral-200 bg-white px-3 py-2.5 text-sm text-neutral-900">
+              {['Foto Produk', 'Video Tiktok', 'Reels Instagram', 'UI/UX Design', 'Branding & Logo', 'Feed Instagram', 'Karya Kreatif'].map((item) => <option key={item} value={item}>{item}</option>)}
+            </select>
           </div>
 
           {/* 2. Caption */}
@@ -195,6 +210,7 @@ export const UploadProjectModal: React.FC<UploadProjectModalProps> = ({
             </div>
           </div>
 
+          {error && <p role="alert" className="text-xs text-red-600">{error}</p>}
           {/* Actions */}
           <div className="pt-2 border-t border-neutral-100 flex items-center justify-end gap-2">
             <button

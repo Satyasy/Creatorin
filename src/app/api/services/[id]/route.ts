@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getAuthenticatedUser } from "@/lib/api-auth";
 import { getDb } from "@/lib/db";
 import { services, profiles, creatorProfiles } from "@/lib/db/schema";
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 
 export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -63,12 +63,14 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
         category: category || undefined,
         description: description || undefined,
         price: price || undefined,
+        priceNumeric: price ? Number(String(price).replace(/\D/g, '')) || 0 : undefined,
         estimatedDays: estimatedDays || undefined,
         isActive: typeof isActive === "boolean" ? isActive : undefined,
       })
-      .where(eq(services.id, id))
+      .where(and(eq(services.id, id), eq(services.creatorId, user.id)))
       .returning();
 
+    if (!updated) return NextResponse.json({ error: "Layanan tidak ditemukan." }, { status: 404 });
     return NextResponse.json({ success: true, service: updated });
   } catch (err: any) {
     return NextResponse.json({ error: err.message }, { status: 500 });
@@ -84,7 +86,8 @@ export async function DELETE(req: NextRequest, { params }: { params: Promise<{ i
   if (!db) return NextResponse.json({ error: "Database not connected" }, { status: 503 });
 
   try {
-    await db.delete(services).where(eq(services.id, id));
+    const [deleted] = await db.delete(services).where(and(eq(services.id, id), eq(services.creatorId, user.id))).returning({ id: services.id });
+    if (!deleted) return NextResponse.json({ error: "Layanan tidak ditemukan." }, { status: 404 });
     return NextResponse.json({ success: true, message: "Layanan berhasil dihapus" });
   } catch (err: any) {
     return NextResponse.json({ error: err.message }, { status: 500 });

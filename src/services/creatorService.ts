@@ -1,116 +1,81 @@
-import { Creator, CreatorService, FeedProject } from '@/types';
-import { MOCK_CREATORS } from '@/data/mockCreators';
-import { MOCK_FEED_PROJECTS } from '@/data/mockFeedProjects';
+import type { Creator, CreatorService, FeedProject } from '@/types';
 
-function transformDbCreatorToFrontend(c: any): Creator {
+export function toCreator(c: any): Creator {
+  const score = Number(c.careerScore || 0);
+  const rating = Number(c.rating || 0);
   return {
-    id: c.id,
-    name: c.fullName || 'Kreator Creatorin',
-    username: c.slug || c.fullName?.toLowerCase().replace(/\s+/g, '-'),
-    avatar: c.avatarUrl || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=240&auto=format&fit=crop&q=80',
-    category: c.skills?.some((s: string) => /video|tiktok|reels/i.test(s)) ? 'Video' : 'Image',
-    roleTitle: c.headline || 'Creative Talent',
-    bio: c.bio || 'Kreator muda berbakat yang siap berkolaborasi untuk proyek kreatif bisnis Anda.',
-    location: c.location || 'Indonesia',
-    startingRate: 150000,
-    formattedRate: c.startingPrice || 'Mulai Rp150.000',
+    id: c.id, name: c.fullName || '', username: c.slug || '', avatar: c.avatarUrl || '',
+    category: c.skills?.some((skill: string) => /video|tiktok|reels/i.test(skill)) ? 'Video' : 'Image',
+    roleTitle: c.headline || '', bio: c.bio || '', location: c.location || '',
+    startingRate: Number(String(c.startingPrice || '').replace(/\D/g, '')) || 0,
+    formattedRate: c.startingPrice || '',
     careerScore: {
-      overall: c.careerScore || 92,
-      deadlineAccuracy: c.onTimeRate || 98,
-      revisionRate: 1.1,
-      completionRate: 100,
-      clientRating: parseFloat(String(c.rating || '5.0')),
-      completedProjects: c.completedProjectsCount || 0,
-      tier: (c.careerScore || 92) >= 90 ? 'Top Tier' : 'Verified Talent',
+      overall: score, deadlineAccuracy: Number(c.onTimeRate || 0), revisionRate: 0,
+      completionRate: 0, clientRating: rating,
+      completedProjects: Number(c.completedProjectsCount || 0),
+      tier: score >= 90 ? 'Top Tier' : score > 0 ? 'Rising Star' : 'Belum Dinilai',
     },
-    rating: parseFloat(String(c.rating || '5.0')),
-    reviewCount: c.reviewsCount || 0,
-    skills: Array.isArray(c.skills) ? c.skills : ['Content Creation', 'Digital Design'],
-    joinedDate: '2026',
-    verified: true,
-    proBadge: Boolean(c.isPro),
-    isPromoted: Boolean(c.isPromoted),
-    responseTime: c.responseTime || '< 1 Jam',
-    handle: `@${c.slug || 'creator'}`,
+    rating, reviewCount: Number(c.reviewsCount || 0),
+    skills: Array.isArray(c.skills) ? c.skills : [],
+    joinedDate: c.createdAt ? new Date(c.createdAt).getFullYear().toString() : '',
+    verified: false, proBadge: Boolean(c.isPro), isPromoted: Boolean(c.isPromoted),
+    responseTime: c.responseTime || '', handle: `@${c.slug || c.id}`,
+    followersCount: Number(c.followersCount || 0),
+  };
+}
+
+export function toFeedProject(p: any, creator?: Creator): FeedProject {
+  const owner = creator || toCreator({ id: p.creatorId, fullName: p.creatorName, avatarUrl: p.creatorAvatar, slug: p.creatorHandle?.replace(/^@/, '') });
+  return {
+    id: p.id, title: p.title, description: p.description || '',
+    coverImage: p.mediaUrl || '', mediaUrl: p.mediaUrl || '',
+    videoUrl: p.mediaType === 'video' ? p.mediaUrl : undefined,
+    mediaType: p.mediaType === 'video' ? 'video' : 'image', creatorId: p.creatorId,
+    creator: owner, category: p.category || 'Karya Kreatif', platform: 'direct',
+    tags: p.description?.match(/#[\w]+/g)?.map((tag: string) => tag.slice(1)) || [],
+    likesCount: 0, commentsCount: 0, viewsCount: p.viewsCount || '0',
+    sharesCount: 0, createdAt: p.createdAt,
   };
 }
 
 export const creatorService = {
   async getCreators(params?: { category?: string; search?: string; location?: string }): Promise<Creator[]> {
-    try {
-      const searchParams = new URLSearchParams();
-      if (params?.category) searchParams.set('category', params.category);
-      if (params?.search) searchParams.set('search', params.search);
-      if (params?.location) searchParams.set('location', params.location);
-
-      const res = await fetch(`/api/creators?${searchParams.toString()}`, { cache: 'no-store' });
-      if (!res.ok) throw new Error('API failed');
-
-      const data = await res.json();
-      if (Array.isArray(data.creators) && data.creators.length > 0) {
-        return data.creators.map(transformDbCreatorToFrontend);
-      }
-    } catch {
-      // Graceful fallback to rich mock data
-    }
-    return MOCK_CREATORS;
+    const query = new URLSearchParams();
+    if (params?.category) query.set('category', params.category);
+    if (params?.search) query.set('search', params.search);
+    if (params?.location) query.set('location', params.location);
+    const response = await fetch(`/api/creators?${query}`, { cache: 'no-store' });
+    if (!response.ok) throw new Error('Gagal memuat kreator.');
+    const data = await response.json();
+    return (data.creators || []).map(toCreator);
   },
-
-  async getCreatorDetail(idOrSlug: string): Promise<Creator | null> {
-    try {
-      const res = await fetch(`/api/creators/${encodeURIComponent(idOrSlug)}`, { cache: 'no-store' });
-      if (res.ok) {
-        const data = await res.json();
-        if (data.creator) {
-          const transformed = transformDbCreatorToFrontend(data.creator);
-          if (Array.isArray(data.services) && data.services.length > 0) {
-            transformed.services = data.services.map((s: any): CreatorService => ({
-              id: s.id,
-              title: s.title,
-              price: s.priceNumeric || 250000,
-              formattedPrice: s.price || 'Rp250.000',
-              deliveryDays: s.estimatedDays || '2 Hari Kerja',
-              description: s.description,
-              coverImage: s.imageUrl || 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=600&auto=format&fit=crop&q=80',
-              tag: s.category,
-            }));
-          }
-          return transformed;
-        }
-      }
-    } catch {
-      // Fallback
-    }
-
-    const foundMock = MOCK_CREATORS.find((c) => c.id === idOrSlug || c.username === idOrSlug);
-    return foundMock || MOCK_CREATORS[0] || null;
+  async getCreatorDetail(id: string): Promise<Creator | null> {
+    const response = await fetch(`/api/creators/${encodeURIComponent(id)}`, { cache: 'no-store' });
+    if (response.status === 404) return null;
+    if (!response.ok) throw new Error('Gagal memuat profil kreator.');
+    const data = await response.json();
+    const creator = toCreator(data.creator);
+    creator.services = (data.services || []).map((service: any): CreatorService => ({
+      id: service.id, title: service.title, price: service.priceNumeric || 0,
+      formattedPrice: service.price || '', deliveryDays: service.estimatedDays || '',
+      description: service.description || '', coverImage: service.imageUrl || '', tag: service.category || '',
+    }));
+    creator.reviewsList = (data.reviews || []).map((review: any) => ({
+      id: review.id,
+      clientName: review.reviewerName,
+      clientCompany: review.reviewerRole || '',
+      rating: Number(review.rating || 0),
+      comment: review.comment || '',
+      date: review.completedDate || '',
+      projectTitle: review.projectTitle || '',
+    }));
+    return creator;
   },
-
-  async getFeedProjects(): Promise<FeedProject[]> {
-    try {
-      const res = await fetch('/api/projects', { cache: 'no-store' });
-      if (res.ok) {
-        const data = await res.json();
-        if (Array.isArray(data.projects) && data.projects.length > 0) {
-          return data.projects.map((p: any, idx: number): FeedProject => ({
-            id: p.id,
-            title: p.title,
-            description: p.description || '',
-            coverImage: p.mediaUrl || 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=600&auto=format&fit=crop&q=80',
-            mediaType: p.mediaType === 'video' ? 'video' : 'image',
-            creator: MOCK_CREATORS[idx % MOCK_CREATORS.length],
-            category: 'Karya Kreatif',
-            tags: ['Featured', 'Verified'],
-            likesCount: 120 + idx * 15,
-            commentsCount: 14 + idx * 2,
-            viewsCount: `${p.viewsCount || '1.2k'}`,
-            sharesCount: 18 + idx,
-          }));
-        }
-      }
-    } catch {
-      // Fallback
-    }
-    return MOCK_FEED_PROJECTS;
+  async getFeedProjects(creatorId?: string): Promise<FeedProject[]> {
+    const query = creatorId ? `?creatorId=${encodeURIComponent(creatorId)}` : '';
+    const response = await fetch(`/api/projects${query}`, { cache: 'no-store' });
+    if (!response.ok) throw new Error('Gagal memuat karya.');
+    const data = await response.json();
+    return (data.projects || []).map((project: any) => toFeedProject(project));
   },
 };

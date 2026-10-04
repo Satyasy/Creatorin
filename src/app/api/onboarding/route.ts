@@ -110,10 +110,10 @@ export async function POST(req: NextRequest) {
         .values({
           profileId: user.id,
           slug,
-          headline: headline || "Creative Specialist",
+          headline: headline || "",
           bio: bio || "",
           skills: skills || [],
-          startingPrice: startingPrice || "Mulai Rp100.000",
+          startingPrice: startingPrice || "",
           schoolName: schoolName || null,
         })
         .onConflictDoUpdate({

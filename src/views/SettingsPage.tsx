@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/providers/AuthProvider';
 import { 
@@ -20,16 +20,16 @@ import {
 
 export const SettingsPage: React.FC = () => {
   const router = useRouter();
-  const { user, login } = useAuth();
+  const { user, refreshUser } = useAuth();
 
   const [activeTab, setActiveTab] = useState<'profile' | 'preferences' | 'security'>('profile');
 
   // Form states
-  const [fullName, setFullName] = useState(user?.name || 'Sobakhul Munir Siroj');
-  const [email, setEmail] = useState(user?.email || 'munir@creatorin.id');
-  const [location, setLocation] = useState(user?.location || 'Jakarta Selatan, Indonesia');
-  const [phone, setPhone] = useState(user?.phone || '+62 812-3456-7890');
-  const [bio, setBio] = useState(user?.bio || 'Spesialis antarmuka UI/UX modern, visual website konversi tinggi, dan sistem desain komersial.');
+  const [fullName, setFullName] = useState('');
+  const [email, setEmail] = useState('');
+  const [location, setLocation] = useState('');
+  const [phone, setPhone] = useState('');
+  const [bio, setBio] = useState('');
   
   // Notification states
   const [notifyPush, setNotifyPush] = useState(true);
@@ -43,21 +43,32 @@ export const SettingsPage: React.FC = () => {
   // UI status
   const [isSavedToast, setIsSavedToast] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [saveError, setSaveError] = useState('');
+
+  useEffect(() => {
+    setFullName(user?.name || '');
+    setEmail(user?.email || '');
+    setLocation(user?.location || '');
+    setPhone(user?.phone || '');
+    setBio(user?.bio || '');
+  }, [user]);
+
+  useEffect(() => {
+    if (!user) return;
+    fetch('/api/account/settings', { cache: 'no-store' })
+      .then(async (response) => {
+        const result = await response.json();
+        if (!response.ok) throw new Error(result.error || 'Gagal memuat preferensi.');
+        setNotifyPush(result.settings.notifyPush);
+        setLanguage(result.settings.language === 'en' ? 'en' : 'id');
+      })
+      .catch((caught) => setSaveError(caught instanceof Error ? caught.message : 'Gagal memuat preferensi.'));
+  }, [user]);
 
   const handleSaveProfile = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSaving(true);
-
-    const updatedUser = user
-      ? {
-          ...user,
-          name: fullName,
-          email: email,
-          location,
-          bio,
-          phone,
-        }
-      : null;
+    setSaveError('');
 
     try {
       // Call account settings API
@@ -66,6 +77,7 @@ export const SettingsPage: React.FC = () => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           fullName,
+          ...(email !== user?.email ? { newEmail: email } : {}),
           location,
           phone,
           bio,
@@ -75,19 +87,26 @@ export const SettingsPage: React.FC = () => {
         })
       });
 
-      // Update local state in auth provider if user exists
-      if (updatedUser) {
-        login(updatedUser);
+      const result = await res.json();
+      if (!res.ok) throw new Error(result.error || 'Gagal menyimpan pengaturan.');
+
+      if (user?.role === 'creator' || user?.role === 'umkm') {
+        const profileResponse = await fetch('/api/profile', {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ bio }),
+        });
+        const profileResult = await profileResponse.json();
+        if (!profileResponse.ok) throw new Error(profileResult.error || 'Gagal menyimpan bio.');
       }
-    } catch {
-      // Local fallback : always persist to auth state
-      if (updatedUser) {
-        login(updatedUser);
-      }
-    } finally {
-      setIsSaving(false);
+
+      await refreshUser();
       setIsSavedToast(true);
       setTimeout(() => setIsSavedToast(false), 3500);
+    } catch (caught) {
+      setSaveError(caught instanceof Error ? caught.message : 'Gagal menyimpan pengaturan.');
+    } finally {
+      setIsSaving(false);
     }
   };
 
@@ -164,7 +183,7 @@ export const SettingsPage: React.FC = () => {
               <div className="flex items-center gap-5 pb-6 border-b border-[#E2E8F0]">
                 <div className="relative">
                   <img
-                    src={user?.avatar || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=160&auto=format&fit=crop&q=80'}
+                    src={user?.avatar || '/creatorin/avatar.png'}
                     alt={fullName}
                     className="w-20 h-20 rounded-full object-cover ring-4 ring-neutral-100"
                   />
@@ -379,6 +398,7 @@ export const SettingsPage: React.FC = () => {
                   <span>Pengaturan berhasil disimpan!</span>
                 </div>
               )}
+              {saveError && <p className="text-xs font-semibold text-red-700" role="alert">{saveError}</p>}
             </div>
 
             <button

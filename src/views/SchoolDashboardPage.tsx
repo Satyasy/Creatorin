@@ -62,9 +62,10 @@ type AssessmentTab = 'rubrik' | 'profile' | 'projects';
 type ProfileSubTab = 'info' | 'featured_projects' | 'featured_students' | 'achievements' | 'display_settings';
 
 export function SchoolDashboardPage() {
-  const { user, signOut, switchRole } = useAuth();
+  const { user, signOut } = useAuth();
   const [activeTab, setActiveTab] = useState<DashboardTab>('overview');
   const [isLoading, setIsLoading] = useState(true);
+  const [loadError, setLoadError] = useState('');
 
   // Overview Data
   const [overview, setOverview] = useState<SchoolDashboardOverview | null>(null);
@@ -101,14 +102,15 @@ export function SchoolDashboardPage() {
   const [newAchievement, setNewAchievement] = useState<Partial<SchoolAchievement>>({
     title: '',
     description: '',
-    year: '2026',
+    year: new Date().getFullYear().toString(),
     category: 'Kompetisi',
-    imageUrl: 'https://images.unsplash.com/photo-1567427017947-545c5f8d16ad?w=800&auto=format&fit=crop&q=80',
+    imageUrl: '',
   });
 
   // Load Initial Data
   const loadData = async () => {
     setIsLoading(true);
+    setLoadError('');
     try {
       const [overviewData, approvalsData, studentsData, publicProfile, studentProjects, schoolStudents] = await Promise.all([
         schoolService.getDashboardOverview(),
@@ -129,6 +131,7 @@ export function SchoolDashboardPage() {
       setSectionOrderList(publicProfile.school.sectionOrder || ['featured_projects', 'students', 'achievements', 'about']);
     } catch (err) {
       console.error('Failed to load school dashboard data:', err);
+      setLoadError(err instanceof Error ? err.message : 'Gagal memuat data sekolah');
     } finally {
       setIsLoading(false);
     }
@@ -329,9 +332,9 @@ export function SchoolDashboardPage() {
     setNewAchievement({
       title: '',
       description: '',
-      year: '2026',
+      year: new Date().getFullYear().toString(),
       category: 'Kompetisi',
-      imageUrl: 'https://images.unsplash.com/photo-1567427017947-545c5f8d16ad?w=800&auto=format&fit=crop&q=80',
+      imageUrl: '',
     });
     setProfileFeedback('Prestasi baru berhasil ditambahkan.');
     setTimeout(() => setProfileFeedback(null), 3000);
@@ -390,16 +393,6 @@ export function SchoolDashboardPage() {
           </div>
 
           <div className="pt-2 space-y-3">
-            <button
-              id="btn-switch-to-school"
-              data-testid="btn-switch-school-role"
-              onClick={() => switchRole('school')}
-              className="w-full py-3 px-4 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-semibold text-sm shadow-lg shadow-blue-600/30 transition cursor-pointer flex items-center justify-center gap-2"
-            >
-              <GraduationCap className="size-4" />
-              <span>Beralih ke Akun Sekolah (Mode QA / Demo)</span>
-            </button>
-
             <Link
               href="/"
               className="inline-flex w-full py-2.5 px-4 rounded-xl border border-slate-700 hover:bg-slate-800 text-slate-400 hover:text-white font-medium text-xs transition items-center justify-center"
@@ -411,6 +404,8 @@ export function SchoolDashboardPage() {
       </div>
     );
   }
+
+  if (loadError) return <div className="min-h-[70vh] grid place-items-center p-8 text-sm text-red-700" role="alert">{loadError}</div>;
 
   const pendingApprovalsCount = approvals.filter(a => a.status === 'pending').length;
 
@@ -429,13 +424,13 @@ export function SchoolDashboardPage() {
           <div className="p-4 border-b border-slate-800/80 bg-slate-900/60">
             <div className="flex items-center gap-3">
               <img
-                src={schoolProfile?.logoUrl || 'https://images.unsplash.com/photo-1592280771190-3e2e4d571952?w=200&auto=format&fit=crop&q=80'}
+                src={schoolProfile?.logoUrl || '/creatorin/avatar.png'}
                 alt={schoolProfile?.name || 'School Logo'}
                 className="w-10 h-10 rounded-xl object-cover border border-slate-700 shadow-md shrink-0 bg-white"
               />
               <div className="min-w-0 flex-1">
                 <h2 className="text-xs font-bold text-white truncate leading-tight">
-                  {schoolProfile?.name || 'SMK Kreatif Indonesia'}
+                  {schoolProfile?.name || user?.name || 'Sekolah'}
                 </h2>
                 <div className="flex items-center gap-1.5 mt-1">
                   <span className="inline-flex items-center gap-1 text-[10px] font-semibold text-emerald-400 bg-emerald-950/60 border border-emerald-800/80 px-1.5 py-0.2 rounded">
@@ -627,7 +622,7 @@ export function SchoolDashboardPage() {
           <div className="pt-2 border-t border-slate-800/60 flex items-center justify-between text-xs">
             <div className="flex items-center gap-2 min-w-0">
               <img
-                src={user?.avatar || 'https://images.unsplash.com/photo-1546410531-bb4caa6b424d?w=120&auto=format&fit=crop&q=80'}
+                src={user?.avatar || '/creatorin/avatar.png'}
                 alt="PIC Avatar"
                 className="w-7 h-7 rounded-full object-cover border border-slate-700 shrink-0"
               />
@@ -659,13 +654,13 @@ export function SchoolDashboardPage() {
         <div className="px-4 py-3 flex items-center justify-between border-b border-slate-800/80">
           <div className="flex items-center gap-2.5 min-w-0">
             <img
-              src={schoolProfile?.logoUrl || 'https://images.unsplash.com/photo-1592280771190-3e2e4d571952?w=200&auto=format&fit=crop&q=80'}
+              src={schoolProfile?.logoUrl || '/creatorin/avatar.png'}
               alt={schoolProfile?.name || 'School Logo'}
               className="w-8 h-8 rounded-lg object-cover border border-slate-700 shrink-0 bg-white"
             />
             <div className="min-w-0">
               <h2 className="text-xs font-bold text-white truncate">
-                {schoolProfile?.name || 'SMK Kreatif Indonesia'}
+                {schoolProfile?.name || user?.name || 'Sekolah'}
               </h2>
               <span className="text-[10px] font-semibold text-blue-400 block">
                 Dashboard Vokasi SMK
@@ -990,117 +985,18 @@ export function SchoolDashboardPage() {
                   </div>
                 </div>
 
-                {/* Chart 2: Predikat Kompetensi (5 cols) */}
-                <div className="lg:col-span-5 bg-white rounded-2xl p-5 sm:p-6 border border-slate-200/90 shadow-xs flex flex-col justify-between">
-                  <div>
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2.5">
-                        <div className="size-9 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center font-bold">
-                          <Award className="size-5" />
-                        </div>
-                        <div>
-                          <h2 className="text-sm sm:text-base font-bold text-slate-900 leading-tight">
-                            Distribusi Predikat Kompetensi
-                          </h2>
-                          <p className="text-[11px] sm:text-xs text-slate-500">
-                            Standar kelulusan asesmen industri (SKKNI)
-                          </p>
-                        </div>
-                      </div>
-                      <span className="text-[11px] font-semibold px-2 py-0.5 rounded-md bg-slate-100 text-slate-700">
-                        Terverifikasi
-                      </span>
-                    </div>
-
-                    <div className="mt-5 flex items-center justify-center gap-6">
-                      <div className="relative size-36 sm:size-40 flex items-center justify-center shrink-0">
-                        <svg className="size-full -rotate-90" viewBox="0 0 36 36">
-                          <path
-                            className="text-slate-100"
-                            strokeWidth="3.8"
-                            stroke="currentColor"
-                            fill="none"
-                            d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-                          />
-                          <path
-                            className="text-emerald-500"
-                            strokeDasharray="45, 100"
-                            strokeDashoffset="0"
-                            strokeWidth="3.8"
-                            strokeLinecap="round"
-                            stroke="currentColor"
-                            fill="none"
-                            d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-                          />
-                          <path
-                            className="text-blue-600"
-                            strokeDasharray="35, 100"
-                            strokeDashoffset="-45"
-                            strokeWidth="3.8"
-                            strokeLinecap="round"
-                            stroke="currentColor"
-                            fill="none"
-                            d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-                          />
-                          <path
-                            className="text-amber-400"
-                            strokeDasharray="15, 100"
-                            strokeDashoffset="-80"
-                            strokeWidth="3.8"
-                            strokeLinecap="round"
-                            stroke="currentColor"
-                            fill="none"
-                            d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-                          />
-                        </svg>
-                        <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
-                          <span className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">88.6</span>
-                          <span className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Rata-rata Skor</span>
-                        </div>
-                      </div>
-
-                      <div className="space-y-2 flex-1 text-xs">
-                        <div className="flex items-center justify-between">
-                          <span className="flex items-center gap-1.5 text-slate-600">
-                            <span className="size-2 rounded-full bg-emerald-500" />
-                            Predikat A (Sangat Baik)
-                          </span>
-                          <span className="font-bold text-slate-900">45%</span>
-                        </div>
-                        <div className="flex items-center justify-between">
-                          <span className="flex items-center gap-1.5 text-slate-600">
-                            <span className="size-2 rounded-full bg-blue-600" />
-                            Predikat B (Kompeten)
-                          </span>
-                          <span className="font-bold text-slate-900">35%</span>
-                        </div>
-                        <div className="flex items-center justify-between">
-                          <span className="flex items-center gap-1.5 text-slate-600">
-                            <span className="size-2 rounded-full bg-amber-400" />
-                            Predikat C (Cukup)
-                          </span>
-                          <span className="font-bold text-slate-900">15%</span>
-                        </div>
-                        <div className="flex items-center justify-between">
-                          <span className="flex items-center gap-1.5 text-slate-600">
-                            <span className="size-2 rounded-full bg-slate-300" />
-                            Predikat D (Remedial)
-                          </span>
-                          <span className="font-bold text-slate-900">5%</span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="mt-4 pt-3 border-t border-slate-100 grid grid-cols-2 gap-2 text-[11px]">
-                    <div className="p-2.5 bg-slate-50 rounded-xl">
-                      <span className="text-slate-500 block">Kualitas Teknis & Aset</span>
-                      <strong className="text-slate-900 font-bold text-xs">91.2 / 100</strong>
-                    </div>
-                    <div className="p-2.5 bg-slate-50 rounded-xl">
-                      <span className="text-slate-500 block">Relevansi Brief Industri</span>
-                      <strong className="text-slate-900 font-bold text-xs">89.4 / 100</strong>
-                    </div>
+                <div className="lg:col-span-5 bg-white rounded-2xl p-5 sm:p-6 border border-slate-200/90 shadow-xs">
+                  <h2 className="text-sm sm:text-base font-bold text-slate-900">Hasil penilaian siswa</h2>
+                  <p className="mt-2 text-xs text-slate-500">Berdasarkan rubrik yang telah disimpan sekolah.</p>
+                  <p className="mt-8 text-3xl font-bold text-slate-900">
+                    {students.filter(student => student.status === 'completed').length
+                      ? (students.filter(student => student.status === 'completed').reduce((sum, student) => sum + (student.finalScore || 0), 0) / students.filter(student => student.status === 'completed').length).toFixed(1)
+                      : '0'} <span className="text-base font-normal text-slate-400">/ 100 rata-rata</span>
+                  </p>
+                  <div className="mt-6 grid grid-cols-3 gap-3 text-center text-xs">
+                    <div><strong className="block text-lg">{overview.assessmentProgress.graded}</strong>Selesai</div>
+                    <div><strong className="block text-lg">{overview.assessmentProgress.draft}</strong>Draf</div>
+                    <div><strong className="block text-lg">{overview.assessmentProgress.ungraded}</strong>Belum dinilai</div>
                   </div>
                 </div>
               </div>
@@ -1244,7 +1140,7 @@ export function SchoolDashboardPage() {
                           <td className="py-3 px-4">
                             <div className="flex items-center gap-2.5">
                               <img
-                                src={req.avatarUrl || 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=200&auto=format&fit=crop&q=80'}
+                                src={req.avatarUrl || '/creatorin/avatar.png'}
                                 alt={req.name}
                                 className="w-8 h-8 rounded-full object-cover border border-slate-200 shrink-0"
                               />
@@ -1477,7 +1373,7 @@ export function SchoolDashboardPage() {
                             <td className="py-3 px-4">
                               <div className="flex items-center gap-2.5">
                                 <img
-                                  src={student.avatarUrl || 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=200&auto=format&fit=crop&q=80'}
+                                  src={student.avatarUrl || '/creatorin/avatar.png'}
                                   alt={student.name}
                                   className="w-8 h-8 rounded-full object-cover border border-slate-200"
                                 />
@@ -1563,7 +1459,7 @@ export function SchoolDashboardPage() {
               <div className="bg-white rounded-2xl p-5 sm:p-6 border border-slate-200/90 shadow-xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                 <div className="flex items-center gap-4">
                   <img
-                    src={studentDetail.student.avatarUrl || 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=200&auto=format&fit=crop&q=80'}
+                    src={studentDetail.student.avatarUrl || '/creatorin/avatar.png'}
                     alt={studentDetail.student.name}
                     className="w-16 h-16 rounded-2xl object-cover border border-slate-200 shadow-sm shrink-0"
                   />
@@ -2130,7 +2026,7 @@ export function SchoolDashboardPage() {
                       >
                         <div className="flex items-center gap-3">
                           <img
-                            src={std.avatarUrl || 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=200&auto=format&fit=crop&q=80'}
+                            src={std.avatarUrl || '/creatorin/avatar.png'}
                             alt={std.name}
                             className="size-11 rounded-full object-cover border border-slate-200 shrink-0"
                           />

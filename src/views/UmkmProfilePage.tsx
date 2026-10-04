@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { 
   Building2, 
   MapPin, 
@@ -47,9 +47,8 @@ import {
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/providers/AuthProvider';
+import { creatorService } from '@/services/creatorService';
 import { UMKMProfile, AuthState, ActivePage, ProjectListing, UMKMCompletedCollab, UMKMCreatorReview, Creator } from '@/types';
-import { MOCK_PRIMARY_UMKM } from '@/data/mockUmkm';
-import { MOCK_CREATORS } from '@/data/mockCreators';
 
 interface UmkmProfilePageProps {
   currentUser?: AuthState['user'];
@@ -57,7 +56,7 @@ interface UmkmProfilePageProps {
   onNavigate?: (page: ActivePage) => void;
   onViewCreatorProfile?: (creator: Creator) => void;
   onViewBrief?: (brief: ProjectListing) => void;
-  initialProfile?: UMKMProfile;
+  initialProfile: UMKMProfile;
 }
 
 type TabKey = 'briefs' | 'collabs' | 'reviews' | 'about';
@@ -66,7 +65,7 @@ const formatDisplayBudget = (formatted?: string, budgetMin?: number) => {
   if (budgetMin) {
     return `Rp${budgetMin.toLocaleString('id-ID')}`;
   }
-  if (!formatted) return 'Rp1.500.000';
+  if (!formatted) return 'Rp0';
   const clean = formatted.split(/[-–—]|sampai/i)[0].trim();
   return clean.startsWith('Rp') ? clean : `Rp${clean}`;
 };
@@ -77,7 +76,7 @@ export const UmkmProfilePage: React.FC<UmkmProfilePageProps> = ({
   onNavigate,
   onViewCreatorProfile,
   onViewBrief,
-  initialProfile = MOCK_PRIMARY_UMKM
+  initialProfile
 }) => {
   const router = useRouter();
   const { user: authUser } = useAuth();
@@ -111,7 +110,8 @@ export const UmkmProfilePage: React.FC<UmkmProfilePageProps> = ({
   
   // Follow / Save Brand State
   const [isFollowing, setIsFollowing] = useState(false);
-  const [followersCount, setFollowersCount] = useState(1284);
+  const [followersCount, setFollowersCount] = useState(0);
+  useEffect(() => setProfile(initialProfile), [initialProfile]);
   const [isMoreMenuOpen, setIsMoreMenuOpen] = useState(false);
   const [savedCollabIds, setSavedCollabIds] = useState<Set<string>>(new Set());
 
@@ -265,8 +265,12 @@ export const UmkmProfilePage: React.FC<UmkmProfilePageProps> = ({
     });
   };
 
-  const handleSaveProfile = (e: React.FormEvent) => {
+  const handleSaveProfile = async (e: React.FormEvent) => {
     e.preventDefault();
+    try {
+      const response = await fetch('/api/onboarding', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ fullName: editForm.brandName, companyName: editForm.brandName, businessCategory: editForm.category, description: editForm.bio, website: editForm.website, location: editForm.location }) });
+      if (!response.ok) throw new Error((await response.json()).error || 'Gagal menyimpan profil.');
+    } catch (error) { showToast(error instanceof Error ? error.message : 'Gagal menyimpan profil.'); return; }
     setProfile(prev => ({
       ...prev,
       brandName: editForm.brandName,
@@ -291,10 +295,11 @@ export const UmkmProfilePage: React.FC<UmkmProfilePageProps> = ({
     showToast('Profil UMKM berhasil diperbarui!');
   };
 
-  const handleCreateNewBrief = (e: React.FormEvent) => {
+  const handleCreateNewBrief = async (e: React.FormEvent) => {
     e.preventDefault();
-    const minNum = parseInt(newBriefForm.budgetMin) || 1000000;
-    const maxNum = parseInt(newBriefForm.budgetMax) || 2000000;
+    const minNum = parseInt(newBriefForm.budgetMin) || 0;
+    const maxNum = parseInt(newBriefForm.budgetMax) || 0;
+    if (!minNum || !newBriefForm.title.trim() || !newBriefForm.description.trim()) { showToast('Judul, deskripsi, dan budget wajib diisi.'); return; }
     
     const formattedBudget = `Rp${minNum.toLocaleString('id-ID')}`;
     const deliverablesList = newBriefForm.deliverables
@@ -306,25 +311,33 @@ export const UmkmProfilePage: React.FC<UmkmProfilePageProps> = ({
       .map(s => s.trim())
       .filter(Boolean);
 
+    let persistedBrief: { id: string };
+    try {
+      const response = await fetch('/api/briefs', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ title: newBriefForm.title, category: newBriefForm.category, description: newBriefForm.description, expectedOutput: deliverablesList.join('\n'), budget: formattedBudget, deadline: newBriefForm.deadline }) });
+      const result = await response.json();
+      if (!response.ok) throw new Error(result.error || 'Gagal menyimpan brief.');
+      persistedBrief = result.brief;
+    } catch (error) { showToast(error instanceof Error ? error.message : 'Gagal menyimpan brief.'); return; }
+
     const newBrief: ProjectListing = {
-      id: `brief-${Date.now()}`,
+      id: persistedBrief.id,
       title: newBriefForm.title,
       clientName: profile.brandName,
       clientAvatar: profile.logo,
       clientIndustry: profile.industry,
       clientLocation: profile.location,
-      isVerifiedClient: true,
+      isVerifiedClient: false,
       budgetMin: minNum,
       budgetMax: maxNum,
       formattedBudget: formattedBudget,
       category: newBriefForm.category,
       description: newBriefForm.description,
-      deliverables: deliverablesList.length > 0 ? deliverablesList : ['1x Deliverable Video HD'],
+      deliverables: deliverablesList,
       deadline: newBriefForm.deadline,
       productShippingProvided: newBriefForm.productShipping,
       proposalsCount: 0,
       postedTimeAgo: 'Baru saja',
-      requiredSkills: skillsList.length > 0 ? skillsList : ['Video Editing', 'Kreator UGC']
+      requiredSkills: skillsList
     };
 
     setProfile(prev => ({
@@ -365,10 +378,10 @@ export const UmkmProfilePage: React.FC<UmkmProfilePageProps> = ({
     });
   };
 
-  const handleSaveEditBrief = (e: React.FormEvent) => {
+  const handleSaveEditBrief = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!editingBrief) return;
-    const minNum = parseInt(editBriefForm.budgetMin) || 1500000;
+    const minNum = parseInt(editBriefForm.budgetMin) || 0;
     const deliverablesList = editBriefForm.deliverables
       .split('\n')
       .map(d => d.trim())
@@ -377,6 +390,11 @@ export const UmkmProfilePage: React.FC<UmkmProfilePageProps> = ({
       .split(',')
       .map(s => s.trim())
       .filter(Boolean);
+
+    try {
+      const response = await fetch(`/api/briefs/${editingBrief.id}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ title: editBriefForm.title, category: editBriefForm.category, description: editBriefForm.description, expectedOutput: deliverablesList.join('\n'), budget: `Rp${minNum.toLocaleString('id-ID')}`, deadline: editBriefForm.deadline }) });
+      if (!response.ok) throw new Error((await response.json()).error || 'Gagal memperbarui brief.');
+    } catch (error) { showToast(error instanceof Error ? error.message : 'Gagal memperbarui brief.'); return; }
 
     setProfile(prev => ({
       ...prev,
@@ -2031,14 +2049,15 @@ export const UmkmProfilePage: React.FC<UmkmProfilePageProps> = ({
                 </div>
 
                 <button
-                  onClick={() => {
-                    const found = MOCK_CREATORS.find(c => c.name === selectedCollabDetail.creatorName || c.id === selectedCollabDetail.creatorId);
+                  onClick={async () => {
+                    const creatorId = selectedCollabDetail.creatorId;
                     setSelectedCollabDetail(null);
-                    if (found) {
+                    if (creatorId) {
                       if (onViewCreatorProfile) {
-                        onViewCreatorProfile(found);
+                        const found = await creatorService.getCreatorDetail(creatorId).catch(() => null);
+                        if (found) onViewCreatorProfile(found);
                       } else {
-                        router.push(`/creator/${found.id}`);
+                        router.push(`/creator/${creatorId}`);
                       }
                     } else {
                       navigateTo('explore', '/explore');

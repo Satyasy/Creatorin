@@ -12,7 +12,6 @@
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
     "db:push": "drizzle-kit push",
-    "db:seed": "tsx src/lib/db/seed.ts",
     "db:studio": "drizzle-kit studio",
     "test:api": "tsx scripts/test-api.ts",
     "test:creator-dashboard": "node scripts/verify-creator-dashboard.mjs",

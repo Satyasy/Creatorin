@@ -3,38 +3,28 @@ import { createClient } from '@/lib/supabase/client';
 
 export const chatService = {
   async getConversations(): Promise<ChatConversation[]> {
-    try {
       const res = await fetch('/api/conversations', { cache: 'no-store' });
-      if (res.ok) {
-        const data = await res.json();
-        if (Array.isArray(data.conversations) && data.conversations.length > 0) {
-          return data.conversations.map((c: any): ChatConversation => ({
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Gagal memuat percakapan');
+      return (data.conversations || []).map((c: any): ChatConversation => ({
             id: c.id,
-            creatorId: c.otherParticipant?.id || '',
-            name: c.otherParticipant?.fullName || 'Mitra Kolaborasi',
-            roleTitle: c.otherParticipant?.role === 'creator' ? 'Creative Talent' : 'Brand UMKM',
-            avatar: c.otherParticipant?.avatarUrl || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=240&auto=format&fit=crop&q=80',
-            online: true,
-            lastMessage: c.lastMessage || 'Percakapan dimulai.',
+            creatorId: c.partner?.id || '',
+            name: c.partner?.fullName || 'Mitra Kolaborasi',
+            roleTitle: c.partner?.role === 'creator' ? 'Kreator' : 'UMKM',
+            avatar: c.partner?.avatarUrl || '',
+            online: false,
+            lastMessage: c.lastMessage || '',
             lastMessageTime: new Date(c.lastMessageTime || c.updatedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
             unreadCount: 0,
             messages: [],
           }));
-        }
-      }
-    } catch {
-      // Fallback
-    }
-    return [];
   },
 
   async getMessages(conversationId: string, currentUserId?: string): Promise<ChatMessage[]> {
-    try {
       const res = await fetch(`/api/messages?conversationId=${conversationId}`, { cache: 'no-store' });
-      if (res.ok) {
-        const data = await res.json();
-        if (Array.isArray(data.messages)) {
-          return data.messages.map((m: any): ChatMessage => ({
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Gagal memuat pesan');
+      return (data.messages || []).map((m: any): ChatMessage => ({
             id: m.id,
             senderId: m.senderId,
             text: m.content,
@@ -43,12 +33,6 @@ export const chatService = {
             status: m.isRead ? 'read' : 'delivered',
             attachment: m.attachmentUrl ? { type: 'file', url: m.attachmentUrl, name: 'Attachment' } : undefined,
           }));
-        }
-      }
-    } catch {
-      // Fallback
-    }
-    return [];
   },
 
   async sendMessage(conversationId: string, content: string): Promise<{ success: boolean; message?: any; error?: string }> {

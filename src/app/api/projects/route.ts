@@ -3,34 +3,14 @@ import { getAuthenticatedUser } from "@/lib/api-auth";
 import { getDb } from "@/lib/db";
 import { projects, profiles } from "@/lib/db/schema";
 import { eq, desc } from "drizzle-orm";
-import { MOCK_FEED_PROJECTS } from "@/data/mockFeedProjects";
+import { createClient } from "@/lib/supabase/server";
 
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
   const creatorId = searchParams.get("creatorId");
 
   const db = getDb();
-  if (!db) {
-    let list = MOCK_FEED_PROJECTS;
-    if (creatorId) {
-      list = list.filter(p => p.creatorId === creatorId || p.creator?.id === creatorId);
-    }
-    return NextResponse.json({
-      projects: list.map(p => ({
-        id: p.id,
-        title: p.title,
-        description: p.description || p.caption || "",
-        creatorHandle: p.socialHandle || p.creator?.handle || "@creator",
-        viewsCount: p.viewsCount,
-        mediaUrl: p.mediaUrl || p.coverImage,
-        mediaType: p.mediaType,
-        createdAt: p.createdAt || p.postedDate || new Date().toISOString(),
-        creatorId: p.creatorId || p.creator?.id || "mock-creator",
-        creatorName: p.creator?.name || "Kreator",
-        creatorAvatar: p.creator?.avatar || "/creatorin/avatar.png",
-      }))
-    });
-  }
+  if (!db) return NextResponse.json({ error: "Database not connected" }, { status: 503 });
 
   try {
     let q = db
@@ -38,6 +18,7 @@ export async function GET(req: NextRequest) {
         id: projects.id,
         title: projects.title,
         description: projects.description,
+        category: projects.category,
         creatorHandle: projects.creatorHandle,
         viewsCount: projects.viewsCount,
         mediaUrl: projects.mediaUrl,
@@ -68,27 +49,45 @@ export async function POST(req: NextRequest) {
   const db = getDb();
   if (!db) return NextResponse.json({ error: "Database not connected" }, { status: 503 });
 
-  const body = await req.json();
-  const { title, description, mediaUrl, mediaType = "shader", externalLink } = body;
-
-  if (!title) {
-    return NextResponse.json({ error: "Judul proyek wajib diisi." }, { status: 400 });
-  }
+  if (user.role !== "creator") return NextResponse.json({ error: "Hanya kreator dapat mengunggah karya." }, { status: 403 });
 
   try {
+    const form = await req.formData();
+    const title = String(form.get("title") || "").trim();
+    const description = String(form.get("description") || "").trim();
+    const category = String(form.get("category") || "Karya Kreatif").trim();
+    const file = form.get("file");
+    if (!title || !(file instanceof File) || file.size === 0) {
+      return NextResponse.json({ error: "Judul dan file karya wajib diisi." }, { status: 400 });
+    }
+    if (file.size > 20 * 1024 * 1024 || !["image/jpeg", "image/png", "image/webp", "video/mp4", "video/webm"].includes(file.type)) {
+      return NextResponse.json({ error: "Gunakan JPG, PNG, WebP, MP4, atau WebM maksimal 20 MB." }, { status: 400 });
+    }
+    const supabase = await createClient();
+    const extension = file.type.split("/")[1] === "jpeg" ? "jpg" : file.type.split("/")[1];
+    const path = `${user.id}/${crypto.randomUUID()}.${extension}`;
+    const { error: uploadError } = await supabase.storage.from("project-media").upload(path, file, { contentType: file.type });
+    if (uploadError) return NextResponse.json({ error: uploadError.message }, { status: 500 });
+    const { data: publicFile } = supabase.storage.from("project-media").getPublicUrl(path);
     const handle = `@${user.fullName.toLowerCase().replace(/\s+/g, "")}`;
-    const [newProject] = await db
+    let newProject;
+    try {
+      [newProject] = await db
       .insert(projects)
       .values({
         creatorId: user.id,
         title,
         description,
+        category,
         creatorHandle: handle,
-        mediaUrl,
-        mediaType,
-        externalLink,
+        mediaUrl: publicFile.publicUrl,
+        mediaType: file.type.startsWith("video/") ? "video" : "image",
       })
       .returning();
+    } catch (error) {
+      await supabase.storage.from("project-media").remove([path]);
+      throw error;
+    }
 
     return NextResponse.json({ success: true, project: newProject }, { status: 201 });
   } catch (err: any) {

@@ -33,7 +33,6 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from '@/providers/AuthProvider';
 import { ProjectBriefModal } from '@/components/modals/ProjectBriefModal';
 import { BriefDetailPage } from './BriefDetailPage';
-import { MOCK_PROJECTS } from '@/data/mockProjects';
 import { ActivePage, AuthState, ProjectListing } from '@/types';
 import { briefService } from '@/services/briefService';
 
@@ -114,18 +113,10 @@ export const ProjectBriefsPage: React.FC<ProjectBriefsPageProps> = ({
   };
 
   // Projects data state (so creators can apply and UMKM can add briefs in-session)
-  const [projectsList, setProjectsList] = useState<ProjectListing[]>(MOCK_PROJECTS);
+  const [projectsList, setProjectsList] = useState<ProjectListing[]>([]);
 
   useEffect(() => {
-    briefService.getBriefs().then((briefs) => {
-      if (briefs && briefs.length > 0) {
-        setProjectsList(prev => {
-          const existingIds = new Set(prev.map(p => p.id));
-          const newFromDb = briefs.filter(b => !existingIds.has(b.id));
-          return [...newFromDb, ...prev];
-        });
-      }
-    });
+    briefService.getBriefs().then(setProjectsList).catch(() => setProjectsList([]));
   }, []);
   
   // Filter & Search states
@@ -174,7 +165,7 @@ export const ProjectBriefsPage: React.FC<ProjectBriefsPageProps> = ({
     });
   };
 
-  const handleSaveEditBrief = (e: React.FormEvent) => {
+  const handleSaveEditBrief = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!editingBrief) return;
     const minNum = parseInt(editBriefForm.budgetMin) || 1500000;
@@ -186,6 +177,11 @@ export const ProjectBriefsPage: React.FC<ProjectBriefsPageProps> = ({
       .split(',')
       .map(s => s.trim())
       .filter(Boolean);
+
+    try {
+      const response = await fetch(`/api/briefs/${editingBrief.id}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ title: editBriefForm.title, category: editBriefForm.category, description: editBriefForm.description, expectedOutput: deliverablesList.join('\n'), budget: `Rp${minNum.toLocaleString('id-ID')}`, deadline: editBriefForm.deadline }) });
+      if (!response.ok) throw new Error((await response.json()).error || 'Gagal memperbarui brief.');
+    } catch (error) { showToast(error instanceof Error ? error.message : 'Gagal memperbarui brief.'); return; }
 
     setProjectsList(prev => prev.map(p => {
       if (p.id === editingBrief.id) {
@@ -242,13 +238,14 @@ export const ProjectBriefsPage: React.FC<ProjectBriefsPageProps> = ({
     setIsProposalSuccess(false);
   };
 
-  const handleSubmitProposal = (e: React.FormEvent) => {
+  const handleSubmitProposal = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!selectedBriefForApply) return;
 
     setIsSubmittingProposal(true);
-    setTimeout(() => {
+    const result = await briefService.applyToBrief(selectedBriefForApply.id, proposalPitch, proposalRate);
       setIsSubmittingProposal(false);
+    if (!result.success) { showToast(result.error || 'Gagal mengirim proposal.'); return; }
       setIsProposalSuccess(true);
       
       // Update proposal count in list
@@ -268,17 +265,7 @@ export const ProjectBriefsPage: React.FC<ProjectBriefsPageProps> = ({
         }
       }));
 
-      // If connected to a real database brief, submit proposal to backend
-      if (selectedBriefForApply.id.length > 20 && !selectedBriefForApply.id.startsWith('proj-')) {
-        briefService.applyToBrief(
-          selectedBriefForApply.id,
-          proposalPitch || 'Saya siap mengerjakan brief proyek ini sesuai spesifikasi.',
-          proposalRate || selectedBriefForApply.formattedBudget
-        ).catch(() => {});
-      }
-
       showToast('Proposal Anda berhasil diajukan ke klien!');
-    }, 600);
   };
 
   // Filter & sort logic
@@ -1150,6 +1137,7 @@ export const ProjectBriefsPage: React.FC<ProjectBriefsPageProps> = ({
       <ProjectBriefModal
         isOpen={isPostBriefModalOpen}
         onClose={() => setIsPostBriefModalOpen(false)}
+        onSuccess={() => { briefService.getBriefs().then(setProjectsList).catch(() => {}); }}
       />
 
     </div>

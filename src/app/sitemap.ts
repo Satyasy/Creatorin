@@ -1,9 +1,9 @@
 import type { MetadataRoute } from 'next';
-import { MOCK_CREATORS } from '@/data/mockCreators';
-import { MOCK_ALL_UMKM } from '@/data/mockUmkm';
-import { MOCK_PROJECTS } from '@/data/mockProjects';
+import { getDb } from '@/lib/db';
+import { creatorProfiles, businessProfiles, projectBriefs } from '@/lib/db/schema';
+import { eq } from 'drizzle-orm';
 
-export default function sitemap(): MetadataRoute.Sitemap {
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = (process.env.NEXT_PUBLIC_APP_URL || 'https://creatorin.id').replace(/\/$/, '');
   const lastModified = new Date();
 
@@ -20,38 +20,28 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { path: '/landing', changeFrequency: 'weekly', priority: 0.8 },
   ];
 
-  const creatorRoutes = MOCK_CREATORS.map((creator) => ({
-    path: `/creator/${encodeURIComponent(creator.username || creator.id)}`,
-    changeFrequency: 'weekly' as const,
-    priority: creator.isPromoted ? 0.8 : 0.7,
-  }));
-
-  const umkmRoutes = MOCK_ALL_UMKM.map((umkm) => ({
-    path: `/umkm/${encodeURIComponent(umkm.id)}`,
-    changeFrequency: 'weekly' as const,
-    priority: umkm.verified ? 0.75 : 0.65,
-  }));
-
-  const briefRoutes = MOCK_PROJECTS.map((brief) => ({
-    path: `/briefs/${encodeURIComponent(brief.id)}`,
-    changeFrequency: 'daily' as const,
-    priority: brief.isUrgent ? 0.75 : 0.7,
-  }));
-
-  const schoolRoutes = [
-    {
-      path: '/school/smk-kreatif-indonesia',
-      changeFrequency: 'weekly' as const,
-      priority: 0.7,
-    },
-  ];
+  const db = getDb();
+  let creatorRoutes: Array<{ path: string; changeFrequency: 'weekly'; priority: number }> = [];
+  let umkmRoutes: Array<{ path: string; changeFrequency: 'weekly'; priority: number }> = [];
+  let briefRoutes: Array<{ path: string; changeFrequency: 'daily'; priority: number }> = [];
+  if (db) {
+    try {
+      const [creators, businesses, briefs] = await Promise.all([
+        db.select({ id: creatorProfiles.profileId }).from(creatorProfiles),
+        db.select({ id: businessProfiles.profileId }).from(businessProfiles),
+        db.select({ id: projectBriefs.id }).from(projectBriefs).where(eq(projectBriefs.status, 'open')),
+      ]);
+      creatorRoutes = creators.map(({ id }) => ({ path: `/creator/${id}`, changeFrequency: 'weekly', priority: 0.7 }));
+      umkmRoutes = businesses.map(({ id }) => ({ path: `/umkm/${id}`, changeFrequency: 'weekly', priority: 0.65 }));
+      briefRoutes = briefs.map(({ id }) => ({ path: `/briefs/${id}`, changeFrequency: 'daily', priority: 0.7 }));
+    } catch { /* Static routes remain available while the database is offline. */ }
+  }
 
   const routes = [
     ...staticRoutes,
     ...creatorRoutes,
     ...umkmRoutes,
     ...briefRoutes,
-    ...schoolRoutes,
   ];
 
   return routes.map(({ path, changeFrequency, priority }) => ({

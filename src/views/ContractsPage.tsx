@@ -4,7 +4,6 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useEffect, useMemo, useState } from 'react';
 import { BriefcaseBusiness, CheckCircle2, Clock3, FileText, MessageSquareText, Search } from 'lucide-react';
-import { MOCK_PROJECTS } from '@/data/mockProjects';
 
 type ContractStatus = 'pending' | 'accepted' | 'rejected';
 type StatusFilter = 'all' | 'accepted' | 'pending';
@@ -43,23 +42,6 @@ type ApiContract = {
   companyName?: string | null;
 };
 
-const demoContracts: ContractItem[] = MOCK_PROJECTS.slice(0, 4).map((brief, index) => ({
-  id: `demo-contract-${brief.id}`,
-  briefId: brief.id,
-  status: index === 0 ? 'accepted' : 'pending',
-  proposedPrice: index === 0 ? 'Rp2.000.000' : brief.formattedBudget,
-  appliedAt: index === 0 ? '2 hari lalu' : `${index + 1} jam lalu`,
-  title: brief.title,
-  category: brief.category,
-  description: brief.description,
-  budget: brief.formattedBudget,
-  deadline: brief.deadline,
-  businessName: brief.clientName,
-  businessAvatar: brief.clientAvatar,
-  businessLocation: brief.clientLocation,
-  source: 'demo',
-}));
-
 const statusCopy: Record<ContractStatus, { label: string; className: string }> = {
   accepted: { label: 'Accepted', className: 'border-[#B7E4C7] bg-[#F0FDF4] text-[#166534]' },
   pending: { label: 'Menunggu review', className: 'border-[#F3D58B] bg-[#FFFBEB] text-[#92400E]' },
@@ -68,7 +50,6 @@ const statusCopy: Record<ContractStatus, { label: string; className: string }> =
 
 export function ContractsPage() {
   const [contracts, setContracts] = useState<ContractItem[]>([]);
-  const [isDemoData, setIsDemoData] = useState(false);
   const [loading, setLoading] = useState(true);
   const [query, setQuery] = useState('');
   const [filter, setFilter] = useState<StatusFilter>('all');
@@ -83,11 +64,9 @@ export function ContractsPage() {
         const data = await response.json();
         if (!alive) return;
         setContracts(Array.isArray(data.contracts) ? data.contracts.map(mapApiContract) : []);
-        setIsDemoData(Boolean(data.demo));
       } catch {
         if (!alive) return;
-        setContracts(demoContracts);
-        setIsDemoData(true);
+        setContracts([]);
       } finally {
         if (alive) setLoading(false);
       }
@@ -132,11 +111,6 @@ export function ContractsPage() {
             </div>
           </div>
 
-          {isDemoData && (
-            <p className="mt-5 rounded-lg border border-[#DFE0DA] bg-[#F8F9FC] px-3 py-2 text-xs text-[#62635E]">
-              Menampilkan data contoh karena sesi database atau login server belum tersedia.
-            </p>
-          )}
         </div>
       </section>
 

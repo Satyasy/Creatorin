@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getAuthenticatedUser } from "@/lib/api-auth";
 import { getDb } from "@/lib/db";
-import { reviews, creatorProfiles } from "@/lib/db/schema";
-import { eq, desc, sql } from "drizzle-orm";
+import { reviews, creatorProfiles, collaborationRooms } from "@/lib/db/schema";
+import { and, eq, desc, sql } from "drizzle-orm";
 
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
@@ -30,13 +30,20 @@ export async function POST(req: NextRequest) {
   if (!db) return NextResponse.json({ error: "Database not connected" }, { status: 503 });
 
   const body = await req.json();
-  const { creatorId, roomId, projectTitle, rating = 5.0, comment } = body;
+  const { creatorId, roomId, projectTitle, rating, comment } = body;
 
-  if (!creatorId || !projectTitle || !comment) {
+  if (!creatorId || !roomId || !projectTitle || !comment || !Number.isFinite(Number(rating)) || Number(rating) < 1 || Number(rating) > 5 || user.role !== 'business') {
     return NextResponse.json({ error: "Data review belum lengkap." }, { status: 400 });
   }
 
   try {
+    const [room] = await db.select().from(collaborationRooms).where(and(
+      eq(collaborationRooms.id, roomId), eq(collaborationRooms.businessId, user.id),
+      eq(collaborationRooms.creatorId, creatorId), eq(collaborationRooms.status, 'completed')
+    )).limit(1);
+    if (!room) return NextResponse.json({ error: 'Kolaborasi belum selesai atau tidak dapat diulas.' }, { status: 403 });
+    const [existing] = await db.select({ id: reviews.id }).from(reviews).where(eq(reviews.roomId, roomId)).limit(1);
+    if (existing) return NextResponse.json({ error: 'Kolaborasi ini sudah diulas.' }, { status: 409 });
     const today = new Intl.DateTimeFormat("id-ID", { day: "numeric", month: "long", year: "numeric" }).format(new Date());
 
     const [newReview] = await db
@@ -55,11 +62,12 @@ export async function POST(req: NextRequest) {
       })
       .returning();
 
-    // Increment creator review count
+    const [summary] = await db.select({ count: sql<number>`count(*)::int`, average: sql<string>`round(avg(${reviews.rating})::numeric, 1)` }).from(reviews).where(eq(reviews.creatorId, creatorId));
     await db
       .update(creatorProfiles)
       .set({
-        reviewsCount: sql`${creatorProfiles.reviewsCount} + 1`,
+        reviewsCount: summary.count,
+        rating: summary.average,
       })
       .where(eq(creatorProfiles.profileId, creatorId));
 

@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getAuthenticatedUser } from "@/lib/api-auth";
 import { getDb } from "@/lib/db";
 import { projects, profiles } from "@/lib/db/schema";
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 
 export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -15,6 +15,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
         id: projects.id,
         title: projects.title,
         description: projects.description,
+        category: projects.category,
         creatorHandle: projects.creatorHandle,
         viewsCount: projects.viewsCount,
         mediaUrl: projects.mediaUrl,
@@ -61,9 +62,10 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
         mediaType: mediaType || undefined,
         externalLink: externalLink || undefined,
       })
-      .where(eq(projects.id, id))
+      .where(and(eq(projects.id, id), eq(projects.creatorId, user.id)))
       .returning();
 
+    if (!updated) return NextResponse.json({ error: "Proyek tidak ditemukan." }, { status: 404 });
     return NextResponse.json({ success: true, project: updated });
   } catch (err: any) {
     return NextResponse.json({ error: err.message }, { status: 500 });
@@ -79,7 +81,8 @@ export async function DELETE(req: NextRequest, { params }: { params: Promise<{ i
   if (!db) return NextResponse.json({ error: "Database not connected" }, { status: 503 });
 
   try {
-    await db.delete(projects).where(eq(projects.id, id));
+    const [deleted] = await db.delete(projects).where(and(eq(projects.id, id), eq(projects.creatorId, user.id))).returning({ id: projects.id });
+    if (!deleted) return NextResponse.json({ error: "Proyek tidak ditemukan." }, { status: 404 });
     return NextResponse.json({ success: true, message: "Proyek portofolio berhasil dihapus" });
   } catch (err: any) {
     return NextResponse.json({ error: err.message }, { status: 500 });

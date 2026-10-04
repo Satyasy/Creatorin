@@ -8,7 +8,7 @@ export interface CareerScoreBreakdown {
   completionRate: number; // e.g. 100%
   clientRating: number; // e.g. 4.9
   completedProjects: number;
-  tier: 'Top Tier' | 'Rising Star' | 'Verified Talent';
+  tier: 'Top Tier' | 'Rising Star' | 'Verified Talent' | 'Belum Dinilai';
 }
 
 export interface PortfolioItem {
@@ -107,6 +107,7 @@ export interface ProjectListing {
   requiredSkills: string[];
   proposalsCount: number;
   postedTimeAgo: string;
+  createdAt?: string;
   isUrgent?: boolean;
   isVerifiedClient?: boolean;
   clientIndustry?: string;
@@ -168,6 +169,7 @@ export interface FeedProject {
 export interface AuthState {
   isAuthenticated: boolean;
   user: {
+    id?: string;
     name: string;
     email: string;
     role: UserRole;

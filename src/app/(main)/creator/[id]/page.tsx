@@ -1,23 +1,22 @@
+'use client';
+
+import { useEffect, useState } from 'react';
+import { useParams } from 'next/navigation';
 import { CreatorProfilePage } from '@/views/CreatorProfilePage';
-import { MOCK_CREATORS } from '@/data/mockCreators';
 import { creatorService } from '@/services/creatorService';
-import type { Metadata } from 'next';
+import type { Creator } from '@/types';
 
-interface CreatorRouteProps {
-  params: Promise<{ id: string }>;
-}
-
-export async function generateMetadata({ params }: CreatorRouteProps): Promise<Metadata> {
-  const { id } = await params;
-  const creator = (await creatorService.getCreatorDetail(id)) || MOCK_CREATORS[0];
-  return {
-    title: `${creator.name} - Portofolio & Layanan di Creatorin`,
-    description: creator.bio || `Profil kreator ${creator.name} di platform Creatorin.`,
-  };
-}
-
-export default async function CreatorRoute({ params }: CreatorRouteProps) {
-  const { id } = await params;
-  const creator = (await creatorService.getCreatorDetail(id)) || MOCK_CREATORS[0];
+export default function CreatorRoute() {
+  const { id } = useParams<{ id: string }>();
+  const [creator, setCreator] = useState<Creator | null>(null);
+  const [loading, setLoading] = useState(true);
+  useEffect(() => {
+    creatorService.getCreatorDetail(id)
+      .then(setCreator)
+      .catch(() => setCreator(null))
+      .finally(() => setLoading(false));
+  }, [id]);
+  if (loading) return <p className="p-8">Memuat profil...</p>;
+  if (!creator) return <p className="p-8">Profil kreator tidak ditemukan.</p>;
   return <CreatorProfilePage creator={creator} />;
 }

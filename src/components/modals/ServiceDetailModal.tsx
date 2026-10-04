@@ -42,8 +42,6 @@ export const ServiceDetailModal: React.FC<ServiceDetailModalProps> = ({
   const [isLiked, setIsLiked] = useState<boolean>(false);
   const [isFollowing, setIsFollowing] = useState<boolean>(false);
 
-  const creatorDomain = `${creator.name.toLowerCase().replace(/[^a-z0-9]/g, '')}.creatorin.id`;
-  const creatorEmail = `inquiry@${creator.name.toLowerCase().replace(/[^a-z0-9]/g, '')}.com`;
 
   // Sync state if initialService changes
   useEffect(() => {
@@ -102,156 +100,18 @@ export const ServiceDetailModal: React.FC<ServiceDetailModalProps> = ({
       });
     }
 
-    // Contextual high-resolution photo sets based on creative domain
-    const titleLower = currentService.title.toLowerCase();
-    const tagLower = (currentService.tag || '').toLowerCase();
-
-    let categoryPool: string[] = [];
-    if (titleLower.includes('figma') || tagLower.includes('figma') || titleLower.includes('landing page') || titleLower.includes('ui') || titleLower.includes('app')) {
-      categoryPool = [
-        'https://images.unsplash.com/photo-1507238691740-187a5b1d37b8?w=1200&auto=format&fit=crop&q=80',
-        'https://images.unsplash.com/photo-1581291518857-4e27b48ff24e?w=1200&auto=format&fit=crop&q=80',
-        'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=1200&auto=format&fit=crop&q=80',
-        'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=1200&auto=format&fit=crop&q=80',
-        'https://images.unsplash.com/photo-1542744094-3a31727220c3?w=1200&auto=format&fit=crop&q=80',
-        'https://images.unsplash.com/photo-1531403009284-440f080d1e12?w=1200&auto=format&fit=crop&q=80'
-      ];
-    } else if (titleLower.includes('framer') || tagLower.includes('framer') || titleLower.includes('website') || titleLower.includes('web')) {
-      categoryPool = [
-        'https://images.unsplash.com/photo-1547658719-da2b51169166?w=1200&auto=format&fit=crop&q=80',
-        'https://images.unsplash.com/photo-1507238691740-187a5b1d37b8?w=1200&auto=format&fit=crop&q=80',
-        'https://images.unsplash.com/photo-1522542550221-31fd19575a2d?w=1200&auto=format&fit=crop&q=80',
-        'https://images.unsplash.com/photo-1558655146-d09347e92766?w=1200&auto=format&fit=crop&q=80',
-        'https://images.unsplash.com/photo-1467232004584-a241de8bcf5d?w=1200&auto=format&fit=crop&q=80',
-        'https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=1200&auto=format&fit=crop&q=80'
-      ];
-    } else if (titleLower.includes('ugc') || tagLower.includes('ugc') || titleLower.includes('video') || titleLower.includes('tiktok')) {
-      categoryPool = [
-        'https://images.unsplash.com/photo-1574717024653-61fd2cf4d44d?w=1200&auto=format&fit=crop&q=80',
-        'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=1200&auto=format&fit=crop&q=80',
-        'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=1200&auto=format&fit=crop&q=80',
-        'https://images.unsplash.com/photo-1492691527719-9d1e07e534b4?w=1200&auto=format&fit=crop&q=80',
-        'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=1200&auto=format&fit=crop&q=80',
-        'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=1200&auto=format&fit=crop&q=80'
-      ];
-    } else if (titleLower.includes('brand') || titleLower.includes('identity') || titleLower.includes('logo') || tagLower.includes('design system')) {
-      categoryPool = [
-        'https://images.unsplash.com/photo-1626785774573-4b799315345d?w=1200&auto=format&fit=crop&q=80',
-        'https://images.unsplash.com/photo-1600132806370-bf17e65e942f?w=1200&auto=format&fit=crop&q=80',
-        'https://images.unsplash.com/photo-1586717791821-3f44a563fa4c?w=1200&auto=format&fit=crop&q=80',
-        'https://images.unsplash.com/photo-1561070791-2526d30994b5?w=1200&auto=format&fit=crop&q=80',
-        'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=1200&auto=format&fit=crop&q=80',
-        'https://images.unsplash.com/photo-1634942537034-2531766767d1?w=1200&auto=format&fit=crop&q=80'
-      ];
-    } else {
-      categoryPool = [
-        'https://images.unsplash.com/photo-1554080353-a576cf803bda?w=1200&auto=format&fit=crop&q=80',
-        'https://images.unsplash.com/photo-1542038784456-1ea8e935640e?w=1200&auto=format&fit=crop&q=80',
-        'https://images.unsplash.com/photo-1516035069371-29a1b244cc32?w=1200&auto=format&fit=crop&q=80',
-        'https://images.unsplash.com/photo-1507238691740-187a5b1d37b8?w=1200&auto=format&fit=crop&q=80',
-        'https://images.unsplash.com/photo-1581291518857-4e27b48ff24e?w=1200&auto=format&fit=crop&q=80',
-        'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=1200&auto=format&fit=crop&q=80'
-      ];
-    }
-
-    // Ensure at least 6 gallery photos
-    categoryPool.forEach(img => {
-      if (!list.includes(img) && list.length < 6) {
-        list.push(img);
-      }
-    });
-
     return list;
   };
 
   const galleryImages = getGalleryImages();
   const currentActiveImage = galleryImages[activeImageIndex] || currentService.coverImage || galleryImages[0];
 
-  // Deliverables tailored to service type
-  const getDeliverables = () => {
-    if (currentService.deliverables && currentService.deliverables.length > 0) {
-      return currentService.deliverables;
-    }
-    const titleLower = currentService.title.toLowerCase();
-    const tagLower = (currentService.tag || '').toLowerCase();
-
-    if (titleLower.includes('figma') || tagLower.includes('figma') || titleLower.includes('landing page')) {
-      return [
-        'File Master Figma (.fig) lengkap dengan Auto-Layout & Design Tokens',
-        'Struktur Komponen Responsif (Desktop, Tablet, dan Mobile View)',
-        'Style Guide terintegrasi: Typography, Color Palette, dan UI Assets',
-        '2x Putaran Revisi Minor & penyesuaian copywriting brand',
-        'Hak Cipta Lisensi Komersial Penuh 100% untuk UMKM / Bisnis'
-      ];
-    }
-    if (titleLower.includes('framer') || tagLower.includes('framer') || titleLower.includes('website')) {
-      return [
-        'Full Framer Website siap live dengan interaksi micro-animation halus',
-        'Setup responsive breakpoints (Desktop, Tablet, Mobile)',
-        'SEO Friendly structure, clean CMS collections & form contact',
-        'Panduan handoff & deployment custom domain tanpa repot coding',
-        'Garansi perbaikan bug selama 14 hari pasca serah terima'
-      ];
-    }
-    if (titleLower.includes('ugc') || titleLower.includes('tiktok') || titleLower.includes('video')) {
-      return [
-        '1x Video Konten Vertikal (9:16) format MP4 Full HD / 4K jernih',
-        'Hook opening teruji algoritma untuk retensi audiens tinggi',
-        'Subtitle animasi dinamis, sound trending komersial, & color grading',
-        'Raw footage & cutdown cut untuk kebutuhan iklan berbayar (Ads)',
-        'Lisensi hak tayang komersial lintas platform media sosial'
-      ];
-    }
-    if (titleLower.includes('brand') || titleLower.includes('identity') || titleLower.includes('logo')) {
-      return [
-        'Paket Logo Utama, Alternatif Horizontal/Vertical, & Favicon Icon',
-        'Brand Guidelines PDF: Tipografi, Skema Warna Pantone/HEX, & Aturan Penggunaan',
-        'Aset Siap Pakai resolusi tinggi (Vector SVG, AI, EPS, PNG Transparan)',
-        'Mockup aplikasi identitas brand pada kartu nama & stationery bisnis',
-        '2x Revisi Konseptual terstruktur'
-      ];
-    }
-    return [
-      'Hasil pengerjaan profesional beresolusi tinggi sesuai standar industri',
-      'File master editable lengkap serta format export siap pakai',
-      'Revisi minor terstruktur untuk memastikan kesesuaian brief bisnis Anda',
-      'Hak guna komersial penuh bebas royalti untuk kebutuhan bisnis Anda'
-    ];
-  };
-
-  const deliverables = getDeliverables();
-
-  // Tags / Hashtags tailored to service
-  const getServiceTags = () => {
-    const titleLower = currentService.title.toLowerCase();
-    const tagLower = (currentService.tag || '').toLowerCase();
-
-    if (titleLower.includes('figma') || tagLower.includes('figma') || titleLower.includes('landing page')) {
-      return ['#FigmaTemplate', '#LandingPage', '#UIUXDesign', '#AutoLayout', '#DesignSystem', '#ResponsiveWeb'];
-    }
-    if (titleLower.includes('framer') || tagLower.includes('framer') || titleLower.includes('website')) {
-      return ['#FramerSite', '#InteractiveWebsite', '#WebDevelopment', '#NoCode', '#Responsive', '#FramerAnimation'];
-    }
-    if (titleLower.includes('ugc') || titleLower.includes('tiktok') || titleLower.includes('video')) {
-      return ['#UGCVideo', '#TikTokViral', '#ContentCreator', '#ReviewProduk', '#ReelsInstagram', '#VideoPromosi'];
-    }
-    if (titleLower.includes('brand') || titleLower.includes('identity') || titleLower.includes('logo')) {
-      return ['#BrandIdentity', '#LogoDesign', '#DesignSystem', '#VisualBranding', '#CorporateIdentity', '#StyleGuide'];
-    }
-    return [
-      currentService.tag ? `#${currentService.tag.replace(/\s+/g, '')}` : '#LayananKreatif',
-      '#KreatorIndonesia',
-      '#DesainProfesional',
-      '#UMKMGoDigital',
-      '#CreativeAgency'
-    ];
-  };
-
-  const serviceTags = getServiceTags();
+  const deliverables = currentService.deliverables || [];
+  const serviceTags = currentService.tag ? [`#${currentService.tag.replace(/\s+/g, '')}`] : [];
   const otherServices = (creator.services || []).filter(s => s.id !== currentService.id);
   const formattedDelivery = currentService.deliveryDays
     ? (currentService.deliveryDays.toLowerCase().includes('hari') ? currentService.deliveryDays : `${currentService.deliveryDays} Hari Kerja`)
-    : '2-3 Hari Kerja';
+    : 'Belum ditentukan';
   const formattedRevisions = currentService.revisions
     ? (currentService.revisions.toLowerCase().includes('revisi') ? currentService.revisions : `${currentService.revisions} Revisi`)
     : '2x Revisi Gratis';
@@ -362,26 +222,8 @@ export const ServiceDetailModal: React.FC<ServiceDetailModalProps> = ({
                   </button>
                 </div>
 
-                {/* Row 3: Domain, Email & Location */}
+                {/* Location */}
                 <div className="flex flex-wrap items-center gap-2 sm:gap-2.5 pt-0.5 text-xs text-neutral-500 font-medium">
-                  <a
-                    href={`https://${creatorDomain}`}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="inline-flex items-center gap-1 hover:text-blue-600 transition"
-                  >
-                    <Globe className="w-3.5 h-3.5 text-neutral-400" />
-                    <span>{creatorDomain}</span>
-                  </a>
-                  <span>•</span>
-                  <a
-                    href={`mailto:${creatorEmail}`}
-                    className="inline-flex items-center gap-1 hover:text-blue-600 transition"
-                  >
-                    <Mail className="w-3.5 h-3.5 text-neutral-400" />
-                    <span>{creatorEmail}</span>
-                  </a>
-                  <span>•</span>
                   <span className="inline-flex items-center gap-1 text-neutral-500">
                     <MapPin className="w-3.5 h-3.5 text-neutral-400" />
                     <span>{creator.location || 'Indonesia'}</span>
@@ -427,12 +269,7 @@ export const ServiceDetailModal: React.FC<ServiceDetailModalProps> = ({
             <div className="space-y-3 sm:space-y-3.5">
               {/* Cover Preview Utama */}
               <div className="relative w-full rounded-[16px] overflow-hidden border border-black/10 bg-neutral-900 aspect-[16/10] sm:aspect-16/9 group">
-                <img
-                  id="main-service-preview-image"
-                  src={currentActiveImage}
-                  alt={`${currentService.title} - Foto ${activeImageIndex + 1}`}
-                  className="w-full h-full object-cover transition-all duration-300 select-none"
-                />
+                {currentActiveImage && <img id="main-service-preview-image" src={currentActiveImage} alt={`${currentService.title} - Foto ${activeImageIndex + 1}`} className="w-full h-full object-cover transition-all duration-300 select-none" />}
 
                 {/* Counter Pill Badge */}
                 {galleryImages.length > 1 && (
@@ -673,21 +510,6 @@ export const ServiceDetailModal: React.FC<ServiceDetailModalProps> = ({
                 </button>
               </div>
 
-              {/* Contact / Links: Domain & Email */}
-              <div className="flex items-center justify-center gap-3 pt-2 text-xs text-neutral-500 font-medium">
-                <span className="inline-flex items-center gap-1.5 hover:text-[#0D0B0B] transition cursor-pointer">
-                  <Globe className="w-3.5 h-3.5 text-neutral-400 stroke-[1.75]" />
-                  <span>{creatorDomain}</span>
-                </span>
-                <span className="text-neutral-300">•</span>
-                <a
-                  href={`mailto:${creatorEmail}`}
-                  className="inline-flex items-center gap-1.5 hover:text-[#0D0B0B] transition"
-                >
-                  <Mail className="w-3.5 h-3.5 text-neutral-400 stroke-[1.75]" />
-                  <span>{creatorEmail}</span>
-                </a>
-              </div>
             </div>
             {otherServices.length > 0 && (
               <div className="pt-8 border-t border-black/10 space-y-4">

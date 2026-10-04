@@ -1,9 +1,10 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Bookmark, BriefcaseBusiness, Clock, MapPin, Search, ShieldCheck, WalletCards } from 'lucide-react';
 import Link from 'next/link';
-import { MOCK_PROJECTS } from '@/data/mockProjects';
+import { briefService } from '@/services/briefService';
+import type { ProjectListing } from '@/types';
 import { useAuth } from '@/providers/AuthProvider';
 
 type FeedTab = 'recommended' | 'recent' | 'saved';
@@ -14,28 +15,25 @@ const tabs: { id: FeedTab; label: string }[] = [
   { id: 'saved', label: 'Tersimpan' },
 ];
 
-const ageInHours = (value: string) => {
-  const amount = Number.parseInt(value, 10) || 0;
-  return value.includes('hari') ? amount * 24 : amount;
-};
-
 export const CreatorDashboard = () => {
   const { user } = useAuth();
   const [query, setQuery] = useState('');
   const [activeTab, setActiveTab] = useState<FeedTab>('recommended');
   const [savedIds, setSavedIds] = useState<string[]>([]);
+  const [availableBriefs, setAvailableBriefs] = useState<ProjectListing[]>([]);
+  useEffect(() => { briefService.getBriefs().then(setAvailableBriefs); }, []);
 
   const briefs = useMemo(() => {
     const needle = query.trim().toLowerCase();
-    const matching = MOCK_PROJECTS.filter((brief) => {
+    const matching = availableBriefs.filter((brief) => {
       if (activeTab === 'saved' && !savedIds.includes(brief.id)) return false;
       return !needle || `${brief.title} ${brief.description} ${brief.category} ${(brief.requiredSkills || []).join(' ')}`.toLowerCase().includes(needle);
     });
 
     return activeTab === 'recent'
-      ? [...matching].sort((a, b) => ageInHours(a.postedTimeAgo) - ageInHours(b.postedTimeAgo))
+      ? [...matching].sort((a, b) => new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime())
       : matching;
-  }, [activeTab, query, savedIds]);
+  }, [activeTab, query, savedIds, availableBriefs]);
 
   const toggleSaved = (id: string) => {
     setSavedIds((items) => items.includes(id) ? items.filter((item) => item !== id) : [...items, id]);
@@ -83,7 +81,6 @@ export const CreatorDashboard = () => {
               </div>
             </div>
 
-            <p className="mt-5 text-xs text-[#6F7285]">Data demo ditampilkan untuk memperlihatkan bentuk feed proyek.</p>
 
             <div className="mt-3 divide-y divide-[var(--outline)] border-y border-[var(--outline)] bg-white">
               {briefs.length > 0 ? briefs.map((brief) => {

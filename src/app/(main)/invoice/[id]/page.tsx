@@ -16,13 +16,6 @@ export async function generateMetadata({ params }: InvoiceRouteProps): Promise<M
 export default async function InvoiceRoute({ params }: InvoiceRouteProps) {
   const { id } = await params;
   return (
-    <InvoiceDetailPage
-      invoiceData={{
-        id,
-        serviceTitle: 'Premium Project Deliverables & Asset Rights',
-        amount: 'Rp1.500.000',
-        status: 'unpaid',
-      }}
-    />
+    <InvoiceDetailPage invoiceData={{ id }} />
   );
 }

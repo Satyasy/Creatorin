@@ -10,6 +10,7 @@ export interface UserSession {
   avatar?: string;
   location?: string;
   phone?: string;
+  bio?: string;
 }
 
 export function mapRoleToFrontend(dbRole: string): UserRole {
@@ -26,11 +27,10 @@ export function mapRoleToBackend(feRole: UserRole): 'creator' | 'business' {
 export const authService = {
   async signInWithGoogle(role: Exclude<UserRole, 'school'> = 'umkm'): Promise<{ success: boolean; error?: string }> {
     const supabase = createClient();
-    localStorage.setItem('creatorin_oauth_role', mapRoleToBackend(role));
     const { error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {
-        redirectTo: `${window.location.origin}/auth/callback`,
+        redirectTo: `${window.location.origin}/auth/callback?role=${mapRoleToBackend(role)}`,
       },
     });
     return error ? { success: false, error: error.message } : { success: true };
@@ -51,9 +51,10 @@ export const authService = {
         email: data.user.email,
         role: mapRoleToFrontend(data.user.role),
         dbRole: data.user.role,
-        avatar: data.user.avatarUrl || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=240&auto=format&fit=crop&q=80',
+        avatar: data.user.avatarUrl || '',
         location: data.user.location,
         phone: data.user.phone,
+        bio: data.details?.bio || data.details?.description || '',
       };
     } catch {
       return null;
@@ -78,7 +79,7 @@ export const authService = {
         email: data.user.email,
         role: mapRoleToFrontend(data.user.role),
         dbRole: data.user.role,
-        avatar: data.user.avatarUrl || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=240&auto=format&fit=crop&q=80',
+        avatar: data.user.avatarUrl || '',
       };
 
       return { success: true, user };
@@ -93,7 +94,7 @@ export const authService = {
     password: string;
     fullName: string;
     role: UserRole;
-  }): Promise<{ success: boolean; user?: UserSession; error?: string }> {
+  }): Promise<{ success: boolean; user?: UserSession; requiresConfirmation?: boolean; error?: string }> {
     try {
       const dbRole = mapRoleToBackend(params.role);
       const res = await fetch('/api/auth/register', {
@@ -117,10 +118,10 @@ export const authService = {
         email: data.user.email,
         role: params.role,
         dbRole,
-        avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=240&auto=format&fit=crop&q=80',
+        avatar: '',
       };
 
-      return { success: true, user };
+      return { success: true, user, requiresConfirmation: Boolean(data.requiresConfirmation) };
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : 'Terjadi kendala saat registrasi.';
       return { success: false, error: msg };
