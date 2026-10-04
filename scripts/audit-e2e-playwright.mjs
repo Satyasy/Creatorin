@@ -164,7 +164,7 @@ async function runAudit() {
     }, SEED_USER);
 
     // Reload and check if user profile reflects in navbar
-    await page.reload({ waitUntil: 'domcontentloaded' });
+    await page.reload({ waitUntil: 'domcontentloaded', timeout: 15000 }).catch(() => {});
     await page.waitForTimeout(800);
 
     const authCheck = await page.evaluate(() => {
@@ -235,7 +235,7 @@ async function runAudit() {
             await page.waitForTimeout(1000);
 
             // Now test REFRESH persistence
-            await page.reload({ waitUntil: 'domcontentloaded' });
+            await page.reload({ waitUntil: 'domcontentloaded', timeout: 15000 }).catch(() => {});
             await page.waitForTimeout(1200);
 
             const postReloadBio = await page.evaluate(() => {

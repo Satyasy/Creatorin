@@ -1,6 +1,5 @@
 import { UserRole } from '@/types';
 import { createClient } from '@/lib/supabase/client';
-import { AuthState, UserRole } from '@/types';
 import { apiUrl } from '@/lib/api-config';
 
 export interface UserSession {
