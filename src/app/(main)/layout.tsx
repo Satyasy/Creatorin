@@ -23,7 +23,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
   const isStandaloneExplore = pathname === '/explore';
   const isPublicSchoolProfile = pathname?.startsWith('/school/');
   const isCreatorShell = user?.role === 'creator';
-  const isSchoolShell = user?.role === 'school' && !isPublicSchoolProfile;
+  const isSchoolShell = (user?.role === 'school' || pathname?.startsWith('/dashboard/school')) && !isPublicSchoolProfile;
 
   // Hide footer on full workspace views to maintain SaaS cleanliness
   const hideFooter = isChat || pathname?.startsWith('/contracts') || isDashboard || isSchoolShell;

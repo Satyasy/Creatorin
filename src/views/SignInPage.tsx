@@ -25,7 +25,6 @@ export const SignInPage: React.FC<Props> = ({ onNavigate, onLoginSuccess }) => {
     }
     login(result.user); onLoginSuccess?.(result.user); onNavigate?.('explore'); router.push('/explore');
   };
-
   return <main className="grid min-h-screen bg-white lg:grid-cols-[minmax(0,1.2fr)_minmax(360px,.8fr)]">
     <section className="flex items-center justify-center px-4 py-10 sm:px-8">
       <div className="w-full max-w-md">
