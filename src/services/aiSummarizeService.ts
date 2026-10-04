@@ -1,4 +1,5 @@
 import { SummarizeResponseData } from '@/app/api/ai/summarize/route';
+import { apiUrl } from '@/lib/api-config';
 
 export interface SummarizeParams {
   roomId: string;
@@ -11,9 +12,10 @@ export interface SummarizeParams {
 export const aiSummarizeService = {
   async summarizeConversation(params: SummarizeParams): Promise<SummarizeResponseData> {
     try {
-      const res = await fetch('/api/ai/summarize', {
+      const res = await fetch(apiUrl('/api/ai/summarize'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body: JSON.stringify(params),
       });
 

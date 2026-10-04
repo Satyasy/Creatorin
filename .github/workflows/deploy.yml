@@ -12,27 +12,11 @@ concurrency:
 
 jobs:
   deploy:
-    name: Deploy via SSH to VPS
-    runs-on: ubuntu-latest
+    name: Zero-Downtime Deployment
+    runs-on: self-hosted
     steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v4
+      - name: Trigger Zero-Downtime Deployment
+        run: |
+          echo "🚀 Starting self-hosted deployment on $(hostname)..."
+          sudo bash /var/www/creatorin/deploy.sh
 
-      - name: Deploy via SSH to VPS
-        uses: appleboy/ssh-action@v1.0.3
-        with:
-          host: ${{ secrets.SSH_HOST }}
-          username: ${{ secrets.SSH_USER }}
-          port: ${{ secrets.SSH_PORT }}
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
-          script_stop: true
-          script: |
-            # Inisialisasi repo jika belum ada di VPS
-            if [ ! -d "/var/www/creatorin/.git" ]; then
-              cd /var/www
-              rm -rf creatorin
-              git clone git@github.com:${{ github.repository }}.git creatorin
-            fi
-
-            # Jalankan zero downtime deployment script
-            bash /var/www/creatorin/deploy.sh

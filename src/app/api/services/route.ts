@@ -4,12 +4,19 @@ import { getDb } from "@/lib/db";
 import { services, profiles, creatorProfiles } from "@/lib/db/schema";
 import { eq, desc, ilike, and } from "drizzle-orm";
 import { MOCK_CREATORS } from "@/data/mockCreators";
+import { getCache, setCache, deleteCache } from "@/lib/redis";
 
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
   const category = searchParams.get("category");
   const creatorId = searchParams.get("creatorId");
   const search = searchParams.get("search");
+
+  const cacheKey = `services:${category || "all"}:${creatorId || "all"}:${search || "all"}`;
+  const cached = await getCache<{ services: any[] }>(cacheKey);
+  if (cached) {
+    return NextResponse.json({ ...cached, _source: "redis" });
+  }
 
   const db = getDb();
   if (!db) {
@@ -83,7 +90,10 @@ export async function GET(req: NextRequest) {
       filtered = filtered.filter((r) => r.title.toLowerCase().includes(s) || r.category.toLowerCase().includes(s));
     }
 
-    return NextResponse.json({ services: filtered });
+    const result = { services: filtered };
+    await setCache(cacheKey, result, 180);
+
+    return NextResponse.json(result);
   } catch (err: any) {
     return NextResponse.json({ error: err.message }, { status: 500 });
   }
@@ -124,6 +134,9 @@ export async function POST(req: NextRequest) {
         isActive: true,
       })
       .returning();
+
+    // Invalidate cached services lists
+    await deleteCache("services:*");
 
     return NextResponse.json({ success: true, service: newService }, { status: 201 });
   } catch (err: any) {

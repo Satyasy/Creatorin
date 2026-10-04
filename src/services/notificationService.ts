@@ -1,9 +1,13 @@
 import { AppNotification } from '@/types';
+import { apiUrl } from '@/lib/api-config';
 
 export const notificationService = {
   async getNotifications(): Promise<AppNotification[]> {
     try {
-      const res = await fetch('/api/notifications', { cache: 'no-store' });
+      const res = await fetch(apiUrl('/api/notifications'), {
+        credentials: 'include',
+        cache: 'no-store',
+      });
       if (res.ok) {
         const data = await res.json();
         if (Array.isArray(data.notifications) && data.notifications.length > 0) {
@@ -26,9 +30,10 @@ export const notificationService = {
 
   async markAsRead(id: string): Promise<boolean> {
     try {
-      const res = await fetch('/api/notifications', {
+      const res = await fetch(apiUrl('/api/notifications'), {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body: JSON.stringify({ id, isRead: true }),
       });
       return res.ok;
@@ -46,9 +51,10 @@ export const notificationService = {
     notifyPush?: boolean;
   }): Promise<{ success: boolean; error?: string }> {
     try {
-      const res = await fetch('/api/account/settings', {
+      const res = await fetch(apiUrl('/api/account/settings'), {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body: JSON.stringify(payload),
       });
       const data = await res.json();

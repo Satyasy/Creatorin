@@ -12,10 +12,10 @@ export function getDb() {
   }
 
   if (!dbInstance) {
-    // Disable prefetch for transaction poolers / serverless + enable SSL
+    const isLocal = connectionString.includes("127.0.0.1") || connectionString.includes("localhost");
     const client = postgres(connectionString, {
       prepare: false,
-      ssl: { rejectUnauthorized: false },
+      ssl: isLocal ? false : { rejectUnauthorized: false },
       connect_timeout: 10,
     });
     dbInstance = drizzle(client, { schema });

@@ -2,9 +2,19 @@ import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { getDb } from "@/lib/db";
 import { profiles, creatorProfiles, businessProfiles, creatorWallets, schoolProfiles } from "@/lib/db/schema";
+import { checkRateLimit } from "@/lib/redis";
 
 export async function POST(req: NextRequest) {
   try {
+    const ip = req.headers.get("cf-connecting-ip") || req.headers.get("x-forwarded-for")?.split(",")[0].trim() || "127.0.0.1";
+    const { allowed, reset } = await checkRateLimit(`register:${ip}`, 5, 60);
+    if (!allowed) {
+      return NextResponse.json(
+        { error: "Terlalu banyak permintaan pendaftaran. Silakan coba beberapa saat lagi." },
+        { status: 429, headers: { "Retry-After": String(reset) } }
+      );
+    }
+
     const body = await req.json();
     const { email, password, fullName, role = "creator" } = body;
 

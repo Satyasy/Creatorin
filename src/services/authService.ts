@@ -1,5 +1,7 @@
 import { UserRole } from '@/types';
 import { createClient } from '@/lib/supabase/client';
+import { AuthState, UserRole } from '@/types';
+import { apiUrl } from '@/lib/api-config';
 
 export interface UserSession {
   id: string;
@@ -10,6 +12,11 @@ export interface UserSession {
   avatar?: string;
   location?: string;
   phone?: string;
+  bio?: string;
+  roleTitle?: string;
+  handle?: string;
+  skills?: string[];
+  startingPrice?: string;
 }
 
 export function mapRoleToFrontend(dbRole: string): UserRole {
@@ -37,23 +44,30 @@ export const authService = {
   },
   async getCurrentUser(): Promise<UserSession | null> {
     try {
-      const res = await fetch('/api/auth/me', {
-        headers: { credentials: 'include' },
+      const res = await fetch(apiUrl('/api/auth/me'), {
+        credentials: 'include',
         cache: 'no-store',
       });
       if (!res.ok) return null;
       const data = await res.json();
       if (!data.user) return null;
 
+      const details = data.details || {};
+      const fallbackName = data.user.fullName || data.user.email.split('@')[0];
       return {
         id: data.user.id,
-        name: data.user.fullName || data.user.email.split('@')[0],
+        name: fallbackName,
         email: data.user.email,
         role: mapRoleToFrontend(data.user.role),
         dbRole: data.user.role,
         avatar: data.user.avatarUrl || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=240&auto=format&fit=crop&q=80',
         location: data.user.location,
         phone: data.user.phone,
+        bio: details.bio || data.user.bio,
+        roleTitle: details.headline || (data.user.role === 'creator' ? 'Kreator Konten' : 'Brand / UMKM'),
+        handle: details.slug ? `@${details.slug}` : `@${fallbackName.toLowerCase().replace(/[^a-z0-9]/g, '')}`,
+        skills: details.skills || [],
+        startingPrice: details.startingPrice,
       };
     } catch {
       return null;
@@ -62,9 +76,10 @@ export const authService = {
 
   async signIn(email: string, password: string):Promise<{ success: boolean; user?: UserSession; error?: string }> {
     try {
-      const res = await fetch('/api/auth/login', {
+      const res = await fetch(apiUrl('/api/auth/login'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body: JSON.stringify({ email, password }),
       });
       const data = await res.json();
@@ -96,9 +111,10 @@ export const authService = {
   }): Promise<{ success: boolean; user?: UserSession; error?: string }> {
     try {
       const dbRole = mapRoleToBackend(params.role);
-      const res = await fetch('/api/auth/register', {
+      const res = await fetch(apiUrl('/api/auth/register'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body: JSON.stringify({
           email: params.email,
           password: params.password,
@@ -129,9 +145,10 @@ export const authService = {
 
   async completeOnboarding(payload: Record<string, unknown>): Promise<{ success: boolean; error?: string }> {
     try {
-      const res = await fetch('/api/onboarding', {
+      const res = await fetch(apiUrl('/api/onboarding'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body: JSON.stringify(payload),
       });
       const data = await res.json();
@@ -144,4 +161,33 @@ export const authService = {
       return { success: false, error: msg };
     }
   },
+
+  async updateProfile(payload: {
+    fullName?: string;
+    phone?: string;
+    location?: string;
+    avatarUrl?: string;
+    headline?: string;
+    bio?: string;
+    skills?: string[];
+    startingPrice?: string;
+  }): Promise<{ success: boolean; message?: string; error?: string }> {
+    try {
+      const res = await fetch('/api/profile', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify(payload),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        return { success: false, error: data.error || 'Gagal memperbarui profil.' };
+      }
+      return { success: true, message: data.message || 'Profil berhasil diperbarui.' };
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Terjadi kendala saat memperbarui profil.';
+      return { success: false, error: msg };
+    }
+  },
 };
+

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { 
   Share2, 
   MoreHorizontal, 
@@ -53,6 +53,7 @@ import {
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/providers/AuthProvider';
+import { authService } from '@/services/authService';
 import { MOCK_CREATORS } from '@/data/mockCreators';
 import { Creator, CreatorService, PortfolioItem, AuthState, ActivePage, FeedProject } from '@/types';
 import { CareerScoreBadge } from '@/components/common/CareerScoreBadge';
@@ -90,7 +91,7 @@ export const CreatorProfilePage: React.FC<CreatorProfilePageProps> = ({
   isOwnProfile = false
 }) => {
   const router = useRouter();
-  const { user: authUser } = useAuth();
+  const { user: authUser, updateUser } = useAuth();
   const currentUser = propUser !== undefined ? propUser : authUser;
   const isEffectiveOwner = Boolean(isOwnProfile);
   const isCreatorShell = currentUser?.role === 'creator';
@@ -132,17 +133,29 @@ export const CreatorProfilePage: React.FC<CreatorProfilePageProps> = ({
   // In-place inline edit profile state
   const [isEditModeActive, setIsEditModeActive] = useState(false);
   const [editingSection, setEditingSection] = useState<'name' | 'bio' | 'avatar' | 'banner' | null>(null);
+  const [isSavingProfile, setIsSavingProfile] = useState(false);
   const [creatorName, setCreatorName] = useState(creator.name);
   const [creatorRoleTitle, setCreatorRoleTitle] = useState(creator.roleTitle);
   const [creatorBio, setCreatorBio] = useState(creator.bio);
   const [creatorAvatar, setCreatorAvatar] = useState(creator.avatar);
   const [creatorBannerColor, setCreatorBannerColor] = useState('#0063b4');
 
+  // Keep state updated when creator prop updates
+  useEffect(() => {
+    if (!isEditModeActive) {
+      if (creator.name) setCreatorName(creator.name);
+      if (creator.roleTitle) setCreatorRoleTitle(creator.roleTitle);
+      if (creator.bio) setCreatorBio(creator.bio);
+      if (creator.avatar) setCreatorAvatar(creator.avatar);
+    }
+  }, [creator.name, creator.roleTitle, creator.bio, creator.avatar, isEditModeActive]);
+
   // Temp editing inputs
   const [tempName, setTempName] = useState(creator.name);
   const [tempRoleTitle, setTempRoleTitle] = useState(creator.roleTitle);
   const [tempBio, setTempBio] = useState(creator.bio);
   const [tempAvatar, setTempAvatar] = useState(creator.avatar);
+
 
   // Saved shots / projects in profile
   const [likedShots, setLikedShots] = useState<Set<string>>(new Set());
@@ -1993,9 +2006,17 @@ export const CreatorProfilePage: React.FC<CreatorProfilePageProps> = ({
                       accept="image/*"
                       onChange={(e) => {
                         const file = e.target.files?.[0];
-                        if (file) setTempAvatar(URL.createObjectURL(file));
+                        if (file) {
+                          const reader = new FileReader();
+                          reader.onloadend = () => {
+                            if (typeof reader.result === 'string') {
+                              setTempAvatar(reader.result);
+                            }
+                          };
+                          reader.readAsDataURL(file);
+                        }
                       }}
-                      className="text-xs text-neutral-500"
+                      className="text-xs text-neutral-500 cursor-pointer"
                     />
                   </div>
                 </div>
@@ -2031,20 +2052,47 @@ export const CreatorProfilePage: React.FC<CreatorProfilePageProps> = ({
               </button>
               <button
                 type="button"
-                onClick={() => {
-                  if (editingSection === 'name') {
-                    setCreatorName(tempName);
-                    setCreatorRoleTitle(tempRoleTitle);
-                  } else if (editingSection === 'bio') {
-                    setCreatorBio(tempBio);
-                  } else if (editingSection === 'avatar') {
-                    setCreatorAvatar(tempAvatar);
+                disabled={isSavingProfile}
+                onClick={async () => {
+                  setIsSavingProfile(true);
+                  try {
+                    const payload: {
+                      fullName?: string;
+                      headline?: string;
+                      bio?: string;
+                      avatarUrl?: string;
+                    } = {};
+
+                    if (editingSection === 'name') {
+                      setCreatorName(tempName);
+                      setCreatorRoleTitle(tempRoleTitle);
+                      payload.fullName = tempName;
+                      payload.headline = tempRoleTitle;
+                      updateUser({ name: tempName, roleTitle: tempRoleTitle });
+                    } else if (editingSection === 'bio') {
+                      setCreatorBio(tempBio);
+                      payload.bio = tempBio;
+                      updateUser({ bio: tempBio });
+                    } else if (editingSection === 'avatar') {
+                      setCreatorAvatar(tempAvatar);
+                      payload.avatarUrl = tempAvatar;
+                      updateUser({ avatar: tempAvatar });
+                    }
+
+                    // Save directly to backend API
+                    await authService.updateProfile(payload);
+                  } catch (err) {
+                    console.error('Failed to update profile to backend:', err);
+                  } finally {
+                    setIsSavingProfile(false);
+                    setEditingSection(null);
                   }
-                  setEditingSection(null);
                 }}
-                className="px-4 py-1.5 rounded-xl bg-[#0D0C22] hover:bg-neutral-800 text-white text-xs font-bold cursor-pointer transition shadow-xs"
+                className={`px-4 py-1.5 rounded-xl bg-[#0D0C22] hover:bg-neutral-800 text-white text-xs font-bold cursor-pointer transition shadow-xs flex items-center gap-1.5 ${
+                  isSavingProfile ? 'opacity-70 cursor-not-allowed' : ''
+                }`}
               >
-                Simpan
+                {isSavingProfile ? 'Menyimpan...' : 'Simpan'}
               </button>
             </div>
           </div>
