@@ -3,6 +3,7 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { AuthState, UserRole } from '../types';
 import { authService } from '@/services/authService';
+import { DEMO_COOKIE, getDemoUser } from '@/lib/demo-users';
 import { apiUrl } from '@/lib/api-config';
 
 // Global Client-Side Fetch Interceptor:
@@ -77,6 +78,34 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [isLoading, setIsLoading] = useState(true);
 
   const syncServerSession = useCallback(async () => {
+    // ── Demo mode (development only) ──────────────────────────────
+    if (process.env.NODE_ENV === 'development') {
+      const demoCookie = document.cookie
+        .split('; ')
+        .find(row => row.startsWith(`${DEMO_COOKIE}=`))
+        ?.split('=')[1];
+
+      if (demoCookie) {
+        const demoUser = getDemoUser(demoCookie);
+        if (demoUser) {
+          setAuthState({
+            isAuthenticated: true,
+            user: {
+              id: demoUser.id,
+              name: demoUser.name,
+              email: demoUser.email,
+              role: demoUser.role,
+              avatar: demoUser.avatar,
+              location: demoUser.location,
+              bio: demoUser.bio,
+            },
+          });
+          setIsLoading(false);
+          return;
+        }
+      }
+    }
+
     if (typeof window !== 'undefined') {
       const hasLocalToken = Boolean(localStorage.getItem('creatorin_token') || localStorage.getItem('creatorin_access_token'));
       const hasLocalUser = Boolean(localStorage.getItem(AUTH_STORAGE_KEY));
@@ -86,7 +115,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         return;
       }
     }
-
     try {
       const serverUser = await authService.getCurrentUser();
       if (serverUser) {
@@ -168,6 +196,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       isAuthenticated: false,
       user: null,
     });
+    // Clear demo cookie if active
+    if (typeof document !== 'undefined') {
+      document.cookie = `${DEMO_COOKIE}=; path=/; max-age=0`;
+    }
     try {
       localStorage.removeItem(AUTH_STORAGE_KEY);
       localStorage.removeItem('creatorin_token');

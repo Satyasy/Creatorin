@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useMemo, useEffect } from 'react';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/providers/AuthProvider';
 import { 
@@ -29,7 +30,8 @@ import {
   ShieldCheck,
   ArrowRight,
   TrendingUp,
-  Tag
+  Tag,
+  UserCheck
 } from 'lucide-react';
 import { ProjectBriefModal } from '@/components/modals/ProjectBriefModal';
 import { ProjectDetailModal } from '@/components/modals/ProjectDetailModal';
@@ -94,8 +96,8 @@ export const ExploreProjectsPage: React.FC<ExploreProjectsPageProps> = ({
         'home': '/',
         'landing': '/landing',
         'explore': '/explore',
-        'explore-projects': '/explore/projects',
-        'explore-services': '/explore/services',
+        'explore-projects': '/jelajah/proyek',
+        'explore-services': '/jelajah/layanan',
         'chat': '/chat',
         'collaboration': '/contracts',
         'collaboration-room': '/contracts',
@@ -104,7 +106,7 @@ export const ExploreProjectsPage: React.FC<ExploreProjectsPageProps> = ({
         'signin': '/sign-in',
         'signup': '/sign-up',
       };
-      router.push(routeMap[page] || '/explore');
+      router.push(routeMap[page] || '/jelajah/proyek');
     }
   };
 
@@ -297,6 +299,31 @@ export const ExploreProjectsPage: React.FC<ExploreProjectsPageProps> = ({
               <p className="text-sm sm:text-base text-[#64748B] mt-2 max-w-2xl leading-normal font-normal">
                 Temukan portofolio nyata, video Reels, konten TikTok, dan sistem desain yang telah diproduksi oleh kreator top terverifikasi Creatorin.
               </p>
+            </div>
+
+            {/* Sub-Navigation Switcher Tabs for UMKM Jelajah */}
+            <div className="pt-2 flex items-center gap-2 border-b border-black/5 pb-3 overflow-x-auto no-scrollbar">
+              <Link
+                href="/jelajah/layanan"
+                className="px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold text-neutral-600 hover:text-[#0D0C22] hover:bg-neutral-100 transition-colors flex items-center gap-2 shrink-0"
+              >
+                <Briefcase className="w-4 h-4 text-neutral-500" />
+                <span>Layanan Kreator</span>
+              </Link>
+              <Link
+                href="/jelajah/proyek"
+                className="px-4 py-2 rounded-xl text-xs sm:text-sm font-bold bg-white text-[#155DFC] shadow-xs border border-black/10 flex items-center gap-2 shrink-0"
+              >
+                <TrendingUp className="w-4 h-4 text-[#155DFC]" />
+                <span>Portofolio Proyek</span>
+              </Link>
+              <Link
+                href="/jelajah/kreator"
+                className="px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold text-neutral-600 hover:text-[#0D0C22] hover:bg-neutral-100 transition-colors flex items-center gap-2 shrink-0"
+              >
+                <UserCheck className="w-4 h-4 text-neutral-500" />
+                <span>Profil Kreator</span>
+              </Link>
             </div>
 
             {/* Popular Tag Pills */}

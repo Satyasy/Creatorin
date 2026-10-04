@@ -30,8 +30,11 @@ Creatorin memfasilitasi pembuatan brief proyek, kolaborasi produksi konten (vide
     keywords: ['lokasi', 'navigasi', 'dimana', 'halaman', 'menu', 'cara menuju', 'rute', 'link'],
     content: `Berikut adalah lokasi dan halaman utama di Creatorin yang dapat diakses melalui Navbar atas:
 1. Beranda (/): Menampilkan feed tren, kreator unggulan, dan ringkasan platform.
-2. Jelajah Proyek (/explore/projects): Menjelajahi portofolio konten kreatif, video UGC, TikTok/Reels feed, dan desain dari para kreator.
-3. Katalog Layanan (/explore/services): Melihat paket jasa kreatif yang ditawarkan kreator lengkap dengan estimasi harga dan waktu pengerjaan.
+2. Jelajah Layanan (/jelajah/layanan): Paket jasa kreatif instan untuk UMKM.
+3. Jelajah Proyek (/jelajah/proyek): Galeri karya dan portofolio kreator untuk UMKM.
+4. Profil Kreator (/jelajah/kreator): Direktori talenta kreator terverifikasi untuk UMKM.
+5. Explore (/explore): Jelajah video komunitas dan direktori UMKM untuk Kreator.
+
 4. Contracts (/contracts): Daftar brief yang dilamar kreator, termasuk status accepted atau menunggu review.
 5. Brief Proyek (/briefs): Tempat UMKM memasang brief proyek baru dan melihat daftar brief yang sedang aktif.
 6. Chat & Obrolan (/chat): Ruang percakapan pesan langsung antara UMKM, Kreator, dan mitra sekolah.

@@ -14,8 +14,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   }> = [
     { path: '/', changeFrequency: 'daily', priority: 1.0 },
     { path: '/explore', changeFrequency: 'daily', priority: 0.9 },
-    { path: '/explore/projects', changeFrequency: 'daily', priority: 0.9 },
-    { path: '/explore/services', changeFrequency: 'daily', priority: 0.9 },
+    { path: '/jelajah/layanan', changeFrequency: 'daily', priority: 0.9 },
+    { path: '/jelajah/proyek', changeFrequency: 'daily', priority: 0.9 },
+    { path: '/jelajah/kreator', changeFrequency: 'daily', priority: 0.9 },
     { path: '/briefs', changeFrequency: 'daily', priority: 0.85 },
     { path: '/landing', changeFrequency: 'weekly', priority: 0.8 },
   ];
