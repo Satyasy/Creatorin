@@ -134,7 +134,7 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, onOpenBrief }) => {
                 <li>
                   <button
                     type="button"
-                    onClick={() => navigateTo('services', '/explore/services')}
+                    onClick={() => navigateTo('services', '/jelajah/layanan')}
                     className="hover:text-[#0d0c22] transition cursor-pointer text-left"
                   >
                     Layanan Kreator
@@ -143,10 +143,19 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, onOpenBrief }) => {
                 <li>
                   <button
                     type="button"
-                    onClick={() => navigateTo('projects', '/explore/projects')}
+                    onClick={() => navigateTo('projects', '/jelajah/proyek')}
                     className="hover:text-[#0d0c22] transition cursor-pointer text-left"
                   >
                     Portofolio Project
+                  </button>
+                </li>
+                <li>
+                  <button
+                    type="button"
+                    onClick={() => navigateTo('creator-profile' as any, '/jelajah/kreator')}
+                    className="hover:text-[#0d0c22] transition cursor-pointer text-left"
+                  >
+                    Profil Kreator
                   </button>
                 </li>
                 <li>
@@ -189,7 +198,7 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, onOpenBrief }) => {
                 <li>
                   <button
                     type="button"
-                    onClick={() => navigateTo('services', '/explore/services')}
+                    onClick={() => navigateTo('creator-profile' as any, '/jelajah/kreator')}
                     className="hover:text-[#0d0c22] transition cursor-pointer text-left"
                   >
                     Jelajahi Kreator
@@ -223,10 +232,10 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, onOpenBrief }) => {
                 <li>
                   <button
                     type="button"
-                    onClick={() => navigateTo('projects', '/explore/projects')}
+                    onClick={() => navigateTo('explore', '/explore')}
                     className="hover:text-[#0d0c22] transition cursor-pointer text-left"
                   >
-                    Bagikan Project
+                    Explore Komunitas
                   </button>
                 </li>
                 <li>

@@ -1,10 +1,5 @@
-import { ExploreProjectsPage } from '@/views/ExploreProjectsPage';
+import { redirect } from 'next/navigation';
 
-export const metadata = {
-  title: 'Jelajah Proyek & Portofolio - Creatorin',
-  description: 'Inspirasi portofolio dan karya kreatif terbaik dari kreator Creatorin.',
-};
-
-export default function ExploreProjectsRoute() {
-  return <ExploreProjectsPage />;
+export default function ExploreProjectsRedirectRoute() {
+  redirect('/jelajah/proyek');
 }

@@ -14,7 +14,6 @@ import {
   UserCheck,
   TrendingUp,
   Briefcase,
-  Building2,
   Settings,
   GraduationCap,
   WalletCards,
@@ -47,6 +46,7 @@ export const Navbar: React.FC<NavbarProps> = ({
   const pathname = usePathname();
   const { user: authUser, signOut: authSignOut } = useAuth();
   const currentUser = propUser !== undefined ? propUser : authUser;
+  const isHomeActive = activePage === 'home' || pathname === '/' || pathname === '/dashboard';
 
   const navigateTo = (page: ActivePage, path: string) => {
     if (onNavigate) {
@@ -71,7 +71,8 @@ export const Navbar: React.FC<NavbarProps> = ({
   const exploreDropdownRef = useRef<HTMLDivElement>(null);
   const userDropdownRef = useRef<HTMLDivElement>(null);
 
-  const isSearchVisible = showSearch || pathname?.startsWith('/explore') || pathname?.startsWith('/briefs');
+  const isCreator = currentUser?.role === 'creator';
+  const isSearchVisible = showSearch || pathname?.startsWith('/explore') || pathname?.startsWith('/jelajah') || pathname?.startsWith('/briefs');
 
   // Close dropdown on outside click
   useEffect(() => {
@@ -112,8 +113,14 @@ export const Navbar: React.FC<NavbarProps> = ({
     if (onSearch) {
       onSearch(navSearchInput);
     }
-    if (!pathname?.startsWith('/explore')) {
-      router.push(`/explore/services?q=${encodeURIComponent(navSearchInput)}`);
+    if (isCreator) {
+      if (!pathname?.startsWith('/explore')) {
+        router.push(`/explore?q=${encodeURIComponent(navSearchInput)}`);
+      }
+    } else {
+      if (!pathname?.startsWith('/jelajah')) {
+        router.push(`/jelajah/layanan?q=${encodeURIComponent(navSearchInput)}`);
+      }
     }
   };
 
@@ -200,7 +207,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             id="nav-beranda-link"
             onClick={() => navigateTo('home', '/')}
             className={`transition-colors flex items-center gap-1.5 cursor-pointer ${
-              activePage === 'home' || pathname === '/'
+              isHomeActive
                 ? 'text-[#155DFC] font-bold'
                 : 'text-neutral-600 hover:text-[#155DFC]'
             }`}
@@ -208,90 +215,118 @@ export const Navbar: React.FC<NavbarProps> = ({
             <span>Beranda</span>
           </button>
 
-          {/* Dropdown Jelajah dengan Sub-navigasi on Hover & Smooth Animation */}
-          <div 
-            className={`relative group/explore transition-all duration-300 ${isScrolled ? 'py-4' : 'py-6'}`}
-            onMouseEnter={() => setExploreDropdownOpen(true)}
-            onMouseLeave={() => setExploreDropdownOpen(false)}
-            ref={exploreDropdownRef}
-          >
+          {/* Navigasi Eksplorasi: Explore untuk Kreator, Jelajah untuk UMKM/Guest */}
+          {isCreator ? (
             <button
-              onClick={() => navigateTo('services', '/explore/services')}
-              className={`hover:text-[#155DFC] transition-colors flex items-center gap-1.5 cursor-pointer font-bold ${
-                pathname?.startsWith('/explore') ? 'text-[#155DFC]' : 'text-[#0D0C22]'
-              } group-hover/explore:text-[#155DFC]`}
+              id="nav-explore-link"
+              onClick={() => navigateTo('explore', '/explore')}
+              className={`transition-colors flex items-center gap-1.5 cursor-pointer font-bold ${
+                pathname?.startsWith('/explore') ? 'text-[#155DFC]' : 'text-neutral-600 hover:text-[#155DFC]'
+              }`}
             >
-              <span>Jelajah</span>
-              <ChevronDown className="w-3.5 h-3.5 transition-transform duration-200 text-neutral-500 group-hover/explore:rotate-180 group-hover/explore:text-[#155DFC]" />
+              <span>Explore</span>
             </button>
-
-            {exploreDropdownOpen && (
-              <div 
-                className="absolute top-full -left-20 w-[300px] bg-white rounded-[16px] border border-black/10 shadow-xl py-2 z-50 animate-in fade-in zoom-in-95 duration-150"
+          ) : (
+            <div 
+              className={`relative group/explore transition-all duration-300 ${isScrolled ? 'py-4' : 'py-6'}`}
+              onMouseEnter={() => setExploreDropdownOpen(true)}
+              onMouseLeave={() => setExploreDropdownOpen(false)}
+              ref={exploreDropdownRef}
+            >
+              <button
+                onClick={() => navigateTo('services', '/jelajah/layanan')}
+                className={`hover:text-[#155DFC] transition-colors flex items-center gap-1.5 cursor-pointer font-bold ${
+                  pathname?.startsWith('/jelajah') ? 'text-[#155DFC]' : 'text-[#0D0C22]'
+                } group-hover/explore:text-[#155DFC]`}
               >
-                <div className="px-3 py-1.5">
-                  <p className="text-[11px] font-bold text-neutral-400 uppercase tracking-wider px-3 mb-1">
-                    Eksplorasi Talenta
-                  </p>
-                  
-                  <button
-                    onClick={() => {
-                      setExploreDropdownOpen(false);
-                      navigateTo('services', '/explore/services');
-                    }}
-                    className="w-full px-3 py-2 text-left rounded-[10px] hover:bg-[#F3F3F4] text-xs font-semibold text-[#0D0C22] flex items-center gap-2.5 transition-colors group cursor-pointer"
-                  >
-                    <div className="w-7 h-7 rounded-[8px] bg-blue-50 text-[#155DFC] flex items-center justify-center group-hover:bg-[#155DFC] group-hover:text-white transition-colors">
-                      <Briefcase className="w-3.5 h-3.5" />
-                    </div>
-                    <div>
-                      <p className="font-bold">Layanan Kreator</p>
-                      <p className="text-[10px] text-neutral-500 font-normal">Temukan paket jasa siap kerja</p>
-                    </div>
-                  </button>
+                <span>Jelajah</span>
+                <ChevronDown className="w-3.5 h-3.5 transition-transform duration-200 text-neutral-500 group-hover/explore:rotate-180 group-hover/explore:text-[#155DFC]" />
+              </button>
 
-                  <button
-                    onClick={() => {
-                      setExploreDropdownOpen(false);
-                      navigateTo('projects', '/explore/projects');
-                    }}
-                    className="w-full px-3 py-2 text-left rounded-[10px] hover:bg-[#F3F3F4] text-xs font-semibold text-[#0D0C22] flex items-center gap-2.5 transition-colors group cursor-pointer"
-                  >
-                    <div className="w-7 h-7 rounded-[8px] bg-indigo-50 text-indigo-600 flex items-center justify-center group-hover:bg-indigo-600 group-hover:text-white transition-colors">
-                      <TrendingUp className="w-3.5 h-3.5" />
-                    </div>
-                    <div>
-                      <p className="font-bold">Portofolio Project</p>
-                      <p className="text-[10px] text-neutral-500 font-normal">Inspirasi karya kreator terverifikasi</p>
-                    </div>
-                  </button>
-                </div>
+              {exploreDropdownOpen && (
+                <div 
+                  className="absolute top-full -left-20 w-[300px] bg-white rounded-[16px] border border-black/10 shadow-xl py-2 z-50 animate-in fade-in zoom-in-95 duration-150"
+                >
+                  <div className="px-3 py-1.5">
+                    <p className="text-[11px] font-bold text-neutral-400 uppercase tracking-wider px-3 mb-1">
+                      Eksplorasi Talenta & Jasa
+                    </p>
+                    
+                    <button
+                      onClick={() => {
+                        setExploreDropdownOpen(false);
+                        navigateTo('services', '/jelajah/layanan');
+                      }}
+                      className="w-full px-3 py-2 text-left rounded-[10px] hover:bg-[#F3F3F4] text-xs font-semibold text-[#0D0C22] flex items-center gap-2.5 transition-colors group cursor-pointer"
+                    >
+                      <div className="w-7 h-7 rounded-[8px] bg-blue-50 text-[#155DFC] flex items-center justify-center group-hover:bg-[#155DFC] group-hover:text-white transition-colors">
+                        <Briefcase className="w-3.5 h-3.5" />
+                      </div>
+                      <div>
+                        <p className="font-bold">Layanan Kreator</p>
+                        <p className="text-[10px] text-neutral-500 font-normal">Temukan paket jasa siap kerja</p>
+                      </div>
+                    </button>
 
-                <div className="border-t border-black/5 my-1.5" />
+                    <button
+                      onClick={() => {
+                        setExploreDropdownOpen(false);
+                        navigateTo('projects', '/jelajah/proyek');
+                      }}
+                      className="w-full px-3 py-2 text-left rounded-[10px] hover:bg-[#F3F3F4] text-xs font-semibold text-[#0D0C22] flex items-center gap-2.5 transition-colors group cursor-pointer"
+                    >
+                      <div className="w-7 h-7 rounded-[8px] bg-indigo-50 text-indigo-600 flex items-center justify-center group-hover:bg-indigo-600 group-hover:text-white transition-colors">
+                        <TrendingUp className="w-3.5 h-3.5" />
+                      </div>
+                      <div>
+                        <p className="font-bold">Portofolio Project</p>
+                        <p className="text-[10px] text-neutral-500 font-normal">Inspirasi karya kreator terverifikasi</p>
+                      </div>
+                    </button>
 
-                <div className="px-3 py-1">
-                  <p className="text-[11px] font-bold text-neutral-400 uppercase tracking-wider px-3 mb-1.5">
-                    Kategori Populer
-                  </p>
-                  <div className="grid grid-cols-2 gap-1 px-1">
-                    {CATEGORY_ITEMS.slice(0, 4).map((cat) => (
-                      <button
-                        key={cat}
-                        onClick={() => {
-                          setExploreDropdownOpen(false);
-                          if (onSelectTag) onSelectTag(cat);
-                          router.push(`/explore/services?tag=${encodeURIComponent(cat)}`);
-                        }}
-                        className="px-2 py-1.5 text-left rounded-[6px] hover:bg-[#F3F3F4] text-[11px] font-medium text-neutral-600 hover:text-[#155DFC] truncate transition cursor-pointer"
-                      >
-                        {cat}
-                      </button>
-                    ))}
+                    <button
+                      onClick={() => {
+                        setExploreDropdownOpen(false);
+                        navigateTo('creator-profile', '/jelajah/kreator');
+                      }}
+                      className="w-full px-3 py-2 text-left rounded-[10px] hover:bg-[#F3F3F4] text-xs font-semibold text-[#0D0C22] flex items-center gap-2.5 transition-colors group cursor-pointer"
+                    >
+                      <div className="w-7 h-7 rounded-[8px] bg-emerald-50 text-emerald-600 flex items-center justify-center group-hover:bg-emerald-600 group-hover:text-white transition-colors">
+                        <UserCheck className="w-3.5 h-3.5" />
+                      </div>
+                      <div>
+                        <p className="font-bold">Profil Kreator</p>
+                        <p className="text-[10px] text-neutral-500 font-normal">Temukan kreator terverifikasi</p>
+                      </div>
+                    </button>
+                  </div>
+
+                  <div className="border-t border-black/5 my-1.5" />
+
+                  <div className="px-3 py-1">
+                    <p className="text-[11px] font-bold text-neutral-400 uppercase tracking-wider px-3 mb-1.5">
+                      Kategori Populer
+                    </p>
+                    <div className="grid grid-cols-2 gap-1 px-1">
+                      {CATEGORY_ITEMS.slice(0, 4).map((cat) => (
+                        <button
+                          key={cat}
+                          onClick={() => {
+                            setExploreDropdownOpen(false);
+                            if (onSelectTag) onSelectTag(cat);
+                            router.push(`/jelajah/layanan?tag=${encodeURIComponent(cat)}`);
+                          }}
+                          className="px-2 py-1.5 text-left rounded-[6px] hover:bg-[#F3F3F4] text-[11px] font-medium text-neutral-600 hover:text-[#155DFC] truncate transition cursor-pointer"
+                        >
+                          {cat}
+                        </button>
+                      ))}
+                    </div>
                   </div>
                 </div>
-              </div>
-            )}
-          </div>
+              )}
+            </div>
+          )}
 
           {/* Nav Link Brief Proyek */}
           <button
@@ -515,24 +550,55 @@ export const Navbar: React.FC<NavbarProps> = ({
             >
               Beranda
             </button>
-            <button
-              onClick={() => {
-                setMobileMenuOpen(false);
-                navigateTo('services', '/explore/services');
-              }}
-              className="py-2 text-left hover:text-blue-600 text-neutral-600"
-            >
-              Layanan Kreator
-            </button>
-            <button
-              onClick={() => {
-                setMobileMenuOpen(false);
-                navigateTo('projects', '/explore/projects');
-              }}
-              className="py-2 text-left hover:text-blue-600 text-neutral-600"
-            >
-              Portofolio Project
-            </button>
+            {isCreator ? (
+              <button
+                onClick={() => {
+                  setMobileMenuOpen(false);
+                  navigateTo('explore', '/explore');
+                }}
+                className={`py-2 text-left hover:text-blue-600 ${
+                  pathname?.startsWith('/explore') ? 'text-blue-600 font-bold' : 'text-neutral-600'
+                }`}
+              >
+                Explore
+              </button>
+            ) : (
+              <>
+                <button
+                  onClick={() => {
+                    setMobileMenuOpen(false);
+                    navigateTo('services', '/jelajah/layanan');
+                  }}
+                  className={`py-2 text-left hover:text-blue-600 ${
+                    pathname?.startsWith('/jelajah/layanan') ? 'text-blue-600 font-bold' : 'text-neutral-600'
+                  }`}
+                >
+                  Layanan Kreator
+                </button>
+                <button
+                  onClick={() => {
+                    setMobileMenuOpen(false);
+                    navigateTo('projects', '/jelajah/proyek');
+                  }}
+                  className={`py-2 text-left hover:text-blue-600 ${
+                    pathname?.startsWith('/jelajah/proyek') ? 'text-blue-600 font-bold' : 'text-neutral-600'
+                  }`}
+                >
+                  Portofolio Project
+                </button>
+                <button
+                  onClick={() => {
+                    setMobileMenuOpen(false);
+                    navigateTo('creator-profile', '/jelajah/kreator');
+                  }}
+                  className={`py-2 text-left hover:text-blue-600 ${
+                    pathname?.startsWith('/jelajah/kreator') ? 'text-blue-600 font-bold' : 'text-neutral-600'
+                  }`}
+                >
+                  Profil Kreator
+                </button>
+              </>
+            )}
             <button
               onClick={() => {
                 setMobileMenuOpen(false);

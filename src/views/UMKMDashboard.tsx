@@ -136,7 +136,7 @@ export const UMKMDashboard = () => {
             <p className="text-sm font-semibold text-primary">Pilih dari hasil nyata</p>
             <h2 id="category-heading" className="mt-1 text-2xl font-semibold sm:text-3xl">Mulai dari format yang kamu butuhkan</h2>
           </div>
-          <button onClick={() => router.push('/explore/projects')} className="hidden items-center gap-2 text-sm font-semibold text-[var(--ink)] hover:text-primary sm:flex">Semua karya <ArrowRight className="h-4 w-4" /></button>
+          <button onClick={() => router.push('/jelajah/proyek')} className="hidden items-center gap-2 text-sm font-semibold text-[var(--ink)] hover:text-primary sm:flex">Semua karya <ArrowRight className="h-4 w-4" /></button>
         </div>
 
         <div className="grid grid-cols-[repeat(5,minmax(220px,1fr))] gap-4 overflow-x-auto pb-3" role="list">
