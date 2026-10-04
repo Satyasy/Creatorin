@@ -40,6 +40,11 @@ export const SignUpPage: React.FC<Props> = ({ onNavigate, onLoginSuccess }) => {
     }
     login(result.user);
     onLoginSuccess?.(result.user);
+    if (result.user.role === 'school') {
+      onNavigate?.('school-dashboard');
+      router.push('/school/dashboard');
+      return;
+    }
     onNavigate?.('explore');
     router.push('/explore');
   };
