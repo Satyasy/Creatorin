@@ -1,6 +1,5 @@
 import { UserRole } from '@/types';
 import { createClient } from '@/lib/supabase/client';
-import { apiUrl } from '@/lib/api-config';
 
 export interface UserSession {
   id: string;
@@ -12,10 +11,6 @@ export interface UserSession {
   location?: string;
   phone?: string;
   bio?: string;
-  roleTitle?: string;
-  handle?: string;
-  skills?: string[];
-  startingPrice?: string;
 }
 
 export function mapRoleToFrontend(dbRole: string): UserRole {
@@ -32,41 +27,34 @@ export function mapRoleToBackend(feRole: UserRole): 'creator' | 'business' {
 export const authService = {
   async signInWithGoogle(role: Exclude<UserRole, 'school'> = 'umkm'): Promise<{ success: boolean; error?: string }> {
     const supabase = createClient();
-    localStorage.setItem('creatorin_oauth_role', mapRoleToBackend(role));
     const { error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {
-        redirectTo: `${window.location.origin}/auth/callback`,
+        redirectTo: `${window.location.origin}/auth/callback?role=${mapRoleToBackend(role)}`,
       },
     });
     return error ? { success: false, error: error.message } : { success: true };
   },
   async getCurrentUser(): Promise<UserSession | null> {
     try {
-      const res = await fetch(apiUrl('/api/auth/me'), {
-        credentials: 'include',
+      const res = await fetch('/api/auth/me', {
+        headers: { credentials: 'include' },
         cache: 'no-store',
       });
       if (!res.ok) return null;
       const data = await res.json();
       if (!data.user) return null;
 
-      const details = data.details || {};
-      const fallbackName = data.user.fullName || data.user.email.split('@')[0];
       return {
         id: data.user.id,
-        name: fallbackName,
+        name: data.user.fullName || data.user.email.split('@')[0],
         email: data.user.email,
         role: mapRoleToFrontend(data.user.role),
         dbRole: data.user.role,
-        avatar: data.user.avatarUrl || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=240&auto=format&fit=crop&q=80',
+        avatar: data.user.avatarUrl || '',
         location: data.user.location,
         phone: data.user.phone,
-        bio: details.bio || data.user.bio,
-        roleTitle: details.headline || (data.user.role === 'creator' ? 'Kreator Konten' : 'Brand / UMKM'),
-        handle: details.slug ? `@${details.slug}` : `@${fallbackName.toLowerCase().replace(/[^a-z0-9]/g, '')}`,
-        skills: details.skills || [],
-        startingPrice: details.startingPrice,
+        bio: data.details?.bio || data.details?.description || '',
       };
     } catch {
       return null;
@@ -75,10 +63,9 @@ export const authService = {
 
   async signIn(email: string, password: string):Promise<{ success: boolean; user?: UserSession; error?: string }> {
     try {
-      const res = await fetch(apiUrl('/api/auth/login'), {
+      const res = await fetch('/api/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
         body: JSON.stringify({ email, password }),
       });
       const data = await res.json();
@@ -92,7 +79,7 @@ export const authService = {
         email: data.user.email,
         role: mapRoleToFrontend(data.user.role),
         dbRole: data.user.role,
-        avatar: data.user.avatarUrl || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=240&auto=format&fit=crop&q=80',
+        avatar: data.user.avatarUrl || '',
       };
 
       return { success: true, user };
@@ -107,13 +94,12 @@ export const authService = {
     password: string;
     fullName: string;
     role: UserRole;
-  }): Promise<{ success: boolean; user?: UserSession; error?: string }> {
+  }): Promise<{ success: boolean; user?: UserSession; requiresConfirmation?: boolean; error?: string }> {
     try {
       const dbRole = mapRoleToBackend(params.role);
-      const res = await fetch(apiUrl('/api/auth/register'), {
+      const res = await fetch('/api/auth/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
         body: JSON.stringify({
           email: params.email,
           password: params.password,
@@ -132,10 +118,10 @@ export const authService = {
         email: data.user.email,
         role: params.role,
         dbRole,
-        avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=240&auto=format&fit=crop&q=80',
+        avatar: '',
       };
 
-      return { success: true, user };
+      return { success: true, user, requiresConfirmation: Boolean(data.requiresConfirmation) };
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : 'Terjadi kendala saat registrasi.';
       return { success: false, error: msg };
@@ -144,10 +130,9 @@ export const authService = {
 
   async completeOnboarding(payload: Record<string, unknown>): Promise<{ success: boolean; error?: string }> {
     try {
-      const res = await fetch(apiUrl('/api/onboarding'), {
+      const res = await fetch('/api/onboarding', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
         body: JSON.stringify(payload),
       });
       const data = await res.json();
@@ -160,33 +145,4 @@ export const authService = {
       return { success: false, error: msg };
     }
   },
-
-  async updateProfile(payload: {
-    fullName?: string;
-    phone?: string;
-    location?: string;
-    avatarUrl?: string;
-    headline?: string;
-    bio?: string;
-    skills?: string[];
-    startingPrice?: string;
-  }): Promise<{ success: boolean; message?: string; error?: string }> {
-    try {
-      const res = await fetch('/api/profile', {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify(payload),
-      });
-      const data = await res.json();
-      if (!res.ok) {
-        return { success: false, error: data.error || 'Gagal memperbarui profil.' };
-      }
-      return { success: true, message: data.message || 'Profil berhasil diperbarui.' };
-    } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : 'Terjadi kendala saat memperbarui profil.';
-      return { success: false, error: msg };
-    }
-  },
 };
-

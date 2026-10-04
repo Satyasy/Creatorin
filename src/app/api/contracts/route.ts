@@ -3,15 +3,14 @@ import { and, desc, eq } from 'drizzle-orm';
 import { getAuthenticatedUser } from '@/lib/api-auth';
 import { getDb } from '@/lib/db';
 import { briefApplications, businessProfiles, profiles, projectBriefs } from '@/lib/db/schema';
-import { MOCK_PROJECTS } from '@/data/mockProjects';
 
 export async function GET(req: NextRequest) {
   const user = await getAuthenticatedUser(req);
-  if (!user) return NextResponse.json({ contracts: demoContracts(), demo: true });
+  if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   if (user.role !== 'creator') return NextResponse.json({ error: 'Creator only' }, { status: 403 });
 
   const db = getDb();
-  if (!db) return NextResponse.json({ contracts: demoContracts(), demo: true });
+  if (!db) return NextResponse.json({ error: 'Database not connected' }, { status: 503 });
 
   try {
     const contracts = await db
@@ -45,22 +44,4 @@ export async function GET(req: NextRequest) {
     const message = err instanceof Error ? err.message : 'Gagal memuat daftar lamaran.';
     return NextResponse.json({ error: message }, { status: 500 });
   }
-}
-
-function demoContracts() {
-  return MOCK_PROJECTS.slice(0, 4).map((brief, index) => ({
-    id: `demo-contract-${brief.id}`,
-    briefId: brief.id,
-    status: index === 0 ? 'accepted' : 'pending',
-    proposedPrice: index === 0 ? 'Rp2.000.000' : brief.formattedBudget,
-    appliedAt: undefined,
-    title: brief.title,
-    category: brief.category,
-    description: brief.description,
-    budget: brief.formattedBudget,
-    deadline: brief.deadline,
-    businessName: brief.clientName,
-    businessAvatar: brief.clientAvatar,
-    businessLocation: brief.clientLocation,
-  }));
 }

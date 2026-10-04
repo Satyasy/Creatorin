@@ -229,7 +229,7 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({ creator, isOpen = tr
                 {creator.services.map((srv, idx) => {
                   const imageSrc = srv.coverImage || 
                     creator.portfolioSamples?.[idx % (creator.portfolioSamples?.length || 1)]?.thumbnail ||
-                    'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&auto=format&fit=crop&q=80';
+                    '';
 
                   return (
                     <div
@@ -241,11 +241,7 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({ creator, isOpen = tr
                       className="group/modalsrv flex flex-col cursor-pointer text-left select-none"
                     >
                       <div className="aspect-[4/3] w-full rounded-2xl overflow-hidden bg-neutral-900 relative shadow-2xs group-hover/modalsrv:shadow-md transition-all duration-300">
-                        <img
-                          src={imageSrc}
-                          alt={srv.title}
-                          className="w-full h-full object-cover "
-                        />
+                        {imageSrc && <img src={imageSrc} alt={srv.title} className="w-full h-full object-cover" />}
                         <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent opacity-0 group-hover/modalsrv:opacity-100 transition-opacity duration-300" />
                         {srv.tag && (
                           <div className="absolute top-2.5 left-2.5 bg-black/60 backdrop-blur-md text-white text-[10px] font-semibold px-2.5 py-0.5 rounded-full shadow-2xs">

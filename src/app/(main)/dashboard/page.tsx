@@ -8,14 +8,14 @@ import { UMKMDashboard } from '@/views/UMKMDashboard';
 import { SchoolDashboardPage } from '@/views/SchoolDashboardPage';
 
 export default function DashboardIndexRoute() {
-  const { user, isAuthenticated } = useAuth();
+  const { user, isAuthenticated, isLoading } = useAuth();
   const router = useRouter();
 
   useEffect(() => {
-    if (!isAuthenticated && !user) {
+    if (!isLoading && !isAuthenticated && !user) {
       router.replace('/');
     }
-  }, [isAuthenticated, user, router]);
+  }, [isAuthenticated, isLoading, user, router]);
 
   if (!user) {
     return (

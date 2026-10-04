@@ -1,45 +1,47 @@
 import { AppNotification } from '@/types';
-import { apiUrl } from '@/lib/api-config';
 
 export const notificationService = {
   async getNotifications(): Promise<AppNotification[]> {
-    try {
-      const res = await fetch(apiUrl('/api/notifications'), {
-        credentials: 'include',
-        cache: 'no-store',
-      });
-      if (res.ok) {
-        const data = await res.json();
-        if (Array.isArray(data.notifications) && data.notifications.length > 0) {
-          return data.notifications.map((n: any): AppNotification => ({
-            id: n.id,
-            type: n.type || 'system',
-            title: n.title,
-            description: n.body,
-            timeAgo: new Date(n.createdAt).toLocaleDateString('id-ID', { month: 'short', day: 'numeric' }),
-            read: Boolean(n.isRead),
-            actionUrl: n.linkUrl,
-          }));
-        }
-      }
-    } catch {
-      // Fallback
-    }
-    return [];
+    const res = await fetch('/api/notifications', { cache: 'no-store' });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Gagal memuat notifikasi');
+    return (data.notifications || []).map((n: any): AppNotification => {
+      const createdAt = new Date(n.createdAt);
+      const age = Date.now() - createdAt.getTime();
+      return {
+        id: n.id,
+        type: n.type || 'system',
+        title: n.title,
+        description: n.body,
+        timeAgo: createdAt.toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' }),
+        read: Boolean(n.isRead),
+        actionUrl: n.linkUrl,
+        category: n.type === 'message' ? 'messages' : n.type === 'invoice' ? 'transactions' : ['submission', 'approval', 'revision', 'collaboration'].includes(n.type) ? 'collaboration' : 'general',
+        timeGroup: age < 86_400_000 ? 'today' : age < 172_800_000 ? 'yesterday' : 'earlier',
+      };
+    });
   },
 
   async markAsRead(id: string): Promise<boolean> {
     try {
-      const res = await fetch(apiUrl('/api/notifications'), {
+      const res = await fetch('/api/notifications', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
         body: JSON.stringify({ id, isRead: true }),
       });
       return res.ok;
     } catch {
       return false;
     }
+  },
+
+  async markAllAsRead(): Promise<boolean> {
+    const res = await fetch('/api/notifications', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: '{}',
+    });
+    return res.ok;
   },
 
   async updateSettings(payload: {
@@ -51,10 +53,9 @@ export const notificationService = {
     notifyPush?: boolean;
   }): Promise<{ success: boolean; error?: string }> {
     try {
-      const res = await fetch(apiUrl('/api/account/settings'), {
+      const res = await fetch('/api/account/settings', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
         body: JSON.stringify(payload),
       });
       const data = await res.json();

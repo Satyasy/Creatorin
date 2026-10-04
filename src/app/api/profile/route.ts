@@ -80,29 +80,32 @@ export async function PUT(req: NextRequest) {
   const { fullName, phone, location, avatarUrl, headline, bio, skills, startingPrice } = body;
 
   try {
-    if (fullName || phone || location || avatarUrl) {
+    if (fullName !== undefined || phone !== undefined || location !== undefined || avatarUrl !== undefined) {
       await db
         .update(profiles)
         .set({
-          fullName: fullName || undefined,
-          phone: phone || undefined,
-          location: location || undefined,
-          avatarUrl: avatarUrl || undefined,
+          fullName: fullName !== undefined ? fullName : undefined,
+          phone: phone !== undefined ? phone : undefined,
+          location: location !== undefined ? location : undefined,
+          avatarUrl: avatarUrl !== undefined ? avatarUrl : undefined,
           updatedAt: new Date(),
         })
         .where(eq(profiles.id, user.id));
     }
 
-    if (user.role === "creator" && (headline || bio || skills || startingPrice)) {
+    if (user.role === "creator" && (headline !== undefined || bio !== undefined || skills !== undefined || startingPrice !== undefined)) {
       await db
         .update(creatorProfiles)
         .set({
-          headline: headline || undefined,
-          bio: bio || undefined,
-          skills: skills || undefined,
-          startingPrice: startingPrice || undefined,
+          headline: headline !== undefined ? headline : undefined,
+          bio: bio !== undefined ? bio : undefined,
+          skills: skills !== undefined ? skills : undefined,
+          startingPrice: startingPrice !== undefined ? startingPrice : undefined,
         })
         .where(eq(creatorProfiles.profileId, user.id));
+    }
+    if (user.role === "business" && bio !== undefined) {
+      await db.update(businessProfiles).set({ description: bio }).where(eq(businessProfiles.profileId, user.id));
     }
 
     // Invalidate cached profiles, creator listings, and user session details

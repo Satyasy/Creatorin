@@ -13,11 +13,6 @@ const CreatorinChatbot = dynamic(
   { ssr: false }
 );
 
-const RoleSwitcher = dynamic(
-  () => import('@/components/common/RoleSwitcher').then((mod) => mod.RoleSwitcher),
-  { ssr: false }
-);
-
 export default function MainLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const { user } = useAuth();
@@ -56,7 +51,6 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
       </div>
       {!hideFooter && !isCreatorShell && !isSchoolShell && !isStandaloneExplore && <Footer />}
       {!isCreatorShell && !isSchoolShell && !isStandaloneExplore && <CreatorinChatbot />}
-      <RoleSwitcher />
     </div>
   );
 }

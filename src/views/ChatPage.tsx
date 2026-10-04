@@ -27,7 +27,7 @@ import {
 } from 'lucide-react';
 import { InvoiceDetailPage } from './InvoiceDetailPage';
 import { ActivePage, AuthState, ChatConversation, ChatInvoice, ChatMessage, Creator, CreatorService } from '@/types';
-import { MOCK_CREATORS } from '@/data/mockCreators';
+import { toCreator } from '@/services/creatorService';
 import { chatService } from '@/services/chatService';
 import { aiSummarizeService } from '@/services/aiSummarizeService';
 
@@ -37,241 +37,6 @@ interface ChatPageProps {
   onNavigate?: (page: ActivePage) => void;
   onViewCreatorProfile?: (creator: Creator) => void;
 }
-
-// Data awal percakapan yang mencerminkan alur percakapan, negosiasi, dan invoice resmi Creatorin
-const INITIAL_CONVERSATIONS: ChatConversation[] = [
-  {
-    id: 'conv-cr-1',
-    creatorId: 'cr-1',
-    name: 'Sobakhul Munir Siroj',
-    roleTitle: 'Product Designer & Framer Architect',
-    avatar: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=240&auto=format&fit=crop&q=80',
-    verified: true,
-    online: true,
-    lastSeen: 'Online',
-    lastMessage: 'Berikut invoice resmi untuk pengerjaan project ini.',
-    lastMessageTime: '10:45',
-    unreadCount: 1,
-    rate: 'Rp1.500.000/proyek',
-    category: 'UI/UX & Framer',
-    messages: [
-      {
-        id: 'm1-1',
-        senderId: 'user',
-        text: 'Halo Mas Munir, kami tertarik dengan layanan Premium Figma SaaS Landing Page untuk brand kami.',
-        timestamp: '10:30',
-        isSelf: true,
-        status: 'read',
-        serviceInquiry: {
-          id: 'srv-1-1',
-          title: 'Premium Figma SaaS Landing Page Template',
-          price: 1500000,
-          formattedPrice: 'Rp1.500.000',
-          deliveryDays: '2 Hari Kerja',
-          tag: 'Figma Template',
-          coverImage: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&auto=format&fit=crop&q=80',
-          description: 'Desain antarmuka landing page SaaS modern 20+ komponen responsif, auto-layout rapi, dan panduan variabel warna token.'
-        }
-      },
-      {
-        id: 'm1-2',
-        senderId: 'cr-1',
-        text: 'Halo! Terima kasih sudah menghubungi. Untuk paket ini sudah termasuk 20+ komponen responsif, auto-layout rapi, dan panduan variabel warna.',
-        timestamp: '10:35',
-        isSelf: false,
-        status: 'read'
-      },
-      {
-        id: 'm1-3',
-        senderId: 'user',
-        text: 'Bagus sekali. Apakah bisa diselaraskan dengan palet warna brand kami?',
-        timestamp: '10:38',
-        isSelf: true,
-        status: 'read'
-      },
-      {
-        id: 'm1-4',
-        senderId: 'cr-1',
-        text: 'Sangat bisa kak! Saya sudah siapkan style guide terpisah agar tinggal switch token warna.',
-        timestamp: '10:42',
-        isSelf: false,
-        status: 'read',
-        attachment: {
-          type: 'image',
-          url: 'https://images.unsplash.com/photo-1507238691740-187a5b1d37b8?w=800&auto=format&fit=crop&q=80',
-          name: 'Preview_Figma_Design_v1.png',
-          size: '2.4 MB'
-        }
-      },
-      {
-        id: 'm1-5',
-        senderId: 'user',
-        text: 'Baik Mas Munir, kami sepakat dengan scope pengerjaan dan harganya. Silakan terbitkan invoice ya agar bisa kami proses ke Escrow.',
-        timestamp: '10:44',
-        isSelf: true,
-        status: 'read'
-      },
-      {
-        id: 'm1-6',
-        senderId: 'cr-1',
-        text: 'Siap kak, terima kasih atas kepercayaannya! Berikut invoice resmi untuk pengerjaan project ini. Setelah pembayaran masuk ke escrow, Collaboration Room akan otomatis aktif.',
-        timestamp: '10:45',
-        isSelf: false,
-        status: 'delivered',
-        invoice: {
-          id: 'INV-882194',
-          serviceTitle: 'Premium Figma SaaS Landing Page Template',
-          amount: 'Rp1.500.000',
-          status: 'unpaid',
-          dueDate: '24 Jam',
-          scopeSummary: '1 Proyek • Estimasi 2 Hari Kerja • 20+ Komponen Responsif & Style Guide'
-        }
-      }
-    ]
-  },
-  {
-    id: 'conv-cr-3',
-    creatorId: 'cr-3',
-    name: 'Maya Angelina',
-    roleTitle: 'Beauty & Lifestyle UGC Creator',
-    avatar: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=240&auto=format&fit=crop&q=80',
-    verified: true,
-    online: true,
-    lastSeen: 'Online',
-    lastMessage: 'Draft hook video TikTok sudah saya sesuaikan dengan brief ya.',
-    lastMessageTime: 'Kemarin',
-    unreadCount: 0,
-    rate: 'Rp450.000/video',
-    category: 'Video UGC',
-    messages: [
-      {
-        id: 'm3-1',
-        senderId: 'user',
-        text: 'Halo Maya! Kami ingin diskusi mengenai paket video UGC untuk produk serum brightening.',
-        timestamp: '14:10',
-        isSelf: true,
-        status: 'read',
-        serviceInquiry: {
-          id: 'srv-3-1',
-          title: '1x Video UGC Skincare & Beauty Routine',
-          price: 450000,
-          formattedPrice: 'Rp450.000',
-          deliveryDays: '2 Hari Kerja',
-          tag: 'UGC Video',
-          coverImage: 'https://images.unsplash.com/photo-1574717024653-61fd2cf4d44d?w=800&auto=format&fit=crop&q=80'
-        }
-      },
-      {
-        id: 'm3-2',
-        senderId: 'cr-3',
-        text: 'Halo kak! Senang bisa terhubung. Tekstur serumnya pas banget untuk konsep visual morning glow routine.',
-        timestamp: '14:20',
-        isSelf: false,
-        status: 'read'
-      }
-    ]
-  },
-  {
-    id: 'conv-cr-2',
-    creatorId: 'cr-2',
-    name: 'Phenomenon Creative',
-    roleTitle: 'Brand Strategy & Digital Visual',
-    avatar: 'https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?w=240&auto=format&fit=crop&q=80',
-    verified: true,
-    online: false,
-    lastSeen: '1 jam lalu',
-    lastMessage: '3 konsep alternatif identitas visual sudah selesai kami susun.',
-    lastMessageTime: '13 Sep',
-    unreadCount: 0,
-    rate: 'Rp1.200.000/proyek',
-    category: 'Branding',
-    messages: [
-      {
-        id: 'm2-1',
-        senderId: 'cr-2',
-        text: '3 konsep alternatif identitas visual sudah selesai kami susun. Siap kami kirimkan untuk sesi feedback.',
-        timestamp: '11:15',
-        isSelf: false,
-        status: 'read'
-      }
-    ]
-  },
-  {
-    id: 'conv-cr-4',
-    creatorId: 'cr-4',
-    name: 'Rian Prasetyo',
-    roleTitle: 'FnB & Culinary Storytelling',
-    avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=240&auto=format&fit=crop&q=80',
-    verified: true,
-    online: false,
-    lastSeen: 'Kemarin',
-    lastMessage: 'Siap kak, jadwal take video ASMR b-roll kopi sudah saya jadwalkan.',
-    lastMessageTime: '12 Sep',
-    unreadCount: 0,
-    rate: 'Rp350.000/video',
-    category: 'FnB Video',
-    messages: [
-      {
-        id: 'm4-1',
-        senderId: 'cr-4',
-        text: 'Siap kak, jadwal take video ASMR b-roll kopi sudah saya jadwalkan.',
-        timestamp: '17:30',
-        isSelf: false,
-        status: 'read'
-      }
-    ]
-  },
-  {
-    id: 'conv-cr-5',
-    creatorId: 'cr-5',
-    name: 'Annisa Putri Rahayu',
-    roleTitle: 'Product Catalog Photographer',
-    avatar: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=240&auto=format&fit=crop&q=80',
-    verified: false,
-    online: false,
-    lastSeen: '3 hari lalu',
-    lastMessage: 'Hasil foto produk lookbook siap diunduh via Google Drive.',
-    lastMessageTime: '10 Sep',
-    unreadCount: 0,
-    rate: 'Rp250.000/sesi',
-    category: 'Fotografi',
-    messages: [
-      {
-        id: 'm5-1',
-        senderId: 'cr-5',
-        text: 'Hasil foto produk lookbook siap diunduh via Google Drive resolusi penuh.',
-        timestamp: '13:00',
-        isSelf: false,
-        status: 'read'
-      }
-    ]
-  },
-  {
-    id: 'conv-cr-6',
-    creatorId: 'cr-6',
-    name: 'Dimas Wicaksono',
-    roleTitle: 'Tech Reviewer UGC',
-    avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=240&auto=format&fit=crop&q=80',
-    verified: true,
-    online: false,
-    lastSeen: '5 hari lalu',
-    lastMessage: 'Unit gadget sudah diterima di studio dengan aman.',
-    lastMessageTime: '8 Sep',
-    unreadCount: 0,
-    rate: 'Rp500.000/video',
-    category: 'Tech UGC',
-    messages: [
-      {
-        id: 'm6-1',
-        senderId: 'cr-6',
-        text: 'Unit gadget sudah diterima di studio dengan aman. Besok langsung masuk tahap unboxing.',
-        timestamp: '15:20',
-        isSelf: false,
-        status: 'read'
-      }
-    ]
-  }
-];
 
 export const ChatPage: React.FC<ChatPageProps> = ({
   currentUser: propUser,
@@ -292,7 +57,7 @@ export const ChatPage: React.FC<ChatPageProps> = ({
     if (onViewCreatorProfile) onViewCreatorProfile(creator);
     else router.push(`/creator/${creator.id}`);
   };
-  const [conversations, setConversations] = useState<ChatConversation[]>(INITIAL_CONVERSATIONS);
+  const [conversations, setConversations] = useState<ChatConversation[]>([]);
   const [activeChatId, setActiveChatId] = useState<string | null>(null);
   const [inputText, setInputText] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
@@ -322,7 +87,7 @@ export const ChatPage: React.FC<ChatPageProps> = ({
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const activeConversation = activeChatId ? (conversations.find(c => c.id === activeChatId) || null) : null;
-  const activeCreator = activeConversation ? (MOCK_CREATORS.find(cr => cr.id === activeConversation.creatorId) || null) : null;
+  const activeCreator = activeConversation ? toCreator({ id: activeConversation.creatorId, fullName: activeConversation.name, avatarUrl: activeConversation.avatar, headline: activeConversation.roleTitle }) : null;
 
   // State untuk AI Summarize Obrolan di Bar Kanan
   const [chatSummaryData, setChatSummaryData] = useState<{
@@ -370,15 +135,7 @@ export const ChatPage: React.FC<ChatPageProps> = ({
 
   // 1. Fetch conversations from live database with fallback
   useEffect(() => {
-    chatService.getConversations().then((dbConvs) => {
-      if (dbConvs && dbConvs.length > 0) {
-        setConversations(prev => {
-          const existingIds = new Set(prev.map(p => p.id));
-          const newFromDb = dbConvs.filter(d => !existingIds.has(d.id));
-          return [...newFromDb, ...prev];
-        });
-      }
-    });
+    chatService.getConversations().then(setConversations).catch(() => setConversations([]));
   }, []);
 
   // 2. Realtime listener for active database conversation
@@ -388,7 +145,7 @@ export const ChatPage: React.FC<ChatPageProps> = ({
     if (!isDbConversation) return;
 
     // Load initial messages for DB conversation
-    chatService.getMessages(activeChatId, currentUser?.name).then((msgs) => {
+    chatService.getMessages(activeChatId, currentUser?.id).then((msgs) => {
       if (msgs && msgs.length > 0) {
         setConversations(prev => prev.map(c => c.id === activeChatId ? { ...c, messages: msgs } : c));
       }
@@ -428,12 +185,14 @@ export const ChatPage: React.FC<ChatPageProps> = ({
   }, [activeConversation?.messages]);
 
   // Kirim pesan teks sederhana
-  const handleSendMessage = (textToSend?: string) => {
+  const handleSendMessage = async (textToSend?: string) => {
     const messageContent = (textToSend !== undefined ? textToSend : inputText).trim();
-    if (!messageContent) return;
+    if (!messageContent || !activeChatId) return;
+    const result = await chatService.sendMessage(activeChatId, messageContent);
+    if (!result.success) { alert(result.error || 'Gagal mengirim pesan.'); return; }
 
     const newMessage: ChatMessage = {
-      id: `msg-${Date.now()}`,
+      id: result.message?.id || `msg-${Date.now()}`,
       senderId: 'user',
       text: messageContent,
       timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
@@ -455,118 +214,12 @@ export const ChatPage: React.FC<ChatPageProps> = ({
 
     setInputText('');
 
-    // If connected to a real database conversation, persist to server
-    if (activeChatId && activeChatId.length > 20 && !activeChatId.startsWith('conv-')) {
-      chatService.sendMessage(activeChatId, messageContent).catch(() => {});
-      return;
-    }
-
-    // Simulasi respon kontekstual kreator (untuk demo mock)
-    setTimeout(() => {
-      setConversations(prev => prev.map(conv => {
-        if (conv.id === activeChatId) {
-          const autoReply: ChatMessage = {
-            id: `reply-${Date.now()}`,
-            senderId: conv.creatorId,
-            text: 'Baik kak, pesan sudah saya terima. Saya pelajari dan segera saya tindak lanjuti.',
-            timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-            isSelf: false,
-            status: 'delivered'
-          };
-          return {
-            ...conv,
-            lastMessage: autoReply.text,
-            lastMessageTime: 'Baru saja',
-            messages: [...conv.messages, autoReply]
-          };
-        }
-        return conv;
-      }));
-    }, 1200);
   };
 
-  // Masukkan diskusi layanan dari sidebar kanan ke room chat (fokus diskusi & negosiasi, bukan checkout)
   const handleDiscussService = (service: CreatorService) => {
     if (!activeCreator || !activeChatId) return;
-    const serviceMessage: ChatMessage = {
-      id: `srv-${Date.now()}`,
-      senderId: 'user',
-      text: `Halo ${activeCreator.name}, saya tertarik mendiskusikan layanan "${service.title}" (${service.formattedPrice}). Apakah slot pengerjaan tersedia dan bisa disesuaikan dengan brief brand kami?`,
-      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-      isSelf: true,
-      status: 'sent',
-      serviceInquiry: service
-    };
-
-    setConversations(prev => prev.map(conv => {
-      if (conv.id === activeChatId) {
-        return {
-          ...conv,
-          lastMessage: `Mendiskusikan: ${service.title}`,
-          lastMessageTime: 'Baru saja',
-          messages: [...conv.messages, serviceMessage]
-        };
-      }
-      return conv;
-    }));
-
+    void handleSendMessage(`Halo ${activeCreator.name}, saya ingin mendiskusikan layanan "${service.title}" (${service.formattedPrice}).`);
     setIsRightSidebarOpenMobile(false);
-
-    // Respon otomatis kreator: menawarkan diskusi brief & siap membuatkan invoice jika deal
-    setTimeout(() => {
-      setConversations(prev => prev.map(conv => {
-        if (conv.id === activeChatId) {
-          const autoReply: ChatMessage = {
-            id: `reply-srv-${Date.now()}`,
-            senderId: conv.creatorId,
-            text: `Halo kak! Untuk layanan "${service.title}" slot pengerjaan tersedia (estimasi ${service.deliveryDays || '2-3 hari kerja'}). Boleh bagikan referensi atau brief detailnya? Jika scope sudah cocok, saya akan langsung terbitkan invoice resmi di sini agar terlindungi Creatorin Escrow.`,
-            timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-            isSelf: false,
-            status: 'delivered'
-          };
-          return {
-            ...conv,
-            lastMessage: autoReply.text,
-            lastMessageTime: 'Baru saja',
-            messages: [...conv.messages, autoReply]
-          };
-        }
-        return conv;
-      }));
-    }, 1200);
-  };
-
-  // Creator membuat invoice di room chat ketika kesepakatan tercapai
-  const handleCreateDraftInvoice = (service: CreatorService) => {
-    if (!activeConversation || !activeChatId) return;
-    const invoiceMsg: ChatMessage = {
-      id: `inv-${Date.now()}`,
-      senderId: activeConversation.creatorId,
-      text: `Saya telah menerbitkan invoice resmi untuk pengerjaan "${service.title}". Silakan periksa rincian dan selesaikan pembayaran escrow untuk langsung mengaktifkan Collaboration Room.`,
-      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-      isSelf: false,
-      status: 'delivered',
-      invoice: {
-        id: `INV-${Math.floor(100000 + Math.random() * 900000)}`,
-        serviceTitle: service.title,
-        amount: service.formattedPrice,
-        status: 'unpaid',
-        dueDate: '24 Jam',
-        scopeSummary: `1 Proyek • Estimasi ${service.deliveryDays || '2-3 Hari Kerja'} • Termasuk Revisi Terarah`
-      }
-    };
-
-    setConversations(prev => prev.map(conv => {
-      if (conv.id === activeChatId) {
-        return {
-          ...conv,
-          lastMessage: `Invoice diterbitkan: ${service.title}`,
-          lastMessageTime: 'Baru saja',
-          messages: [...conv.messages, invoiceMsg]
-        };
-      }
-      return conv;
-    }));
   };
 
   // Membuka Halaman Detail Invoice resmi yang memuat Barcode & Beragam Metode Pembayaran
@@ -574,9 +227,9 @@ export const ChatPage: React.FC<ChatPageProps> = ({
     setActiveInvoiceDetail({
       invoice,
       messageId,
-      creatorName: activeConversation?.name || 'Sobakhul Munir Siroj',
-      creatorRole: activeConversation?.roleTitle || 'Product Designer & Framer Architect',
-      creatorAvatar: activeConversation?.avatar || 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=240&auto=format&fit=crop&q=80'
+      creatorName: activeConversation?.name || '',
+      creatorRole: activeConversation?.roleTitle || '',
+      creatorAvatar: activeConversation?.avatar || ''
     });
   };
 

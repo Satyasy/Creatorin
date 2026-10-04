@@ -9,12 +9,15 @@ export type AuthUser = {
   email: string;
   role: "creator" | "business" | "school";
   fullName: string;
+  avatarUrl?: string | null;
+  location?: string | null;
+  phone?: string | null;
 };
 
 export async function getAuthenticatedUser(req: NextRequest): Promise<AuthUser | null> {
   // 1. Check for testing/development override header
   const devUserId = req.headers.get("x-user-id");
-  if (devUserId) {
+  if (process.env.NODE_ENV === "test" && devUserId) {
     if (devUserId === "33333333-3333-3333-3333-333333333333") {
       return {
         id: devUserId,
@@ -93,6 +96,7 @@ export async function getAuthenticatedUser(req: NextRequest): Promise<AuthUser |
         if (profile) {
           userRole = profile.role;
           fullName = profile.fullName;
+          return { id: user.id, email: user.email || "", role: userRole, fullName, avatarUrl: profile.avatarUrl, location: profile.location, phone: profile.phone };
         }
       } catch (err) {
         console.warn("Profile fetch fallback:", err);

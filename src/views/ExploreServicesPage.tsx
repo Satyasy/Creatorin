@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/providers/AuthProvider';
 import { 
@@ -28,7 +28,7 @@ import { CareerScoreBadge } from '@/components/common/CareerScoreBadge';
 import { ServiceDetailModal } from '@/components/modals/ServiceDetailModal';
 import { ServiceFilterModal, FilterState } from '@/components/modals/ServiceFilterModal';
 import { ScrollReveal } from '@/components/common/ScrollReveal';
-import { MOCK_CREATORS } from '@/data/mockCreators';
+import { toCreator } from '@/services/creatorService';
 import { ActivePage, AuthState, Creator, CreatorService } from '@/types';
 
 interface ExploreServicesPageProps {
@@ -167,19 +167,19 @@ export const ExploreServicesPage: React.FC<ExploreServicesPageProps> = ({
   ]);
 
   // Aggregate all services from all creators
-  const allServices: ServiceWithCreator[] = useMemo(() => {
-    const list: ServiceWithCreator[] = [];
-    MOCK_CREATORS.forEach((cr) => {
-      if (cr.services && cr.services.length > 0) {
-        cr.services.forEach((srv) => {
-          list.push({
-            ...srv,
-            creator: cr
-          });
-        });
-      }
-    });
-    return list;
+  const [allServices, setAllServices] = useState<ServiceWithCreator[]>([]);
+  useEffect(() => {
+    fetch('/api/services', { cache: 'no-store' }).then(async (response) => {
+      if (!response.ok) throw new Error('Gagal memuat layanan.');
+      const data = await response.json();
+      setAllServices((data.services || []).map((service: any) => ({
+        id: service.id, title: service.title, price: service.priceNumeric || 0,
+        formattedPrice: service.price || '', deliveryDays: service.estimatedDays || '',
+        description: service.description || '', coverImage: service.imageUrl || '',
+        tag: service.category || '',
+        creator: toCreator({ id: service.creatorId, fullName: service.creatorName, avatarUrl: service.creatorAvatar, slug: service.creatorSlug }),
+      })));
+    }).catch(() => setAllServices([]));
   }, []);
 
   // Filter and Sort services
@@ -613,10 +613,10 @@ export const ExploreServicesPage: React.FC<ExploreServicesPageProps> = ({
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5 sm:gap-6">
               {filteredServices.map((item, sIdx) => {
-                const coverImage = item.coverImage || 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&auto=format&fit=crop&q=80';
+                const coverImage = item.coverImage || '';
                 const formattedDelivery = item.deliveryDays
                   ? (item.deliveryDays.toLowerCase().includes('hari') ? item.deliveryDays : `${item.deliveryDays} Hari Kerja`)
-                  : '2-3 Hari Kerja';
+                  : 'Belum ditentukan';
 
                 return (
                   <ScrollReveal
@@ -635,13 +635,7 @@ export const ExploreServicesPage: React.FC<ExploreServicesPageProps> = ({
                         className="aspect-[16/10] rounded-xl overflow-hidden bg-[#F3F3F4] mb-4 cursor-pointer"
                         title="Klik untuk melihat detail layanan"
                       >
-                        <img
-                          src={coverImage}
-                          alt={item.title}
-                          className="w-full h-full object-cover"
-                          loading="lazy"
-                          referrerPolicy="no-referrer"
-                        />
+                        {coverImage && <img src={coverImage} alt={item.title} className="w-full h-full object-cover" loading="lazy" referrerPolicy="no-referrer" />}
                       </div>
 
                       {/* Tag & Creator Attribution Header */}

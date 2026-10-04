@@ -19,19 +19,8 @@ export const SignInPage: React.FC<Props> = ({ onNavigate, onLoginSuccess }) => {
     event.preventDefault(); setLoading(true); setError('');
     const result = await authService.signIn(email.trim(), password);
     if (!result.success || !result.user) {
-      const inputLower = email.toLowerCase();
-      const isCreator = inputLower.includes('creator') || inputLower.includes('maya') || inputLower.includes('munir') || inputLower.includes('revano');
-      const isSchool = inputLower.includes('school') || inputLower.includes('sekolah') || inputLower.includes('smk');
-      const role = isSchool ? 'school' : isCreator ? 'creator' : 'umkm';
-      const demoUser: NonNullable<AuthState['user']> = {
-        name: email.includes('@') ? email.split('@')[0] : 'Demo User',
-        email: email.trim() || 'demo@creatorin.id',
-        role: role as any,
-        avatar: isCreator
-          ? 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=240&auto=format&fit=crop&q=80'
-          : 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=240&auto=format&fit=crop&q=80',
-      };
-      login(demoUser); onLoginSuccess?.(demoUser); onNavigate?.('explore'); router.push('/explore');
+      setError(result.error || 'Email atau kata sandi tidak sesuai.');
+      setLoading(false);
       return;
     }
     login(result.user); onLoginSuccess?.(result.user); onNavigate?.('explore'); router.push('/explore');

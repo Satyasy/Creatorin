@@ -1,12 +1,14 @@
 import React, { useState } from 'react';
 import { X, Send, CheckCircle2, ShieldCheck } from 'lucide-react';
 import { Creator } from '@/types';
+import { briefService } from '@/services/briefService';
 
 interface ProjectBriefModalProps {
   isOpen: boolean;
   onClose: () => void;
   targetCreator?: Creator | null;
   preselectedCreator?: Creator | null;
+  onSuccess?: () => void;
 }
 
 export const ProjectBriefModal: React.FC<ProjectBriefModalProps> = ({
@@ -14,6 +16,7 @@ export const ProjectBriefModal: React.FC<ProjectBriefModalProps> = ({
   onClose,
   targetCreator,
   preselectedCreator,
+  onSuccess,
 }) => {
   const selectedCreator = targetCreator ?? preselectedCreator ?? null;
   const [projectTitle, setProjectTitle] = useState('');
@@ -22,12 +25,20 @@ export const ProjectBriefModal: React.FC<ProjectBriefModalProps> = ({
   const [deadline, setDeadline] = useState('7 Hari Kerja');
   const [briefDetails, setBriefDetails] = useState('');
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState('');
 
   if (!isOpen) return null;
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setIsSubmitting(true);
+    setError('');
+    const result = await briefService.createBrief({ title: projectTitle.trim(), category: projectType, description: briefDetails.trim(), budget, deadline });
+    setIsSubmitting(false);
+    if (!result.success) { setError(result.error || 'Gagal menyimpan brief.'); return; }
     setIsSubmitted(true);
+    onSuccess?.();
   };
 
   const handleResetAndClose = () => {
@@ -70,9 +81,7 @@ export const ProjectBriefModal: React.FC<ProjectBriefModalProps> = ({
               </div>
               <h4 className="text-lg font-bold text-[#0D0C22]">Brief Berhasil Dikirim!</h4>
               <p className="text-xs sm:text-sm text-neutral-600 max-w-md mx-auto leading-relaxed">
-                {selectedCreator 
-                  ? `Notifikasi telah dikirim ke ${selectedCreator.name}. Estimasi balasan: ${selectedCreator.responseTime || '1 jam'}.` 
-                  : 'Brief proyek Anda telah disiarkan ke talenta terverifikasi yang cocok dengan kriteria Anda.'}
+                Brief proyek Anda telah diterbitkan dan dapat dilihat oleh kreator.
               </p>
               <div className="pt-3">
                 <button
@@ -85,6 +94,7 @@ export const ProjectBriefModal: React.FC<ProjectBriefModalProps> = ({
             </div>
           ) : (
             <form onSubmit={handleSubmit} className="space-y-4">
+              {error && <p role="alert" className="text-xs text-red-600">{error}</p>}
               {selectedCreator && (
                 <div className="flex items-center gap-3 p-3 rounded-[8px] bg-[#F3F3F4] border border-black/10 mb-2">
                   <img
@@ -201,10 +211,11 @@ export const ProjectBriefModal: React.FC<ProjectBriefModalProps> = ({
                 </button>
                 <button
                   type="submit"
+                  disabled={isSubmitting}
                   className="px-5 py-2 rounded-[8px] bg-[#155DFC] hover:bg-[#0E4CD1] text-white text-xs font-semibold flex items-center gap-2 transition cursor-pointer"
                 >
                   <Send className="w-3.5 h-3.5" />
-                  <span>Kirim Brief Proyek</span>
+                  <span>{isSubmitting ? 'Menyimpan...' : 'Kirim Brief Proyek'}</span>
                 </button>
               </div>
             </form>

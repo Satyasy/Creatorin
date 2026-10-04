@@ -17,15 +17,13 @@ export const SignUpPage: React.FC<Props> = ({ onNavigate, onLoginSuccess }) => {
     event.preventDefault(); setLoading(true); setError('');
     const result = await authService.signUp({ fullName: name.trim(), email: email.trim(), password, role });
     if (!result.success || !result.user) {
-      const demoUser: NonNullable<AuthState['user']> = {
-        name: name.trim() || 'Pengguna Baru',
-        email: email.trim() || 'user@creatorin.id',
-        role: role as any,
-        avatar: role === 'creator'
-          ? 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=240&auto=format&fit=crop&q=80'
-          : 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=240&auto=format&fit=crop&q=80',
-      };
-      login(demoUser); onLoginSuccess?.(demoUser); onNavigate?.('explore'); router.push('/explore');
+      setError(result.error || 'Gagal mendaftar akun.');
+      setLoading(false);
+      return;
+    }
+    if (result.requiresConfirmation) {
+      setError('Akun dibuat. Periksa email untuk mengonfirmasi akun, lalu masuk.');
+      setLoading(false);
       return;
     }
     login(result.user); onLoginSuccess?.(result.user); onNavigate?.('explore'); router.push('/explore');

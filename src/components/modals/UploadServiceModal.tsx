@@ -20,9 +20,9 @@ export const UploadServiceModal: React.FC<UploadServiceModalProps> = ({
   const [price, setPrice] = useState('');
   const [deliveryDays, setDeliveryDays] = useState('3 Hari Kerja');
   const [category, setCategory] = useState('Desain Grafis & UI/UX');
-  const [galleryImages, setGalleryImages] = useState<string[]>([
-    'https://images.unsplash.com/photo-1507238691740-187a5b1d37b8?w=800&auto=format&fit=crop&q=80'
-  ]);
+  const [galleryImages, setGalleryImages] = useState<string[]>([]);
+  const [coverFile, setCoverFile] = useState<File | null>(null);
+  const [error, setError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [successToast, setSuccessToast] = useState(false);
 
@@ -30,48 +30,47 @@ export const UploadServiceModal: React.FC<UploadServiceModalProps> = ({
 
   const handleAddImage = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
-    if (files) {
+    if (files?.length) {
       const newUrls: string[] = [];
-      for (let i = 0; i < files.length; i++) {
-        newUrls.push(URL.createObjectURL(files[i]));
-      }
-      setGalleryImages(prev => [...prev, ...newUrls]);
+      if (galleryImages[0]) URL.revokeObjectURL(galleryImages[0]);
+      newUrls.push(URL.createObjectURL(files[0]));
+      setGalleryImages(newUrls);
+      setCoverFile(files[0]);
     }
   };
 
   const handleRemoveImage = (indexToRemove: number) => {
-    setGalleryImages(prev => prev.filter((_, idx) => idx !== indexToRemove));
+    if (galleryImages[indexToRemove]) URL.revokeObjectURL(galleryImages[indexToRemove]);
+    setGalleryImages([]);
+    setCoverFile(null);
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
-
-    const numericPrice = parseInt(price.replace(/\D/g, '')) || 1500000;
-
-    const newService: CreatorService = {
-      id: `srv-${Date.now()}`,
-      title: serviceName,
-      price: numericPrice,
-      formattedPrice: `Rp${numericPrice.toLocaleString('id-ID')}`,
-      deliveryDays,
-      description,
-      tag: category,
-      coverImage: galleryImages[0] || 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&auto=format&fit=crop&q=80',
-      galleryImages,
-    };
-
-    setTimeout(() => {
+    setError('');
+    try {
+      const form = new FormData();
+      form.set('title', serviceName.trim());
+      form.set('category', category);
+      form.set('description', description.trim());
+      form.set('price', price.trim());
+      form.set('estimatedDays', deliveryDays);
+      if (coverFile) form.set('file', coverFile);
+      const response = await fetch('/api/services', { method: 'POST', body: form });
+      const result = await response.json();
+      if (!response.ok) throw new Error(result.error || 'Gagal menerbitkan layanan.');
       setIsSubmitting(false);
       setSuccessToast(true);
-      if (onSuccess) {
-        onSuccess(newService);
-      }
+      onSuccess?.({ id: result.service.id, title: result.service.title, price: result.service.priceNumeric, formattedPrice: result.service.price, deliveryDays: result.service.estimatedDays, description: result.service.description, tag: result.service.category, coverImage: result.service.imageUrl });
       setTimeout(() => {
         setSuccessToast(false);
         onClose();
       }, 900);
-    }, 1000);
+    } catch (caught) {
+      setError(caught instanceof Error ? caught.message : 'Gagal menerbitkan layanan.');
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -172,7 +171,7 @@ export const UploadServiceModal: React.FC<UploadServiceModalProps> = ({
           <div>
             <div className="flex items-center justify-between mb-1.5">
               <label className="text-xs font-semibold text-neutral-700">
-                Portofolio & Gambar Sampel Layanan (Bisa Banyak)
+                Gambar Sampul Layanan
               </label>
               <span className="text-[10px] text-neutral-400">{galleryImages.length} gambar terpilih</span>
             </div>
@@ -202,8 +201,7 @@ export const UploadServiceModal: React.FC<UploadServiceModalProps> = ({
                 <span className="text-[9px] font-semibold">Tambah</span>
                 <input
                   type="file"
-                  multiple
-                  accept="image/*"
+                  accept="image/jpeg,image/png,image/webp"
                   onChange={handleAddImage}
                   className="absolute inset-0 opacity-0 cursor-pointer"
                 />
@@ -211,6 +209,7 @@ export const UploadServiceModal: React.FC<UploadServiceModalProps> = ({
             </div>
           </div>
 
+          {error && <p role="alert" className="text-xs text-red-600">{error}</p>}
           {/* Actions */}
           <div className="pt-2 border-t border-neutral-100 flex items-center justify-end gap-2">
             <button

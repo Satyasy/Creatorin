@@ -2,7 +2,14 @@ import { NextRequest, NextResponse } from "next/server";
 import { getAuthenticatedUser } from "@/lib/api-auth";
 import { getDb } from "@/lib/db";
 import { messages, conversations, profiles } from "@/lib/db/schema";
-import { eq, asc } from "drizzle-orm";
+import { eq, asc, and, or } from "drizzle-orm";
+
+async function canAccessConversation(db: NonNullable<ReturnType<typeof getDb>>, conversationId: string, userId: string) {
+  const [room] = await db.select({ id: conversations.id }).from(conversations)
+    .where(and(eq(conversations.id, conversationId), or(eq(conversations.participant1Id, userId), eq(conversations.participant2Id, userId))))
+    .limit(1);
+  return Boolean(room);
+}
 
 export async function GET(req: NextRequest) {
   const user = await getAuthenticatedUser(req);
@@ -19,6 +26,7 @@ export async function GET(req: NextRequest) {
   if (!db) return NextResponse.json({ error: "Database not connected" }, { status: 503 });
 
   try {
+    if (!await canAccessConversation(db, conversationId, user.id)) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     const list = await db
       .select({
         id: messages.id,
@@ -58,6 +66,7 @@ export async function POST(req: NextRequest) {
   }
 
   try {
+    if (!await canAccessConversation(db, conversationId, user.id)) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     const [msg] = await db
       .insert(messages)
       .values({

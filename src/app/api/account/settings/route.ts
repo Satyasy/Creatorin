@@ -2,8 +2,21 @@ import { NextRequest, NextResponse } from "next/server";
 import { getAuthenticatedUser } from "@/lib/api-auth";
 import { createClient } from "@/lib/supabase/server";
 import { getDb } from "@/lib/db";
-import { profiles } from "@/lib/db/schema";
+import { profiles, userSettings } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
+
+export async function GET(req: NextRequest) {
+  const user = await getAuthenticatedUser(req);
+  if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  const db = getDb();
+  if (!db) return NextResponse.json({ error: "Database not connected" }, { status: 503 });
+  try {
+    const [settings] = await db.select().from(userSettings).where(eq(userSettings.userId, user.id)).limit(1);
+    return NextResponse.json({ settings: settings || { notifyPush: true, language: 'id' } });
+  } catch (error) {
+    return NextResponse.json({ error: error instanceof Error ? error.message : 'Gagal memuat pengaturan' }, { status: 500 });
+  }
+}
 
 export async function PUT(req: NextRequest) {
   const user = await getAuthenticatedUser(req);
@@ -35,9 +48,11 @@ export async function PUT(req: NextRequest) {
     }
 
     // 2. Handle Profile details in database if provided
-    if (hasProfileUpdates) {
-      const db = getDb();
-      if (db) {
+    const db = getDb();
+    if ((hasProfileUpdates || hasPrefUpdates) && !db) {
+      return NextResponse.json({ error: "Database not connected" }, { status: 503 });
+    }
+    if (hasProfileUpdates && db) {
         await db
           .update(profiles)
           .set({
@@ -47,7 +62,20 @@ export async function PUT(req: NextRequest) {
             updatedAt: new Date(),
           })
           .where(eq(profiles.id, user.id));
-      }
+    }
+    if (hasPrefUpdates && db) {
+      await db.insert(userSettings).values({
+        userId: user.id,
+        notifyPush: notifyPush ?? true,
+        language: language || 'id',
+      }).onConflictDoUpdate({
+        target: userSettings.userId,
+        set: {
+          ...(notifyPush !== undefined && { notifyPush }),
+          ...(language !== undefined && { language }),
+          updatedAt: new Date(),
+        },
+      });
     }
 
     return NextResponse.json({

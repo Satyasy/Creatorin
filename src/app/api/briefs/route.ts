@@ -3,28 +3,11 @@ import { getAuthenticatedUser } from "@/lib/api-auth";
 import { getDb } from "@/lib/db";
 import { projectBriefs, profiles, businessProfiles } from "@/lib/db/schema";
 import { eq, desc } from "drizzle-orm";
-import { MOCK_ALL_UMKM } from "@/data/mockUmkm";
 
 export async function GET(req: NextRequest) {
+  const businessId = new URL(req.url).searchParams.get("businessId");
   const db = getDb();
-  if (!db) {
-    const fallbackListings = MOCK_ALL_UMKM.flatMap((u) => u.activeBriefsList || []);
-    const mockBriefs = fallbackListings.map((b) => ({
-      id: b.id,
-      title: b.title,
-      category: b.category,
-      description: b.description,
-      expectedOutput: b.deliverables?.[0] || "Output sesuai kesepakatan",
-      budget: b.formattedBudget,
-      deadline: b.deadline,
-      status: "open",
-      createdAt: new Date().toISOString(),
-      businessId: "mock-biz-id",
-      businessName: b.clientName,
-      businessAvatar: b.clientAvatar,
-    }));
-    return NextResponse.json({ briefs: mockBriefs });
-  }
+  if (!db) return NextResponse.json({ error: "Database not connected" }, { status: 503 });
 
   try {
     const briefs = await db
@@ -46,7 +29,7 @@ export async function GET(req: NextRequest) {
       .innerJoin(profiles, eq(projectBriefs.businessId, profiles.id))
       .orderBy(desc(projectBriefs.createdAt));
 
-    return NextResponse.json({ briefs });
+    return NextResponse.json({ briefs: businessId ? briefs.filter((brief) => brief.businessId === businessId) : briefs });
   } catch (err: any) {
     return NextResponse.json({ error: err.message }, { status: 500 });
   }
@@ -55,6 +38,7 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
   const user = await getAuthenticatedUser(req);
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  if (user.role !== "business") return NextResponse.json({ error: "Hanya UMKM dapat membuat brief." }, { status: 403 });
 
   const db = getDb();
   if (!db) return NextResponse.json({ error: "Database not connected" }, { status: 503 });

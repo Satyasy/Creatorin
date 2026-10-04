@@ -1,34 +1,34 @@
 'use client';
 
-import Image from 'next/image';
 import Link from 'next/link';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { ArrowUpRight, Check, MapPin, Search, Video, X } from 'lucide-react';
-import { MOCK_CREATORS } from '@/data/mockCreators';
-import { MOCK_ALL_UMKM } from '@/data/mockUmkm';
+import { businessService } from '@/services/businessService';
+import { creatorService } from '@/services/creatorService';
+import type { UMKMProfile } from '@/types';
 
 type ExploreTab = 'umkm' | 'video';
-
-const videoPosts = MOCK_CREATORS.flatMap((creator) =>
-  (creator.portfolioSamples ?? [])
-    .filter((item) => item.type === 'video')
-    .map((item) => ({ ...item, creator }))
-);
 
 export function ExplorePage() {
   const [activeTab, setActiveTab] = useState<ExploreTab>('umkm');
   const [query, setQuery] = useState('');
+  const [businesses, setBusinesses] = useState<UMKMProfile[]>([]);
+  const [videoPosts, setVideoPosts] = useState<Array<{ id: string; title: string; categoryTag: string; thumbnail: string; views: string; creator: { id: string; name: string; avatar: string; roleTitle: string } }>>([]);
+  useEffect(() => {
+    businessService.getBusinesses().then(setBusinesses).catch(() => setBusinesses([]));
+    creatorService.getFeedProjects().then((projects) => setVideoPosts(projects.filter((project) => project.mediaType === 'video').map((project) => ({ id: project.id, title: project.title, categoryTag: project.category, thumbnail: project.mediaUrl || '', views: project.viewsCount, creator: project.creator })))).catch(() => setVideoPosts([]));
+  }, []);
 
   const normalizedQuery = query.trim().toLowerCase();
   const visibleBusinesses = useMemo(
     () =>
-      MOCK_ALL_UMKM.filter((business) =>
+      businesses.filter((business) =>
         [business.brandName, business.industry, business.category, business.location]
           .join(' ')
           .toLowerCase()
           .includes(normalizedQuery)
       ),
-    [normalizedQuery]
+    [normalizedQuery, businesses]
   );
   const visibleVideos = useMemo(
     () =>
@@ -38,7 +38,7 @@ export function ExplorePage() {
           .toLowerCase()
           .includes(normalizedQuery)
       ),
-    [normalizedQuery]
+    [normalizedQuery, videoPosts]
   );
 
   const switchTab = (tab: ExploreTab) => {
@@ -101,11 +101,11 @@ export function ExplorePage() {
                 {visibleBusinesses.map((business) => (
                   <Link key={business.id} href={`/umkm/${business.id}`} className="group grid min-w-0 overflow-hidden rounded-2xl border border-[#DFE0DA] bg-white transition-colors hover:border-[#AEB0A8] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#155DFC] sm:grid-cols-[190px_minmax(0,1fr)]">
                     <div className="relative aspect-[16/10] overflow-hidden bg-[#E9EAE5] sm:aspect-auto sm:min-h-[260px]">
-                      <Image src={business.coverBanner} alt={`Suasana ${business.brandName}`} fill sizes="(max-width: 640px) 100vw, 190px" className="object-cover transition-transform duration-500 group-hover:scale-[1.03]" />
+                      {business.coverBanner && <img src={business.coverBanner} alt={`Suasana ${business.brandName}`} className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.03]" />}
                     </div>
                     <div className="flex min-w-0 flex-col p-5 sm:p-6">
                       <div className="flex items-start gap-3">
-                        <Image src={business.logo} alt="" width={48} height={48} className="h-12 w-12 shrink-0 rounded-xl border border-[#DFE0DA] object-cover" />
+                        {business.logo && <img src={business.logo} alt="" width={48} height={48} className="h-12 w-12 shrink-0 rounded-xl border border-[#DFE0DA] object-cover" />}
                         <div className="min-w-0 flex-1">
                           <div className="flex items-center gap-2">
                             <h3 className="truncate text-lg font-semibold tracking-[-0.02em]">{business.brandName}</h3>
@@ -147,7 +147,7 @@ export function ExplorePage() {
                   <article key={`${post.creator.id}-${post.id}`} className="group min-w-0">
                     <Link href={`/creator/${post.creator.id}`} className="block focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#155DFC]">
                       <div className="relative aspect-[4/5] overflow-hidden rounded-xl bg-[#E9EAE5]">
-                        <Image src={post.thumbnail} alt={`Pratinjau ${post.title}`} fill sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw" className="object-cover transition-transform duration-500 group-hover:scale-[1.025]" />
+                        <video src={post.thumbnail} muted playsInline preload="metadata" className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.025]" />
                         <span className="absolute left-3 top-3 inline-flex items-center gap-1.5 rounded-md bg-[#171714]/88 px-2.5 py-1.5 text-xs font-medium text-white">
                           <Video className="h-3.5 w-3.5" strokeWidth={1.7} /> Video portofolio
                         </span>
@@ -156,7 +156,7 @@ export function ExplorePage() {
                       <h3 className="mt-3 line-clamp-2 text-base font-semibold leading-6 tracking-[-0.015em] group-hover:text-[#155DFC]">{post.title}</h3>
                     </Link>
                     <div className="mt-3 flex items-center gap-2.5">
-                      <Image src={post.creator.avatar} alt="" width={32} height={32} className="h-8 w-8 rounded-full object-cover" />
+                      {post.creator.avatar && <img src={post.creator.avatar} alt="" width={32} height={32} className="h-8 w-8 rounded-full object-cover" />}
                       <div className="min-w-0">
                         <Link href={`/creator/${post.creator.id}`} className="block truncate text-sm font-medium hover:text-[#155DFC] focus-visible:outline-2 focus-visible:outline-[#155DFC]">{post.creator.name}</Link>
                         <p className="truncate text-xs text-[#62635E]">{post.categoryTag}</p>

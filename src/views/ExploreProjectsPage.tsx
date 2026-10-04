@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/providers/AuthProvider';
 import { 
@@ -35,7 +35,7 @@ import { ProjectBriefModal } from '@/components/modals/ProjectBriefModal';
 import { ProjectDetailModal } from '@/components/modals/ProjectDetailModal';
 import { ProjectCard } from '@/components/common/ProjectCard';
 import { ScrollReveal } from '@/components/common/ScrollReveal';
-import { MOCK_FEED_PROJECTS } from '@/data/mockFeedProjects';
+import { creatorService } from '@/services/creatorService';
 import { ActivePage, AuthState, FeedProject, Creator } from '@/types';
 
 interface ExploreProjectsPageProps {
@@ -122,6 +122,10 @@ export const ExploreProjectsPage: React.FC<ExploreProjectsPageProps> = ({
 
   // Modal states
   const [selectedProject, setSelectedProject] = useState<FeedProject | null>(null);
+  const [projects, setProjects] = useState<FeedProject[]>([]);
+  useEffect(() => {
+    creatorService.getFeedProjects().then(setProjects).catch(() => setProjects([]));
+  }, []);
   const [currentCarouselIndex, setCurrentCarouselIndex] = useState(0);
   const [isVideoPlaying, setIsVideoPlaying] = useState(true);
   const [isMuted, setIsMuted] = useState(true);
@@ -143,7 +147,7 @@ export const ExploreProjectsPage: React.FC<ExploreProjectsPageProps> = ({
 
   // Filter projects
   const filteredProjects = useMemo(() => {
-    const list = MOCK_FEED_PROJECTS.filter((proj) => {
+    const list = projects.filter((proj) => {
       // Search
       if (searchQuery.trim()) {
         const q = searchQuery.toLowerCase();
@@ -200,7 +204,7 @@ export const ExploreProjectsPage: React.FC<ExploreProjectsPageProps> = ({
       // popular
       return [...list].sort((a, b) => (b.sharesCount + b.likesCount) - (a.sharesCount + a.likesCount));
     }
-  }, [searchQuery, selectedCategory, selectedPlatform, selectedFormat, selectedSort, selectedTag]);
+  }, [searchQuery, selectedCategory, selectedPlatform, selectedFormat, selectedSort, selectedTag, projects]);
 
   const handleOpenProjectModal = (proj: FeedProject) => {
     setSelectedProject(proj);
@@ -619,7 +623,7 @@ export const ExploreProjectsPage: React.FC<ExploreProjectsPageProps> = ({
             setIsBriefModalOpen(true);
           }}
           onNavigate={navigateTo}
-          allProjects={MOCK_FEED_PROJECTS}
+          allProjects={projects}
         />
       )}
 

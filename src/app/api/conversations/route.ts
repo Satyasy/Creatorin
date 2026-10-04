@@ -6,10 +6,10 @@ import { eq, or, and, desc } from "drizzle-orm";
 
 export async function GET(req: NextRequest) {
   const user = await getAuthenticatedUser(req);
-  if (!user) return NextResponse.json({ conversations: [] });
+  if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const db = getDb();
-  if (!db) return NextResponse.json({ conversations: [] });
+  if (!db) return NextResponse.json({ error: "Database not connected" }, { status: 503 });
 
   try {
     const list = await db
@@ -32,7 +32,7 @@ export async function GET(req: NextRequest) {
         const [partner] = await db.select().from(profiles).where(eq(profiles.id, partnerId)).limit(1);
         return {
           ...c,
-          partner: partner || { id: partnerId, fullName: "User", avatarUrl: "/creatorin/avatar.png" },
+          partner: partner || { id: partnerId, fullName: "Akun tidak tersedia", avatarUrl: "" },
         };
       })
     );
@@ -53,11 +53,13 @@ export async function POST(req: NextRequest) {
   const body = await req.json();
   const { recipientId } = body;
 
-  if (!recipientId) {
+  if (!recipientId || recipientId === user.id) {
     return NextResponse.json({ error: "recipientId wajib disertakan." }, { status: 400 });
   }
 
   try {
+    const [recipient] = await db.select({ id: profiles.id }).from(profiles).where(eq(profiles.id, recipientId)).limit(1);
+    if (!recipient) return NextResponse.json({ error: "Penerima tidak ditemukan." }, { status: 404 });
     // Check if conversation already exists
     const [existing] = await db
       .select()

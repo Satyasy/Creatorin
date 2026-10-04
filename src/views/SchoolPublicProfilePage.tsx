@@ -32,6 +32,7 @@ interface SchoolPublicProfilePageProps {
 export function SchoolPublicProfilePage({ slug = 'smk-kreatif-indonesia' }: SchoolPublicProfilePageProps) {
   const [profile, setProfile] = useState<PublicSchoolProfile | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [loadError, setLoadError] = useState('');
   const [showAllStudents, setShowAllStudents] = useState(false);
   const [projectCategoryFilter, setProjectCategoryFilter] = useState('Semua');
 
@@ -51,6 +52,7 @@ export function SchoolPublicProfilePage({ slug = 'smk-kreatif-indonesia' }: Scho
         setProfile(data);
       } catch (err) {
         console.error('Failed to load public school profile:', err);
+        setLoadError(err instanceof Error ? err.message : 'Gagal memuat profil sekolah');
       } finally {
         setIsLoading(false);
       }
@@ -71,6 +73,7 @@ export function SchoolPublicProfilePage({ slug = 'smk-kreatif-indonesia' }: Scho
     }, 2500);
   };
 
+  if (!isLoading && !profile) return <div className="min-h-[70vh] grid place-items-center text-sm text-neutral-600" role="alert">{loadError || 'Profil sekolah tidak ditemukan.'}</div>;
   if (isLoading || !profile) {
     return (
       <div className="flex-1 flex items-center justify-center min-h-[70vh]">
@@ -245,7 +248,7 @@ export function SchoolPublicProfilePage({ slug = 'smk-kreatif-indonesia' }: Scho
         <h2 className="text-lg font-bold text-[#0D0C22]">Tentang {school.name}</h2>
         <p className="text-xs sm:text-sm text-neutral-600 leading-relaxed">
           {school.description ||
-            'SMK Kreatif Indonesia berfokus pada kurikulum vokasi berbasis proyek industri nyata. Siswa dibekali keterampilan praktis mulai dari UI/UX, software development, hingga multimedia branding.'}
+            'Belum ada deskripsi sekolah.'}
         </p>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-4 border-t border-black/10 text-xs">
@@ -295,11 +298,7 @@ export function SchoolPublicProfilePage({ slug = 'smk-kreatif-indonesia' }: Scho
       <section className="relative w-full">
         {/* Cover Image */}
         <div className="w-full h-64 sm:h-80 md:h-96 relative overflow-hidden bg-neutral-900">
-          <img
-            src={school.coverUrl || 'https://images.unsplash.com/photo-1523240795612-9a054b0db644?w=1600&auto=format&fit=crop&q=80'}
-            alt={school.name}
-            className="w-full h-full object-cover opacity-85"
-          />
+          {school.coverUrl && <img src={school.coverUrl} alt={school.name} className="w-full h-full object-cover opacity-85" />}
           <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
         </div>
 
@@ -310,7 +309,7 @@ export function SchoolPublicProfilePage({ slug = 'smk-kreatif-indonesia' }: Scho
               {/* Logo & Main Info */}
               <div className="flex flex-col sm:flex-row items-start sm:items-center gap-5">
                 <img
-                  src={school.logoUrl || 'https://images.unsplash.com/photo-1592280771190-3e2e4d571952?w=200&auto=format&fit=crop&q=80'}
+                  src={school.logoUrl || '/creatorin/avatar.png'}
                   alt={school.name}
                   className="w-20 h-20 sm:w-24 sm:h-24 rounded-[16px] object-cover border-2 border-white shadow-md shrink-0 bg-white"
                 />
