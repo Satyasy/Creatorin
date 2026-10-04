@@ -10,8 +10,13 @@ if (typeof window !== 'undefined' && !(window as any).__creatorin_fetch_intercep
   (window as any).__creatorin_fetch_intercepted__ = true;
   const originalFetch = window.fetch.bind(window);
   window.fetch = function (input: RequestInfo | URL, init?: RequestInit) {
-    if (typeof input === 'string' && input.startsWith('/api/')) {
-      const targetUrl = apiUrl(input);
+    if (typeof input === 'string') {
+      let targetUrl = input;
+      if (input.startsWith('/api/')) {
+        targetUrl = apiUrl(input);
+      } else if (input.includes('/api/api/')) {
+        targetUrl = input.replace('/api/api/', '/api/');
+      }
       const updatedInit: RequestInit = {
         credentials: 'include',
         ...init,
