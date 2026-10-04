@@ -134,6 +134,7 @@ export const SignInPage: React.FC<Props> = ({ onNavigate, onLoginSuccess }) => {
               </div>
 
               <button
+                type="submit"
                 disabled={loading}
                 className="h-12 w-full mt-2 inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-sm font-bold text-white shadow-lg shadow-blue-500/25 transition-all duration-200 cursor-pointer hover:shadow-xl active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
               >
