@@ -232,8 +232,20 @@ export default function AdminDashboardPage() {
   const handleLogout = async () => {
     localStorage.removeItem('creatorin_access_token');
     localStorage.removeItem('creatorin_role');
-    await fetch('/api/auth/logout', { method: 'POST' }).catch(() => {});
-    router.push('/admin/login');
+    localStorage.removeItem('creatorin_token');
+    localStorage.removeItem('creatorin_auth_user');
+
+    if (typeof document !== 'undefined') {
+      const domains = ['.creatorin.my.id', 'creatorin.my.id', 'api.creatorin.my.id', ''];
+      for (const dom of domains) {
+        const domStr = dom ? `; domain=${dom}` : '';
+        document.cookie = `creatorin_token=; Max-Age=0; path=/${domStr}; expires=Thu, 01 Jan 1970 00:00:00 GMT`;
+        document.cookie = `creatorin_access_token=; Max-Age=0; path=/${domStr}; expires=Thu, 01 Jan 1970 00:00:00 GMT`;
+      }
+    }
+
+    await fetch('/api/auth/logout', { method: 'POST', credentials: 'include' }).catch(() => {});
+    window.location.href = '/admin/login';
   };
 
   useEffect(() => {
@@ -479,8 +491,7 @@ export default function AdminDashboardPage() {
                 >
                   Admin CreatorIn
                 </span>
-                <span className="block text-[10px] text-emerald-500 truncate flex items-center gap-1 font-medium">
-                  <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 inline-block animate-pulse" />
+                <span className="block text-[10px] text-emerald-500 truncate font-semibold">
                   Super Admin
                 </span>
               </div>
@@ -747,7 +758,7 @@ export default function AdminDashboardPage() {
                         }`}
                       >
                         <div className="flex items-center gap-2">
-                          <span className="h-2.5 w-2.5 rounded-full bg-blue-500" />
+                          <span className="h-2.5 w-2 rounded-xs bg-blue-500" />
                           <span className={isDark ? 'text-slate-300' : 'text-slate-700'}>Creator Freelance</span>
                         </div>
                         <span className={`font-bold ${isDark ? 'text-white' : 'text-slate-900'}`}>
@@ -760,7 +771,7 @@ export default function AdminDashboardPage() {
                         }`}
                       >
                         <div className="flex items-center gap-2">
-                          <span className="h-2.5 w-2.5 rounded-full bg-emerald-500" />
+                          <span className="h-2.5 w-2 rounded-xs bg-emerald-500" />
                           <span className={isDark ? 'text-slate-300' : 'text-slate-700'}>UMKM / Bisnis</span>
                         </div>
                         <span className={`font-bold ${isDark ? 'text-white' : 'text-slate-900'}`}>
@@ -773,7 +784,7 @@ export default function AdminDashboardPage() {
                         }`}
                       >
                         <div className="flex items-center gap-2">
-                          <span className="h-2.5 w-2.5 rounded-full bg-amber-500" />
+                          <span className="h-2.5 w-2 rounded-xs bg-amber-500" />
                           <span className={isDark ? 'text-slate-300' : 'text-slate-700'}>SMK Vokasi</span>
                         </div>
                         <span className={`font-bold ${isDark ? 'text-white' : 'text-slate-900'}`}>

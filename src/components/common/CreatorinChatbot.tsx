@@ -180,7 +180,6 @@ export function CreatorinChatbot() {
               <div>
                 <div className="flex items-center gap-1.5">
                   <span className="font-bold text-sm tracking-tight">Creatorin Assistant</span>
-                  <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
                 </div>
                 <span className="text-[10px] text-neutral-300 block font-normal">
                   Grounded RAG AI • Panduan Resmi

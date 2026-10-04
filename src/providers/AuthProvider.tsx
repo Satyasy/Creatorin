@@ -38,8 +38,8 @@ interface AuthContextType {
   isLoading: boolean;
   login: (user: NonNullable<AuthState['user']>) => void;
   updateUser: (fields: Partial<NonNullable<AuthState['user']>>) => void;
-  logout: () => void;
-  signOut: () => void;
+  logout: () => Promise<void>;
+  signOut: () => Promise<void>;
   refreshUser: () => Promise<void>;
   switchRole: (role: UserRole) => void;
 }
@@ -50,8 +50,8 @@ const AuthContext = createContext<AuthContextType>({
   isLoading: true,
   login: () => {},
   updateUser: () => {},
-  logout: () => {},
-  signOut: () => {},
+  logout: async () => {},
+  signOut: async () => {},
   refreshUser: async () => {},
   switchRole: () => {},
 });
@@ -153,7 +153,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     });
   }, []);
 
-  const logout = useCallback(() => {
+  const logout = useCallback(async () => {
     setAuthState({
       isAuthenticated: false,
       user: null,
@@ -161,7 +161,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     try {
       localStorage.removeItem(AUTH_STORAGE_KEY);
       localStorage.removeItem('creatorin_token');
-      fetch(apiUrl('/api/auth/logout'), { method: 'POST', credentials: 'include' }).catch(() => {});
+      localStorage.removeItem('creatorin_access_token');
+      localStorage.removeItem('creatorin_role');
+      localStorage.removeItem('creatorin_auth_user');
+
+      if (typeof document !== 'undefined') {
+        const domains = ['.creatorin.my.id', 'creatorin.my.id', 'api.creatorin.my.id', ''];
+        for (const dom of domains) {
+          const domStr = dom ? `; domain=${dom}` : '';
+          document.cookie = `creatorin_token=; Max-Age=0; path=/${domStr}; expires=Thu, 01 Jan 1970 00:00:00 GMT`;
+          document.cookie = `creatorin_access_token=; Max-Age=0; path=/${domStr}; expires=Thu, 01 Jan 1970 00:00:00 GMT`;
+        }
+      }
+      await fetch(apiUrl('/api/auth/logout'), { method: 'POST', credentials: 'include' }).catch(() => {});
     } catch (e) {
       console.error('Failed to remove auth state', e);
     }

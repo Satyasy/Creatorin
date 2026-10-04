@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { ArrowRight, BriefcaseBusiness, Check, Coins, GraduationCap, MessageSquare, Palette, ShieldCheck } from 'lucide-react';
+import { ArrowRight, BriefcaseBusiness, Check, Coins, GraduationCap, MessageSquare, Palette, ShieldCheck, TrendingUp } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 
 export const GuestLandingPage = () => {
@@ -36,82 +36,140 @@ export const GuestLandingPage = () => {
         </div>
       </div>
 
-      {/* Right Column: Visual Creative Assets Showcase (Replaces old text card) */}
-      <div className="relative flex items-center justify-center lg:justify-end">
-        {/* Ambient Glow & Decorative Grid */}
-        <div className="absolute -top-12 -right-12 h-80 w-80 rounded-full bg-gradient-to-tr from-blue-500/20 via-sky-400/20 to-transparent blur-3xl pointer-events-none" />
-        <div className="absolute -bottom-8 -left-8 h-72 w-72 rounded-full bg-gradient-to-br from-indigo-500/15 via-blue-600/15 to-transparent blur-3xl pointer-events-none" />
+      {/* Right Column: Layered Abstract Shapes & Platform Metrics (Option A: Pure Vector & Glassmorphic Architecture, No Photos, No Live Dots) */}
+      <div className="relative flex items-center justify-center lg:justify-end w-full">
+        {/* Ambient Gradient Mesh Background Glows */}
+        <div className="absolute -top-14 -right-14 h-96 w-96 rounded-full bg-gradient-to-tr from-blue-500/20 via-sky-400/20 to-indigo-500/10 blur-3xl pointer-events-none" />
+        <div className="absolute -bottom-10 -left-10 h-80 w-80 rounded-full bg-gradient-to-br from-indigo-500/20 via-blue-600/15 to-transparent blur-3xl pointer-events-none" />
 
-        {/* Layered Showcase Stack */}
-        <div className="relative w-full max-w-[480px]">
-          {/* Main Visual Card */}
-          <div className="group relative rounded-3xl border border-slate-200/80 bg-white/95 p-4 shadow-[0_20px_50px_rgba(13,12,34,0.12)] backdrop-blur-md transition-all duration-500 hover:shadow-[0_25px_60px_rgba(21,93,252,0.18)]">
-            {/* Visual Cover Header */}
-            <div className="relative h-60 w-full overflow-hidden rounded-2xl bg-gradient-to-br from-slate-900 via-blue-950 to-slate-900">
-              <img 
-                src="https://images.unsplash.com/photo-1541167760496-1628856ab772?q=80&w=1000&auto=format&fit=crop" 
-                alt="Brand Identity & Packaging Design Showcase"
-                className="h-full w-full object-cover opacity-90 transition-transform duration-700 ease-out group-hover:scale-105"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
-              
-              {/* Category & Verified Pill */}
-              <div className="absolute top-3.5 left-3.5 flex items-center gap-2">
-                <span className="rounded-full bg-black/60 backdrop-blur-md border border-white/20 px-3 py-1 text-xs font-semibold text-white">
-                  Identitas Brand & Kemasan
-                </span>
-                <span className="rounded-full bg-emerald-500/90 backdrop-blur-md px-2.5 py-1 text-[11px] font-bold text-white flex items-center gap-1 shadow-sm">
-                  <Check className="h-3 w-3 stroke-[3]" /> Terverifikasi
-                </span>
-              </div>
-
-              {/* Bottom Project Label on Cover */}
-              <div className="absolute bottom-3.5 left-3.5 right-3.5 flex items-end justify-between text-white">
-                <div>
-                  <p className="text-xs text-slate-300 font-medium">Mitra UMKM Kopi Specialty</p>
-                  <h3 className="text-lg font-bold tracking-tight">Kopi Lereng Nusantara</h3>
-                </div>
-                <div className="rounded-xl bg-white/20 backdrop-blur-md px-2.5 py-1 text-right">
-                  <span className="text-[10px] text-slate-200 block uppercase font-mono">Rating</span>
-                  <span className="text-sm font-bold text-amber-300">★ 4.9 / 5.0</span>
-                </div>
-              </div>
-            </div>
-
-            {/* Micro Specs Bar under Image */}
-            <div className="mt-4 flex items-center justify-between px-2 pt-1 text-xs text-slate-600">
-              <div className="flex items-center gap-2">
-                <div className="h-7 w-7 rounded-full bg-blue-600 text-white font-bold flex items-center justify-center text-xs">
-                  CR
+        {/* Outer Visual Frame */}
+        <div className="relative w-full max-w-[560px] xl:max-w-[600px] flex flex-col gap-4">
+          
+          {/* Main Glassmorphic Container Card */}
+          <div className="relative rounded-3xl border border-slate-200/90 bg-white/95 p-6 sm:p-7 shadow-[0_20px_50px_rgba(21,93,252,0.08)] backdrop-blur-xl transition-all duration-300">
+            
+            {/* Header Protocol Bar */}
+            <div className="flex items-center justify-between pb-5 border-b border-slate-100">
+              <div className="flex items-center gap-3">
+                <div className="grid h-10 w-10 place-items-center rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-600 text-white shadow-md shadow-blue-500/25">
+                  <ShieldCheck className="h-5 w-5" />
                 </div>
                 <div>
-                  <span className="font-semibold text-slate-900 block leading-tight">Aditya Pratama</span>
-                  <span className="text-[11px] text-slate-500">Motion & Brand Designer</span>
+                  <div className="flex items-center gap-2">
+                    <h3 className="text-sm font-bold text-slate-900 tracking-tight">Protokol Escrow & Kolaborasi</h3>
+                    <span className="rounded-md bg-blue-50 px-2 py-0.5 text-[10px] font-bold text-blue-600 border border-blue-200/60 uppercase font-mono">
+                      Smart Contract
+                    </span>
+                  </div>
+                  <p className="text-[11px] text-slate-500">Transparansi alur kerja UMKM & talenta terverifikasi</p>
                 </div>
               </div>
-              <div className="text-right">
-                <span className="text-[10px] uppercase tracking-wider text-slate-400 block font-mono">Career Score</span>
-                <span className="font-bold text-blue-600 text-sm">98 / 100</span>
+              <div className="hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-slate-50 border border-slate-200 text-[11px] font-semibold text-slate-700">
+                <Check className="h-3 w-3 text-blue-600 stroke-[3]" />
+                <span>Terverifikasi</span>
+              </div>
+            </div>
+
+            {/* Visual Vector Metric: Dynamic Area Chart & Delivery Velocity */}
+            <div className="my-5 rounded-2xl bg-gradient-to-b from-slate-50/80 to-blue-50/30 p-4 border border-slate-100">
+              <div className="flex items-center justify-between mb-3 text-xs">
+                <div>
+                  <span className="text-[11px] text-slate-400 font-medium block">Penyelesaian Sesuai Brief & Tenggat</span>
+                  <span className="text-base font-bold text-slate-900">99.4% Skor Ketepatan Hasil</span>
+                </div>
+                <div className="text-right">
+                  <span className="inline-flex items-center gap-1 text-[11px] font-bold text-blue-600 bg-blue-100/70 px-2 py-0.5 rounded-md">
+                    <TrendingUp className="h-3.5 w-3.5" /> +18.2% Kuartal Ini
+                  </span>
+                </div>
+              </div>
+
+              {/* Pure SVG Geometric Waveform & Graph */}
+              <div className="h-24 w-full">
+                <svg className="h-full w-full overflow-visible" viewBox="0 0 400 100" preserveAspectRatio="none">
+                  <defs>
+                    <linearGradient id="heroMetricGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                      <stop offset="0%" stopColor="#155DFC" stopOpacity="0.25" />
+                      <stop offset="100%" stopColor="#155DFC" stopOpacity="0.0" />
+                    </linearGradient>
+                  </defs>
+                  {/* Subtle Grid Lines */}
+                  <line x1="0" y1="25" x2="400" y2="25" stroke="#E2E8F0" strokeDasharray="3 3" strokeWidth="1" />
+                  <line x1="0" y1="65" x2="400" y2="65" stroke="#E2E8F0" strokeDasharray="3 3" strokeWidth="1" />
+                  {/* Area Fill */}
+                  <path 
+                    d="M 0 85 C 70 80, 110 55, 170 50 C 230 45, 280 25, 340 20 C 370 18, 390 12, 400 10 L 400 100 L 0 100 Z" 
+                    fill="url(#heroMetricGradient)" 
+                  />
+                  {/* Primary Line */}
+                  <path 
+                    d="M 0 85 C 70 80, 110 55, 170 50 C 230 45, 280 25, 340 20 C 370 18, 390 12, 400 10" 
+                    fill="none" 
+                    stroke="#155DFC" 
+                    strokeWidth="3" 
+                    strokeLinecap="round" 
+                  />
+                  {/* Milestone Nodes */}
+                  <circle cx="170" cy="50" r="4" fill="#FFFFFF" stroke="#155DFC" strokeWidth="2.5" />
+                  <circle cx="340" cy="20" r="4" fill="#FFFFFF" stroke="#155DFC" strokeWidth="2.5" />
+                  <circle cx="400" cy="10" r="4" fill="#155DFC" stroke="#FFFFFF" strokeWidth="2" />
+                </svg>
+              </div>
+            </div>
+
+            {/* 4-Stage Architectural Pipeline (Pure CSS & Icons, No Dots) */}
+            <div className="space-y-2.5">
+              <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">
+                Siklus Transaksi & Verifikasi Hasil
+              </span>
+              <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-4">
+                {[
+                  { step: '01', title: 'Brief Sah', desc: 'Ruang lingkup terkunci' },
+                  { step: '02', title: 'Escrow Aktif', desc: 'Koin diamankan sistem' },
+                  { step: '03', title: 'Produksi', desc: 'Revisi terkuota jelas' },
+                  { step: '04', title: 'Pelepasan', desc: 'Hasil disetujui UMKM' },
+                ].map((item) => (
+                  <div 
+                    key={item.step} 
+                    className="rounded-xl border border-slate-200/80 bg-slate-50/70 p-3 transition-colors hover:border-blue-300 hover:bg-blue-50/50"
+                  >
+                    <div className="flex items-center justify-between mb-1">
+                      <span className="font-mono text-xs font-bold text-blue-600">{item.step}</span>
+                      <Check className="h-3 w-3 text-emerald-600 stroke-[3]" />
+                    </div>
+                    <span className="block text-xs font-bold text-slate-900 leading-snug">{item.title}</span>
+                    <span className="block text-[10px] text-slate-500 leading-tight mt-0.5">{item.desc}</span>
+                  </div>
+                ))}
               </div>
             </div>
           </div>
 
-          {/* Floating Pill Card: Escrow Guarantee (Left Bottom) */}
-          <div className="absolute -bottom-6 -left-6 z-20 flex items-center gap-3 rounded-2xl border border-white/80 bg-white/95 p-3.5 shadow-xl shadow-slate-900/10 backdrop-blur-md transition-transform duration-300 hover:scale-105">
-            <div className="grid h-11 w-11 place-items-center rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-600 text-white shadow-md shadow-blue-500/30">
-              <ShieldCheck className="h-6 w-6" />
+          {/* Dual Accent Stat Cards (Balanced Width & Height, No Dots) */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            {/* Stat Pill 1: Escrow Protection */}
+            <div className="flex items-center gap-3 rounded-2xl border border-slate-200/90 bg-white/95 p-3.5 shadow-lg shadow-slate-900/5 backdrop-blur-md">
+              <div className="grid h-10 w-10 place-items-center rounded-xl bg-blue-50 text-blue-600 font-bold shrink-0 border border-blue-200/60">
+                <Coins className="h-5 w-5" />
+              </div>
+              <div className="min-w-0">
+                <span className="block text-xs font-bold text-slate-900 truncate">Proteksi Dana Escrow</span>
+                <span className="block text-[11px] text-slate-500 truncate">Rilis otomatis saat hasil disetujui</span>
+              </div>
             </div>
-            <div>
-              <span className="block text-xs font-bold text-slate-900">Dana Aman dalam Escrow</span>
-              <span className="block text-[11px] text-slate-500">Otomatis rilis saat hasil disetujui</span>
+
+            {/* Stat Pill 2: Career Score & Validation */}
+            <div className="flex items-center gap-3 rounded-2xl border border-slate-200/90 bg-white/95 p-3.5 shadow-lg shadow-slate-900/5 backdrop-blur-md">
+              <div className="grid h-10 w-10 place-items-center rounded-xl bg-indigo-50 text-indigo-600 font-bold shrink-0 border border-indigo-200/60">
+                <GraduationCap className="h-5 w-5" />
+              </div>
+              <div className="min-w-0">
+                <span className="block text-xs font-bold text-slate-900 truncate">Talenta Terkurasi & SMK</span>
+                <span className="block text-[11px] text-slate-500 truncate">Validasi portofolio & Career Score 98</span>
+              </div>
             </div>
           </div>
 
-          {/* Floating Pill Card: On-Time Delivery (Right Top) */}
-          <div className="absolute -top-5 -right-5 z-20 hidden sm:flex items-center gap-2.5 rounded-2xl border border-white/80 bg-white/95 px-4 py-2.5 shadow-xl shadow-slate-900/10 backdrop-blur-md transition-transform duration-300 hover:scale-105">
-            <div className="h-2.5 w-2.5 rounded-full bg-emerald-500 animate-pulse" />
-            <span className="text-xs font-bold text-slate-800">100% On-Time Completion</span>
-          </div>
         </div>
       </div>
     </div></section>
