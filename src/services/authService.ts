@@ -35,7 +35,12 @@ export const authService = {
 
   async getCurrentUser(): Promise<UserSession | null> {
     try {
+      const token = typeof window !== 'undefined' ? localStorage.getItem('creatorin_token') : null;
+      const headers: Record<string, string> = {};
+      if (token) headers['Authorization'] = `Bearer ${token}`;
+
       const res = await fetch(apiUrl('/api/auth/me'), {
+        headers,
         credentials: 'include',
         cache: 'no-store',
       });
@@ -76,6 +81,10 @@ export const authService = {
       const data = await res.json();
       if (!res.ok) {
         return { success: false, error: data.error || 'Gagal masuk akun.' };
+      }
+
+      if (data.session?.accessToken && typeof window !== 'undefined') {
+        localStorage.setItem('creatorin_token', data.session.accessToken);
       }
 
       const fallbackName = data.user.fullName || data.user.email?.split('@')[0] || 'User';
@@ -119,6 +128,10 @@ export const authService = {
       const data = await res.json();
       if (!res.ok) {
         return { success: false, error: data.error || 'Gagal mendaftar akun baru.' };
+      }
+
+      if (data.session?.accessToken && typeof window !== 'undefined') {
+        localStorage.setItem('creatorin_token', data.session.accessToken);
       }
 
       const user: UserSession = {

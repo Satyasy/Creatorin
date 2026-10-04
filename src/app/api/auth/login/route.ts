@@ -71,12 +71,15 @@ export async function POST(req: NextRequest) {
       },
     });
 
-    // Set HTTP-Only Cookie untuk persistensi browser
+    // Set HTTP-Only Cookie untuk persistensi browser cross-subdomain (creatorin.my.id <-> api.creatorin.my.id)
+    const isProd = process.env.NODE_ENV === "production";
+    const cookieDomain = isProd ? ".creatorin.my.id" : undefined;
     response.cookies.set("creatorin_token", token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "lax",
+      secure: isProd,
+      sameSite: isProd ? "none" : "lax",
       path: "/",
+      domain: cookieDomain,
       maxAge: 7 * 24 * 60 * 60,
     });
 

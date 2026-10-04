@@ -6,11 +6,14 @@ export async function POST() {
     message: "Logout berhasil.",
   });
 
+  const isProd = process.env.NODE_ENV === "production";
+  const cookieDomain = isProd ? ".creatorin.my.id" : undefined;
   response.cookies.set("creatorin_token", "", {
     httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: "lax",
+    secure: isProd,
+    sameSite: isProd ? "none" : "lax",
     path: "/",
+    domain: cookieDomain,
     maxAge: 0,
   });
 

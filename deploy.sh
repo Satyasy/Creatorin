@@ -57,8 +57,10 @@ else
 fi
 
 # Use shared node_modules via atomic symlink (instant, no disk copying)
-mkdir -p "${SHARED_DIR}/node_modules"
+mkdir -p "${SHARED_DIR}/node_modules" "${SHARED_DIR}/uploads"
 ln -sfn "${SHARED_DIR}/node_modules" "${NEW_RELEASE_DIR}/node_modules"
+mkdir -p "${NEW_RELEASE_DIR}/public"
+ln -sfn "${SHARED_DIR}/uploads" "${NEW_RELEASE_DIR}/public/uploads"
 
 echo "📦 Installing dependencies..."
 npm install --no-audit --prefer-offline

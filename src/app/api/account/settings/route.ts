@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getAuthenticatedUser } from "@/lib/api-auth";
-import { createClient } from "@/lib/supabase/server";
+import { hashPassword } from "@/lib/auth-local";
 import { getDb } from "@/lib/db";
 import { profiles, userSettings } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
@@ -34,25 +34,28 @@ export async function PUT(req: NextRequest) {
   }
 
   try {
-    // 1. Handle Supabase Auth credential changes if provided
-    if (hasAuthUpdates) {
-      const supabase = await createClient();
-      const updates: { password?: string; email?: string } = {};
-      if (newPassword) updates.password = newPassword;
-      if (newEmail) updates.email = newEmail;
+    const db = getDb();
+    if (!db) {
+      return NextResponse.json({ error: "Database not connected" }, { status: 503 });
+    }
 
-      const { error } = await supabase.auth.updateUser(updates);
-      if (error) {
-        return NextResponse.json({ error: error.message }, { status: 400 });
-      }
+    // 1. Handle Auth credential changes in PostgreSQL
+    if (hasAuthUpdates) {
+      const updates: { passwordHash?: string; email?: string } = {};
+      if (newPassword) updates.passwordHash = hashPassword(newPassword);
+      if (newEmail) updates.email = newEmail.trim().toLowerCase();
+
+      await db
+        .update(profiles)
+        .set({
+          ...updates,
+          updatedAt: new Date(),
+        })
+        .where(eq(profiles.id, user.id));
     }
 
     // 2. Handle Profile details in database if provided
-    const db = getDb();
-    if ((hasProfileUpdates || hasPrefUpdates) && !db) {
-      return NextResponse.json({ error: "Database not connected" }, { status: 503 });
-    }
-    if (hasProfileUpdates && db) {
+    if (hasProfileUpdates) {
         await db
           .update(profiles)
           .set({

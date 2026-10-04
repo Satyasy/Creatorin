@@ -109,12 +109,15 @@ export async function POST(req: NextRequest) {
       { status: 201 }
     );
 
-    // Set HTTP-Only Cookie untuk persistensi session
+    // Set HTTP-Only Cookie untuk persistensi session cross-subdomain (creatorin.my.id <-> api.creatorin.my.id)
+    const isProd = process.env.NODE_ENV === "production";
+    const cookieDomain = isProd ? ".creatorin.my.id" : undefined;
     response.cookies.set("creatorin_token", token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "lax",
+      secure: isProd,
+      sameSite: isProd ? "none" : "lax",
       path: "/",
+      domain: cookieDomain,
       maxAge: 7 * 24 * 60 * 60, // 7 hari
     });
 

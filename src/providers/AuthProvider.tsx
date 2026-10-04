@@ -7,16 +7,22 @@ import { apiUrl } from '@/lib/api-config';
 
 // Global Client-Side Fetch Interceptor:
 // Routes all relative /api/* calls directly to the VPS backend (https://api.creatorin.my.id/api/*)
-// and ensures credentials: 'include' for cross-domain cookie authentication between CF Pages and VPS
+// and ensures credentials: 'include' + Authorization Bearer header for resilient authentication
 if (typeof window !== 'undefined' && !(window as any).__creatorin_fetch_intercepted__) {
   (window as any).__creatorin_fetch_intercepted__ = true;
   const originalFetch = window.fetch.bind(window);
   window.fetch = function (input: RequestInfo | URL, init?: RequestInit) {
     if (typeof input === 'string' && input.startsWith('/api/')) {
       const targetUrl = apiUrl(input);
+      const token = localStorage.getItem('creatorin_token');
+      const headers = new Headers(init?.headers || {});
+      if (token && !headers.has('Authorization')) {
+        headers.set('Authorization', `Bearer ${token}`);
+      }
       const updatedInit: RequestInit = {
         credentials: 'include',
         ...init,
+        headers,
       };
       return originalFetch(targetUrl, updatedInit);
     }
@@ -154,6 +160,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     });
     try {
       localStorage.removeItem(AUTH_STORAGE_KEY);
+      localStorage.removeItem('creatorin_token');
       fetch(apiUrl('/api/auth/logout'), { method: 'POST', credentials: 'include' }).catch(() => {});
     } catch (e) {
       console.error('Failed to remove auth state', e);
