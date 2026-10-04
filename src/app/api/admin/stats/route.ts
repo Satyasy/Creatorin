@@ -56,8 +56,8 @@ export async function GET(req: NextRequest) {
         totalCount: sql<number>`count(*)::int`,
         paidCount: sql<number>`count(case when status = 'paid' then 1 end)::int`,
         unpaidCount: sql<number>`count(case when status = 'unpaid' then 1 end)::int`,
-        totalVolume: sql<string>`coalesce(sum(amount), 0)::text`,
-        paidVolume: sql<string>`coalesce(sum(case when status = 'paid' then amount else 0 end), 0)::text`,
+        totalVolume: sql<string>`coalesce(sum(total_amount), 0)::text`,
+        paidVolume: sql<string>`coalesce(sum(case when status = 'paid' then total_amount else 0 end), 0)::text`,
       })
       .from(invoices);
 
