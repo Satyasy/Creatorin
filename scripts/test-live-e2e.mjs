@@ -52,13 +52,13 @@ async function run() {
     console.log('❌ Still on /admin!');
   }
 
-  console.log('\n3. Testing Regular User Login and Logout on Navbar...');
+  console.log('\n3. Testing UMKM User Login and Logout on Navbar...');
   await page.goto('https://api.creatorin.my.id/sign-in');
-  await page.fill('input[type="email"]', 'creator@creatorin.my.id');
+  await page.fill('input[type="email"]', 'umkm@creatorin.my.id');
   await page.fill('input[type="password"]', 'Creatorin2026');
   await page.click('button:has-text("Masuk ke Akun"), button[type="submit"]');
   await page.waitForTimeout(4000);
-  console.log('User signed in, URL:', page.url());
+  console.log('UMKM signed in, URL:', page.url());
 
   const userMenuBtn = page.locator('#nav-user-profile-logo-btn');
   if (await userMenuBtn.count() > 0) {
@@ -81,9 +81,41 @@ async function run() {
     console.log('Avatar button count after reload:', await avatarBtn.count());
 
     if (await signinBtn.count() > 0 && (await avatarBtn.count() === 0)) {
-      console.log('✅ User is successfully logged out completely across reloads!');
+      console.log('✅ UMKM user is successfully logged out completely across reloads!');
     } else {
-      console.log('❌ Session still detected on reload!');
+      console.log('❌ UMKM session still detected on reload!');
+    }
+  }
+
+  console.log('\n4. Testing Creator User Login and Logout on CreatorSidebar...');
+  await page.goto('https://api.creatorin.my.id/sign-in');
+  await page.fill('input[type="email"]', 'creator@creatorin.my.id');
+  await page.fill('input[type="password"]', 'Creatorin2026');
+  await page.click('button:has-text("Masuk ke Akun"), button[type="submit"]');
+  await page.waitForTimeout(4000);
+  console.log('Creator signed in, URL:', page.url());
+
+  const creatorLogoutBtn = page.locator('aside[aria-label="Sidebar kreator"] button[aria-label="Logout"]');
+  if (await creatorLogoutBtn.count() > 0) {
+    console.log('Clicking Logout in Creator sidebar...');
+    await creatorLogoutBtn.click();
+    await page.waitForTimeout(3000);
+    console.log('URL after creator sidebar logout:', page.url());
+
+    // Reload
+    console.log('Reloading home page...');
+    await page.reload();
+    await page.waitForTimeout(2000);
+
+    const signinBtn = page.locator('#nav-signin-btn');
+    const sidebar = page.locator('aside[aria-label="Sidebar kreator"]');
+    console.log('Sign in button count after reload:', await signinBtn.count());
+    console.log('Creator sidebar count after reload:', await sidebar.count());
+
+    if (await signinBtn.count() > 0 && (await sidebar.count() === 0)) {
+      console.log('✅ Creator user is successfully logged out completely across reloads!');
+    } else {
+      console.log('❌ Creator session still detected on reload!');
     }
   }
 

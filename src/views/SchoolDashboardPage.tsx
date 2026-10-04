@@ -506,9 +506,12 @@ export function SchoolDashboardPage() {
               </span>
             </div>
             <button
-              onClick={() => signOut()}
+              onClick={async () => {
+                await signOut();
+                window.location.href = '/';
+              }}
               title="Keluar"
-              className="rounded-md p-1.5 text-[#55576A] transition-colors hover:bg-[#FEE4E2] hover:text-[#D92D20]"
+              className="rounded-md p-1.5 text-[#55576A] transition-colors hover:bg-[#FEE4E2] hover:text-[#D92D20] cursor-pointer"
             >
               <LogOut className="size-3.5" />
             </button>
@@ -1621,8 +1624,11 @@ export function SchoolDashboardPage() {
                   </div>
                   <div className="mt-6">
                     <button
-                      onClick={() => signOut()}
-                      className="flex items-center gap-2 rounded-xl border border-[#FCA5A5] px-4 py-2 text-sm font-semibold text-[#D92D20] transition-colors hover:bg-[#FEE4E2]"
+                      onClick={async () => {
+                        await signOut();
+                        window.location.href = '/';
+                      }}
+                      className="flex items-center gap-2 rounded-xl border border-[#FCA5A5] px-4 py-2 text-sm font-semibold text-[#D92D20] transition-colors hover:bg-[#FEE4E2] cursor-pointer"
                     >
                       <LogOut className="size-4" />
                       Keluar dari akun
