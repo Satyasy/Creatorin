@@ -11,7 +11,9 @@ import {
   RotateCcw,
   CheckCircle2,
   Copy,
-  Check
+  Check,
+  Maximize2,
+  Minimize2
 } from 'lucide-react';
 
 interface ChatMessage {
@@ -31,6 +33,7 @@ const PRESET_QUESTIONS = [
 
 export function CreatorinChatbot() {
   const [isOpen, setIsOpen] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(false);
   const [inputMessage, setInputMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [hasUnreadNotice, setHasUnreadNotice] = useState(true);
@@ -159,13 +162,19 @@ export function CreatorinChatbot() {
         </button>
       )}
 
-      {/* 2. Chat Window (Linear / Notion Style) */}
+      {/* 2. Chat Window (Linear / Notion Style - Expandable) */}
       {isOpen && (
-        <div className="w-[calc(100vw-32px)] sm:w-[410px] h-[540px] max-h-[calc(100vh-100px)] bg-white rounded-[16px] border border-black/10 shadow-2xl flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+        <div
+          className={`w-[calc(100vw-32px)] ${
+            isExpanded
+              ? 'sm:w-[680px] lg:w-[760px] h-[calc(100vh-80px)] sm:h-[620px]'
+              : 'sm:w-[410px] h-[540px] max-h-[calc(100vh-100px)]'
+          } bg-white rounded-[18px] border border-black/10 shadow-2xl flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-200 transition-all`}
+        >
           {/* Header */}
           <div className="px-4 py-3.5 bg-[#0B1F3A] text-white flex items-center justify-between shrink-0">
             <div className="flex items-center gap-2.5">
-              <div className="w-9 h-9 rounded-[10px] bg-[#155DFC] flex items-center justify-center shrink-0">
+              <div className="w-9 h-9 rounded-[10px] bg-[#155DFC] flex items-center justify-center shrink-0 shadow-sm shadow-blue-500/20">
                 <Bot className="w-5 h-5 text-white" />
               </div>
               <div>
@@ -181,15 +190,23 @@ export function CreatorinChatbot() {
 
             <div className="flex items-center gap-1">
               <button
+                onClick={() => setIsExpanded(!isExpanded)}
+                className="p-1.5 rounded-[6px] text-neutral-300 hover:text-white hover:bg-white/10 transition-colors cursor-pointer active:scale-95"
+                title={isExpanded ? 'Perkecil tampilan' : 'Perbesar tampilan'}
+                aria-label={isExpanded ? 'Perkecil tampilan' : 'Perbesar tampilan'}
+              >
+                {isExpanded ? <Minimize2 className="w-4 h-4" /> : <Maximize2 className="w-4 h-4" />}
+              </button>
+              <button
                 onClick={handleResetChat}
-                className="p-1.5 rounded-[6px] text-neutral-300 hover:text-white hover:bg-white/10 transition-colors cursor-pointer"
+                className="p-1.5 rounded-[6px] text-neutral-300 hover:text-white hover:bg-white/10 transition-colors cursor-pointer active:scale-95"
                 title="Reset percakapan"
               >
                 <RotateCcw className="w-4 h-4" />
               </button>
               <button
                 onClick={() => setIsOpen(false)}
-                className="p-1.5 rounded-[6px] text-neutral-300 hover:text-white hover:bg-white/10 transition-colors cursor-pointer"
+                className="p-1.5 rounded-[6px] text-neutral-300 hover:text-white hover:bg-white/10 transition-colors cursor-pointer active:scale-95"
                 title="Tutup asisten"
               >
                 <X className="w-4 h-4" />

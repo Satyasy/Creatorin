@@ -53,26 +53,26 @@ export default function AdminLoginPage() {
   };
 
   return (
-    <div className="relative min-h-screen flex items-center justify-center p-4 bg-[#080c14] overflow-hidden">
-      {/* Background Subtle Ambient Glow */}
-      <div className="absolute -top-40 -left-40 w-96 h-96 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
-      <div className="absolute -bottom-40 -right-40 w-96 h-96 bg-blue-600/10 rounded-full blur-3xl pointer-events-none" />
+    <div className="relative min-h-screen flex items-center justify-center p-4 bg-[#080C14] overflow-hidden font-sans">
+      {/* Dynamic Ambient Gradient Mesh Glows */}
+      <div className="absolute -top-32 -left-32 w-96 h-96 bg-blue-600/20 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute -bottom-32 -right-32 w-96 h-96 bg-indigo-600/20 rounded-full blur-3xl pointer-events-none" />
 
-      <div className="relative w-full max-w-md">
-        {/* Filament-styled Header */}
+      <div className="relative w-full max-w-md z-10">
+        {/* Header Branding */}
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-amber-400 mb-4 shadow-lg shadow-amber-500/5">
+          <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-gradient-to-tr from-blue-600 to-indigo-600 text-white mb-4 shadow-xl shadow-blue-500/25">
             <ShieldCheck className="w-8 h-8" />
           </div>
           <h1 className="text-2xl font-bold text-slate-100 tracking-tight">CreatorIn Admin</h1>
-          <p className="text-xs text-slate-400 mt-1">Filament Control Panel Management</p>
+          <p className="text-xs text-slate-400 mt-1">Pusat Pengendalian Terpadu Platform</p>
         </div>
 
-        {/* Card Box */}
-        <div className="rounded-2xl border border-slate-800 bg-slate-900/90 backdrop-blur-xl p-6 sm:p-8 shadow-2xl shadow-black/60">
+        {/* Card Box with Glassmorphism */}
+        <div className="rounded-3xl border border-slate-800/90 bg-slate-900/85 backdrop-blur-xl p-6 sm:p-8 shadow-2xl shadow-black/80">
           {error && (
-            <div className="mb-6 flex items-start gap-3 rounded-xl border border-rose-500/30 bg-rose-500/10 p-3.5 text-xs text-rose-400">
-              <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
+            <div className="mb-6 flex items-start gap-3 rounded-xl border border-rose-500/30 bg-rose-500/10 p-3.5 text-xs text-rose-300">
+              <AlertCircle className="w-4 h-4 shrink-0 mt-0.5 text-rose-400" />
               <span>{error}</span>
             </div>
           )}
@@ -80,7 +80,7 @@ export default function AdminLoginPage() {
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <label className="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2">
-                Alamat Email
+                Alamat Email Administrator
               </label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-500">
@@ -92,7 +92,7 @@ export default function AdminLoginPage() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="admin@creatorin.my.id"
-                  className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-700 bg-slate-950/60 text-sm text-slate-100 placeholder:text-slate-600 focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500 transition-colors"
+                  className="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-700 bg-slate-950/70 text-sm text-slate-100 placeholder:text-slate-600 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all"
                 />
               </div>
             </div>
@@ -113,7 +113,7 @@ export default function AdminLoginPage() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••••••"
-                  className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-700 bg-slate-950/60 text-sm text-slate-100 placeholder:text-slate-600 focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500 transition-colors"
+                  className="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-700 bg-slate-950/70 text-sm text-slate-100 placeholder:text-slate-600 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all"
                 />
               </div>
             </div>
@@ -121,7 +121,7 @@ export default function AdminLoginPage() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full mt-2 inline-flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-amber-500 hover:bg-amber-400 active:scale-[0.99] text-slate-950 font-bold text-sm transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-amber-500/20"
+              className="w-full mt-2 inline-flex items-center justify-center gap-2 px-4 py-3.5 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 active:scale-[0.98] text-white font-bold text-sm transition-all duration-200 cursor-pointer shadow-lg shadow-blue-500/25 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {loading ? (
                 <>
@@ -130,7 +130,7 @@ export default function AdminLoginPage() {
                 </>
               ) : (
                 <>
-                  <span>Masuk ke Admin Panel</span>
+                  <span>Masuk ke Panel Kendali</span>
                   <ArrowRight className="w-4 h-4" />
                 </>
               )}
@@ -139,7 +139,7 @@ export default function AdminLoginPage() {
 
           <div className="mt-6 pt-5 border-t border-slate-800 text-center">
             <span className="text-[11px] text-slate-500">
-              Koneksi terenkripsi TLS 1.3 &bull; Sesi Guard VPS Hosting
+              Koneksi Terenkripsi TLS 1.3 &bull; Database PostgreSQL 17
             </span>
           </div>
         </div>
