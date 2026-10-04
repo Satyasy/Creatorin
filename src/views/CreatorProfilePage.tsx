@@ -90,7 +90,7 @@ export const CreatorProfilePage: React.FC<CreatorProfilePageProps> = ({
   isOwnProfile = false
 }) => {
   const router = useRouter();
-  const { user: authUser } = useAuth();
+  const { user: authUser, updateUser, refreshUser } = useAuth();
   const currentUser = propUser !== undefined ? propUser : authUser;
   const isEffectiveOwner = Boolean(isOwnProfile);
   const isCreatorShell = currentUser?.role === 'creator';
@@ -1572,28 +1572,44 @@ export const CreatorProfilePage: React.FC<CreatorProfilePageProps> = ({
                   try {
                     let avatarUrl = tempAvatar;
                     if (editingSection === 'avatar' && avatarFile) {
-                      if (!['image/jpeg', 'image/png', 'image/webp'].includes(avatarFile.type) || avatarFile.size > 20 * 1024 * 1024) throw new Error('Gunakan JPG, PNG, atau WebP maksimal 20 MB.');
-                      const supabase = createClient();
-                      const path = `${creator.id}/${crypto.randomUUID()}.${avatarFile.type === 'image/jpeg' ? 'jpg' : avatarFile.type.split('/')[1]}`;
-                      const { error } = await supabase.storage.from('project-media').upload(path, avatarFile, { contentType: avatarFile.type });
-                      if (error) throw error;
-                      avatarUrl = supabase.storage.from('project-media').getPublicUrl(path).data.publicUrl;
+                      if (!['image/jpeg', 'image/png', 'image/webp'].includes(avatarFile.type) || avatarFile.size > 10 * 1024 * 1024) {
+                        throw new Error('Gunakan JPG, PNG, atau WebP maksimal 10 MB.');
+                      }
+                      const formData = new FormData();
+                      formData.append('file', avatarFile);
+                      const uploadRes = await fetch('/api/upload', {
+                        method: 'POST',
+                        body: formData,
+                      });
+                      const uploadData = await uploadRes.json();
+                      if (!uploadRes.ok) {
+                        throw new Error(uploadData.error || 'Gagal mengunggah foto profil.');
+                      }
+                      avatarUrl = uploadData.url;
                     }
                     const payload = editingSection === 'name' ? { fullName: tempName, headline: tempRoleTitle } : editingSection === 'bio' ? { bio: tempBio } : editingSection === 'avatar' ? { avatarUrl } : {};
                     if (editingSection !== 'banner') {
                       const response = await fetch('/api/profile', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
                       if (!response.ok) throw new Error((await response.json()).error || 'Gagal menyimpan profil.');
                     }
-                  if (editingSection === 'name') {
-                    setCreatorName(tempName);
-                    setCreatorRoleTitle(tempRoleTitle);
-                  } else if (editingSection === 'bio') {
-                    setCreatorBio(tempBio);
-                  } else if (editingSection === 'avatar') {
-                    setCreatorAvatar(avatarUrl);
-                    setAvatarFile(null);
-                  }
-                  setEditingSection(null);
+                    if (editingSection === 'name') {
+                      setCreatorName(tempName);
+                      setCreatorRoleTitle(tempRoleTitle);
+                      creator.name = tempName;
+                      creator.roleTitle = tempRoleTitle;
+                      updateUser({ name: tempName, roleTitle: tempRoleTitle });
+                    } else if (editingSection === 'bio') {
+                      setCreatorBio(tempBio);
+                      creator.bio = tempBio;
+                      updateUser({ bio: tempBio });
+                    } else if (editingSection === 'avatar') {
+                      setCreatorAvatar(avatarUrl);
+                      setAvatarFile(null);
+                      creator.avatar = avatarUrl;
+                      updateUser({ avatar: avatarUrl });
+                    }
+                    await refreshUser();
+                    setEditingSection(null);
                   } catch (error) { alert(error instanceof Error ? error.message : 'Gagal menyimpan profil.'); }
                 }}
                 className="px-4 py-1.5 rounded-xl bg-[#0D0C22] hover:bg-neutral-800 text-white text-xs font-bold cursor-pointer transition shadow-xs"

@@ -1,18 +1,48 @@
 'use client';
 
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
-import { AuthState } from '../types';
+import { AuthState, UserRole } from '../types';
 import { authService } from '@/services/authService';
 import { DEMO_COOKIE, getDemoUser } from '@/lib/demo-users';
+import { apiUrl } from '@/lib/api-config';
+
+// Global Client-Side Fetch Interceptor:
+// Routes all relative /api/* calls directly to the VPS backend (https://api.creatorin.my.id/api/*)
+// and ensures credentials: 'include' + Authorization Bearer header for resilient authentication
+if (typeof window !== 'undefined' && !(window as any).__creatorin_fetch_intercepted__) {
+  (window as any).__creatorin_fetch_intercepted__ = true;
+  const originalFetch = window.fetch.bind(window);
+  window.fetch = function (input: RequestInfo | URL, init?: RequestInit) {
+    if (typeof input === 'string' && input.startsWith('/api/')) {
+      const targetUrl = apiUrl(input);
+      const token = localStorage.getItem('creatorin_token');
+      const headers = new Headers(init?.headers || {});
+      if (token && !headers.has('Authorization')) {
+        headers.set('Authorization', `Bearer ${token}`);
+      }
+      const updatedInit: RequestInit = {
+        credentials: 'include',
+        ...init,
+        headers,
+      };
+      return originalFetch(targetUrl, updatedInit);
+    }
+    return originalFetch(input, init);
+  };
+}
+
+const AUTH_STORAGE_KEY = 'creatorin_session_user';
 
 interface AuthContextType {
   user: AuthState['user'];
   isAuthenticated: boolean;
   isLoading: boolean;
   login: (user: NonNullable<AuthState['user']>) => void;
+  updateUser: (fields: Partial<NonNullable<AuthState['user']>>) => void;
   logout: () => void;
   signOut: () => void;
   refreshUser: () => Promise<void>;
+  switchRole: (role: UserRole) => void;
 }
 
 const AuthContext = createContext<AuthContextType>({
@@ -20,13 +50,31 @@ const AuthContext = createContext<AuthContextType>({
   isAuthenticated: false,
   isLoading: true,
   login: () => {},
+  updateUser: () => {},
   logout: () => {},
   signOut: () => {},
   refreshUser: async () => {},
+  switchRole: () => {},
 });
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [authState, setAuthState] = useState<AuthState>({ isAuthenticated: false, user: null });
+  const [authState, setAuthState] = useState<AuthState>(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const saved = localStorage.getItem(AUTH_STORAGE_KEY);
+        if (saved) {
+          return {
+            isAuthenticated: true,
+            user: JSON.parse(saved),
+          };
+        }
+      } catch {}
+    }
+    return {
+      isAuthenticated: false,
+      user: null,
+    };
+  });
   const [isLoading, setIsLoading] = useState(true);
 
   const syncServerSession = useCallback(async () => {
@@ -62,50 +110,112 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const serverUser = await authService.getCurrentUser();
       if (serverUser) {
         const mappedUser: NonNullable<AuthState['user']> = {
-          name: serverUser.name,
           id: serverUser.id,
+          name: serverUser.name,
           email: serverUser.email,
           role: serverUser.role,
           avatar: serverUser.avatar,
           location: serverUser.location,
           phone: serverUser.phone,
           bio: serverUser.bio,
+          roleTitle: serverUser.roleTitle,
+          handle: serverUser.handle,
         };
         setAuthState({
           isAuthenticated: true,
           user: mappedUser,
         });
+        localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(mappedUser));
         setIsLoading(false);
         return;
       }
-    } catch { /* Session check failed. */ }
-    setAuthState({ isAuthenticated: false, user: null });
+    } catch {
+      // Fallback to local storage if offline or server temporary unreachable
+    }
+
+    try {
+      const saved = localStorage.getItem(AUTH_STORAGE_KEY);
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        setAuthState({
+          isAuthenticated: true,
+          user: parsed,
+        });
+      } else {
+        setAuthState({ isAuthenticated: false, user: null });
+      }
+    } catch {
+      setAuthState({ isAuthenticated: false, user: null });
+    }
     setIsLoading(false);
   }, []);
 
   useEffect(() => {
-    const sync = async () => { await syncServerSession(); };
-    void sync();
+    syncServerSession();
   }, [syncServerSession]);
 
-  const login = (user: NonNullable<AuthState['user']>) => {
-    setIsLoading(false);
+  const login = useCallback((user: NonNullable<AuthState['user']>) => {
     setAuthState({
       isAuthenticated: true,
       user,
     });
-  };
+    try {
+      localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(user));
+    } catch (e) {
+      console.error('Failed to persist auth state', e);
+    }
+  }, []);
 
-  const logout = () => {
-    setIsLoading(false);
+  const updateUser = useCallback((fields: Partial<NonNullable<AuthState['user']>>) => {
+    setAuthState((prev) => {
+      if (!prev.user) return prev;
+      const updated = { ...prev.user, ...fields };
+      try {
+        localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(updated));
+      } catch (e) {
+        console.error('Failed to update auth state in localStorage', e);
+      }
+      return {
+        ...prev,
+        user: updated,
+      };
+    });
+  }, []);
+
+  const logout = useCallback(() => {
     setAuthState({
       isAuthenticated: false,
       user: null,
     });
     // Clear demo cookie if active
-    document.cookie = `${DEMO_COOKIE}=; path=/; max-age=0`;
-    fetch('/api/auth/logout', { method: 'POST' }).catch(() => {});
-  };
+    if (typeof document !== 'undefined') {
+      document.cookie = `${DEMO_COOKIE}=; path=/; max-age=0`;
+    }
+    try {
+      localStorage.removeItem(AUTH_STORAGE_KEY);
+      localStorage.removeItem('creatorin_token');
+      fetch(apiUrl('/api/auth/logout'), { method: 'POST', credentials: 'include' }).catch(() => {});
+    } catch (e) {
+      console.error('Failed to remove auth state', e);
+    }
+  }, []);
+
+  const switchRole = useCallback((role: UserRole) => {
+    setAuthState((prev) => {
+      if (!prev.user) return prev;
+      const nextUser: NonNullable<AuthState['user']> = {
+        ...prev.user,
+        role,
+      };
+      try {
+        localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(nextUser));
+      } catch {}
+      return {
+        isAuthenticated: true,
+        user: nextUser,
+      };
+    });
+  }, []);
 
   return (
     <AuthContext.Provider
@@ -114,9 +224,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         isAuthenticated: authState.isAuthenticated,
         isLoading,
         login,
+        updateUser,
         logout,
         signOut: logout,
         refreshUser: syncServerSession,
+        switchRole,
       }}
     >
       {children}
