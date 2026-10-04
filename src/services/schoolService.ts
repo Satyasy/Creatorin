@@ -3,6 +3,7 @@ import type {
   SchoolDashboardOverview, SchoolInfo, SchoolStatus, SchoolStudentItem,
   SchoolStudentProjectItem, StudentApprovalItem, StudentAssessmentDetail, StudentAssessmentSummary,
 } from '@/types';
+import { apiUrl } from '@/lib/api-config';
 
 export const DEFAULT_RUBRIC: RubricCriterion[] = [
   { name: 'Kemampuan Teknis', score: 0, weight: 40 },

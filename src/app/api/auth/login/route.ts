@@ -3,9 +3,19 @@ import { createClient } from "@/lib/supabase/server";
 import { getDb } from "@/lib/db";
 import { profiles } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
+import { checkRateLimit } from "@/lib/redis";
 
 export async function POST(req: NextRequest) {
   try {
+    const ip = req.headers.get("cf-connecting-ip") || req.headers.get("x-forwarded-for")?.split(",")[0].trim() || "127.0.0.1";
+    const { allowed, reset } = await checkRateLimit(`login:${ip}`, 10, 60);
+    if (!allowed) {
+      return NextResponse.json(
+        { error: "Terlalu banyak percobaan login. Silakan coba beberapa saat lagi." },
+        { status: 429, headers: { "Retry-After": String(reset) } }
+      );
+    }
+
     const body = await req.json();
     const { email, password } = body;
 

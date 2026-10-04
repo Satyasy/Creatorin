@@ -6,6 +6,8 @@ node_modules/
 # testing
 /coverage
 /lighthouse-reports/
+/testing/
+testing/
 
 # next.js
 /.next/

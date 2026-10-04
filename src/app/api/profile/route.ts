@@ -3,6 +3,7 @@ import { getAuthenticatedUser } from "@/lib/api-auth";
 import { getDb } from "@/lib/db";
 import { profiles, creatorProfiles, businessProfiles } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
+import { getCache, setCache, deleteCache } from "@/lib/redis";
 
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
@@ -14,6 +15,12 @@ export async function GET(req: NextRequest) {
   }
 
   if (slug) {
+    const cacheKey = `profile:slug:${slug}`;
+    const cached = await getCache<{ creator: any }>(cacheKey);
+    if (cached) {
+      return NextResponse.json({ ...cached, _source: "redis" });
+    }
+
     const [creator] = await db
       .select({
         id: profiles.id,
@@ -44,6 +51,7 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: "Profile not found" }, { status: 404 });
     }
 
+    await setCache(cacheKey, { creator }, 300);
     return NextResponse.json({ creator });
   }
 
@@ -99,6 +107,13 @@ export async function PUT(req: NextRequest) {
     if (user.role === "business" && bio !== undefined) {
       await db.update(businessProfiles).set({ description: bio }).where(eq(businessProfiles.profileId, user.id));
     }
+
+    // Invalidate cached profiles, creator listings, and user session details
+    await Promise.all([
+      deleteCache("profile:slug:*"),
+      deleteCache("creators:*"),
+      deleteCache(`user:me:${user.id}`),
+    ]);
 
     return NextResponse.json({ success: true, message: "Profil berhasil diperbarui." });
   } catch (err: any) {

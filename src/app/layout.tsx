@@ -101,6 +101,10 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link rel="preconnect" href="https://api.creatorin.my.id" crossOrigin="use-credentials" />
+        <link rel="dns-prefetch" href="https://api.creatorin.my.id" />
+        <link rel="preconnect" href="https://images.unsplash.com" />
+        <link rel="dns-prefetch" href="https://images.unsplash.com" />
         {/* App Router root layout owns the document head. */}
         {/* eslint-disable-next-line @next/next/no-page-custom-font */}
         <link
