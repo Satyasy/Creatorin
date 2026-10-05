@@ -24,12 +24,22 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
       return NextResponse.json({ error: "Hanya UMKM pemilik invoice yang dapat membayar." }, { status: 403 });
     }
 
+    // Ensure user wallet exists
+    const [existingWallet] = await db.select().from(creatorWallets).where(eq(creatorWallets.creatorId, user.id)).limit(1);
+    if (!existingWallet) {
+      await db.insert(creatorWallets).values({
+        creatorId: user.id,
+        balance: 5000,
+        points: 100,
+      });
+    }
+
     const room = await db.transaction(async tx => {
       const [wallet] = await tx.update(creatorWallets)
         .set({ balance: sql`${creatorWallets.balance} - ${invoice.totalAmount}`, updatedAt: new Date() })
         .where(and(eq(creatorWallets.creatorId, user.id), gte(creatorWallets.balance, invoice.totalAmount)))
         .returning();
-      if (!wallet) throw new Error('Saldo koin tidak cukup.');
+      if (!wallet) throw new Error('Saldo koin tidak cukup untuk membayar invoice ini.');
       const [paid] = await tx.update(invoices).set({ status: 'paid', paidAt: new Date() })
         .where(and(eq(invoices.id, invoiceId), eq(invoices.status, 'unpaid'))).returning();
       if (!paid) throw new Error('Invoice sudah diproses.');

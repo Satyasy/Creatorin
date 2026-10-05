@@ -1,21 +1,23 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   ShieldCheck, 
   ArrowLeft, 
   CheckCircle2, 
   Clock, 
   Upload, 
-  FileText, 
   ExternalLink, 
   AlertCircle, 
-  Sparkles,
-  MessageSquare,
-  Check,
-  RotateCcw
+  Sparkles, 
+  Check, 
+  RotateCcw,
+  Coins,
+  RefreshCw,
+  FileText
 } from 'lucide-react';
 import { AuthState, ChatConversation, ChatInvoice } from '@/types';
+import { formatCoin } from '@/lib/coin';
 
 interface DeliverableItem {
   id: string;
@@ -43,23 +45,31 @@ export const CollaborationRoomView: React.FC<CollaborationRoomViewProps> = ({
   onBackToChat,
   onSendChatMessage
 }) => {
-  const isCreator = currentUser?.role === 'creator';
-  const projectTitle = invoice?.serviceTitle || conversation.category || 'Proyek Kolaborasi Konten Kreatif';
-  const escrowAmount = invoice?.amount || 'Rp1.500.000';
+  const [loading, setLoading] = useState(false);
+  const [roomData, setRoomData] = useState<any>(null);
+  const [submissionsList, setSubmissionsList] = useState<DeliverableItem[]>([]);
+  
+  // Determine if current user is Creator in this room
+  const isCreator = roomData 
+    ? roomData.creatorId === currentUser?.id 
+    : (conversation.myRole === 'creator' || currentUser?.role === 'creator');
 
-  // State alur kolaborasi: 1: brief_dp, 2: production, 3: review, 4: completed
+  const projectTitle = roomData?.title || invoice?.serviceTitle || conversation.category || 'Proyek Kolaborasi Konten Kreatif';
+  
+  // Format escrow amount to Coin
+  const rawEscrow = invoice?.amount ? invoice.amount.replace(/[^0-9]/g, '') : '1500';
+  const escrowCoin = parseInt(rawEscrow, 10) || 1500;
+  const escrowDisplay = `${escrowCoin.toLocaleString('id-ID')} Koin`;
+
+  // Determine current step (1: brief_dp, 2: production, 3: review, 4: completed)
+  const computeStep = (status?: string, subs?: any[]) => {
+    if (status === 'completed') return 4;
+    if (status === 'review_pending' || (subs && subs.length > 0 && subs[0].status === 'pending')) return 3;
+    if (status === 'revision_requested') return 2;
+    return 2;
+  };
+
   const [currentStep, setCurrentStep] = useState<number>(2);
-  const [deliverables, setDeliverables] = useState<DeliverableItem[]>([
-    {
-      id: 'del-1',
-      version: 1,
-      title: 'Draft Awal Pengerjaan Konten',
-      url: 'https://creatorin.my.id/preview/draft-v1',
-      notes: 'Draft versi 1 mencakup hook pembuka dan visual storytelling sesuai arahan brief.',
-      submittedAt: 'Baru saja',
-      status: 'pending'
-    }
-  ]);
 
   // Form input upload hasil karya kreator
   const [newDeliverableTitle, setNewDeliverableTitle] = useState('');
@@ -78,14 +88,79 @@ export const CollaborationRoomView: React.FC<CollaborationRoomViewProps> = ({
     setTimeout(() => setToastMessage(null), 3500);
   };
 
+  // Fetch live collaboration room data from backend
+  const fetchRoomData = async () => {
+    if (!invoice?.id) return;
+    setLoading(true);
+    try {
+      const res = await fetch(`/api/collaboration-rooms/by-invoice/${invoice.id}`);
+      if (res.ok) {
+        const data = await res.json();
+        setRoomData(data.room);
+        
+        const mappedSubs: DeliverableItem[] = (data.submissions || []).map((s: any) => ({
+          id: s.id,
+          version: s.version,
+          title: `Hasil Karya Versi ${s.version}`,
+          url: s.fileUrls && s.fileUrls[0] ? s.fileUrls[0] : undefined,
+          notes: s.notes || undefined,
+          submittedAt: new Date(s.submittedAt).toLocaleDateString('id-ID', { hour: '2-digit', minute: '2-digit' }),
+          status: s.status,
+          revisionNote: data.revisions?.find((r: any) => r.submissionId === s.id)?.feedback,
+        }));
+        
+        setSubmissionsList(mappedSubs);
+        setCurrentStep(computeStep(data.room.status, mappedSubs));
+        
+        const revCount = data.revisions?.length || 0;
+        setRemainingRevisions(Math.max(0, 2 - revCount));
+      } else {
+        // Fallback default sample if not yet created in DB
+        setSubmissionsList([
+          {
+            id: 'del-1',
+            version: 1,
+            title: 'Draft Awal Pengerjaan Konten',
+            url: 'https://creatorin.my.id/preview/draft-v1',
+            notes: 'Draft versi 1 mencakup hook pembuka dan visual storytelling sesuai arahan brief.',
+            submittedAt: 'Baru saja',
+            status: 'pending'
+          }
+        ]);
+      }
+    } catch {
+      // Fallback
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchRoomData();
+  }, [invoice?.id]);
+
   // Kreator mengunggah hasil karya
-  const handleSubmitDeliverable = (e: React.FormEvent) => {
+  const handleSubmitDeliverable = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newDeliverableTitle.trim()) return;
 
     setIsSubmittingWork(true);
-    setTimeout(() => {
-      const nextVer = deliverables.length + 1;
+    try {
+      if (roomData?.id) {
+        const res = await fetch(`/api/collaboration-rooms/${roomData.id}/submissions`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            title: newDeliverableTitle,
+            notes: newDeliverableNotes,
+            fileUrls: newDeliverableUrl ? [newDeliverableUrl] : [],
+          }),
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Gagal mengunggah hasil karya');
+      }
+
+      const nextVer = submissionsList.length + 1;
       const newItem: DeliverableItem = {
         id: `del-${Date.now()}`,
         version: nextVer,
@@ -96,64 +171,93 @@ export const CollaborationRoomView: React.FC<CollaborationRoomViewProps> = ({
         status: 'pending'
       };
 
-      setDeliverables(prev => [newItem, ...prev]);
+      setSubmissionsList(prev => [newItem, ...prev]);
       setCurrentStep(3); // Masuk ke tahap tinjauan
       setNewDeliverableTitle('');
       setNewDeliverableUrl('');
       setNewDeliverableNotes('');
-      setIsSubmittingWork(false);
       showToast(`Hasil karya versi ${nextVer} berhasil dikirim ke UMKM!`);
 
       if (onSendChatMessage) {
         onSendChatMessage(`[Collaboration Room] Kreator telah mengunggah hasil karya versi ${nextVer}: "${newItem.title}". Silakan tinjau di Collaboration Room.`);
       }
-    }, 600);
+    } catch (err: any) {
+      alert(err.message || 'Gagal mengirim hasil karya');
+    } finally {
+      setIsSubmittingWork(false);
+    }
   };
 
   // UMKM meminta revisi
-  const handleRequestRevision = (e: React.FormEvent) => {
+  const handleRequestRevision = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!revisionFeedback.trim()) return;
 
     if (remainingRevisions <= 0) {
-      alert('Kuota revisi minor sudah habis. Silakan diskusikan tambahan revisi di ruang obrolan.');
+      alert('Kuota revisi gratis sudah habis. Silakan diskusikan tambahan revisi di ruang obrolan.');
       return;
     }
 
-    setRemainingRevisions(prev => prev - 1);
-    setDeliverables(prev => prev.map((item, idx) => {
-      if (idx === 0) {
-        return {
-          ...item,
-          status: 'revision_requested',
-          revisionNote: revisionFeedback
-        };
+    try {
+      if (roomData?.id) {
+        const res = await fetch(`/api/collaboration-rooms/${roomData.id}/revisions`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ feedback: revisionFeedback.trim() }),
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Gagal mengajukan revisi');
       }
-      return item;
-    }));
 
-    setCurrentStep(2); // Kembali ke produksi
-    setIsRevisionModalOpen(false);
-    showToast('Catatan revisi telah dikirimkan ke Kreator!');
+      setRemainingRevisions(prev => prev - 1);
+      setSubmissionsList(prev => prev.map((item, idx) => {
+        if (idx === 0) {
+          return {
+            ...item,
+            status: 'revision_requested',
+            revisionNote: revisionFeedback
+          };
+        }
+        return item;
+      }));
 
-    if (onSendChatMessage) {
-      onSendChatMessage(`[Collaboration Room] UMKM meminta revisi: "${revisionFeedback}". Sisa kuota revisi: ${remainingRevisions - 1}x.`);
+      setCurrentStep(2); // Kembali ke produksi
+      setIsRevisionModalOpen(false);
+      showToast('Catatan revisi telah dikirimkan ke Kreator!');
+
+      if (onSendChatMessage) {
+        onSendChatMessage(`[Collaboration Room] UMKM meminta revisi: "${revisionFeedback}". Sisa kuota revisi: ${remainingRevisions - 1}x.`);
+      }
+
+      setRevisionFeedback('');
+    } catch (err: any) {
+      alert(err.message || 'Gagal mengirim revisi');
     }
-
-    setRevisionFeedback('');
   };
 
-  // UMKM menyetujui hasil karya & menyelesaikan escrow
-  const handleApproveProject = () => {
-    const confirmApprove = window.confirm('Apakah Anda yakin ingin menyetujui hasil karya ini? Setelah disetujui, dana di Escrow akan dicairkan ke saldo Kreator dan proyek dianggap selesai.');
+  // UMKM menyetujui hasil karya & mencairkan escrow
+  const handleApproveProject = async () => {
+    const confirmApprove = window.confirm(`Apakah Anda yakin ingin menyetujui hasil karya ini? Setelah disetujui, dana Escrow sebesar 🪙 ${escrowDisplay} akan dicairkan ke saldo Kreator dan proyek dianggap selesai.`);
     if (!confirmApprove) return;
 
-    setCurrentStep(4);
-    setDeliverables(prev => prev.map((item, idx) => idx === 0 ? { ...item, status: 'approved' } : item));
-    showToast('Proyek berhasil diselesaikan! Dana Escrow telah diteruskan ke Kreator.');
+    try {
+      if (roomData?.id) {
+        const res = await fetch(`/api/collaboration-rooms/${roomData.id}/approve`, {
+          method: 'POST',
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Gagal menyetujui proyek');
+      }
 
-    if (onSendChatMessage) {
-      onSendChatMessage(`[Collaboration Room] Selamat! UMKM telah MENYETUJUI hasil akhir pengerjaan. Dana Escrow ${escrowAmount} telah berhasil dicairkan.`);
+      setCurrentStep(4);
+      setSubmissionsList(prev => prev.map((item, idx) => idx === 0 ? { ...item, status: 'approved' } : item));
+      showToast('Proyek berhasil diselesaikan! Dana Escrow Koin telah dicairkan ke Kreator.');
+
+      if (onSendChatMessage) {
+        onSendChatMessage(`[Collaboration Room] Selamat! UMKM telah MENYETUJUI hasil akhir pengerjaan. Dana Escrow 🪙 ${escrowDisplay} telah berhasil dicairkan.`);
+      }
+    } catch (err: any) {
+      alert(err.message || 'Gagal menyetujui proyek');
     }
   };
 
@@ -190,6 +294,9 @@ export const CollaborationRoomView: React.FC<CollaborationRoomViewProps> = ({
               }`}>
                 {currentStep === 4 ? 'Proyek Selesai' : 'Sedang Berjalan'}
               </span>
+              <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-neutral-100 text-neutral-600 border border-neutral-200">
+                Akses: {isCreator ? 'Kreator' : 'UMKM'}
+              </span>
             </div>
             <p className="text-xs text-neutral-500 mt-0.5 truncate max-w-md">
               {projectTitle} • Bersama <strong>{conversation.name}</strong>
@@ -197,12 +304,14 @@ export const CollaborationRoomView: React.FC<CollaborationRoomViewProps> = ({
           </div>
         </div>
 
-        {/* Escrow Status Badge */}
-        <div className="flex items-center gap-2.5 bg-emerald-50 border border-emerald-200 px-3.5 py-1.5 rounded-xl text-xs text-emerald-900">
-          <ShieldCheck className="w-4 h-4 text-emerald-600 shrink-0" />
+        {/* Escrow Status Badge dengan Koin */}
+        <div className="flex items-center gap-2.5 bg-amber-50/80 border border-amber-200/80 px-3.5 py-1.5 rounded-xl text-xs text-amber-950">
+          <div className="w-7 h-7 rounded-lg bg-amber-100 text-amber-800 flex items-center justify-center font-bold text-xs shrink-0">
+            🪙
+          </div>
           <div>
-            <span className="text-[10px] text-emerald-700 block font-medium">Dana Escrow Terlindungi</span>
-            <span className="font-bold text-xs">{escrowAmount}</span>
+            <span className="text-[10px] text-amber-700 block font-medium">Dana Escrow Terproteksi</span>
+            <span className="font-bold text-xs text-amber-950">{escrowDisplay}</span>
           </div>
         </div>
       </div>
@@ -212,9 +321,19 @@ export const CollaborationRoomView: React.FC<CollaborationRoomViewProps> = ({
         
         {/* 4 Tahapan Kolaborasi (Progress Stepper) */}
         <div className="bg-white rounded-2xl border border-neutral-200/80 p-5 shadow-2xs">
-          <h2 className="text-xs font-bold text-neutral-400 uppercase tracking-wider mb-4">
-            Tahapan Pengerjaan Proyek
-          </h2>
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-xs font-bold text-neutral-400 uppercase tracking-wider">
+              Tahapan Pengerjaan Proyek
+            </h2>
+            <button
+              onClick={fetchRoomData}
+              disabled={loading}
+              className="text-[11px] text-neutral-500 hover:text-blue-600 flex items-center gap-1 cursor-pointer"
+            >
+              <RefreshCw className={`w-3 h-3 ${loading ? 'animate-spin' : ''}`} />
+              <span>Sinkron</span>
+            </button>
+          </div>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
             
             {/* Step 1: Brief & DP */}
@@ -227,7 +346,7 @@ export const CollaborationRoomView: React.FC<CollaborationRoomViewProps> = ({
               </div>
               <div>
                 <p className="text-xs font-bold text-neutral-900">Brief & DP</p>
-                <p className="text-[10px] text-neutral-500 mt-0.5">Escrow aktif</p>
+                <p className="text-[10px] text-neutral-500 mt-0.5">Escrow koin aktif</p>
               </div>
             </div>
 
@@ -263,7 +382,7 @@ export const CollaborationRoomView: React.FC<CollaborationRoomViewProps> = ({
               </div>
               <div>
                 <p className="text-xs font-bold text-neutral-900">Tinjauan Hasil</p>
-                <p className="text-[10px] text-neutral-500 mt-0.5">{currentStep === 3 ? 'Review oleh UMKM' : 'Menunggu draft'}</p>
+                <p className="text-[10px] text-neutral-500 mt-0.5">{currentStep === 3 ? 'Review oleh UMKM' : 'Menunggu draf'}</p>
               </div>
             </div>
 
@@ -277,14 +396,14 @@ export const CollaborationRoomView: React.FC<CollaborationRoomViewProps> = ({
               </div>
               <div>
                 <p className="text-xs font-bold text-neutral-900">Selesai</p>
-                <p className="text-[10px] text-neutral-500 mt-0.5">{currentStep === 4 ? 'Escrow dicairkan' : 'Tahap akhir'}</p>
+                <p className="text-[10px] text-neutral-500 mt-0.5">{currentStep === 4 ? 'Koin dicairkan' : 'Tahap akhir'}</p>
               </div>
             </div>
 
           </div>
         </div>
 
-        {/* Action Panel Khusus Sesuai Role */}
+        {/* Action Panel Khusus Sesuai Role (STRICT RBAC) */}
         {currentStep < 4 && (
           <div className="bg-white rounded-2xl border border-neutral-200/80 p-5 shadow-2xs space-y-4">
             <div className="flex items-center justify-between">
@@ -297,8 +416,8 @@ export const CollaborationRoomView: React.FC<CollaborationRoomViewProps> = ({
               </span>
             </div>
 
-            {/* KREATOR: Form Upload Hasil Karya */}
-            {isCreator && currentStep <= 3 && (
+            {/* KREATOR ONLY: Form Upload Hasil Karya */}
+            {isCreator && (
               <form onSubmit={handleSubmitDeliverable} className="space-y-3 pt-2 border-t border-neutral-100">
                 <p className="text-xs text-neutral-600">
                   Unggah draft atau hasil karya final untuk ditinjau oleh UMKM:
@@ -357,11 +476,11 @@ export const CollaborationRoomView: React.FC<CollaborationRoomViewProps> = ({
               </form>
             )}
 
-            {/* UMKM: Tombol Tinjauan & Approval */}
+            {/* UMKM ONLY: Tombol Tinjauan & Approval */}
             {!isCreator && (
               <div className="pt-2 border-t border-neutral-100 flex flex-col sm:flex-row items-center justify-between gap-3">
                 <p className="text-xs text-neutral-600">
-                  Periksa hasil karya yang dikirimkan. Anda dapat meminta revisi minor atau menyetujui hasil final.
+                  Periksa hasil karya yang dikirimkan. Anda dapat meminta revisi minor atau menyetujui hasil final untuk mencairkan koin escrow.
                 </p>
                 <div className="flex items-center gap-2.5 w-full sm:w-auto">
                   <button
@@ -392,11 +511,11 @@ export const CollaborationRoomView: React.FC<CollaborationRoomViewProps> = ({
         {/* Daftar Hasil Karya / Deliverables History */}
         <div className="bg-white rounded-2xl border border-neutral-200/80 p-5 shadow-2xs space-y-4">
           <h2 className="text-sm font-bold text-neutral-900">
-            Daftar Berkas & Hasil Karya ({deliverables.length})
+            Daftar Berkas & Hasil Karya ({submissionsList.length})
           </h2>
 
           <div className="space-y-3">
-            {deliverables.map((item) => (
+            {submissionsList.map((item) => (
               <div
                 key={item.id}
                 className="p-4 rounded-xl border border-neutral-200 hover:border-neutral-300 transition bg-neutral-50/50 space-y-2.5"
@@ -486,7 +605,7 @@ export const CollaborationRoomView: React.FC<CollaborationRoomViewProps> = ({
               <textarea
                 required
                 rows={4}
-                placeholder="Contoh: Tolong ubah logo di 3 detik terakhir agar lebih kontras, dan tambahkan teks diskon 10%..."
+                placeholder="Contoh: Tolong sesuaikan warna teks di 5 detik awal, dan perbaiki penulisan tagline..."
                 value={revisionFeedback}
                 onChange={(e) => setRevisionFeedback(e.target.value)}
                 className="w-full text-xs p-3 rounded-xl border border-neutral-200 focus:outline-hidden focus:border-[#0B1F3A]"

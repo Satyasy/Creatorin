@@ -387,11 +387,15 @@ export interface ChatMessage {
   };
   serviceInquiry?: CreatorService;
   invoice?: ChatInvoice;
+  metadata?: Record<string, any>;
 }
 
 export interface ChatConversation {
   id: string;
   creatorId: string;
+  partnerId?: string;
+  partnerRole?: string;
+  myRole?: 'creator' | 'umkm' | 'business' | 'admin';
   name: string;
   roleTitle: string;
   avatar: string;

@@ -37,6 +37,7 @@ import { ActivePage, AuthState, ChatConversation, ChatInvoice, ChatMessage, Crea
 import { toCreator } from '@/services/creatorService';
 import { chatService } from '@/services/chatService';
 import { aiSummarizeService } from '@/services/aiSummarizeService';
+import { formatCoin, formatCoinWithIcon } from '@/lib/coin';
 
 interface ChatPageProps {
   currentUser?: AuthState['user'];
@@ -82,10 +83,10 @@ export const ChatPage: React.FC<ChatPageProps> = ({
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isUploadingFile, setIsUploadingFile] = useState(false);
 
-  // Invoice DP Modal State
+  // Invoice DP Modal State (Default: 1.500 Koin = Rp1.500.000)
   const [isCreateInvoiceModalOpen, setIsCreateInvoiceModalOpen] = useState(false);
   const [invoiceFormTitle, setInvoiceFormTitle] = useState('');
-  const [invoiceFormTotal, setInvoiceFormTotal] = useState('1500000');
+  const [invoiceFormTotal, setInvoiceFormTotal] = useState('1500');
   const [invoiceFormDpPercent, setInvoiceFormDpPercent] = useState<number>(50);
   const [invoiceFormScope, setInvoiceFormScope] = useState('');
   const [invoiceFormDays, setInvoiceFormDays] = useState<number>(3);
@@ -114,6 +115,11 @@ export const ChatPage: React.FC<ChatPageProps> = ({
 
   const activeConversation = activeChatId ? (conversations.find(c => c.id === activeChatId) || null) : null;
   const activeCreator = activeConversation ? toCreator({ id: activeConversation.creatorId, fullName: activeConversation.name, avatarUrl: activeConversation.avatar, headline: activeConversation.roleTitle }) : null;
+
+  // Derivasi Role di Percakapan Aktif: Kreator vs UMKM
+  const myRole = activeConversation?.myRole || (currentUser?.role === 'creator' ? 'creator' : 'umkm');
+  const isCreatorInRoom = myRole === 'creator';
+  const isUmkmInRoom = myRole === 'umkm';
 
   // State untuk AI Summarize Obrolan di Bar Kanan
   const [chatSummaryData, setChatSummaryData] = useState<{
@@ -161,7 +167,7 @@ export const ChatPage: React.FC<ChatPageProps> = ({
 
   // 1. Fetch conversations from live database with fallback & auto-select from query
   useEffect(() => {
-    chatService.getConversations().then((loadedConvs) => {
+    chatService.getConversations(currentUser).then((loadedConvs) => {
       setConversations(loadedConvs);
       if (targetConvId) {
         const found = loadedConvs.find(c => c.id === targetConvId);
@@ -174,7 +180,7 @@ export const ChatPage: React.FC<ChatPageProps> = ({
         }
       }
     }).catch(() => setConversations([]));
-  }, [targetConvId]);
+  }, [targetConvId, currentUser]);
 
   // 2. Realtime listener for active database conversation
   useEffect(() => {
@@ -190,6 +196,7 @@ export const ChatPage: React.FC<ChatPageProps> = ({
     });
 
     const unsubscribe = chatService.subscribeToMessages(activeChatId, (newMsg) => {
+      const meta = newMsg.metadata || {};
       const incoming: ChatMessage = {
         id: newMsg.id,
         senderId: newMsg.sender_id,
@@ -197,6 +204,9 @@ export const ChatPage: React.FC<ChatPageProps> = ({
         timestamp: new Date(newMsg.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
         isSelf: newMsg.sender_id === (currentUser as any)?.id,
         status: 'delivered',
+        attachment: meta.attachment || (newMsg.attachment_url ? { type: 'file', url: newMsg.attachment_url, name: 'Lampiran' } : undefined),
+        invoice: meta.invoice || undefined,
+        metadata: meta,
       };
       setConversations(prev => prev.map(c => {
         if (c.id === activeChatId) {
@@ -292,7 +302,12 @@ export const ChatPage: React.FC<ChatPageProps> = ({
       };
 
       const msgText = isImage ? `[Foto: ${file.name}]` : `[Dokumen: ${file.name}]`;
-      const result = await chatService.sendMessage(activeChatId, msgText);
+      const result = await chatService.sendMessage(
+        activeChatId,
+        msgText,
+        { type: 'attachment', attachment: attachmentPayload },
+        data.url
+      );
 
       const newMessage: ChatMessage = {
         id: result.message?.id || `msg-${Date.now()}`,
@@ -302,6 +317,7 @@ export const ChatPage: React.FC<ChatPageProps> = ({
         isSelf: true,
         status: 'sent',
         attachment: attachmentPayload,
+        metadata: { type: 'attachment', attachment: attachmentPayload },
       };
 
       setConversations(prev => prev.map(conv => {
@@ -326,35 +342,59 @@ export const ChatPage: React.FC<ChatPageProps> = ({
   const handleOpenCreateInvoiceModal = () => {
     if (!activeConversation) return;
     setInvoiceFormTitle(activeConversation.category ? `Proyek ${activeConversation.category}` : 'Kesepakatan Pengerjaan Proyek');
-    setInvoiceFormTotal('1500000');
+    setInvoiceFormTotal('1500'); // 1.500 Koin
     setInvoiceFormDpPercent(50);
     setInvoiceFormScope('Pengerjaan konten kreatif sesuai brief yang disepakati, termasuk 2 kali kuota revisi minor.');
     setInvoiceFormDays(3);
     setIsCreateInvoiceModalOpen(true);
   };
 
-  // Mengirim pengajuan invoice DP ke bubble chat
+  // Mengirim pengajuan invoice DP ke bubble chat dan database
   const handleSendInvoice = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!activeChatId || !activeConversation) return;
 
     setIsSendingInvoice(true);
     try {
-      const cleanTotal = parseInt(invoiceFormTotal.replace(/[^0-9]/g, ''), 10) || 1500000;
-      const dpAmount = Math.round((cleanTotal * invoiceFormDpPercent) / 100);
-      const invId = `INV-${Date.now().toString().slice(-6)}`;
+      const inputVal = parseInt(invoiceFormTotal.replace(/[^0-9]/g, ''), 10) || 1500;
+      // Convert to Coin (if user inputted e.g. 1500000, convert to 1500 coins; otherwise use coin value)
+      const cleanTotalCoin = inputVal > 50000 ? Math.round(inputVal / 1000) : inputVal;
+      const dpCoin = Math.round((cleanTotalCoin * invoiceFormDpPercent) / 100);
+
+      // Partner ID is the business/UMKM recipient
+      const partnerId = activeConversation.partnerId || activeConversation.creatorId;
+
+      // Call API to persist invoice in database
+      let dbInvoiceId = `INV-${Date.now().toString().slice(-6)}`;
+      const apiRes = await chatService.createInvoice({
+        businessId: partnerId,
+        conversationId: activeChatId,
+        title: invoiceFormTitle,
+        scopeDescription: `DP ${invoiceFormDpPercent}% (${dpCoin.toLocaleString('id-ID')} Koin) dari Total ${cleanTotalCoin.toLocaleString('id-ID')} Koin. ${invoiceFormScope}`,
+        totalAmount: dpCoin,
+        deadlineDays: invoiceFormDays,
+      });
+
+      if (apiRes.success && apiRes.invoice?.id) {
+        dbInvoiceId = apiRes.invoice.id;
+      }
 
       const newInvoice: ChatInvoice = {
-        id: invId,
+        id: dbInvoiceId,
         serviceTitle: invoiceFormTitle,
-        amount: `Rp${dpAmount.toLocaleString('id-ID')}`,
+        amount: `${dpCoin.toLocaleString('id-ID')} Koin`,
         status: 'unpaid',
         dueDate: `${invoiceFormDays} Hari Kerja`,
-        scopeSummary: `DP ${invoiceFormDpPercent}% dari Total Rp${cleanTotal.toLocaleString('id-ID')}. ${invoiceFormScope}`,
+        scopeSummary: `DP ${invoiceFormDpPercent}% (${dpCoin.toLocaleString('id-ID')} Koin). ${invoiceFormScope}`,
       };
 
-      const msgText = `Pengajuan Kesepakatan: Invoice DP ${invoiceFormDpPercent}% sebesar Rp${dpAmount.toLocaleString('id-ID')} untuk ${invoiceFormTitle}.`;
-      const result = await chatService.sendMessage(activeChatId, msgText);
+      const msgText = `Pengajuan Kesepakatan: Invoice DP ${invoiceFormDpPercent}% sebesar 🪙 ${dpCoin.toLocaleString('id-ID')} Koin untuk ${invoiceFormTitle}.`;
+
+      // Send chat message with invoice metadata to database
+      const result = await chatService.sendMessage(activeChatId, msgText, {
+        type: 'invoice',
+        invoice: newInvoice,
+      });
 
       const invoiceMessage: ChatMessage = {
         id: result.message?.id || `msg-${Date.now()}`,
@@ -364,6 +404,7 @@ export const ChatPage: React.FC<ChatPageProps> = ({
         isSelf: true,
         status: 'sent',
         invoice: newInvoice,
+        metadata: { type: 'invoice', invoice: newInvoice },
       };
 
       setConversations(prev => prev.map(conv => {
@@ -689,16 +730,18 @@ export const ChatPage: React.FC<ChatPageProps> = ({
                 </button>
               </div>
 
-              {/* Tombol Ajukan Invoice DP */}
-              <button
-                type="button"
-                onClick={handleOpenCreateInvoiceModal}
-                className="h-8 px-3 rounded-lg bg-[#0B1F3A] hover:bg-[#123B8C] text-white text-xs font-semibold flex items-center gap-1.5 transition cursor-pointer shadow-2xs"
-                title="Ajukan Kesepakatan / Invoice DP ke Klien"
-              >
-                <Handshake className="w-3.5 h-3.5" />
-                <span className="hidden md:inline">Ajukan Invoice DP</span>
-              </button>
+              {/* Tombol Ajukan Invoice DP (Hanya untuk Kreator) */}
+              {isCreatorInRoom && (
+                <button
+                  type="button"
+                  onClick={handleOpenCreateInvoiceModal}
+                  className="h-8 px-3 rounded-lg bg-[#0B1F3A] hover:bg-[#123B8C] text-white text-xs font-semibold flex items-center gap-1.5 transition cursor-pointer shadow-2xs"
+                  title="Ajukan Kesepakatan / Invoice DP ke Klien"
+                >
+                  <Handshake className="w-3.5 h-3.5" />
+                  <span className="hidden md:inline">Ajukan Invoice DP</span>
+                </button>
+              )}
 
               <button
                 onClick={() => setIsRightSidebarOpenMobile(!isRightSidebarOpenMobile)}
@@ -804,19 +847,61 @@ export const ChatPage: React.FC<ChatPageProps> = ({
                     )}
 
                     {/* Attachment Gambar Bersih */}
+                    {/* Attachment Gambar atau Dokumen (Dapat Dilihat & Diunduh) */}
                     {msg.attachment && (
-                      <div className="mb-2 rounded-lg overflow-hidden border border-neutral-200/40">
-                        {msg.attachment.type === 'image' && (
-                          <img
-                            src={msg.attachment.url}
-                            alt={msg.attachment.name}
-                            className="w-full max-h-56 object-cover"
-                          />
+                      <div className="mb-2.5 rounded-xl overflow-hidden border border-neutral-200/60 bg-white/95 text-neutral-900 shadow-2xs">
+                        {msg.attachment.type === 'image' ? (
+                          <a
+                            href={msg.attachment.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="block group relative overflow-hidden bg-neutral-100"
+                            title="Klik untuk membuka gambar ukuran penuh"
+                          >
+                            <img
+                              src={msg.attachment.url}
+                              alt={msg.attachment.name}
+                              className="w-full max-h-60 object-cover group-hover:scale-101 transition duration-200"
+                            />
+                            <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition flex items-center justify-center opacity-0 group-hover:opacity-100 text-white font-medium text-xs">
+                              <span className="bg-black/60 px-3 py-1.5 rounded-lg backdrop-blur-xs flex items-center gap-1.5">
+                                <span>Buka Gambar Penuh</span>
+                                <ExternalLink className="w-3.5 h-3.5" />
+                              </span>
+                            </div>
+                          </a>
+                        ) : (
+                          <div className="p-3 flex items-center gap-3">
+                            <div className="w-9 h-9 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center shrink-0">
+                              <FileText className="w-5 h-5" />
+                            </div>
+                            <div className="min-w-0 flex-1">
+                              <p className="text-xs font-semibold text-neutral-900 truncate">
+                                {msg.attachment.name}
+                              </p>
+                              <span className="text-[11px] text-neutral-400">
+                                {msg.attachment.size || 'Dokumen Proyek'}
+                              </span>
+                            </div>
+                            <a
+                              href={msg.attachment.url}
+                              download={msg.attachment.name}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="p-2 rounded-lg bg-neutral-100 hover:bg-neutral-200 text-neutral-700 text-xs font-semibold transition flex items-center gap-1 shrink-0 cursor-pointer"
+                              title="Unduh berkas"
+                            >
+                              <Download className="w-3.5 h-3.5" />
+                              <span className="hidden sm:inline">Unduh</span>
+                            </a>
+                          </div>
                         )}
-                        <div className="p-1.5 bg-neutral-900/80 text-[11px] text-white flex justify-between">
-                          <span className="truncate">{msg.attachment.name}</span>
-                          <span className="text-neutral-300 ml-2">{msg.attachment.size}</span>
-                        </div>
+                        {msg.attachment.type === 'image' && (
+                          <div className="px-3 py-1.5 bg-neutral-900/85 text-[11px] text-white flex justify-between items-center">
+                            <span className="truncate">{msg.attachment.name}</span>
+                            <span className="text-neutral-300 ml-2 text-[10px] shrink-0">{msg.attachment.size}</span>
+                          </div>
+                        )}
                       </div>
                     )}
 
@@ -852,31 +937,47 @@ export const ChatPage: React.FC<ChatPageProps> = ({
                           )}
                           <div className="flex items-baseline justify-between mt-2 pt-2 border-t border-neutral-100">
                             <span className="text-xs text-neutral-500">Total Kesepakatan:</span>
-                            <span className="text-sm font-bold text-neutral-900">
-                              {msg.invoice.amount}
+                            <span className="text-sm font-bold text-neutral-900 flex items-center gap-1">
+                              <span>🪙</span>
+                              <span>{msg.invoice.amount}</span>
                             </span>
                           </div>
                         </div>
 
-                        {/* Aksi Pembayaran Escrow atau Buka Collaboration Room */}
+                        {/* Aksi Pembayaran Escrow atau Buka Collaboration Room (RBAC STRICT) */}
                         {msg.invoice.status === 'unpaid' ? (
-                          <div className="space-y-1.5 pt-1">
-                            <button
-                              onClick={() => handleOpenInvoiceDetail(msg.id, msg.invoice!)}
-                              className="w-full py-2.5 px-3 rounded-xl text-xs font-bold text-white bg-[#0B1F3A] hover:bg-[#123B8C] transition-colors cursor-pointer flex items-center justify-center gap-2 shadow-xs"
-                            >
-                              <QrCode className="w-3.5 h-3.5" />
-                              <span>Bayar Invoice (Escrow Terproteksi)</span>
-                            </button>
-                            <p className="text-[10px] text-neutral-400 text-center">
-                              Termasuk QRIS, Barcode pembayaran, dan Virtual Account Bank.
-                            </p>
-                          </div>
+                          isUmkmInRoom ? (
+                            /* UMKM: Tombol Bayar Invoice ke Halaman Detail */
+                            <div className="space-y-1.5 pt-1">
+                              <button
+                                onClick={() => handleOpenInvoiceDetail(msg.id, msg.invoice!)}
+                                className="w-full py-2.5 px-3 rounded-xl text-xs font-bold text-white bg-[#0B1F3A] hover:bg-[#123B8C] transition-colors cursor-pointer flex items-center justify-center gap-2 shadow-xs"
+                              >
+                                <Sparkles className="w-3.5 h-3.5 text-amber-300" />
+                                <span>Bayar Invoice (🪙 Escrow Koin)</span>
+                              </button>
+                              <p className="text-[10px] text-neutral-400 text-center">
+                                Klik untuk melihat rincian saldo koin dan konfirmasi pembayaran escrow.
+                              </p>
+                            </div>
+                          ) : (
+                            /* KREATOR: Status Menunggu Pembayaran Klien (TIDAK ADA TOMBOL BAYAR) */
+                            <div className="pt-1">
+                              <div className="p-2.5 rounded-xl bg-amber-50/80 border border-amber-200/60 text-amber-900 text-xs flex items-center justify-between gap-2">
+                                <div className="flex items-center gap-1.5">
+                                  <Clock className="w-3.5 h-3.5 text-amber-600 shrink-0" />
+                                  <span className="font-medium text-[11px]">Menunggu Pembayaran dari Klien UMKM</span>
+                                </div>
+                                <span className="font-bold text-xs">🪙 {msg.invoice.amount}</span>
+                              </div>
+                            </div>
+                          )
                         ) : (
+                          /* STATUS PAID: Buka Collaboration Room */
                           <div className="space-y-2 pt-1">
                             <div className="p-2 rounded-lg bg-emerald-50 text-emerald-800 text-[11px] flex items-center gap-1.5">
                               <ShieldCheck className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
-                              <span>Dana diamankan di Escrow. Collaboration Room aktif.</span>
+                              <span>Dana koin diamankan di Escrow. Collaboration Room aktif.</span>
                             </div>
                             <div className="grid grid-cols-2 gap-1.5">
                               <button
@@ -958,15 +1059,17 @@ export const ChatPage: React.FC<ChatPageProps> = ({
                 <Paperclip className="w-4 h-4" />
               </button>
 
-              {/* Tombol Cepat Ajukan Kesepakatan / Invoice DP */}
-              <button
-                type="button"
-                onClick={handleOpenCreateInvoiceModal}
-                className="p-2 text-neutral-500 hover:text-[#0B1F3A] hover:bg-neutral-100 rounded-lg transition-colors cursor-pointer shrink-0"
-                title="Ajukan Kesepakatan / Invoice DP"
-              >
-                <Handshake className="w-4 h-4" />
-              </button>
+              {/* Tombol Cepat Ajukan Kesepakatan / Invoice DP (Kreator Only) */}
+              {isCreatorInRoom && (
+                <button
+                  type="button"
+                  onClick={handleOpenCreateInvoiceModal}
+                  className="p-2 text-neutral-500 hover:text-[#0B1F3A] hover:bg-neutral-100 rounded-lg transition-colors cursor-pointer shrink-0"
+                  title="Ajukan Kesepakatan / Invoice DP"
+                >
+                  <Handshake className="w-4 h-4" />
+                </button>
+              )}
 
               {/* Input Teks Pesan */}
               <input
@@ -1370,17 +1473,25 @@ export const ChatPage: React.FC<ChatPageProps> = ({
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-semibold text-neutral-700 mb-1">
-                    Total Nilai Proyek (Rp)
-                  </label>
+                  <div className="flex items-center justify-between mb-1">
+                    <label className="text-xs font-semibold text-neutral-700">
+                      Total Nilai Proyek (Koin)
+                    </label>
+                    <span className="text-[10px] text-blue-600 font-medium bg-blue-50 px-1.5 py-0.5 rounded">
+                      1 Koin = Rp1.000
+                    </span>
+                  </div>
                   <input
                     type="text"
                     required
-                    placeholder="1500000"
+                    placeholder="1500"
                     value={invoiceFormTotal}
                     onChange={(e) => setInvoiceFormTotal(e.target.value)}
                     className="w-full text-xs sm:text-sm p-3 rounded-xl border border-neutral-200 focus:outline-hidden focus:border-[#0B1F3A]"
                   />
+                  <p className="text-[10px] text-neutral-400 mt-1">
+                    Contoh: 1.500 Koin setara dengan Rp1.500.000
+                  </p>
                 </div>
 
                 <div>
@@ -1406,21 +1517,33 @@ export const ChatPage: React.FC<ChatPageProps> = ({
                 </div>
               </div>
 
-              {/* Rincian DP Terhitung */}
-              <div className="p-3 bg-blue-50/70 border border-blue-100 rounded-xl flex items-center justify-between text-xs">
-                <div>
-                  <span className="text-[11px] text-blue-700 block font-medium">Nominal DP Terhitung ({invoiceFormDpPercent}%)</span>
-                  <span className="font-bold text-sm text-[#0B1F3A]">
-                    Rp{Math.round(((parseInt(invoiceFormTotal.replace(/[^0-9]/g, ''), 10) || 0) * invoiceFormDpPercent) / 100).toLocaleString('id-ID')}
-                  </span>
-                </div>
-                <div className="text-right">
-                  <span className="text-[10px] text-neutral-500 block">Sisa Pelunasan</span>
-                  <span className="text-xs font-semibold text-neutral-700">
-                    Rp{Math.round(((parseInt(invoiceFormTotal.replace(/[^0-9]/g, ''), 10) || 0) * (100 - invoiceFormDpPercent)) / 100).toLocaleString('id-ID')}
-                  </span>
-                </div>
-              </div>
+              {/* Rincian DP Terhitung dalam Koin */}
+              {(() => {
+                const rawVal = parseInt(invoiceFormTotal.replace(/[^0-9]/g, ''), 10) || 1500;
+                const totalCoin = rawVal > 50000 ? Math.round(rawVal / 1000) : rawVal;
+                const dpCoin = Math.round((totalCoin * invoiceFormDpPercent) / 100);
+                const remCoin = Math.max(0, totalCoin - dpCoin);
+                return (
+                  <div className="p-3 bg-blue-50/70 border border-blue-100 rounded-xl flex items-center justify-between text-xs">
+                    <div>
+                      <span className="text-[11px] text-blue-700 block font-medium">Nominal DP Terhitung ({invoiceFormDpPercent}%)</span>
+                      <span className="font-bold text-sm text-[#0B1F3A] flex items-center gap-1 mt-0.5">
+                        <span>🪙</span>
+                        <span>{dpCoin.toLocaleString('id-ID')} Koin</span>
+                      </span>
+                      <span className="text-[10px] text-neutral-400 block mt-0.5">
+                        Setara Rp{(dpCoin * 1000).toLocaleString('id-ID')}
+                      </span>
+                    </div>
+                    <div className="text-right">
+                      <span className="text-[10px] text-neutral-500 block">Sisa Pelunasan</span>
+                      <span className="text-xs font-semibold text-neutral-700 block mt-0.5">
+                        🪙 {remCoin.toLocaleString('id-ID')} Koin
+                      </span>
+                    </div>
+                  </div>
+                );
+              })()}
 
               <div>
                 <label className="block text-xs font-semibold text-neutral-700 mb-1">
