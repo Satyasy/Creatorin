@@ -2,7 +2,13 @@
 
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { ShieldCheck, Lock, Mail, AlertCircle, ArrowRight, Loader2 } from 'lucide-react';
+import { AlertCircle, ArrowRight, BriefcaseBusiness, Loader2, Lock, Mail, ShieldCheck, UsersRound } from 'lucide-react';
+
+const accessPoints = [
+  { icon: ShieldCheck, label: 'Akses admin', text: 'Masuk hanya dengan akun yang punya role administrator.' },
+  { icon: UsersRound, label: 'Kontrol pengguna', text: 'Kelola peran creator, UMKM, sekolah, dan admin dari satu panel.' },
+  { icon: BriefcaseBusiness, label: 'Operasi platform', text: 'Pantau brief, invoice, dan verifikasi sekolah secara terpusat.' },
+];
 
 export default function AdminLoginPage() {
   const router = useRouter();
@@ -32,11 +38,11 @@ export default function AdminLoginPage() {
       const data = await res.json();
 
       if (!res.ok || !data.success) {
-        throw new Error(data.error || 'Login gagal. Periksa kembali email dan password.');
+        throw new Error(data.error || 'Login gagal. Periksa kembali email dan kata sandi.');
       }
 
       if (data.user?.role !== 'admin' && data.user?.email !== 'admin@creatorin.my.id') {
-        throw new Error('Akses ditolak: Akun ini tidak memiliki hak akses Administrator.');
+        throw new Error('Akses ditolak. Akun ini tidak memiliki hak akses administrator.');
       }
 
       if (data.session?.accessToken) {
@@ -45,105 +51,146 @@ export default function AdminLoginPage() {
       }
 
       router.push('/admin');
-    } catch (err: any) {
-      setError(err.message || 'Terjadi kesalahan sistem.');
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Terjadi kesalahan sistem.');
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="relative min-h-screen flex items-center justify-center p-4 bg-[#080C14] overflow-hidden font-sans">
-      {/* Dynamic Ambient Gradient Mesh Glows */}
-      <div className="absolute -top-32 -left-32 w-96 h-96 bg-blue-600/20 rounded-full blur-3xl pointer-events-none" />
-      <div className="absolute -bottom-32 -right-32 w-96 h-96 bg-indigo-600/20 rounded-full blur-3xl pointer-events-none" />
-
-      <div className="relative w-full max-w-md z-10">
-        {/* Header Branding */}
-        <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-gradient-to-tr from-blue-600 to-indigo-600 text-white mb-4 shadow-xl shadow-blue-500/25">
-            <ShieldCheck className="w-8 h-8" />
+    <main className="min-h-screen bg-[#F8F9FC] px-4 py-6 text-[#0D0C22] sm:px-6 lg:px-8">
+      <div className="mx-auto grid min-h-[calc(100vh-48px)] w-full max-w-6xl items-center gap-8 lg:grid-cols-[1.05fr_0.95fr]">
+        <section className="hidden lg:block">
+          <div className="mb-10 flex items-center gap-3">
+            <div className="grid h-11 w-11 place-items-center rounded-2xl bg-[#155DFC] text-white shadow-[0_4px_12px_rgba(13,12,34,0.10)]">
+              <ShieldCheck className="h-6 w-6" aria-hidden="true" />
+            </div>
+            <div>
+              <p className="font-display text-2xl font-semibold text-[#0D0C22]">Creatorin</p>
+              <p className="text-sm font-medium text-[#55576A]">Admin workspace</p>
+            </div>
           </div>
-          <h1 className="text-2xl font-bold text-slate-100 tracking-tight">CreatorIn Admin</h1>
-          <p className="text-xs text-slate-400 mt-1">Pusat Pengendalian Terpadu Platform</p>
-        </div>
 
-        {/* Card Box with Glassmorphism */}
-        <div className="rounded-3xl border border-slate-800/90 bg-slate-900/85 backdrop-blur-xl p-6 sm:p-8 shadow-2xl shadow-black/80">
-          {error && (
-            <div className="mb-6 flex items-start gap-3 rounded-xl border border-rose-500/30 bg-rose-500/10 p-3.5 text-xs text-rose-300">
-              <AlertCircle className="w-4 h-4 shrink-0 mt-0.5 text-rose-400" />
-              <span>{error}</span>
-            </div>
-          )}
+          <div className="max-w-xl">
+            <h1 className="font-display text-5xl font-semibold leading-[1.08] text-[#0D0C22]">
+              Panel kendali untuk menjaga alur kolaborasi tetap jelas.
+            </h1>
+            <p className="mt-5 max-w-lg text-base leading-7 text-[#55576A]">
+              Masuk untuk memantau aktivitas platform, meninjau akun, dan menjaga kualitas data operasional Creatorin.
+            </p>
+          </div>
 
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div>
-              <label className="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2">
-                Alamat Email Administrator
-              </label>
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-500">
-                  <Mail className="w-4 h-4" />
+          <div className="mt-10 grid max-w-xl gap-3">
+            {accessPoints.map((item) => {
+              const Icon = item.icon;
+
+              return (
+                <div key={item.label} className="flex gap-4 rounded-2xl border border-[#E1E3EA] bg-white p-4 shadow-[0_1px_2px_rgba(13,12,34,0.06)]">
+                  <div className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-[#E8F0FF] text-[#155DFC]">
+                    <Icon className="h-5 w-5" aria-hidden="true" />
+                  </div>
+                  <div>
+                    <p className="text-sm font-semibold text-[#0D0C22]">{item.label}</p>
+                    <p className="mt-1 text-sm leading-6 text-[#55576A]">{item.text}</p>
+                  </div>
                 </div>
-                <input
-                  type="email"
-                  required
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="admin@creatorin.my.id"
-                  className="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-700 bg-slate-950/70 text-sm text-slate-100 placeholder:text-slate-600 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all"
-                />
-              </div>
+              );
+            })}
+          </div>
+        </section>
+
+        <section className="mx-auto w-full max-w-md">
+          <div className="mb-6 flex items-center justify-center gap-3 lg:hidden">
+            <div className="grid h-11 w-11 place-items-center rounded-2xl bg-[#155DFC] text-white">
+              <ShieldCheck className="h-6 w-6" aria-hidden="true" />
+            </div>
+            <div>
+              <p className="font-display text-2xl font-semibold text-[#0D0C22]">Creatorin</p>
+              <p className="text-sm font-medium text-[#55576A]">Admin workspace</p>
+            </div>
+          </div>
+
+          <div className="rounded-2xl border border-[#E1E3EA] bg-white p-6 shadow-[0_16px_40px_rgba(13,12,34,0.08)] sm:p-8">
+            <div className="mb-7">
+              <p className="text-sm font-semibold text-[#155DFC]">Masuk admin</p>
+              <h2 className="mt-2 font-display text-3xl font-semibold leading-10 text-[#0D0C22]">Kelola Creatorin</h2>
+              <p className="mt-2 text-sm leading-6 text-[#55576A]">
+                Gunakan kredensial administrator yang sudah terdaftar.
+              </p>
             </div>
 
-            <div>
-              <div className="flex items-center justify-between mb-2">
-                <label className="block text-xs font-semibold uppercase tracking-wider text-slate-400">
-                  Kata Sandi
+            {error && (
+              <div className="mb-5 flex items-start gap-3 rounded-xl border border-[#FEE4E2] bg-[#FEE4E2] p-3 text-sm text-[#912018]" role="alert">
+                <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" aria-hidden="true" />
+                <span>{error}</span>
+              </div>
+            )}
+
+            <form onSubmit={handleSubmit} className="space-y-5">
+              <div>
+                <label htmlFor="admin-email" className="mb-2 block text-sm font-semibold text-[#0D0C22]">
+                  Email administrator
                 </label>
-              </div>
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-500">
-                  <Lock className="w-4 h-4" />
+                <div className="relative">
+                  <Mail className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-[#55576A]" aria-hidden="true" />
+                  <input
+                    id="admin-email"
+                    type="email"
+                    required
+                    autoComplete="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="admin@creatorin.my.id"
+                    className="h-12 w-full rounded-xl border border-[#B7BBC9] bg-white pl-10 pr-4 text-sm text-[#0D0C22] placeholder:text-[#6F7285] outline-none transition focus:border-[#155DFC] focus:ring-4 focus:ring-[#155DFC]/20"
+                  />
                 </div>
-                <input
-                  type="password"
-                  required
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="••••••••••••"
-                  className="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-700 bg-slate-950/70 text-sm text-slate-100 placeholder:text-slate-600 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all"
-                />
               </div>
-            </div>
 
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full mt-2 inline-flex items-center justify-center gap-2 px-4 py-3.5 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 active:scale-[0.98] text-white font-bold text-sm transition-all duration-200 cursor-pointer shadow-lg shadow-blue-500/25 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {loading ? (
-                <>
-                  <Loader2 className="w-4 h-4 animate-spin" />
-                  <span>Memverifikasi Otoritas…</span>
-                </>
-              ) : (
-                <>
-                  <span>Masuk ke Panel Kendali</span>
-                  <ArrowRight className="w-4 h-4" />
-                </>
-              )}
-            </button>
-          </form>
+              <div>
+                <label htmlFor="admin-password" className="mb-2 block text-sm font-semibold text-[#0D0C22]">
+                  Kata sandi
+                </label>
+                <div className="relative">
+                  <Lock className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-[#55576A]" aria-hidden="true" />
+                  <input
+                    id="admin-password"
+                    type="password"
+                    required
+                    autoComplete="current-password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    placeholder="Masukkan kata sandi"
+                    className="h-12 w-full rounded-xl border border-[#B7BBC9] bg-white pl-10 pr-4 text-sm text-[#0D0C22] placeholder:text-[#6F7285] outline-none transition focus:border-[#155DFC] focus:ring-4 focus:ring-[#155DFC]/20"
+                  />
+                </div>
+              </div>
 
-          <div className="mt-6 pt-5 border-t border-slate-800 text-center">
-            <span className="text-[11px] text-slate-500">
-              Koneksi Terenkripsi TLS 1.3 &bull; Database PostgreSQL 17
-            </span>
+              <button
+                type="submit"
+                disabled={loading}
+                className="inline-flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-[#155DFC] px-5 text-sm font-semibold text-white shadow-[0_4px_12px_rgba(13,12,34,0.10)] transition hover:bg-[#1248C7] active:bg-[#0E3A9E] disabled:opacity-60"
+              >
+                {loading ? (
+                  <>
+                    <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
+                    <span>Memeriksa akses</span>
+                  </>
+                ) : (
+                  <>
+                    <span>Masuk ke dashboard</span>
+                    <ArrowRight className="h-4 w-4" aria-hidden="true" />
+                  </>
+                )}
+              </button>
+            </form>
+
+            <p className="mt-6 border-t border-[#E1E3EA] pt-5 text-center text-sm text-[#55576A]">
+              Halaman ini khusus untuk pengelola platform Creatorin.
+            </p>
           </div>
-        </div>
+        </section>
       </div>
-    </div>
+    </main>
   );
 }
