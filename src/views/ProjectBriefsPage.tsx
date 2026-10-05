@@ -394,16 +394,18 @@ export const ProjectBriefsPage: React.FC<ProjectBriefsPageProps> = ({
               </p>
             </div>
 
-            {/* Tombol Pasang Brief Baru (CTA transaksional utama #0B1F3A) */}
-            <div className="shrink-0 flex items-center gap-2.5">
-              <button
-                onClick={() => setIsPostBriefModalOpen(true)}
-                className="h-11 px-5 rounded-xl bg-[#0B1F3A] hover:bg-[#123B8C] text-white text-sm font-semibold transition-colors shadow-xs flex items-center gap-2 cursor-pointer"
-              >
-                <Plus className="w-4 h-4" />
-                <span>Pasang Brief Baru</span>
-              </button>
-            </div>
+            {/* Tombol Pasang Brief Baru (Hanya untuk UMKM / Brand) */}
+            {(currentUser?.role === 'umkm' || (currentUser?.role as string) === 'business') && (
+              <div className="shrink-0 flex items-center gap-2.5">
+                <button
+                  onClick={() => setIsPostBriefModalOpen(true)}
+                  className="h-11 px-5 rounded-xl bg-[#0B1F3A] hover:bg-[#123B8C] text-white text-sm font-semibold transition-colors shadow-xs flex items-center gap-2 cursor-pointer"
+                >
+                  <Plus className="w-4 h-4" />
+                  <span>Pasang Brief Baru</span>
+                </button>
+              </div>
+            )}
           </div>
 
           {/* Popular Tag Pills */}
@@ -775,19 +777,33 @@ export const ProjectBriefsPage: React.FC<ProjectBriefsPageProps> = ({
                   </div>
 
                   <div className="flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
-                    {appliedBriefIds[project.id] ? (
-                      <span className="px-3.5 py-1.5 rounded-xl bg-emerald-50 text-emerald-700 border border-emerald-200 text-xs font-semibold flex items-center gap-1.5">
-                        <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
-                        <span>Sudah Dilamar</span>
-                      </span>
+                    {currentUser?.role === 'creator' ? (
+                      appliedBriefIds[project.id] ? (
+                        <span className="px-3.5 py-1.5 rounded-xl bg-emerald-50 text-emerald-700 border border-emerald-200 text-xs font-semibold flex items-center gap-1.5">
+                          <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                          <span>Sudah Dilamar</span>
+                        </span>
+                      ) : (
+                        <button
+                          type="button"
+                          onClick={(e) => handleOpenApplyModal(project, e)}
+                          className="h-9 px-4 rounded-xl bg-[#0B1F3A] hover:bg-[#123B8C] text-white text-xs sm:text-sm font-semibold transition-colors cursor-pointer flex items-center gap-1.5 shadow-xs"
+                        >
+                          <Briefcase className="w-3.5 h-3.5 text-white/80" />
+                          <span>Lamar</span>
+                        </button>
+                      )
                     ) : (
                       <button
                         type="button"
-                        onClick={(e) => handleOpenApplyModal(project, e)}
-                        className="h-9 px-4 rounded-xl bg-[#0B1F3A] hover:bg-[#123B8C] text-white text-xs sm:text-sm font-semibold transition-colors cursor-pointer flex items-center gap-1.5 shadow-xs"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setSelectedBriefForDetail(project);
+                        }}
+                        className="h-9 px-3.5 rounded-xl bg-neutral-100 hover:bg-neutral-200 text-neutral-700 text-xs sm:text-sm font-medium transition-colors cursor-pointer flex items-center gap-1.5"
                       >
-                        <Briefcase className="w-3.5 h-3.5 text-white/80" />
-                        <span>Lamar</span>
+                        <FileText className="w-3.5 h-3.5 text-neutral-500" />
+                        <span>Lihat Detail</span>
                       </button>
                     )}
                   </div>

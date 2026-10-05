@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useRef, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '@/providers/AuthProvider';
 import { 
   Search, 
@@ -23,9 +23,16 @@ import {
   Copy,
   Check,
   CheckCircle2,
-  ListChecks
+  ListChecks,
+  Handshake,
+  Upload,
+  Download,
+  ArrowRight,
+  Plus,
+  FileCheck2
 } from 'lucide-react';
 import { InvoiceDetailPage } from './InvoiceDetailPage';
+import { CollaborationRoomView } from '@/components/collaboration/CollaborationRoomView';
 import { ActivePage, AuthState, ChatConversation, ChatInvoice, ChatMessage, Creator, CreatorService } from '@/types';
 import { toCreator } from '@/services/creatorService';
 import { chatService } from '@/services/chatService';
@@ -45,6 +52,8 @@ export const ChatPage: React.FC<ChatPageProps> = ({
   onViewCreatorProfile
 }) => {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const targetConvId = searchParams.get('conversationId');
   const { user: authUser } = useAuth();
   const currentUser = propUser !== undefined ? propUser : authUser;
 
@@ -64,6 +73,23 @@ export const ChatPage: React.FC<ChatPageProps> = ({
   const [filterUnreadOnly, setFilterUnreadOnly] = useState(false);
   const [isMobileChatOpen, setIsMobileChatOpen] = useState(false);
   const [isRightSidebarOpenMobile, setIsRightSidebarOpenMobile] = useState(false);
+
+  // Tab View Mode: 'chat' | 'collaboration'
+  const [activeViewMode, setActiveViewMode] = useState<'chat' | 'collaboration'>('chat');
+  const [activePaidInvoice, setActivePaidInvoice] = useState<ChatInvoice | null>(null);
+
+  // File Upload State
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [isUploadingFile, setIsUploadingFile] = useState(false);
+
+  // Invoice DP Modal State
+  const [isCreateInvoiceModalOpen, setIsCreateInvoiceModalOpen] = useState(false);
+  const [invoiceFormTitle, setInvoiceFormTitle] = useState('');
+  const [invoiceFormTotal, setInvoiceFormTotal] = useState('1500000');
+  const [invoiceFormDpPercent, setInvoiceFormDpPercent] = useState<number>(50);
+  const [invoiceFormScope, setInvoiceFormScope] = useState('');
+  const [invoiceFormDays, setInvoiceFormDays] = useState<number>(3);
+  const [isSendingInvoice, setIsSendingInvoice] = useState(false);
   
   // State untuk modal detail layanan
   const [selectedServiceDetail, setSelectedServiceDetail] = useState<CreatorService | null>(null);
@@ -133,10 +159,22 @@ export const ChatPage: React.FC<ChatPageProps> = ({
     }
   }, [activeChatId]);
 
-  // 1. Fetch conversations from live database with fallback
+  // 1. Fetch conversations from live database with fallback & auto-select from query
   useEffect(() => {
-    chatService.getConversations().then(setConversations).catch(() => setConversations([]));
-  }, []);
+    chatService.getConversations().then((loadedConvs) => {
+      setConversations(loadedConvs);
+      if (targetConvId) {
+        const found = loadedConvs.find(c => c.id === targetConvId);
+        if (found) {
+          setActiveChatId(targetConvId);
+          setIsMobileChatOpen(true);
+        } else if (targetConvId.length > 20) {
+          setActiveChatId(targetConvId);
+          setIsMobileChatOpen(true);
+        }
+      }
+    }).catch(() => setConversations([]));
+  }, [targetConvId]);
 
   // 2. Realtime listener for active database conversation
   useEffect(() => {
@@ -216,6 +254,138 @@ export const ChatPage: React.FC<ChatPageProps> = ({
 
   };
 
+  // Upload Lampiran Berkas / Foto di Obrolan
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !activeChatId) return;
+
+    // Reset input agar file yang sama bisa dipilih ulang jika perlu
+    e.target.value = '';
+
+    setIsUploadingFile(true);
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('folder', 'chat');
+
+      const res = await fetch('/api/upload', {
+        method: 'POST',
+        body: formData,
+      });
+
+      const data = await res.json();
+      if (!res.ok) {
+        alert(data.error || 'Gagal mengunggah file.');
+        return;
+      }
+
+      const isImage = data.fileType === 'image';
+      const formattedSize = file.size > 1024 * 1024
+        ? `${(file.size / (1024 * 1024)).toFixed(1)} MB`
+        : `${Math.round(file.size / 1024)} KB`;
+
+      const attachmentPayload = {
+        type: isImage ? ('image' as const) : ('file' as const),
+        url: data.url,
+        name: data.fileName || file.name,
+        size: formattedSize,
+      };
+
+      const msgText = isImage ? `[Foto: ${file.name}]` : `[Dokumen: ${file.name}]`;
+      const result = await chatService.sendMessage(activeChatId, msgText);
+
+      const newMessage: ChatMessage = {
+        id: result.message?.id || `msg-${Date.now()}`,
+        senderId: currentUser?.id || 'user',
+        text: msgText,
+        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        isSelf: true,
+        status: 'sent',
+        attachment: attachmentPayload,
+      };
+
+      setConversations(prev => prev.map(conv => {
+        if (conv.id === activeChatId) {
+          return {
+            ...conv,
+            lastMessage: msgText,
+            lastMessageTime: 'Baru saja',
+            messages: [...conv.messages, newMessage],
+          };
+        }
+        return conv;
+      }));
+    } catch (err: any) {
+      alert(err.message || 'Gagal mengunggah file.');
+    } finally {
+      setIsUploadingFile(false);
+    }
+  };
+
+  // Membuka modal ajukan kesepakatan invoice DP
+  const handleOpenCreateInvoiceModal = () => {
+    if (!activeConversation) return;
+    setInvoiceFormTitle(activeConversation.category ? `Proyek ${activeConversation.category}` : 'Kesepakatan Pengerjaan Proyek');
+    setInvoiceFormTotal('1500000');
+    setInvoiceFormDpPercent(50);
+    setInvoiceFormScope('Pengerjaan konten kreatif sesuai brief yang disepakati, termasuk 2 kali kuota revisi minor.');
+    setInvoiceFormDays(3);
+    setIsCreateInvoiceModalOpen(true);
+  };
+
+  // Mengirim pengajuan invoice DP ke bubble chat
+  const handleSendInvoice = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!activeChatId || !activeConversation) return;
+
+    setIsSendingInvoice(true);
+    try {
+      const cleanTotal = parseInt(invoiceFormTotal.replace(/[^0-9]/g, ''), 10) || 1500000;
+      const dpAmount = Math.round((cleanTotal * invoiceFormDpPercent) / 100);
+      const invId = `INV-${Date.now().toString().slice(-6)}`;
+
+      const newInvoice: ChatInvoice = {
+        id: invId,
+        serviceTitle: invoiceFormTitle,
+        amount: `Rp${dpAmount.toLocaleString('id-ID')}`,
+        status: 'unpaid',
+        dueDate: `${invoiceFormDays} Hari Kerja`,
+        scopeSummary: `DP ${invoiceFormDpPercent}% dari Total Rp${cleanTotal.toLocaleString('id-ID')}. ${invoiceFormScope}`,
+      };
+
+      const msgText = `Pengajuan Kesepakatan: Invoice DP ${invoiceFormDpPercent}% sebesar Rp${dpAmount.toLocaleString('id-ID')} untuk ${invoiceFormTitle}.`;
+      const result = await chatService.sendMessage(activeChatId, msgText);
+
+      const invoiceMessage: ChatMessage = {
+        id: result.message?.id || `msg-${Date.now()}`,
+        senderId: currentUser?.id || 'user',
+        text: msgText,
+        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        isSelf: true,
+        status: 'sent',
+        invoice: newInvoice,
+      };
+
+      setConversations(prev => prev.map(conv => {
+        if (conv.id === activeChatId) {
+          return {
+            ...conv,
+            lastMessage: `Invoice DP ${newInvoice.amount} diajukan`,
+            lastMessageTime: 'Baru saja',
+            messages: [...conv.messages, invoiceMessage],
+          };
+        }
+        return conv;
+      }));
+
+      setIsCreateInvoiceModalOpen(false);
+    } catch (err: any) {
+      alert(err.message || 'Gagal mengajukan invoice.');
+    } finally {
+      setIsSendingInvoice(false);
+    }
+  };
+
   const handleDiscussService = (service: CreatorService) => {
     if (!activeCreator || !activeChatId) return;
     void handleSendMessage(`Halo ${activeCreator.name}, saya ingin mendiskusikan layanan "${service.title}" (${service.formattedPrice}).`);
@@ -235,6 +405,8 @@ export const ChatPage: React.FC<ChatPageProps> = ({
 
   // UMKM Membayar Invoice di Room Chat -> Masuk ke Escrow & Mengaktifkan Collaboration Room
   const handlePayInvoice = (messageId: string, invoice: ChatInvoice) => {
+    setActivePaidInvoice(invoice);
+
     setConversations(prev => prev.map(conv => {
       if (conv.id === activeChatId) {
         const updatedMessages = conv.messages.map(msg => {
@@ -253,7 +425,7 @@ export const ChatPage: React.FC<ChatPageProps> = ({
         const systemNotice: ChatMessage = {
           id: `sys-${Date.now()}`,
           senderId: 'system',
-          text: `Pembayaran ${invoice.amount} untuk ${invoice.serviceTitle} telah diamankan di Rekening Escrow Creatorin. Proyek resmi dimulai dan Collaboration Room telah aktif!`,
+          text: `Pembayaran DP ${invoice.amount} untuk "${invoice.serviceTitle}" telah diamankan di Rekening Escrow CreatorIn. Proyek resmi dimulai dan Collaboration Room telah aktif!`,
           timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
           isSelf: false,
           status: 'read'
@@ -261,7 +433,7 @@ export const ChatPage: React.FC<ChatPageProps> = ({
 
         return {
           ...conv,
-          lastMessage: `Pembayaran invoice ${invoice.id} berhasil`,
+          lastMessage: `Pembayaran DP invoice ${invoice.id} berhasil diamankan di Escrow`,
           lastMessageTime: 'Baru saja',
           messages: [...updatedMessages, systemNotice]
         };
@@ -485,8 +657,49 @@ export const ChatPage: React.FC<ChatPageProps> = ({
               </div>
             </div>
 
-            {/* Aksi Sisi Kanan: Tombol Profil & Toggle Layanan di Layar Kecil */}
+            {/* Aksi Sisi Kanan: Tab Switcher & Tombol Ajukan DP */}
             <div className="flex items-center gap-2">
+              {/* Tab Switcher antara Chat dan Collaboration Room */}
+              <div className="hidden sm:flex items-center p-1 bg-neutral-100 rounded-xl text-xs font-semibold">
+                <button
+                  type="button"
+                  onClick={() => setActiveViewMode('chat')}
+                  className={`px-3 py-1.5 rounded-lg transition cursor-pointer ${
+                    activeViewMode === 'chat'
+                      ? 'bg-white text-neutral-900 shadow-2xs'
+                      : 'text-neutral-500 hover:text-neutral-900'
+                  }`}
+                >
+                  Obrolan
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setActiveViewMode('collaboration')}
+                  className={`px-3 py-1.5 rounded-lg transition cursor-pointer flex items-center gap-1.5 ${
+                    activeViewMode === 'collaboration'
+                      ? 'bg-[#0B1F3A] text-white shadow-2xs'
+                      : 'text-neutral-500 hover:text-neutral-900'
+                  }`}
+                >
+                  <Sparkles className="w-3 h-3 text-amber-300" />
+                  <span>Collaboration</span>
+                  {activePaidInvoice && (
+                    <span className="w-2 h-2 rounded-full bg-emerald-400" />
+                  )}
+                </button>
+              </div>
+
+              {/* Tombol Ajukan Invoice DP */}
+              <button
+                type="button"
+                onClick={handleOpenCreateInvoiceModal}
+                className="h-8 px-3 rounded-lg bg-[#0B1F3A] hover:bg-[#123B8C] text-white text-xs font-semibold flex items-center gap-1.5 transition cursor-pointer shadow-2xs"
+                title="Ajukan Kesepakatan / Invoice DP ke Klien"
+              >
+                <Handshake className="w-3.5 h-3.5" />
+                <span className="hidden md:inline">Ajukan Invoice DP</span>
+              </button>
+
               <button
                 onClick={() => setIsRightSidebarOpenMobile(!isRightSidebarOpenMobile)}
                 className="xl:hidden inline-flex items-center gap-1.5 text-xs font-semibold text-blue-600 bg-blue-50 px-2.5 py-1.5 rounded-md hover:bg-blue-100 border border-blue-200 transition-colors cursor-pointer"
@@ -494,15 +707,6 @@ export const ChatPage: React.FC<ChatPageProps> = ({
               >
                 <Sparkles className="w-3.5 h-3.5 text-blue-600" />
                 <span className="hidden sm:inline">Ringkasan AI</span>
-              </button>
-
-              <button
-                onClick={() => {
-                  handleCreatorClick(activeCreator);
-                }}
-                className="text-xs font-medium text-neutral-700 hover:text-blue-600 px-3 py-1.5 rounded-md hover:bg-neutral-100 border border-neutral-200 transition-colors cursor-pointer"
-              >
-                Lihat Profil
               </button>
 
               {/* Tombol Tutup Chat untuk Kembali ke Preview Bersih */}
@@ -519,8 +723,18 @@ export const ChatPage: React.FC<ChatPageProps> = ({
             </div>
           </header>
 
-          {/* AREA PESAN CHAT (WHITESPACE LUAS & FOKUS PERCAKAPAN) */}
-          <div className="flex-1 overflow-y-auto overscroll-contain p-4 sm:p-6 space-y-3.5 bg-white">
+          {activeViewMode === 'collaboration' ? (
+            <CollaborationRoomView
+              conversation={activeConversation}
+              currentUser={currentUser}
+              invoice={activePaidInvoice}
+              onBackToChat={() => setActiveViewMode('chat')}
+              onSendChatMessage={(text) => handleSendMessage(text)}
+            />
+          ) : (
+            <>
+              {/* AREA PESAN CHAT (WHITESPACE LUAS & FOKUS PERCAKAPAN) */}
+              <div className="flex-1 overflow-y-auto overscroll-contain p-4 sm:p-6 space-y-3.5 bg-white">
             
             {/* Tanggal Ringkas */}
             <div className="flex items-center justify-center my-2">
@@ -673,11 +887,15 @@ export const ChatPage: React.FC<ChatPageProps> = ({
                                 <span>Rincian Tagihan</span>
                               </button>
                               <button
-                                onClick={() => navigateTo('collaboration-room', '/contracts')}
-                                className="w-full py-2 px-2.5 rounded-xl text-xs font-semibold text-white bg-[#0B1F3A] hover:bg-[#123B8C] transition-colors cursor-pointer flex items-center justify-center gap-1.5 shadow-2xs"
+                                onClick={() => {
+                                  setActivePaidInvoice(msg.invoice!);
+                                  setActiveViewMode('collaboration');
+                                }}
+                                className="w-full py-2 px-2.5 rounded-xl text-xs font-bold text-white bg-[#0B1F3A] hover:bg-[#123B8C] transition-colors cursor-pointer flex items-center justify-center gap-1.5 shadow-2xs"
                               >
+                                <Sparkles className="w-3.5 h-3.5 text-amber-300" />
                                 <span>Masuk Room</span>
-                                <ExternalLink className="w-3 h-3" />
+                                <ArrowRight className="w-3.5 h-3.5" />
                               </button>
                             </div>
                           </div>
@@ -702,9 +920,17 @@ export const ChatPage: React.FC<ChatPageProps> = ({
           </div>
 
           {/* ========================================================== */}
-          {/* COMPOSER BERSIH (HANYA ATTACHMENT + INPUT + KIRIM)        */}
+          {/* COMPOSER REAL FILE UPLOAD + INVOICE SHORTCUT + KIRIM      */}
           {/* ========================================================== */}
-          <footer className="p-3 sm:p-4 border-t border-neutral-200 bg-white shrink-0">
+          <footer className="p-3 sm:p-4 border-t border-neutral-200 bg-white shrink-0 space-y-2">
+            {/* Indikator Sedang Mengunggah File */}
+            {isUploadingFile && (
+              <div className="px-3 py-1.5 rounded-lg bg-blue-50 text-blue-700 text-xs font-medium flex items-center gap-2 animate-pulse">
+                <div className="w-3.5 h-3.5 border-2 border-blue-600 border-t-transparent rounded-full animate-spin" />
+                <span>Sedang mengunggah berkas ke ruang obrolan...</span>
+              </div>
+            )}
+
             <form
               onSubmit={(e) => {
                 e.preventDefault();
@@ -712,14 +938,34 @@ export const ChatPage: React.FC<ChatPageProps> = ({
               }}
               className="flex items-center gap-2"
             >
+              {/* Hidden File Picker untuk Gambar & Dokumen */}
+              <input
+                type="file"
+                ref={fileInputRef}
+                onChange={handleFileUpload}
+                className="hidden"
+                accept="image/jpeg,image/png,image/webp,image/gif,application/pdf,application/zip,application/x-zip-compressed,.docx,.doc,.txt"
+              />
+
               {/* Tombol Lampirkan File / Gambar */}
               <button
                 type="button"
-                onClick={() => alert('Pilih lampiran file atau referensi brief untuk dikirim ke ruang chat.')}
-                className="p-2 text-neutral-500 hover:text-neutral-800 hover:bg-neutral-100 rounded-lg transition-colors cursor-pointer shrink-0"
-                title="Lampirkan File"
+                onClick={() => fileInputRef.current?.click()}
+                disabled={isUploadingFile}
+                className="p-2 text-neutral-500 hover:text-neutral-800 hover:bg-neutral-100 rounded-lg transition-colors cursor-pointer shrink-0 disabled:opacity-50"
+                title="Unggah Foto atau Dokumen Proyek"
               >
                 <Paperclip className="w-4 h-4" />
+              </button>
+
+              {/* Tombol Cepat Ajukan Kesepakatan / Invoice DP */}
+              <button
+                type="button"
+                onClick={handleOpenCreateInvoiceModal}
+                className="p-2 text-neutral-500 hover:text-[#0B1F3A] hover:bg-neutral-100 rounded-lg transition-colors cursor-pointer shrink-0"
+                title="Ajukan Kesepakatan / Invoice DP"
+              >
+                <Handshake className="w-4 h-4" />
               </button>
 
               {/* Input Teks Pesan */}
@@ -734,9 +980,9 @@ export const ChatPage: React.FC<ChatPageProps> = ({
               {/* Tombol Kirim */}
               <button
                 type="submit"
-                disabled={!inputText.trim()}
+                disabled={!inputText.trim() || isUploadingFile}
                 className={`px-3.5 py-2 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-colors shrink-0 ${
-                  inputText.trim()
+                  inputText.trim() && !isUploadingFile
                     ? 'bg-blue-600 hover:bg-blue-700 text-white cursor-pointer'
                     : 'bg-neutral-100 text-neutral-400 cursor-not-allowed'
                 }`}
@@ -746,6 +992,8 @@ export const ChatPage: React.FC<ChatPageProps> = ({
               </button>
             </form>
           </footer>
+          </>
+          )}
 
         </section>
         )}
@@ -1075,6 +1323,138 @@ export const ChatPage: React.FC<ChatPageProps> = ({
             }}
             onClose={() => setActiveInvoiceDetail(null)}
           />
+        </div>
+      )}
+      {/* MODAL AJUKAN KESEPAKATAN / INVOICE DP KE ROOM CHAT         */}
+      {/* ========================================================== */}
+      {isCreateInvoiceModalOpen && activeConversation && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-xs p-4 animate-in fade-in duration-150">
+          <div className="w-full max-w-lg bg-white rounded-2xl border border-neutral-200 p-6 shadow-2xl space-y-4 animate-in zoom-in-95">
+            {/* Header Modal */}
+            <div className="flex items-start justify-between pb-3 border-b border-neutral-100">
+              <div>
+                <span className="text-[11px] font-bold text-[#155DFC] uppercase tracking-wider">
+                  Escrow Kesepakatan Resmi
+                </span>
+                <h3 className="text-base font-bold text-neutral-900 mt-0.5">
+                  Ajukan Invoice DP Proyek
+                </h3>
+                <p className="text-xs text-neutral-500 mt-0.5">
+                  Kirimkan penawaran termin pembayaran bertahap ke <strong>{activeConversation.name}</strong>.
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setIsCreateInvoiceModalOpen(false)}
+                className="text-neutral-400 hover:text-neutral-600 p-1 rounded-lg cursor-pointer"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Form Input */}
+            <form onSubmit={handleSendInvoice} className="space-y-4">
+              <div>
+                <label className="block text-xs font-semibold text-neutral-700 mb-1">
+                  Judul Proyek / Layanan
+                </label>
+                <input
+                  type="text"
+                  required
+                  placeholder="Contoh: Produksi 1 Video Reels UGC + Scripting"
+                  value={invoiceFormTitle}
+                  onChange={(e) => setInvoiceFormTitle(e.target.value)}
+                  className="w-full text-xs sm:text-sm p-3 rounded-xl border border-neutral-200 focus:outline-hidden focus:border-[#0B1F3A]"
+                />
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-semibold text-neutral-700 mb-1">
+                    Total Nilai Proyek (Rp)
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="1500000"
+                    value={invoiceFormTotal}
+                    onChange={(e) => setInvoiceFormTotal(e.target.value)}
+                    className="w-full text-xs sm:text-sm p-3 rounded-xl border border-neutral-200 focus:outline-hidden focus:border-[#0B1F3A]"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-semibold text-neutral-700 mb-1">
+                    Pilihan Termin DP
+                  </label>
+                  <div className="flex gap-1.5 pt-0.5">
+                    {[30, 50, 100].map((pct) => (
+                      <button
+                        key={pct}
+                        type="button"
+                        onClick={() => setInvoiceFormDpPercent(pct)}
+                        className={`flex-1 py-2 rounded-xl text-xs font-bold transition cursor-pointer ${
+                          invoiceFormDpPercent === pct
+                            ? 'bg-[#0B1F3A] text-white shadow-2xs'
+                            : 'bg-neutral-100 text-neutral-700 hover:bg-neutral-200'
+                        }`}
+                      >
+                        {pct}%
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              {/* Rincian DP Terhitung */}
+              <div className="p-3 bg-blue-50/70 border border-blue-100 rounded-xl flex items-center justify-between text-xs">
+                <div>
+                  <span className="text-[11px] text-blue-700 block font-medium">Nominal DP Terhitung ({invoiceFormDpPercent}%)</span>
+                  <span className="font-bold text-sm text-[#0B1F3A]">
+                    Rp{Math.round(((parseInt(invoiceFormTotal.replace(/[^0-9]/g, ''), 10) || 0) * invoiceFormDpPercent) / 100).toLocaleString('id-ID')}
+                  </span>
+                </div>
+                <div className="text-right">
+                  <span className="text-[10px] text-neutral-500 block">Sisa Pelunasan</span>
+                  <span className="text-xs font-semibold text-neutral-700">
+                    Rp{Math.round(((parseInt(invoiceFormTotal.replace(/[^0-9]/g, ''), 10) || 0) * (100 - invoiceFormDpPercent)) / 100).toLocaleString('id-ID')}
+                  </span>
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-neutral-700 mb-1">
+                  Rincian Lingkup Kerja & Deliverables
+                </label>
+                <textarea
+                  required
+                  rows={3}
+                  placeholder="Tuliskan format file, resolusi, durasi, dan ketentuan revisi..."
+                  value={invoiceFormScope}
+                  onChange={(e) => setInvoiceFormScope(e.target.value)}
+                  className="w-full text-xs sm:text-sm p-3 rounded-xl border border-neutral-200 focus:outline-hidden focus:border-[#0B1F3A]"
+                />
+              </div>
+
+              <div className="flex items-center justify-between pt-2 border-t border-neutral-100">
+                <button
+                  type="button"
+                  onClick={() => setIsCreateInvoiceModalOpen(false)}
+                  className="px-4 py-2.5 rounded-xl text-xs font-semibold text-neutral-600 hover:bg-neutral-100 cursor-pointer"
+                >
+                  Batal
+                </button>
+                <button
+                  type="submit"
+                  disabled={isSendingInvoice}
+                  className="px-5 py-2.5 rounded-xl bg-[#0B1F3A] hover:bg-[#123B8C] text-white text-xs font-bold transition shadow-xs flex items-center gap-2 cursor-pointer"
+                >
+                  <Handshake className="w-4 h-4" />
+                  <span>{isSendingInvoice ? 'Mengirim...' : 'Kirim Penawaran & Invoice DP'}</span>
+                </button>
+              </div>
+            </form>
+          </div>
         </div>
       )}
 
