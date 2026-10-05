@@ -1,30 +1,58 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import {
-  ShieldCheck,
-  LayoutDashboard,
-  Users,
-  Briefcase,
-  Receipt,
-  GraduationCap,
-  LogOut,
-  Search,
-  RefreshCw,
-  ExternalLink,
-  CheckCircle2,
-  Clock,
   AlertCircle,
+  BarChart3,
+  BriefcaseBusiness,
   Building2,
-  TrendingUp,
-  Filter,
   Check,
-  X,
+  CheckCircle2,
+  Clock3,
+  ExternalLink,
+  Filter,
+  GraduationCap,
+  LayoutDashboard,
+  Loader2,
+  LogOut,
   Menu,
-  Sun,
-  Moon,
+  RefreshCw,
+  Search,
+  ShieldCheck,
+  UsersRound,
+  WalletCards,
+  X,
+  type LucideIcon,
 } from 'lucide-react';
+
+type AdminTab = 'overview' | 'users' | 'briefs' | 'schools';
+
+interface AdminUser {
+  id: string;
+  fullName?: string | null;
+  email?: string | null;
+  role?: string | null;
+  createdAt?: string | null;
+}
+
+interface AdminBrief {
+  id: string;
+  title?: string | null;
+  category?: string | null;
+  budget?: string | number | null;
+  status?: string | null;
+  createdAt?: string | null;
+}
+
+interface AdminSchool {
+  id: string;
+  name?: string | null;
+  slug?: string | null;
+  picName?: string | null;
+  picContact?: string | null;
+  isVerified?: boolean | null;
+}
 
 interface AdminStats {
   users: {
@@ -54,62 +82,313 @@ interface AdminStats {
   };
   services: number;
   portfolioProjects: number;
-  recentUsers: Array<{
-    id: string;
-    fullName: string;
-    email: string;
-    role: string;
-    createdAt: string;
-  }>;
+  recentUsers: AdminUser[];
+}
+
+const tabs: Array<{ id: AdminTab; label: string; helper: string; icon: LucideIcon }> = [
+  { id: 'overview', label: 'Ringkasan', helper: 'Metrik platform', icon: LayoutDashboard },
+  { id: 'users', label: 'Pengguna', helper: 'Role dan akses', icon: UsersRound },
+  { id: 'briefs', label: 'Brief proyek', helper: 'Pekerjaan UMKM', icon: BriefcaseBusiness },
+  { id: 'schools', label: 'SMK vokasi', helper: 'Verifikasi sekolah', icon: GraduationCap },
+];
+
+const roleOptions = [
+  { value: '', label: 'Semua peran' },
+  { value: 'admin', label: 'Admin' },
+  { value: 'creator', label: 'Creator' },
+  { value: 'business', label: 'UMKM' },
+  { value: 'school', label: 'SMK' },
+];
+
+const roleLabels: Record<string, string> = {
+  admin: 'Admin',
+  creator: 'Creator',
+  business: 'UMKM',
+  school: 'SMK',
+};
+
+function cx(...classes: Array<string | false | null | undefined>) {
+  return classes.filter(Boolean).join(' ');
+}
+
+function formatDate(value?: string | null) {
+  if (!value) return '-';
+
+  return new Date(value).toLocaleDateString('id-ID', {
+    day: 'numeric',
+    month: 'short',
+    year: 'numeric',
+  });
+}
+
+function formatNumber(value: number) {
+  return new Intl.NumberFormat('id-ID').format(value || 0);
+}
+
+function formatCurrency(value: number) {
+  return new Intl.NumberFormat('id-ID', {
+    style: 'currency',
+    currency: 'IDR',
+    maximumFractionDigits: 0,
+  }).format(value || 0);
+}
+
+function getNameInitial(name?: string | null) {
+  return (name || 'A').trim().charAt(0).toUpperCase();
+}
+
+function roleBadgeClass(role?: string | null) {
+  if (role === 'admin') return 'border-[#FEE4E2] bg-[#FEE4E2] text-[#912018]';
+  if (role === 'creator') return 'border-[#E8F0FF] bg-[#E8F0FF] text-[#0D2A75]';
+  if (role === 'business') return 'border-[#DCFCE7] bg-[#DCFCE7] text-[#14532D]';
+  return 'border-[#FFF4D6] bg-[#FFF4D6] text-[#7A2E0E]';
+}
+
+function statusBadgeClass(status?: string | null) {
+  const normalized = (status || '').toLowerCase();
+  if (normalized.includes('complete') || normalized.includes('selesai')) {
+    return 'border-[#DCFCE7] bg-[#DCFCE7] text-[#14532D]';
+  }
+  if (normalized.includes('progress') || normalized.includes('review')) {
+    return 'border-[#E8F0FF] bg-[#E8F0FF] text-[#0D2A75]';
+  }
+  if (normalized.includes('cancel') || normalized.includes('tolak')) {
+    return 'border-[#FEE4E2] bg-[#FEE4E2] text-[#912018]';
+  }
+  return 'border-[#FFF4D6] bg-[#FFF4D6] text-[#7A2E0E]';
+}
+
+function PageTitle({ activeTab }: { activeTab: AdminTab }) {
+  const copy = {
+    overview: {
+      title: 'Ringkasan platform',
+      text: 'Pantau pengguna, brief, invoice, dan verifikasi dari satu layar kerja.',
+    },
+    users: {
+      title: 'Manajemen pengguna',
+      text: 'Cari akun, tinjau role, dan ubah akses sesuai kebutuhan operasional.',
+    },
+    briefs: {
+      title: 'Daftar brief proyek',
+      text: 'Lihat pekerjaan yang dipublikasikan UMKM beserta status dan budget.',
+    },
+    schools: {
+      title: 'Verifikasi SMK vokasi',
+      text: 'Tinjau sekolah vokasi dan kelola status verifikasinya.',
+    },
+  }[activeTab];
+
+  return (
+    <div>
+      <h1 className="font-display text-2xl font-semibold leading-9 text-[#0D0C22] sm:text-[32px] sm:leading-10">
+        {copy.title}
+      </h1>
+      <p className="mt-1 max-w-2xl text-sm leading-6 text-[#55576A]">{copy.text}</p>
+    </div>
+  );
+}
+
+function MetricCard({
+  icon: Icon,
+  label,
+  value,
+  note,
+  tone = 'primary',
+}: {
+  icon: LucideIcon;
+  label: string;
+  value: string;
+  note: string;
+  tone?: 'primary' | 'info' | 'success' | 'warning';
+}) {
+  const toneClass = {
+    primary: 'bg-[#E8F0FF] text-[#155DFC]',
+    info: 'bg-[#E1F6FF] text-[#087BB8]',
+    success: 'bg-[#DCFCE7] text-[#16803C]',
+    warning: 'bg-[#FFF4D6] text-[#B54708]',
+  }[tone];
+
+  return (
+    <article className="rounded-2xl border border-[#E1E3EA] bg-white p-5 shadow-[0_1px_2px_rgba(13,12,34,0.06)]">
+      <div className="flex items-start justify-between gap-4">
+        <div>
+          <p className="text-sm font-medium text-[#55576A]">{label}</p>
+          <p className="mt-3 font-display text-3xl font-semibold leading-9 text-[#0D0C22]">{value}</p>
+        </div>
+        <div className={cx('grid h-11 w-11 shrink-0 place-items-center rounded-xl', toneClass)}>
+          <Icon className="h-5 w-5" aria-hidden="true" />
+        </div>
+      </div>
+      <p className="mt-4 text-sm leading-6 text-[#55576A]">{note}</p>
+    </article>
+  );
+}
+
+function EmptyState({ title, text }: { title: string; text: string }) {
+  return (
+    <div className="rounded-2xl border border-dashed border-[#B7BBC9] bg-[#F8F9FC] p-8 text-center">
+      <p className="text-sm font-semibold text-[#0D0C22]">{title}</p>
+      <p className="mt-1 text-sm leading-6 text-[#55576A]">{text}</p>
+    </div>
+  );
+}
+
+function LoadingRows({ columns }: { columns: number }) {
+  return (
+    <>
+      {Array.from({ length: 5 }).map((_, rowIndex) => (
+        <tr key={rowIndex} className="border-b border-[#E1E3EA]">
+          {Array.from({ length: columns }).map((__, colIndex) => (
+            <td key={colIndex} className="py-4">
+              <div className="h-4 w-4/5 animate-pulse rounded bg-[#E9EAF0]" />
+            </td>
+          ))}
+        </tr>
+      ))}
+    </>
+  );
+}
+
+function StatusPill({
+  children,
+  className,
+  icon: Icon,
+}: {
+  children: React.ReactNode;
+  className: string;
+  icon?: LucideIcon;
+}) {
+  return (
+    <span className={cx('inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-semibold', className)}>
+      {Icon ? <Icon className="h-3.5 w-3.5" aria-hidden="true" /> : null}
+      {children}
+    </span>
+  );
+}
+
+function HorizontalChart({
+  title,
+  description,
+  data,
+}: {
+  title: string;
+  description: string;
+  data: Array<{ label: string; value: number; color: string }>;
+}) {
+  const max = Math.max(...data.map((item) => item.value), 0);
+
+  return (
+    <section className="rounded-2xl border border-[#E1E3EA] bg-white p-5 shadow-[0_1px_2px_rgba(13,12,34,0.06)]">
+      <div className="mb-5 flex items-start justify-between gap-4">
+        <div>
+          <h2 className="font-display text-xl font-semibold text-[#0D0C22]">{title}</h2>
+          <p className="mt-1 text-sm leading-6 text-[#55576A]">{description}</p>
+        </div>
+        <div className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-[#E8F0FF] text-[#155DFC]">
+          <BarChart3 className="h-5 w-5" aria-hidden="true" />
+        </div>
+      </div>
+
+      {max === 0 ? (
+        <EmptyState title="Belum ada data grafik" text="Grafik akan tampil setelah API mengirim nilai di atas nol." />
+      ) : (
+        <div className="space-y-4">
+          {data.map((item) => {
+            const width = Math.max((item.value / max) * 100, 4);
+
+            return (
+              <div key={item.label}>
+                <div className="mb-2 flex items-center justify-between gap-3 text-sm">
+                  <span className="font-semibold text-[#0D0C22]">{item.label}</span>
+                  <span className="font-medium text-[#55576A]">{formatNumber(item.value)}</span>
+                </div>
+                <svg viewBox="0 0 100 8" className="h-3 w-full overflow-visible" preserveAspectRatio="none" role="img" aria-label={`${item.label}: ${formatNumber(item.value)}`}>
+                  <rect width="100" height="8" rx="4" fill="#F3F3F4" />
+                  <rect width={width} height="8" rx="4" fill={item.color} />
+                </svg>
+              </div>
+            );
+          })}
+        </div>
+      )}
+    </section>
+  );
+}
+
+function RatioChart({ paid, unpaid }: { paid: number; unpaid: number }) {
+  const total = paid + unpaid;
+  const paidRatio = total > 0 ? paid / total : 0;
+  const circumference = 2 * Math.PI * 42;
+
+  return (
+    <section className="rounded-2xl border border-[#E1E3EA] bg-white p-5 shadow-[0_1px_2px_rgba(13,12,34,0.06)]">
+      <div className="mb-5">
+        <h2 className="font-display text-xl font-semibold text-[#0D0C22]">Status invoice</h2>
+        <p className="mt-1 text-sm leading-6 text-[#55576A]">Komposisi invoice dibayar dan belum dibayar.</p>
+      </div>
+
+      {total === 0 ? (
+        <EmptyState title="Belum ada invoice" text="Komposisi invoice akan muncul saat data transaksi tersedia." />
+      ) : (
+        <div className="grid items-center gap-6 sm:grid-cols-[160px_1fr]">
+          <div className="relative mx-auto h-40 w-40">
+            <svg viewBox="0 0 100 100" className="h-full w-full -rotate-90" role="img" aria-label={`Invoice dibayar ${formatNumber(paid)} dari ${formatNumber(total)}`}>
+              <circle cx="50" cy="50" r="42" fill="none" stroke="#F3F3F4" strokeWidth="10" />
+              <circle
+                cx="50"
+                cy="50"
+                r="42"
+                fill="none"
+                stroke="#155DFC"
+                strokeLinecap="round"
+                strokeWidth="10"
+                strokeDasharray={`${paidRatio * circumference} ${circumference}`}
+              />
+            </svg>
+            <div className="absolute inset-0 grid place-items-center text-center">
+              <div>
+                <p className="font-display text-3xl font-semibold text-[#0D0C22]">{Math.round(paidRatio * 100)}%</p>
+                <p className="text-xs font-semibold text-[#55576A]">dibayar</p>
+              </div>
+            </div>
+          </div>
+
+          <div className="space-y-3">
+            <div className="flex items-center justify-between rounded-xl bg-[#E8F0FF] px-4 py-3">
+              <span className="text-sm font-semibold text-[#0D2A75]">Dibayar</span>
+              <span className="text-sm font-semibold text-[#0D2A75]">{formatNumber(paid)}</span>
+            </div>
+            <div className="flex items-center justify-between rounded-xl bg-[#FFF4D6] px-4 py-3">
+              <span className="text-sm font-semibold text-[#7A2E0E]">Belum dibayar</span>
+              <span className="text-sm font-semibold text-[#7A2E0E]">{formatNumber(unpaid)}</span>
+            </div>
+          </div>
+        </div>
+      )}
+    </section>
+  );
 }
 
 export default function AdminDashboardPage() {
   const router = useRouter();
-  const [activeTab, setActiveTab] = useState<'overview' | 'users' | 'briefs' | 'schools'>('overview');
-  const [theme, setTheme] = useState<'dark' | 'light'>('dark');
+  const [activeTab, setActiveTab] = useState<AdminTab>('overview');
   const [stats, setStats] = useState<AdminStats | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-
-  // Users tab state
-  const [usersList, setUsersList] = useState<any[]>([]);
+  const [usersList, setUsersList] = useState<AdminUser[]>([]);
   const [usersFilter, setUsersFilter] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
   const [usersLoading, setUsersLoading] = useState(false);
-
-  // Schools tab state
-  const [schoolsList, setSchoolsList] = useState<any[]>([]);
+  const [schoolsList, setSchoolsList] = useState<AdminSchool[]>([]);
   const [schoolsLoading, setSchoolsLoading] = useState(false);
-
-  // Briefs tab state
-  const [briefsList, setBriefsList] = useState<any[]>([]);
+  const [briefsList, setBriefsList] = useState<AdminBrief[]>([]);
   const [briefsLoading, setBriefsLoading] = useState(false);
 
-  // Cek token saat inisialisasi & domain redirect
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      if (window.location.hostname === 'creatorin.my.id') {
-        window.location.replace('https://api.creatorin.my.id/admin');
-        return;
-      }
-      const savedTheme = localStorage.getItem('creatorin_admin_theme');
-      if (savedTheme === 'light' || savedTheme === 'dark') {
-        setTheme(savedTheme);
-      }
-    }
-    fetchStats();
-  }, []);
-
-  const toggleTheme = () => {
-    const nextTheme = theme === 'dark' ? 'light' : 'dark';
-    setTheme(nextTheme);
-    localStorage.setItem('creatorin_admin_theme', nextTheme);
-  };
-
-  const fetchStats = async () => {
+  const fetchStats = useCallback(async () => {
     setLoading(true);
     setError(null);
+
     try {
       const token = localStorage.getItem('creatorin_access_token');
       const res = await fetch('/api/admin/stats', {
@@ -124,15 +403,16 @@ export default function AdminDashboardPage() {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Gagal memuat statistik.');
       setStats(data.data);
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Gagal memuat statistik.');
     } finally {
       setLoading(false);
     }
-  };
+  }, [router]);
 
-  const fetchUsers = async () => {
+  const fetchUsers = useCallback(async () => {
     setUsersLoading(true);
+
     try {
       const token = localStorage.getItem('creatorin_access_token');
       const url = new URL('/api/admin/users', window.location.origin);
@@ -143,51 +423,67 @@ export default function AdminDashboardPage() {
         headers: token ? { Authorization: `Bearer ${token}` } : {},
       });
       const data = await res.json();
-      if (data.success) {
-        setUsersList(data.users);
-      }
+      if (!res.ok) throw new Error(data.error || 'Gagal memuat pengguna.');
+      setUsersList(data.users || []);
     } catch (err) {
-      console.error(err);
+      setError(err instanceof Error ? err.message : 'Gagal memuat pengguna.');
     } finally {
       setUsersLoading(false);
     }
-  };
+  }, [searchQuery, usersFilter]);
 
-  const fetchSchools = async () => {
+  const fetchSchools = useCallback(async () => {
     setSchoolsLoading(true);
+
     try {
       const token = localStorage.getItem('creatorin_access_token');
       const res = await fetch('/api/admin/schools', {
         headers: token ? { Authorization: `Bearer ${token}` } : {},
       });
       const data = await res.json();
-      if (data.success) {
-        setSchoolsList(data.schools);
-      }
+      if (!res.ok) throw new Error(data.error || 'Gagal memuat data sekolah.');
+      setSchoolsList(data.schools || []);
     } catch (err) {
-      console.error(err);
+      setError(err instanceof Error ? err.message : 'Gagal memuat data sekolah.');
     } finally {
       setSchoolsLoading(false);
     }
-  };
+  }, []);
 
-  const fetchBriefs = async () => {
+  const fetchBriefs = useCallback(async () => {
     setBriefsLoading(true);
+
     try {
       const token = localStorage.getItem('creatorin_access_token');
       const res = await fetch('/api/admin/briefs', {
         headers: token ? { Authorization: `Bearer ${token}` } : {},
       });
       const data = await res.json();
-      if (data.success) {
-        setBriefsList(data.briefs);
-      }
+      if (!res.ok) throw new Error(data.error || 'Gagal memuat brief.');
+      setBriefsList(data.briefs || []);
     } catch (err) {
-      console.error(err);
+      setError(err instanceof Error ? err.message : 'Gagal memuat brief.');
     } finally {
       setBriefsLoading(false);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      if (window.location.hostname === 'creatorin.my.id') {
+        window.location.replace('https://api.creatorin.my.id/admin');
+        return;
+      }
+    }
+
+    void Promise.resolve().then(fetchStats);
+  }, [fetchStats]);
+
+  useEffect(() => {
+    if (activeTab === 'users') void Promise.resolve().then(fetchUsers);
+    if (activeTab === 'schools') void Promise.resolve().then(fetchSchools);
+    if (activeTab === 'briefs') void Promise.resolve().then(fetchBriefs);
+  }, [activeTab, fetchBriefs, fetchSchools, fetchUsers]);
 
   const handleUpdateSchoolStatus = async (schoolId: string, isVerified: boolean) => {
     try {
@@ -200,12 +496,11 @@ export default function AdminDashboardPage() {
         },
         body: JSON.stringify({ schoolId, isVerified }),
       });
-      if (res.ok) {
-        fetchSchools();
-        fetchStats();
-      }
+
+      if (!res.ok) throw new Error('Gagal memperbarui status sekolah.');
+      await Promise.all([fetchSchools(), fetchStats()]);
     } catch (err) {
-      console.error(err);
+      setError(err instanceof Error ? err.message : 'Gagal memperbarui status sekolah.');
     }
   };
 
@@ -220,12 +515,11 @@ export default function AdminDashboardPage() {
         },
         body: JSON.stringify({ userId, role: newRole }),
       });
-      if (res.ok) {
-        fetchUsers();
-        fetchStats();
-      }
+
+      if (!res.ok) throw new Error('Gagal memperbarui role pengguna.');
+      await Promise.all([fetchUsers(), fetchStats()]);
     } catch (err) {
-      console.error(err);
+      setError(err instanceof Error ? err.message : 'Gagal memperbarui role pengguna.');
     }
   };
 
@@ -245,1034 +539,520 @@ export default function AdminDashboardPage() {
     }
 
     await fetch('/api/auth/logout', { method: 'POST', credentials: 'include' }).catch(() => {});
-    window.location.href = '/admin/login';
+    router.push('/admin/login');
   };
 
-  useEffect(() => {
-    if (activeTab === 'users') fetchUsers();
-    if (activeTab === 'schools') fetchSchools();
-    if (activeTab === 'briefs') fetchBriefs();
-  }, [activeTab, usersFilter, searchQuery]);
+  const userChart = useMemo(
+    () => [
+      { label: 'Creator', value: stats?.users.creator || 0, color: '#155DFC' },
+      { label: 'UMKM', value: stats?.users.business || 0, color: '#03ACFD' },
+      { label: 'SMK', value: stats?.users.school || 0, color: '#087BB8' },
+      { label: 'Admin', value: stats?.users.admin || 0, color: '#0D0C22' },
+    ],
+    [stats],
+  );
 
-  const formatCurrency = (val: number) => {
-    return new Intl.NumberFormat('id-ID', {
-      style: 'currency',
-      currency: 'IDR',
-      maximumFractionDigits: 0,
-    }).format(val);
-  };
+  const briefChart = useMemo(
+    () => [
+      { label: 'Terbuka', value: stats?.briefs.open || 0, color: '#155DFC' },
+      { label: 'Berjalan', value: stats?.briefs.inProgress || 0, color: '#03ACFD' },
+      { label: 'Selesai', value: stats?.briefs.completed || 0, color: '#16803C' },
+    ],
+    [stats],
+  );
 
-  const isDark = theme === 'dark';
+  const activeTabCopy = tabs.find((tab) => tab.id === activeTab);
 
   return (
-    <div
-      className={`relative flex min-h-screen font-sans transition-colors duration-200 ${
-        isDark ? 'bg-[#080C14] text-slate-200' : 'bg-slate-50 text-slate-800'
-      }`}
-    >
-      {/* Dynamic Ambient Background Mesh Glows */}
-      <div
-        className={`absolute top-0 right-1/4 w-[600px] h-[600px] rounded-full blur-3xl pointer-events-none transition-opacity ${
-          isDark
-            ? 'bg-gradient-to-br from-blue-600/15 via-indigo-600/10 to-transparent opacity-80'
-            : 'bg-gradient-to-br from-blue-500/10 via-sky-400/10 to-transparent opacity-70'
-        }`}
-      />
-      <div
-        className={`absolute bottom-0 left-1/3 w-[500px] h-[500px] rounded-full blur-3xl pointer-events-none transition-opacity ${
-          isDark
-            ? 'bg-gradient-to-tr from-indigo-600/15 via-blue-500/10 to-transparent opacity-70'
-            : 'bg-gradient-to-tr from-sky-400/10 via-blue-600/5 to-transparent opacity-60'
-        }`}
-      />
+    <div className="min-h-screen bg-[#F8F9FC] text-[#0D0C22]">
+      {isMobileMenuOpen ? (
+        <button
+          type="button"
+          aria-label="Tutup menu admin"
+          className="fixed inset-0 z-30 bg-[#0D0C22]/35 lg:hidden"
+          onClick={() => setIsMobileMenuOpen(false)}
+        />
+      ) : null}
 
-      {/* 1. Left Sidebar Navigation */}
       <aside
-        className={`fixed inset-y-0 left-0 z-40 w-64 border-r flex flex-col transition-all duration-300 lg:static lg:translate-x-0 ${
-          isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'
-        } ${
-          isDark
-            ? 'border-slate-800/80 bg-[#0D1322]/95 backdrop-blur-xl'
-            : 'border-slate-200 bg-white/95 backdrop-blur-xl shadow-sm'
-        }`}
+        className={cx(
+          'fixed inset-y-0 left-0 z-40 flex w-72 flex-col border-r border-[#E1E3EA] bg-white transition-transform lg:translate-x-0',
+          isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full',
+        )}
       >
-        {/* Brand Header */}
-        <div
-          className={`flex h-16 items-center justify-between px-6 border-b ${
-            isDark ? 'border-slate-800/80' : 'border-slate-200'
-          }`}
-        >
+        <div className="flex h-20 items-center justify-between border-b border-[#E1E3EA] px-5">
           <div className="flex items-center gap-3">
-            <div className="grid h-9 w-9 place-items-center rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-600 text-white shadow-md shadow-blue-500/20">
-              <ShieldCheck className="h-5 w-5" />
+            <div className="grid h-11 w-11 place-items-center rounded-2xl bg-[#155DFC] text-white">
+              <ShieldCheck className="h-6 w-6" aria-hidden="true" />
             </div>
             <div>
-              <span className={`font-bold tracking-tight block text-sm ${isDark ? 'text-white' : 'text-slate-900'}`}>
-                CreatorIn
-              </span>
-              <span className="text-[10px] text-blue-500 font-semibold tracking-wider uppercase block">
-                Control Panel
-              </span>
+              <p className="font-display text-xl font-semibold text-[#0D0C22]">Creatorin</p>
+              <p className="text-sm font-medium text-[#55576A]">Admin workspace</p>
             </div>
           </div>
           <button
+            type="button"
+            aria-label="Tutup menu"
             onClick={() => setIsMobileMenuOpen(false)}
-            className={`lg:hidden p-1.5 rounded-lg cursor-pointer ${
-              isDark ? 'text-slate-400 hover:text-white' : 'text-slate-500 hover:text-slate-800'
-            }`}
+            className="grid h-11 w-11 place-items-center rounded-xl text-[#55576A] hover:bg-[#F3F3F4] lg:hidden"
           >
-            <X className="h-5 w-5" />
+            <X className="h-5 w-5" aria-hidden="true" />
           </button>
         </div>
 
-        {/* Navigation Groups */}
-        <div className="flex-1 overflow-y-auto px-3 py-4 space-y-6">
-          <div>
-            <div
-              className={`px-3 mb-2 text-[11px] font-semibold uppercase tracking-wider ${
-                isDark ? 'text-slate-500' : 'text-slate-400'
-              }`}
-            >
-              Pengendalian Utama
-            </div>
-            <nav className="space-y-1">
-              <button
-                onClick={() => {
-                  setActiveTab('overview');
-                  setIsMobileMenuOpen(false);
-                }}
-                className={`flex w-full items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-medium transition-all cursor-pointer active:scale-[0.98] ${
-                  activeTab === 'overview'
-                    ? isDark
-                      ? 'bg-blue-600/15 text-blue-400 border border-blue-500/30 shadow-xs'
-                      : 'bg-blue-50 text-blue-600 border border-blue-200 font-semibold shadow-xs'
-                    : isDark
-                    ? 'text-slate-400 hover:bg-slate-800/60 hover:text-slate-200'
-                    : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
-                }`}
-              >
-                <LayoutDashboard className="h-4 w-4 shrink-0" />
-                <span>Dashboard Overview</span>
-              </button>
+        <nav className="flex-1 overflow-y-auto px-3 py-5" aria-label="Navigasi admin">
+          <div className="space-y-1">
+            {tabs.map((tab) => {
+              const Icon = tab.icon;
+              const isActive = activeTab === tab.id;
 
-              <button
-                onClick={() => {
-                  setActiveTab('users');
-                  setIsMobileMenuOpen(false);
-                }}
-                className={`flex w-full items-center justify-between px-3 py-2.5 rounded-xl text-xs font-medium transition-all cursor-pointer active:scale-[0.98] ${
-                  activeTab === 'users'
-                    ? isDark
-                      ? 'bg-blue-600/15 text-blue-400 border border-blue-500/30 shadow-xs'
-                      : 'bg-blue-50 text-blue-600 border border-blue-200 font-semibold shadow-xs'
-                    : isDark
-                    ? 'text-slate-400 hover:bg-slate-800/60 hover:text-slate-200'
-                    : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
-                }`}
-              >
-                <div className="flex items-center gap-3">
-                  <Users className="h-4 w-4 shrink-0" />
-                  <span>Manajemen Users</span>
-                </div>
-                {stats?.users.total ? (
-                  <span
-                    className={`text-[10px] px-2 py-0.5 rounded-full font-mono ${
-                      isDark ? 'bg-slate-800 text-slate-300' : 'bg-slate-200 text-slate-700'
-                    }`}
-                  >
-                    {stats.users.total}
+              return (
+                <button
+                  key={tab.id}
+                  type="button"
+                  onClick={() => {
+                    setActiveTab(tab.id);
+                    setIsMobileMenuOpen(false);
+                  }}
+                  className={cx(
+                    'flex w-full items-center gap-3 rounded-xl px-3 py-3 text-left transition',
+                    isActive ? 'bg-[#E8F0FF] text-[#155DFC]' : 'text-[#55576A] hover:bg-[#F3F3F4] hover:text-[#0D0C22]',
+                  )}
+                >
+                  <Icon className="h-5 w-5 shrink-0" aria-hidden="true" />
+                  <span className="min-w-0">
+                    <span className="block text-sm font-semibold">{tab.label}</span>
+                    <span className={cx('block text-xs', isActive ? 'text-[#0D2A75]' : 'text-[#6F7285]')}>
+                      {tab.helper}
+                    </span>
                   </span>
-                ) : null}
-              </button>
-
-              <button
-                onClick={() => {
-                  setActiveTab('briefs');
-                  setIsMobileMenuOpen(false);
-                }}
-                className={`flex w-full items-center justify-between px-3 py-2.5 rounded-xl text-xs font-medium transition-all cursor-pointer active:scale-[0.98] ${
-                  activeTab === 'briefs'
-                    ? isDark
-                      ? 'bg-blue-600/15 text-blue-400 border border-blue-500/30 shadow-xs'
-                      : 'bg-blue-50 text-blue-600 border border-blue-200 font-semibold shadow-xs'
-                    : isDark
-                    ? 'text-slate-400 hover:bg-slate-800/60 hover:text-slate-200'
-                    : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
-                }`}
-              >
-                <div className="flex items-center gap-3">
-                  <Briefcase className="h-4 w-4 shrink-0" />
-                  <span>Briefs & Proyek</span>
-                </div>
-                {stats?.briefs.total ? (
-                  <span
-                    className={`text-[10px] px-2 py-0.5 rounded-full font-mono ${
-                      isDark ? 'bg-slate-800 text-slate-300' : 'bg-slate-200 text-slate-700'
-                    }`}
-                  >
-                    {stats.briefs.total}
-                  </span>
-                ) : null}
-              </button>
-
-              <button
-                onClick={() => {
-                  setActiveTab('schools');
-                  setIsMobileMenuOpen(false);
-                }}
-                className={`flex w-full items-center justify-between px-3 py-2.5 rounded-xl text-xs font-medium transition-all cursor-pointer active:scale-[0.98] ${
-                  activeTab === 'schools'
-                    ? isDark
-                      ? 'bg-blue-600/15 text-blue-400 border border-blue-500/30 shadow-xs'
-                      : 'bg-blue-50 text-blue-600 border border-blue-200 font-semibold shadow-xs'
-                    : isDark
-                    ? 'text-slate-400 hover:bg-slate-800/60 hover:text-slate-200'
-                    : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
-                }`}
-              >
-                <div className="flex items-center gap-3">
-                  <GraduationCap className="h-4 w-4 shrink-0" />
-                  <span>Verifikasi SMK</span>
-                </div>
-                {stats?.schools.pending ? (
-                  <span className="text-[10px] px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-500 font-mono font-bold">
-                    {stats.schools.pending}
-                  </span>
-                ) : null}
-              </button>
-            </nav>
+                </button>
+              );
+            })}
           </div>
 
-          <div>
-            <div
-              className={`px-3 mb-2 text-[11px] font-semibold uppercase tracking-wider ${
-                isDark ? 'text-slate-500' : 'text-slate-400'
-              }`}
-            >
-              Tautan Eksternal
-            </div>
+          <div className="mt-6 border-t border-[#E1E3EA] pt-5">
             <a
               href="https://creatorin.my.id"
               target="_blank"
               rel="noreferrer"
-              className={`flex items-center justify-between px-3 py-2 rounded-xl text-xs transition-colors cursor-pointer ${
-                isDark
-                  ? 'text-slate-400 hover:bg-slate-800/60 hover:text-slate-200'
-                  : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
-              }`}
+              className="flex items-center gap-3 rounded-xl px-3 py-3 text-sm font-semibold text-[#55576A] hover:bg-[#F3F3F4] hover:text-[#0D0C22]"
             >
-              <div className="flex items-center gap-3">
-                <ExternalLink className="h-4 w-4" />
-                <span>Frontend Publik</span>
-              </div>
-              <span className="text-[10px] text-slate-400 font-mono">creatorin.my.id</span>
+              <ExternalLink className="h-5 w-5" aria-hidden="true" />
+              <span>Frontend publik</span>
             </a>
           </div>
-        </div>
+        </nav>
 
-        {/* Sidebar Footer User Info */}
-        <div
-          className={`p-3 border-t ${
-            isDark ? 'border-slate-800/80 bg-slate-950/40' : 'border-slate-200 bg-slate-50/80'
-          }`}
-        >
-          <div
-            className={`flex items-center justify-between p-2 rounded-xl border ${
-              isDark ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200 shadow-2xs'
-            }`}
-          >
-            <div className="flex items-center gap-2.5 min-w-0">
-              <div className="h-8 w-8 rounded-lg bg-gradient-to-tr from-blue-600 to-indigo-600 text-white font-bold flex items-center justify-center text-xs shrink-0 shadow-xs">
+        <div className="border-t border-[#E1E3EA] p-4">
+          <div className="rounded-2xl border border-[#E1E3EA] bg-[#F8F9FC] p-3">
+            <div className="flex items-center gap-3">
+              <div className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-[#0D0C22] text-sm font-semibold text-white">
                 AD
               </div>
               <div className="min-w-0 flex-1">
-                <span
-                  className={`block text-xs font-semibold truncate ${isDark ? 'text-slate-200' : 'text-slate-900'}`}
-                >
-                  Admin CreatorIn
-                </span>
-                <span className="block text-[10px] text-emerald-500 truncate font-semibold">
-                  Super Admin
-                </span>
+                <p className="truncate text-sm font-semibold text-[#0D0C22]">Admin Creatorin</p>
+                <p className="truncate text-xs font-medium text-[#55576A]">Pengelola platform</p>
               </div>
+              <button
+                type="button"
+                onClick={handleLogout}
+                aria-label="Keluar dari admin"
+                className="grid h-10 w-10 place-items-center rounded-xl text-[#55576A] hover:bg-[#FEE4E2] hover:text-[#912018]"
+              >
+                <LogOut className="h-5 w-5" aria-hidden="true" />
+              </button>
             </div>
-            <button
-              onClick={handleLogout}
-              title="Logout"
-              className={`p-1.5 rounded-lg transition-colors cursor-pointer ${
-                isDark
-                  ? 'text-slate-400 hover:text-rose-400 hover:bg-slate-800'
-                  : 'text-slate-500 hover:text-rose-600 hover:bg-slate-100'
-              }`}
-            >
-              <LogOut className="h-4 w-4" />
-            </button>
           </div>
         </div>
       </aside>
 
-      {/* 2. Main Content Area */}
-      <div className="flex-1 flex flex-col min-w-0 relative z-10">
-        {/* Top Navbar */}
-        <header
-          className={`h-16 border-b px-4 sm:px-8 flex items-center justify-between sticky top-0 z-30 backdrop-blur-md transition-colors ${
-            isDark ? 'border-slate-800/80 bg-[#080C14]/80' : 'border-slate-200 bg-white/80'
-          }`}
-        >
-          <div className="flex items-center gap-3">
-            <button
-              onClick={() => setIsMobileMenuOpen(true)}
-              className={`lg:hidden p-2 rounded-lg cursor-pointer ${
-                isDark ? 'text-slate-400 hover:bg-slate-800' : 'text-slate-600 hover:bg-slate-100'
-              }`}
-            >
-              <Menu className="h-5 w-5" />
-            </button>
-            <h2
-              className={`text-base font-bold capitalize tracking-tight ${
-                isDark ? 'text-slate-100' : 'text-slate-900'
-              }`}
-            >
-              {activeTab === 'overview' && 'Ringkasan Platform & Metrik'}
-              {activeTab === 'users' && 'Manajemen Akun Pengguna'}
-              {activeTab === 'briefs' && 'Daftar Brief & Kontrak Proyek'}
-              {activeTab === 'schools' && 'Institusi SMK Vokasi'}
-            </h2>
-          </div>
+      <div className="lg:pl-72">
+        <header className="sticky top-0 z-20 border-b border-[#E1E3EA] bg-white/95 px-4 py-4 backdrop-blur sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between gap-4">
+            <div className="flex items-center gap-3">
+              <button
+                type="button"
+                aria-label="Buka menu admin"
+                onClick={() => setIsMobileMenuOpen(true)}
+                className="grid h-11 w-11 place-items-center rounded-xl border border-[#E1E3EA] text-[#55576A] hover:bg-[#F3F3F4] lg:hidden"
+              >
+                <Menu className="h-5 w-5" aria-hidden="true" />
+              </button>
+              <div>
+                <p className="text-sm font-semibold text-[#155DFC]">{activeTabCopy?.label}</p>
+                <p className="hidden text-sm text-[#55576A] sm:block">Data operasional Creatorin</p>
+              </div>
+            </div>
 
-          <div className="flex items-center gap-2.5">
-            {/* Theme Toggle (Light / Dark) */}
-            <button
-              onClick={toggleTheme}
-              className={`p-2 rounded-xl border transition-all cursor-pointer active:scale-95 ${
-                isDark
-                  ? 'border-slate-700 bg-slate-800/80 text-amber-400 hover:bg-slate-800'
-                  : 'border-slate-300 bg-slate-100 text-slate-700 hover:bg-slate-200'
-              }`}
-              title={isDark ? 'Beralih ke Light Mode' : 'Beralih ke Dark Mode'}
-            >
-              {isDark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
-            </button>
-
-            {/* Refresh Button */}
-            <button
-              onClick={() => {
-                fetchStats();
-                if (activeTab === 'users') fetchUsers();
-                if (activeTab === 'schools') fetchSchools();
-                if (activeTab === 'briefs') fetchBriefs();
-              }}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl border text-xs font-semibold transition-all cursor-pointer active:scale-95 ${
-                isDark
-                  ? 'border-slate-700 bg-slate-800/80 hover:bg-slate-800 text-slate-300'
-                  : 'border-slate-300 bg-slate-100 hover:bg-slate-200 text-slate-700'
-              }`}
-            >
-              <RefreshCw className={`h-3.5 w-3.5 ${loading ? 'animate-spin' : ''}`} />
-              <span className="hidden sm:inline">Perbarui</span>
-            </button>
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={fetchStats}
+                className="inline-flex h-11 items-center justify-center gap-2 rounded-xl border border-[#E1E3EA] bg-white px-3 text-sm font-semibold text-[#0D0C22] hover:bg-[#F3F3F4]"
+              >
+                <RefreshCw className={cx('h-4 w-4', loading && 'animate-spin')} aria-hidden="true" />
+                <span className="hidden sm:inline">Muat ulang</span>
+              </button>
+              <button
+                type="button"
+                onClick={handleLogout}
+                className="hidden h-11 items-center justify-center gap-2 rounded-xl bg-[#0D0C22] px-4 text-sm font-semibold text-white hover:bg-[#26243A] sm:inline-flex"
+              >
+                <LogOut className="h-4 w-4" aria-hidden="true" />
+                Keluar
+              </button>
+            </div>
           </div>
         </header>
 
-        {/* Content Body */}
-        <main className="flex-1 p-4 sm:p-8 space-y-6 overflow-y-auto">
-          {error && (
-            <div className="p-4 rounded-2xl border border-rose-500/30 bg-rose-500/10 text-xs text-rose-400 flex items-center gap-2">
-              <AlertCircle className="h-4 w-4 shrink-0" />
-              <span>{error}</span>
+        <main className="px-4 py-6 sm:px-6 lg:px-8 lg:py-8">
+          <div className="mx-auto max-w-[1440px]">
+            <div className="mb-6 flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+              <PageTitle activeTab={activeTab} />
+              {stats ? (
+                <div className="rounded-2xl border border-[#E1E3EA] bg-white px-4 py-3 text-sm text-[#55576A] shadow-[0_1px_2px_rgba(13,12,34,0.06)]">
+                  <span className="font-semibold text-[#0D0C22]">{formatNumber(stats.services)}</span> layanan dan{' '}
+                  <span className="font-semibold text-[#0D0C22]">{formatNumber(stats.portfolioProjects)}</span> portofolio
+                </div>
+              ) : null}
             </div>
-          )}
 
-          {/* TAB 1: OVERVIEW */}
-          {activeTab === 'overview' && (
-            <div className="space-y-6">
-              {/* Stat Cards Grid */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                {/* Users Card */}
-                <div
-                  className={`p-5 rounded-3xl border relative overflow-hidden backdrop-blur-sm transition-all duration-300 hover:shadow-lg ${
-                    isDark
-                      ? 'border-slate-800/90 bg-[#0F172A]/80 shadow-[0_10px_30px_rgba(0,0,0,0.5)]'
-                      : 'border-slate-200/90 bg-white/95 shadow-sm hover:border-blue-200'
-                  }`}
-                >
-                  <div className="flex items-center justify-between text-slate-400 mb-3">
-                    <span className="text-xs font-semibold uppercase tracking-wider">Total Pengguna</span>
-                    <div className="p-2 rounded-xl bg-blue-500/10 border border-blue-500/20 text-blue-500">
-                      <Users className="h-4 w-4" />
-                    </div>
-                  </div>
-                  <div className={`text-2xl font-bold mb-2 ${isDark ? 'text-white' : 'text-slate-900'}`}>
-                    {stats?.users.total ?? 0}
-                  </div>
-                  <div className="flex items-center gap-2 text-[11px]">
-                    <span className="text-blue-500 font-semibold">{stats?.users.creator ?? 0} Kreator</span>
-                    <span className="text-slate-400">&bull;</span>
-                    <span className="text-emerald-500 font-semibold">{stats?.users.business ?? 0} UMKM</span>
-                    <span className="text-slate-400">&bull;</span>
-                    <span className="text-amber-500 font-semibold">{stats?.users.school ?? 0} SMK</span>
-                  </div>
-                </div>
-
-                {/* Briefs Card */}
-                <div
-                  className={`p-5 rounded-3xl border relative overflow-hidden backdrop-blur-sm transition-all duration-300 hover:shadow-lg ${
-                    isDark
-                      ? 'border-slate-800/90 bg-[#0F172A]/80 shadow-[0_10px_30px_rgba(0,0,0,0.5)]'
-                      : 'border-slate-200/90 bg-white/95 shadow-sm hover:border-amber-200'
-                  }`}
-                >
-                  <div className="flex items-center justify-between text-slate-400 mb-3">
-                    <span className="text-xs font-semibold uppercase tracking-wider">Brief Pekerjaan</span>
-                    <div className="p-2 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-500">
-                      <Briefcase className="h-4 w-4" />
-                    </div>
-                  </div>
-                  <div className={`text-2xl font-bold mb-2 ${isDark ? 'text-white' : 'text-slate-900'}`}>
-                    {stats?.briefs.total ?? 0}
-                  </div>
-                  <div className="flex items-center gap-2 text-[11px]">
-                    <span className="text-amber-500 font-semibold">{stats?.briefs.open ?? 0} Terbuka</span>
-                    <span className="text-slate-400">&bull;</span>
-                    <span className="text-emerald-500 font-semibold">{stats?.briefs.completed ?? 0} Selesai</span>
-                  </div>
-                </div>
-
-                {/* Escrow Card */}
-                <div
-                  className={`p-5 rounded-3xl border relative overflow-hidden backdrop-blur-sm transition-all duration-300 hover:shadow-lg ${
-                    isDark
-                      ? 'border-slate-800/90 bg-[#0F172A]/80 shadow-[0_10px_30px_rgba(0,0,0,0.5)]'
-                      : 'border-slate-200/90 bg-white/95 shadow-sm hover:border-emerald-200'
-                  }`}
-                >
-                  <div className="flex items-center justify-between text-slate-400 mb-3">
-                    <span className="text-xs font-semibold uppercase tracking-wider">Volume Transaksi</span>
-                    <div className="p-2 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-500">
-                      <Receipt className="h-4 w-4" />
-                    </div>
-                  </div>
-                  <div className={`text-2xl font-bold mb-2 truncate ${isDark ? 'text-white' : 'text-slate-900'}`}>
-                    {formatCurrency(stats?.invoices.paidVolume ?? 0)}
-                  </div>
-                  <div className="flex items-center gap-1.5 text-[11px] text-emerald-500 font-semibold">
-                    <TrendingUp className="h-3.5 w-3.5" />
-                    <span>{stats?.invoices.paidCount ?? 0} Transaksi Lunas</span>
-                  </div>
-                </div>
-
-                {/* Schools Card */}
-                <div
-                  className={`p-5 rounded-3xl border relative overflow-hidden backdrop-blur-sm transition-all duration-300 hover:shadow-lg ${
-                    isDark
-                      ? 'border-slate-800/90 bg-[#0F172A]/80 shadow-[0_10px_30px_rgba(0,0,0,0.5)]'
-                      : 'border-slate-200/90 bg-white/95 shadow-sm hover:border-purple-200'
-                  }`}
-                >
-                  <div className="flex items-center justify-between text-slate-400 mb-3">
-                    <span className="text-xs font-semibold uppercase tracking-wider">SMK Terverifikasi</span>
-                    <div className="p-2 rounded-xl bg-purple-500/10 border border-purple-500/20 text-purple-500">
-                      <GraduationCap className="h-4 w-4" />
-                    </div>
-                  </div>
-                  <div className={`text-2xl font-bold mb-2 ${isDark ? 'text-white' : 'text-slate-900'}`}>
-                    {stats?.schools.verified ?? 0}{' '}
-                    <span className="text-xs font-normal text-slate-400">/ {stats?.schools.total ?? 0}</span>
-                  </div>
-                  <div className="flex items-center gap-1.5 text-[11px] text-amber-500 font-semibold">
-                    <Clock className="h-3.5 w-3.5" />
-                    <span>{stats?.schools.pending ?? 0} Menunggu Verifikasi</span>
-                  </div>
+            {error ? (
+              <div className="mb-6 flex items-start gap-3 rounded-2xl border border-[#FEE4E2] bg-[#FEE4E2] p-4 text-sm text-[#912018]" role="alert">
+                <AlertCircle className="mt-0.5 h-5 w-5 shrink-0" aria-hidden="true" />
+                <div>
+                  <p className="font-semibold">Ada data yang belum berhasil dimuat.</p>
+                  <p className="mt-1">{error}</p>
                 </div>
               </div>
+            ) : null}
 
-              {/* Charts & Analytics Section */}
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                {/* SVG Donut / Distribution Card */}
-                <div
-                  className={`p-6 rounded-3xl border backdrop-blur-sm ${
-                    isDark
-                      ? 'border-slate-800/90 bg-[#0F172A]/80 shadow-md'
-                      : 'border-slate-200 bg-white shadow-sm'
-                  }`}
-                >
-                  <h3 className={`text-sm font-bold mb-1 ${isDark ? 'text-slate-200' : 'text-slate-900'}`}>
-                    Distribusi Pengguna
-                  </h3>
-                  <p className="text-xs text-slate-400 mb-6">Proporsi akun terdaftar berdasarkan peran sistem</p>
-
-                  <div className="flex flex-col items-center">
-                    <div className="relative h-44 w-44">
-                      <svg viewBox="0 0 36 36" className="h-full w-full rotate-[-90deg]">
-                        <circle
-                          cx="18"
-                          cy="18"
-                          r="15.915"
-                          fill="transparent"
-                          stroke={isDark ? '#1e293b' : '#f1f5f9'}
-                          strokeWidth="3.5"
-                        />
-                        <circle
-                          cx="18"
-                          cy="18"
-                          r="15.915"
-                          fill="transparent"
-                          stroke="#3b82f6"
-                          strokeWidth="3.5"
-                          strokeDasharray="45 55"
-                          strokeDashoffset="0"
-                        />
-                        <circle
-                          cx="18"
-                          cy="18"
-                          r="15.915"
-                          fill="transparent"
-                          stroke="#10b981"
-                          strokeWidth="3.5"
-                          strokeDasharray="30 70"
-                          strokeDashoffset="-45"
-                        />
-                        <circle
-                          cx="18"
-                          cy="18"
-                          r="15.915"
-                          fill="transparent"
-                          stroke="#f59e0b"
-                          strokeWidth="3.5"
-                          strokeDasharray="20 80"
-                          strokeDashoffset="-75"
-                        />
-                      </svg>
-                      <div className="absolute inset-0 flex flex-col items-center justify-center">
-                        <span className={`text-2xl font-bold ${isDark ? 'text-white' : 'text-slate-900'}`}>
-                          {stats?.users.total ?? 0}
-                        </span>
-                        <span className="text-[10px] text-slate-400 uppercase tracking-wider font-mono">Total</span>
-                      </div>
-                    </div>
-
-                    <div className="mt-6 w-full space-y-2 text-xs">
-                      <div
-                        className={`flex items-center justify-between p-2.5 rounded-xl border ${
-                          isDark ? 'bg-slate-800/40 border-slate-700/50' : 'bg-slate-50 border-slate-200'
-                        }`}
-                      >
-                        <div className="flex items-center gap-2">
-                          <span className="h-2.5 w-2 rounded-xs bg-blue-500" />
-                          <span className={isDark ? 'text-slate-300' : 'text-slate-700'}>Creator Freelance</span>
-                        </div>
-                        <span className={`font-bold ${isDark ? 'text-white' : 'text-slate-900'}`}>
-                          {stats?.users.creator ?? 0}
-                        </span>
-                      </div>
-                      <div
-                        className={`flex items-center justify-between p-2.5 rounded-xl border ${
-                          isDark ? 'bg-slate-800/40 border-slate-700/50' : 'bg-slate-50 border-slate-200'
-                        }`}
-                      >
-                        <div className="flex items-center gap-2">
-                          <span className="h-2.5 w-2 rounded-xs bg-emerald-500" />
-                          <span className={isDark ? 'text-slate-300' : 'text-slate-700'}>UMKM / Bisnis</span>
-                        </div>
-                        <span className={`font-bold ${isDark ? 'text-white' : 'text-slate-900'}`}>
-                          {stats?.users.business ?? 0}
-                        </span>
-                      </div>
-                      <div
-                        className={`flex items-center justify-between p-2.5 rounded-xl border ${
-                          isDark ? 'bg-slate-800/40 border-slate-700/50' : 'bg-slate-50 border-slate-200'
-                        }`}
-                      >
-                        <div className="flex items-center gap-2">
-                          <span className="h-2.5 w-2 rounded-xs bg-amber-500" />
-                          <span className={isDark ? 'text-slate-300' : 'text-slate-700'}>SMK Vokasi</span>
-                        </div>
-                        <span className={`font-bold ${isDark ? 'text-white' : 'text-slate-900'}`}>
-                          {stats?.users.school ?? 0}
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Activity Bar Chart */}
-                <div
-                  className={`lg:col-span-2 p-6 rounded-3xl border backdrop-blur-sm flex flex-col justify-between ${
-                    isDark
-                      ? 'border-slate-800/90 bg-[#0F172A]/80 shadow-md'
-                      : 'border-slate-200 bg-white shadow-sm'
-                  }`}
-                >
-                  <div>
-                    <div className="flex items-center justify-between mb-1">
-                      <h3 className={`text-sm font-bold ${isDark ? 'text-slate-200' : 'text-slate-900'}`}>
-                        Aktivitas Kolaborasi & Transaksi
-                      </h3>
-                      <span className="text-[11px] px-2.5 py-1 rounded-lg bg-blue-500/10 text-blue-500 font-mono font-bold">
-                        Q4 2026
-                      </span>
-                    </div>
-                    <p className="text-xs text-slate-400 mb-6">Tren volume brief dan penyelesaian pekerjaan</p>
-
-                    <div
-                      className={`h-48 w-full flex items-end justify-between gap-3 pt-6 pb-2 border-b ${
-                        isDark ? 'border-slate-800' : 'border-slate-200'
-                      }`}
-                    >
-                      {[
-                        { label: 'Mei', briefs: 4, volume: 45 },
-                        { label: 'Jun', briefs: 8, volume: 60 },
-                        { label: 'Jul', briefs: 12, volume: 80 },
-                        { label: 'Agt', briefs: 15, volume: 75 },
-                        { label: 'Sep', briefs: 22, volume: 90 },
-                        { label: 'Okt', briefs: 30, volume: 98 },
-                      ].map((item, idx) => (
-                        <div key={idx} className="flex-1 flex flex-col items-center gap-2 h-full justify-end group">
-                          <div className="w-full max-w-[38px] flex items-end gap-1 h-full">
-                            <div
-                              style={{ height: `${item.briefs * 3}%` }}
-                              className="flex-1 bg-amber-500/80 rounded-t-sm group-hover:bg-amber-400 transition-all"
-                              title={`Briefs: ${item.briefs}`}
-                            />
-                            <div
-                              style={{ height: `${item.volume}%` }}
-                              className="flex-1 bg-blue-600/80 rounded-t-sm group-hover:bg-blue-500 transition-all"
-                              title={`Volume: ${item.volume}%`}
-                            />
-                          </div>
-                          <span className="text-[11px] text-slate-400 font-mono">{item.label}</span>
-                        </div>
-                      ))}
-                    </div>
-
-                    <div className="mt-4 flex items-center justify-center gap-6 text-xs text-slate-400">
-                      <div className="flex items-center gap-2">
-                        <span className="h-2 w-2 rounded-sm bg-amber-500" />
-                        <span>Brief Proyek Masuk</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <span className="h-2 w-2 rounded-sm bg-blue-600" />
-                        <span>Realisasi Transaksi Escrow</span>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Summary Bar */}
-                  <div
-                    className={`mt-6 p-4 rounded-2xl border flex items-center justify-between text-xs ${
-                      isDark
-                        ? 'bg-slate-950/60 border-slate-800'
-                        : 'bg-slate-50 border-slate-200'
-                    }`}
-                  >
-                    <span className="text-slate-400">
-                      Layanan Aktif:{' '}
-                      <strong className={isDark ? 'text-white' : 'text-slate-900'}>{stats?.services ?? 0}</strong>
-                    </span>
-                    <span className="text-slate-400">
-                      Portofolio Publik:{' '}
-                      <strong className={isDark ? 'text-white' : 'text-slate-900'}>
-                        {stats?.portfolioProjects ?? 0}
-                      </strong>
-                    </span>
-                    <span className="text-slate-400">
-                      Escrow Pending: <strong className="text-amber-500">{stats?.invoices.unpaidCount ?? 0}</strong>
-                    </span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Recent Registered Users */}
-              <div
-                className={`p-6 rounded-3xl border backdrop-blur-sm ${
-                  isDark
-                    ? 'border-slate-800/90 bg-[#0F172A]/80 shadow-md'
-                    : 'border-slate-200 bg-white shadow-sm'
-                }`}
-              >
-                <div className="flex items-center justify-between mb-4">
-                  <div>
-                    <h3 className={`text-sm font-bold ${isDark ? 'text-slate-200' : 'text-slate-900'}`}>
-                      Pengguna Terbaru
-                    </h3>
-                    <p className="text-xs text-slate-400">Pendaftaran akun pengguna paling mutakhir</p>
-                  </div>
-                  <button
-                    onClick={() => setActiveTab('users')}
-                    className="text-xs font-bold text-blue-500 hover:text-blue-600 transition-colors cursor-pointer"
-                  >
-                    Lihat Semua &rarr;
-                  </button>
-                </div>
-
-                <div className="overflow-x-auto">
-                  <table className="w-full text-left text-xs">
-                    <thead>
-                      <tr
-                        className={`border-b ${
-                          isDark ? 'border-slate-800 text-slate-500' : 'border-slate-200 text-slate-400'
-                        }`}
-                      >
-                        <th className="pb-3 font-semibold">Nama Lengkap</th>
-                        <th className="pb-3 font-semibold">Email</th>
-                        <th className="pb-3 font-semibold">Peran</th>
-                        <th className="pb-3 font-semibold">Terdaftar</th>
-                      </tr>
-                    </thead>
-                    <tbody
-                      className={`divide-y ${
-                        isDark ? 'divide-slate-800/60' : 'divide-slate-100'
-                      }`}
-                    >
-                      {stats?.recentUsers?.map((u) => (
-                        <tr
-                          key={u.id}
-                          className={`transition-colors ${
-                            isDark ? 'hover:bg-slate-800/30' : 'hover:bg-slate-50'
-                          }`}
-                        >
-                          <td
-                            className={`py-3 font-medium flex items-center gap-2.5 ${
-                              isDark ? 'text-slate-200' : 'text-slate-900'
-                            }`}
-                          >
-                            <div
-                              className={`h-7 w-7 rounded-lg border flex items-center justify-center font-bold text-xs ${
-                                isDark
-                                  ? 'bg-slate-800 border-slate-700 text-slate-300'
-                                  : 'bg-slate-100 border-slate-200 text-slate-700'
-                              }`}
-                            >
-                              {u.fullName.charAt(0)}
-                            </div>
-                            <span>{u.fullName}</span>
-                          </td>
-                          <td className="py-3 text-slate-400 font-mono">{u.email}</td>
-                          <td className="py-3">
-                            <span
-                              className={`px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${
-                                u.role === 'admin'
-                                  ? 'bg-rose-500/10 text-rose-500 border border-rose-500/20'
-                                  : u.role === 'creator'
-                                  ? 'bg-blue-500/10 text-blue-500 border border-blue-500/20'
-                                  : u.role === 'business'
-                                  ? 'bg-emerald-500/10 text-emerald-500 border border-emerald-500/20'
-                                  : 'bg-amber-500/10 text-amber-500 border border-amber-500/20'
-                              }`}
-                            >
-                              {u.role}
-                            </span>
-                          </td>
-                          <td className="py-3 text-slate-400 font-mono">
-                            {new Date(u.createdAt).toLocaleDateString('id-ID', {
-                              day: 'numeric',
-                              month: 'short',
-                              year: 'numeric',
-                            })}
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* TAB 2: USERS MANAGEMENT */}
-          {activeTab === 'users' && (
-            <div
-              className={`p-6 rounded-3xl border backdrop-blur-sm space-y-4 ${
-                isDark
-                  ? 'border-slate-800/90 bg-[#0F172A]/80 shadow-md'
-                  : 'border-slate-200 bg-white shadow-sm'
-              }`}
-            >
-              <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-                <div className="relative w-full sm:w-80">
-                  <Search className="absolute left-3.5 top-2.5 h-4 w-4 text-slate-400" />
-                  <input
-                    type="text"
-                    placeholder="Cari nama atau email…"
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    className={`w-full pl-10 pr-4 py-2.5 rounded-xl border text-xs outline-none transition-all ${
-                      isDark
-                        ? 'border-slate-700 bg-slate-950/60 text-slate-100 placeholder:text-slate-600 focus:border-blue-500'
-                        : 'border-slate-300 bg-slate-50 text-slate-900 placeholder:text-slate-400 focus:border-blue-600'
-                    }`}
+            {activeTab === 'overview' ? (
+              <div className="space-y-6">
+                <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+                  <MetricCard
+                    icon={UsersRound}
+                    label="Total pengguna"
+                    value={loading && !stats ? '...' : formatNumber(stats?.users.total || 0)}
+                    note="Semua akun yang terdaftar di platform."
+                  />
+                  <MetricCard
+                    icon={BriefcaseBusiness}
+                    label="Brief aktif"
+                    value={loading && !stats ? '...' : formatNumber((stats?.briefs.open || 0) + (stats?.briefs.inProgress || 0))}
+                    note="Brief terbuka dan proyek yang sedang berjalan."
+                    tone="info"
+                  />
+                  <MetricCard
+                    icon={WalletCards}
+                    label="Volume dibayar"
+                    value={loading && !stats ? '...' : formatCurrency(stats?.invoices.paidVolume || 0)}
+                    note="Nilai invoice yang tercatat sudah dibayar."
+                    tone="success"
+                  />
+                  <MetricCard
+                    icon={GraduationCap}
+                    label="SMK menunggu"
+                    value={loading && !stats ? '...' : formatNumber(stats?.schools.pending || 0)}
+                    note="Sekolah yang masih perlu ditinjau admin."
+                    tone="warning"
                   />
                 </div>
 
-                <div className="flex items-center gap-2 w-full sm:w-auto">
-                  <Filter className="h-4 w-4 text-slate-400" />
-                  <select
-                    value={usersFilter}
-                    onChange={(e) => setUsersFilter(e.target.value)}
-                    className={`px-3 py-2.5 rounded-xl border text-xs outline-none cursor-pointer ${
-                      isDark
-                        ? 'border-slate-700 bg-slate-950/60 text-slate-200 focus:border-blue-500'
-                        : 'border-slate-300 bg-slate-50 text-slate-800 focus:border-blue-600'
-                    }`}
-                  >
-                    <option value="">Semua Peran</option>
-                    <option value="admin">Admin</option>
-                    <option value="creator">Creator</option>
-                    <option value="business">UMKM / Business</option>
-                    <option value="school">SMK Vokasi</option>
-                  </select>
+                <div className="grid gap-6 xl:grid-cols-[1fr_1fr]">
+                  <HorizontalChart title="Distribusi pengguna" description="Jumlah akun berdasarkan peran sistem." data={userChart} />
+                  <HorizontalChart title="Status brief" description="Sebaran brief berdasarkan tahap pengerjaan." data={briefChart} />
+                </div>
+
+                <div className="grid gap-6 xl:grid-cols-[0.8fr_1.2fr]">
+                  <RatioChart paid={stats?.invoices.paidCount || 0} unpaid={stats?.invoices.unpaidCount || 0} />
+
+                  <section className="rounded-2xl border border-[#E1E3EA] bg-white p-5 shadow-[0_1px_2px_rgba(13,12,34,0.06)]">
+                    <div className="mb-5 flex items-start justify-between gap-4">
+                      <div>
+                        <h2 className="font-display text-xl font-semibold text-[#0D0C22]">Pengguna terbaru</h2>
+                        <p className="mt-1 text-sm leading-6 text-[#55576A]">Akun yang baru tercatat di platform.</p>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => setActiveTab('users')}
+                        className="inline-flex h-10 items-center justify-center rounded-xl border border-[#E1E3EA] px-3 text-sm font-semibold text-[#155DFC] hover:bg-[#E8F0FF]"
+                      >
+                        Lihat pengguna
+                      </button>
+                    </div>
+
+                    <div className="overflow-x-auto">
+                      <table className="w-full min-w-[640px] text-left text-sm">
+                        <thead>
+                          <tr className="border-b border-[#E1E3EA] text-[#55576A]">
+                            <th className="pb-3 font-semibold">Nama</th>
+                            <th className="pb-3 font-semibold">Email</th>
+                            <th className="pb-3 font-semibold">Peran</th>
+                            <th className="pb-3 font-semibold">Terdaftar</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-[#E1E3EA]">
+                          {loading && !stats ? (
+                            <LoadingRows columns={4} />
+                          ) : (
+                            stats?.recentUsers?.map((user) => (
+                              <tr key={user.id} className="hover:bg-[#F8F9FC]">
+                                <td className="py-3">
+                                  <div className="flex items-center gap-3">
+                                    <div className="grid h-9 w-9 place-items-center rounded-xl bg-[#F3F3F4] text-sm font-semibold text-[#0D0C22]">
+                                      {getNameInitial(user.fullName)}
+                                    </div>
+                                    <span className="font-semibold text-[#0D0C22]">{user.fullName || 'Tanpa nama'}</span>
+                                  </div>
+                                </td>
+                                <td className="py-3 text-[#55576A]">{user.email || '-'}</td>
+                                <td className="py-3">
+                                  <StatusPill className={roleBadgeClass(user.role)}>
+                                    {roleLabels[user.role || ''] || user.role || 'Role kosong'}
+                                  </StatusPill>
+                                </td>
+                                <td className="py-3 text-[#55576A]">{formatDate(user.createdAt)}</td>
+                              </tr>
+                            ))
+                          )}
+                        </tbody>
+                      </table>
+                    </div>
+
+                    {!loading && (stats?.recentUsers?.length || 0) === 0 ? (
+                      <div className="mt-4">
+                        <EmptyState title="Belum ada pengguna terbaru" text="Daftar ini akan terisi saat ada akun baru." />
+                      </div>
+                    ) : null}
+                  </section>
                 </div>
               </div>
+            ) : null}
 
-              {/* Table */}
-              <div className="overflow-x-auto">
-                <table className="w-full text-left text-xs">
-                  <thead>
-                    <tr
-                      className={`border-b ${
-                        isDark ? 'border-slate-800 text-slate-500' : 'border-slate-200 text-slate-400'
-                      }`}
+            {activeTab === 'users' ? (
+              <section className="rounded-2xl border border-[#E1E3EA] bg-white p-5 shadow-[0_1px_2px_rgba(13,12,34,0.06)]">
+                <div className="mb-5 flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+                  <div className="relative w-full lg:max-w-md">
+                    <Search className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-[#55576A]" aria-hidden="true" />
+                    <input
+                      type="search"
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      placeholder="Cari nama atau email"
+                      className="h-11 w-full rounded-xl border border-[#B7BBC9] bg-white pl-10 pr-4 text-sm text-[#0D0C22] outline-none focus:border-[#155DFC] focus:ring-4 focus:ring-[#155DFC]/20"
+                    />
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Filter className="h-4 w-4 text-[#55576A]" aria-hidden="true" />
+                    <select
+                      value={usersFilter}
+                      onChange={(e) => setUsersFilter(e.target.value)}
+                      className="h-11 rounded-xl border border-[#B7BBC9] bg-white px-3 text-sm font-medium text-[#0D0C22] outline-none focus:border-[#155DFC] focus:ring-4 focus:ring-[#155DFC]/20"
                     >
-                      <th className="pb-3 font-semibold">User</th>
-                      <th className="pb-3 font-semibold">Email</th>
-                      <th className="pb-3 font-semibold">Peran Sistem</th>
-                      <th className="pb-3 font-semibold">Aksi Ubah Role</th>
-                      <th className="pb-3 font-semibold">Terdaftar</th>
-                    </tr>
-                  </thead>
-                  <tbody className={`divide-y ${isDark ? 'divide-slate-800/60' : 'divide-slate-100'}`}>
-                    {usersList.map((user) => (
-                      <tr
-                        key={user.id}
-                        className={`transition-colors ${
-                          isDark ? 'hover:bg-slate-800/30' : 'hover:bg-slate-50'
-                        }`}
-                      >
-                        <td
-                          className={`py-3 font-medium flex items-center gap-2 ${
-                            isDark ? 'text-slate-200' : 'text-slate-900'
-                          }`}
-                        >
-                          <div
-                            className={`h-7 w-7 rounded-lg border flex items-center justify-center font-bold text-xs ${
-                              isDark
-                                ? 'bg-slate-800 border-slate-700 text-slate-300'
-                                : 'bg-slate-100 border-slate-200 text-slate-700'
-                            }`}
-                          >
-                            {user.fullName.charAt(0)}
-                          </div>
-                          <span>{user.fullName}</span>
-                        </td>
-                        <td className="py-3 text-slate-400 font-mono">{user.email}</td>
-                        <td className="py-3">
-                          <span
-                            className={`px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${
-                              user.role === 'admin'
-                                ? 'bg-rose-500/10 text-rose-500 border border-rose-500/20'
-                                : user.role === 'creator'
-                                ? 'bg-blue-500/10 text-blue-500 border border-blue-500/20'
-                                : user.role === 'business'
-                                ? 'bg-emerald-500/10 text-emerald-500 border border-emerald-500/20'
-                                : 'bg-amber-500/10 text-amber-500 border border-amber-500/20'
-                            }`}
-                          >
-                            {user.role}
-                          </span>
-                        </td>
-                        <td className="py-3">
-                          <select
-                            defaultValue={user.role}
-                            onChange={(e) => handleUpdateUserRole(user.id, e.target.value)}
-                            className={`px-2.5 py-1 rounded-lg border text-[11px] outline-none cursor-pointer ${
-                              isDark
-                                ? 'border-slate-700 bg-slate-800 text-slate-200 focus:border-blue-500'
-                                : 'border-slate-300 bg-slate-50 text-slate-800 focus:border-blue-600'
-                            }`}
-                          >
-                            <option value="admin">Admin</option>
-                            <option value="creator">Creator</option>
-                            <option value="business">Business</option>
-                            <option value="school">School</option>
-                          </select>
-                        </td>
-                        <td className="py-3 text-slate-400 font-mono">
-                          {new Date(user.createdAt).toLocaleDateString('id-ID', {
-                            day: 'numeric',
-                            month: 'short',
-                            year: 'numeric',
-                          })}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          )}
-
-          {/* TAB 3: BRIEFS & PROJECTS */}
-          {activeTab === 'briefs' && (
-            <div
-              className={`p-6 rounded-3xl border backdrop-blur-sm space-y-4 ${
-                isDark
-                  ? 'border-slate-800/90 bg-[#0F172A]/80 shadow-md'
-                  : 'border-slate-200 bg-white shadow-sm'
-              }`}
-            >
-              <div className="flex items-center justify-between">
-                <div>
-                  <h3 className={`text-sm font-bold ${isDark ? 'text-slate-200' : 'text-slate-900'}`}>
-                    Daftar Brief Proyek
-                  </h3>
-                  <p className="text-xs text-slate-400">Seluruh pekerjaan yang dipublikasikan oleh UMKM</p>
+                      {roleOptions.map((role) => (
+                        <option key={role.value} value={role.value}>
+                          {role.label}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
                 </div>
-              </div>
 
-              <div className="overflow-x-auto">
-                <table className="w-full text-left text-xs">
-                  <thead>
-                    <tr
-                      className={`border-b ${
-                        isDark ? 'border-slate-800 text-slate-500' : 'border-slate-200 text-slate-400'
-                      }`}
-                    >
-                      <th className="pb-3 font-semibold">Judul Proyek</th>
-                      <th className="pb-3 font-semibold">Kategori</th>
-                      <th className="pb-3 font-semibold">Budget</th>
-                      <th className="pb-3 font-semibold">Status</th>
-                      <th className="pb-3 font-semibold">Tanggal</th>
-                    </tr>
-                  </thead>
-                  <tbody className={`divide-y ${isDark ? 'divide-slate-800/60' : 'divide-slate-100'}`}>
-                    {briefsList.map((brief) => (
-                      <tr
-                        key={brief.id}
-                        className={`transition-colors ${
-                          isDark ? 'hover:bg-slate-800/30' : 'hover:bg-slate-50'
-                        }`}
-                      >
-                        <td className={`py-3 font-medium ${isDark ? 'text-slate-200' : 'text-slate-900'}`}>
-                          {brief.title}
-                        </td>
-                        <td className="py-3 text-slate-400">{brief.category}</td>
-                        <td className="py-3 font-mono font-bold text-emerald-500">{brief.budget}</td>
-                        <td className="py-3">
-                          <span className="px-2.5 py-1 rounded-full text-[10px] font-bold bg-amber-500/10 text-amber-500 border border-amber-500/20 uppercase">
-                            {brief.status}
-                          </span>
-                        </td>
-                        <td className="py-3 text-slate-400 font-mono">
-                          {new Date(brief.createdAt).toLocaleDateString('id-ID')}
-                        </td>
+                <div className="overflow-x-auto">
+                  <table className="w-full min-w-[800px] text-left text-sm">
+                    <thead>
+                      <tr className="border-b border-[#E1E3EA] text-[#55576A]">
+                        <th className="pb-3 font-semibold">User</th>
+                        <th className="pb-3 font-semibold">Email</th>
+                        <th className="pb-3 font-semibold">Peran</th>
+                        <th className="pb-3 font-semibold">Ubah role</th>
+                        <th className="pb-3 font-semibold">Terdaftar</th>
                       </tr>
-                    ))}
-                    {briefsList.length === 0 && (
-                      <tr>
-                        <td colSpan={5} className="py-6 text-center text-slate-400">
-                          Belum ada data brief yang tersimpan.
-                        </td>
-                      </tr>
-                    )}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          )}
+                    </thead>
+                    <tbody className="divide-y divide-[#E1E3EA]">
+                      {usersLoading ? (
+                        <LoadingRows columns={5} />
+                      ) : (
+                        usersList.map((user) => (
+                          <tr key={user.id} className="hover:bg-[#F8F9FC]">
+                            <td className="py-3">
+                              <div className="flex items-center gap-3">
+                                <div className="grid h-9 w-9 place-items-center rounded-xl bg-[#F3F3F4] text-sm font-semibold text-[#0D0C22]">
+                                  {getNameInitial(user.fullName)}
+                                </div>
+                                <span className="font-semibold text-[#0D0C22]">{user.fullName || 'Tanpa nama'}</span>
+                              </div>
+                            </td>
+                            <td className="py-3 text-[#55576A]">{user.email || '-'}</td>
+                            <td className="py-3">
+                              <StatusPill className={roleBadgeClass(user.role)}>
+                                {roleLabels[user.role || ''] || user.role || 'Role kosong'}
+                              </StatusPill>
+                            </td>
+                            <td className="py-3">
+                              <select
+                                defaultValue={user.role || ''}
+                                onChange={(e) => handleUpdateUserRole(user.id, e.target.value)}
+                                className="h-10 rounded-xl border border-[#B7BBC9] bg-white px-3 text-sm font-medium text-[#0D0C22] outline-none focus:border-[#155DFC] focus:ring-4 focus:ring-[#155DFC]/20"
+                              >
+                                <option value="admin">Admin</option>
+                                <option value="creator">Creator</option>
+                                <option value="business">UMKM</option>
+                                <option value="school">SMK</option>
+                              </select>
+                            </td>
+                            <td className="py-3 text-[#55576A]">{formatDate(user.createdAt)}</td>
+                          </tr>
+                        ))
+                      )}
+                    </tbody>
+                  </table>
+                </div>
 
-          {/* TAB 4: SCHOOLS VERIFICATION */}
-          {activeTab === 'schools' && (
-            <div
-              className={`p-6 rounded-3xl border backdrop-blur-sm space-y-4 ${
-                isDark
-                  ? 'border-slate-800/90 bg-[#0F172A]/80 shadow-md'
-                  : 'border-slate-200 bg-white shadow-sm'
-              }`}
-            >
-              <div>
-                <h3 className={`text-sm font-bold ${isDark ? 'text-slate-200' : 'text-slate-900'}`}>
-                  Verifikasi SMK Vokasi
-                </h3>
-                <p className="text-xs text-slate-400">Persetujuan kemitraan dan akreditasi sekolah vokasi</p>
-              </div>
+                {!usersLoading && usersList.length === 0 ? (
+                  <div className="mt-4">
+                    <EmptyState title="Pengguna tidak ditemukan" text="Ubah kata kunci pencarian atau filter peran." />
+                  </div>
+                ) : null}
+              </section>
+            ) : null}
 
-              <div className="overflow-x-auto">
-                <table className="w-full text-left text-xs">
-                  <thead>
-                    <tr
-                      className={`border-b ${
-                        isDark ? 'border-slate-800 text-slate-500' : 'border-slate-200 text-slate-400'
-                      }`}
-                    >
-                      <th className="pb-3 font-semibold">Nama Sekolah</th>
-                      <th className="pb-3 font-semibold">Slug Profil</th>
-                      <th className="pb-3 font-semibold">Kontak PIC</th>
-                      <th className="pb-3 font-semibold">Status Verifikasi</th>
-                      <th className="pb-3 font-semibold">Aksi Validasi</th>
-                    </tr>
-                  </thead>
-                  <tbody className={`divide-y ${isDark ? 'divide-slate-800/60' : 'divide-slate-100'}`}>
-                    {schoolsList.map((school) => (
-                      <tr
-                        key={school.id}
-                        className={`transition-colors ${
-                          isDark ? 'hover:bg-slate-800/30' : 'hover:bg-slate-50'
-                        }`}
-                      >
-                        <td
-                          className={`py-3 font-medium flex items-center gap-2 ${
-                            isDark ? 'text-slate-200' : 'text-slate-900'
-                          }`}
-                        >
-                          <Building2 className="h-4 w-4 text-purple-500" />
-                          <span>{school.name}</span>
-                        </td>
-                        <td className="py-3 text-slate-400 font-mono">/school/{school.slug}</td>
-                        <td className="py-3 text-slate-400">{school.picName || school.picContact || '-'}</td>
-                        <td className="py-3">
-                          {school.isVerified ? (
-                            <span className="px-2.5 py-1 rounded-full text-[10px] font-bold bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 inline-flex items-center gap-1">
-                              <CheckCircle2 className="h-3 w-3" />
-                              Terverifikasi
-                            </span>
-                          ) : (
-                            <span className="px-2.5 py-1 rounded-full text-[10px] font-bold bg-amber-500/10 text-amber-500 border border-amber-500/20 inline-flex items-center gap-1">
-                              <Clock className="h-3 w-3" />
-                              Pending Review
-                            </span>
-                          )}
-                        </td>
-                        <td className="py-3">
-                          {school.isVerified ? (
-                            <button
-                              onClick={() => handleUpdateSchoolStatus(school.id, false)}
-                              className="px-3 py-1 rounded-xl border border-rose-500/30 bg-rose-500/10 text-rose-500 hover:bg-rose-500/20 transition-all text-[11px] font-semibold cursor-pointer active:scale-95"
-                            >
-                              Cabut Status
-                            </button>
-                          ) : (
-                            <button
-                              onClick={() => handleUpdateSchoolStatus(school.id, true)}
-                              className="px-3 py-1 rounded-xl bg-blue-600 hover:bg-blue-700 text-white transition-all text-[11px] font-bold cursor-pointer shadow-sm shadow-blue-500/20 active:scale-95"
-                            >
-                              Setujui Verifikasi
-                            </button>
-                          )}
-                        </td>
+            {activeTab === 'briefs' ? (
+              <section className="rounded-2xl border border-[#E1E3EA] bg-white p-5 shadow-[0_1px_2px_rgba(13,12,34,0.06)]">
+                <div className="mb-5 flex items-start justify-between gap-4">
+                  <div>
+                    <h2 className="font-display text-xl font-semibold text-[#0D0C22]">Brief dan proyek</h2>
+                    <p className="mt-1 text-sm leading-6 text-[#55576A]">Data yang dikirim oleh UMKM melalui alur brief.</p>
+                  </div>
+                  {briefsLoading ? <Loader2 className="h-5 w-5 animate-spin text-[#155DFC]" aria-hidden="true" /> : null}
+                </div>
+
+                <div className="overflow-x-auto">
+                  <table className="w-full min-w-[760px] text-left text-sm">
+                    <thead>
+                      <tr className="border-b border-[#E1E3EA] text-[#55576A]">
+                        <th className="pb-3 font-semibold">Judul proyek</th>
+                        <th className="pb-3 font-semibold">Kategori</th>
+                        <th className="pb-3 font-semibold">Budget</th>
+                        <th className="pb-3 font-semibold">Status</th>
+                        <th className="pb-3 font-semibold">Tanggal</th>
                       </tr>
-                    ))}
-                    {schoolsList.length === 0 && (
-                      <tr>
-                        <td colSpan={5} className="py-6 text-center text-slate-400">
-                          Tidak ada data sekolah vokasi.
-                        </td>
+                    </thead>
+                    <tbody className="divide-y divide-[#E1E3EA]">
+                      {briefsLoading ? (
+                        <LoadingRows columns={5} />
+                      ) : (
+                        briefsList.map((brief) => (
+                          <tr key={brief.id} className="hover:bg-[#F8F9FC]">
+                            <td className="py-3 font-semibold text-[#0D0C22]">{brief.title || 'Tanpa judul'}</td>
+                            <td className="py-3 text-[#55576A]">{brief.category || '-'}</td>
+                            <td className="py-3 font-semibold text-[#0D0C22]">{brief.budget || '-'}</td>
+                            <td className="py-3">
+                              <StatusPill className={statusBadgeClass(brief.status)}>
+                                {brief.status || 'Status kosong'}
+                              </StatusPill>
+                            </td>
+                            <td className="py-3 text-[#55576A]">{formatDate(brief.createdAt)}</td>
+                          </tr>
+                        ))
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+
+                {!briefsLoading && briefsList.length === 0 ? (
+                  <div className="mt-4">
+                    <EmptyState title="Belum ada brief" text="Brief yang dipublikasikan UMKM akan muncul di sini." />
+                  </div>
+                ) : null}
+              </section>
+            ) : null}
+
+            {activeTab === 'schools' ? (
+              <section className="rounded-2xl border border-[#E1E3EA] bg-white p-5 shadow-[0_1px_2px_rgba(13,12,34,0.06)]">
+                <div className="mb-5 flex items-start justify-between gap-4">
+                  <div>
+                    <h2 className="font-display text-xl font-semibold text-[#0D0C22]">Daftar sekolah</h2>
+                    <p className="mt-1 text-sm leading-6 text-[#55576A]">Setujui sekolah yang sudah layak tampil sebagai mitra vokasi.</p>
+                  </div>
+                  {schoolsLoading ? <Loader2 className="h-5 w-5 animate-spin text-[#155DFC]" aria-hidden="true" /> : null}
+                </div>
+
+                <div className="overflow-x-auto">
+                  <table className="w-full min-w-[860px] text-left text-sm">
+                    <thead>
+                      <tr className="border-b border-[#E1E3EA] text-[#55576A]">
+                        <th className="pb-3 font-semibold">Sekolah</th>
+                        <th className="pb-3 font-semibold">Profil</th>
+                        <th className="pb-3 font-semibold">Kontak PIC</th>
+                        <th className="pb-3 font-semibold">Status</th>
+                        <th className="pb-3 font-semibold">Aksi</th>
                       </tr>
-                    )}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          )}
+                    </thead>
+                    <tbody className="divide-y divide-[#E1E3EA]">
+                      {schoolsLoading ? (
+                        <LoadingRows columns={5} />
+                      ) : (
+                        schoolsList.map((school) => (
+                          <tr key={school.id} className="hover:bg-[#F8F9FC]">
+                            <td className="py-3">
+                              <div className="flex items-center gap-3">
+                                <div className="grid h-9 w-9 place-items-center rounded-xl bg-[#E1F6FF] text-[#087BB8]">
+                                  <Building2 className="h-5 w-5" aria-hidden="true" />
+                                </div>
+                                <span className="font-semibold text-[#0D0C22]">{school.name || 'Tanpa nama sekolah'}</span>
+                              </div>
+                            </td>
+                            <td className="py-3 text-[#55576A]">/school/{school.slug || '-'}</td>
+                            <td className="py-3 text-[#55576A]">{school.picName || school.picContact || '-'}</td>
+                            <td className="py-3">
+                              {school.isVerified ? (
+                                <StatusPill className="border-[#DCFCE7] bg-[#DCFCE7] text-[#14532D]" icon={CheckCircle2}>
+                                  Terverifikasi
+                                </StatusPill>
+                              ) : (
+                                <StatusPill className="border-[#FFF4D6] bg-[#FFF4D6] text-[#7A2E0E]" icon={Clock3}>
+                                  Menunggu tinjauan
+                                </StatusPill>
+                              )}
+                            </td>
+                            <td className="py-3">
+                              {school.isVerified ? (
+                                <button
+                                  type="button"
+                                  onClick={() => handleUpdateSchoolStatus(school.id, false)}
+                                  className="inline-flex h-10 items-center justify-center rounded-xl border border-[#FEE4E2] bg-white px-3 text-sm font-semibold text-[#912018] hover:bg-[#FEE4E2]"
+                                >
+                                  Cabut status
+                                </button>
+                              ) : (
+                                <button
+                                  type="button"
+                                  onClick={() => handleUpdateSchoolStatus(school.id, true)}
+                                  className="inline-flex h-10 items-center justify-center gap-2 rounded-xl bg-[#155DFC] px-3 text-sm font-semibold text-white hover:bg-[#1248C7]"
+                                >
+                                  <Check className="h-4 w-4" aria-hidden="true" />
+                                  Setujui
+                                </button>
+                              )}
+                            </td>
+                          </tr>
+                        ))
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+
+                {!schoolsLoading && schoolsList.length === 0 ? (
+                  <div className="mt-4">
+                    <EmptyState title="Belum ada sekolah" text="Data SMK vokasi akan muncul setelah sekolah melengkapi profil." />
+                  </div>
+                ) : null}
+              </section>
+            ) : null}
+          </div>
         </main>
       </div>
     </div>
