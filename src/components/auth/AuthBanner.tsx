@@ -7,15 +7,17 @@ export const AuthBanner: React.FC = () => {
       aria-hidden="true"
     >
       <div className="relative w-full h-full rounded-[28px] lg:rounded-[32px] overflow-hidden flex flex-col justify-between p-8 lg:p-10 xl:p-12 bg-[linear-gradient(135deg,#1B5BF7_0%,#1A58F2_7%,#1955ED_14%,#1852E8_21%,#1750E3_29%,#164DDE_36%,#154AD9_43%,#1447D4_50%,#1343CA_57%,#113FC0_64%,#103BB7_71%,#0E37AD_79%,#0D34A4_86%,#0B309A_93%,#0A2C91_100%)] shadow-2xl">
-        {/* Repeating pattern mask */}
+        {/* Repeating white pattern */}
         <div
-          className="absolute inset-0 opacity-40 mix-blend-overlay pointer-events-none"
+          className="absolute inset-0 pointer-events-none opacity-10"
           style={{
             backgroundImage: 'url(/brand/bg-pattern.png)',
             backgroundRepeat: 'repeat',
-            backgroundSize: '700px',
-            maskImage: 'linear-gradient(180deg, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.1) 100%)',
-            WebkitMaskImage: 'linear-gradient(180deg, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.1) 100%)',
+            backgroundSize: '100% auto',
+            backgroundPosition: 'top left',
+            filter: 'brightness(1.35) contrast(1.1)',
+            maskImage: 'linear-gradient(180deg, rgba(0,0,0,1) 0%, rgba(0,0,0,0.45) 100%)',
+            WebkitMaskImage: 'linear-gradient(180deg, rgba(0,0,0,1) 0%, rgba(0,0,0,0.45) 100%)',
           }}
         />
 
