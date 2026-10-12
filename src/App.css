@@ -68,8 +68,7 @@
 .project-card { position: relative; aspect-ratio: 378 / 472.5; overflow: hidden; border-radius: 12px; background: #0D0C22; border: 1px solid rgba(13, 11, 11, 0.10); isolation: isolate; cursor: pointer; }
 .project-card-button { width: 100%; padding: 0; border: 0; color: inherit; text-align: left; }
 .project-card::after { content: ""; position: absolute; inset: 45% 0 0; z-index: 1; background: linear-gradient(to top, rgba(13,12,34,.90), rgba(13,12,34,.30) 60%, transparent); pointer-events: none; }
-.project-card .portfolio-shader { transition: transform .3s ease; }
-.project-card:hover .portfolio-shader { transform: scale(1.03); }
+.project-card .portfolio-shader { }
 .project-play { position: absolute; z-index: 2; top: 10px; right: 10px; width: 28px; height: 28px; display: grid; place-items: center; border: 1px solid rgba(255,255,255,.2); border-radius: 8px; background: rgba(13,12,34,.6); color: #fff; backdrop-filter: blur(8px); transition: background .15s; }
 .project-card:hover .project-play { background: #155DFC; }
 .project-play svg { width: 12px; height: 12px; }

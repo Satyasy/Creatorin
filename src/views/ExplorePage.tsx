@@ -226,7 +226,7 @@ export function ExplorePage() {
                           muted
                           playsInline
                           preload="metadata"
-                          className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.025]"
+                          className="h-full w-full object-cover"
                         />
                         <span className="absolute left-3 top-3 inline-flex items-center gap-1.5 rounded-md bg-[#171714]/88 px-2.5 py-1.5 text-xs font-medium text-white">
                           <Video className="h-3.5 w-3.5" strokeWidth={1.7} /> Video portofolio
@@ -290,7 +290,7 @@ export function ExplorePage() {
                         <img
                           src={business.coverBanner}
                           alt={`Suasana ${business.brandName}`}
-                          className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
+                          className="h-full w-full object-cover"
                         />
                       )}
                     </div>

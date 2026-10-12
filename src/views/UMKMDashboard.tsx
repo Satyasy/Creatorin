@@ -991,8 +991,8 @@ export const UMKMDashboard = () => {
       {/* Symmetrical Hero Section matching Figma 4816-18898 */}
       <HomeHeroSection
         onExploreClick={() => router.push('/jelajah/kreator')}
-        onSecondaryClick={() => setIsBriefModalOpen(true)}
-        secondaryText="Bergabung Creatorin"
+        onSecondaryClick={user ? () => setIsBriefModalOpen(true) : () => router.push('/sign-in')}
+        secondaryText={user ? 'Buat Brief Proyek' : 'Bergabung Creatorin'}
       />
 
       {/* Main Content Area */}
@@ -1189,7 +1189,7 @@ export const UMKMDashboard = () => {
                           <img
                             src={service.image}
                             alt={service.title}
-                            className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                            className="w-full h-full object-cover"
                             loading="lazy"
                           />
                         </div>
@@ -1259,7 +1259,7 @@ export const UMKMDashboard = () => {
                         <img
                           src={service.image}
                           alt={service.title}
-                          className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                          className="w-full h-full object-cover"
                           loading="lazy"
                         />
                       </div>
@@ -1371,12 +1371,12 @@ export const UMKMDashboard = () => {
                     <img
                       src={project.mediaUrl}
                       alt={project.title}
-                      className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                      className="w-full h-full object-cover"
                       loading="lazy"
                     />
 
                     {/* Top Right Video Play Badge */}
-                    <div className="absolute top-3 right-3 w-7 h-7 rounded-full bg-black/50 backdrop-blur-xs flex items-center justify-center text-white shadow-xs group-hover:scale-110 transition-transform">
+                    <div className="absolute top-3 right-3 w-7 h-7 rounded-full bg-black/50 backdrop-blur-xs flex items-center justify-center text-white shadow-xs">
                       <Play className="w-3.5 h-3.5 fill-white text-white ml-0.5" />
                     </div>
 

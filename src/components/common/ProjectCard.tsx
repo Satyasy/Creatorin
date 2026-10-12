@@ -61,7 +61,7 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({
         src={displayMedia}
         alt={project.title}
         referrerPolicy="no-referrer"
-        className="w-full h-full object-cover object-center transition-transform duration-300 group-hover:scale-105"
+        className="w-full h-full object-cover object-center"
         loading="lazy"
       />
 

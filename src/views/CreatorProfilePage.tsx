@@ -1659,19 +1659,21 @@ export const CreatorProfilePage: React.FC<CreatorProfilePageProps> = ({
         </div>
       )}
 
-      {/* Upload Project Modal (Instagram style) */}
+      {/* Upload Project Modal (Figma JHIC 2.0 style) */}
       <UploadProjectModal
         isOpen={isUploadProjectModalOpen}
         onClose={() => setIsUploadProjectModalOpen(false)}
+        creator={creator}
         onSuccess={() => {
           creatorService.getFeedProjects(creator.id).then(setLiveProjects).catch(() => {});
         }}
       />
 
-      {/* Upload Service Modal */}
+      {/* Upload Service Modal (Figma JHIC 2.0 style) */}
       <UploadServiceModal
         isOpen={isUploadServiceModalOpen}
         onClose={() => setIsUploadServiceModalOpen(false)}
+        creator={creator}
         onSuccess={(newSrv) => setLiveServices((services) => [newSrv, ...services])}
       />
 

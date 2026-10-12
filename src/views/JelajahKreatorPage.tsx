@@ -8,10 +8,14 @@ import {
   Star, 
   Check, 
   SlidersHorizontal, 
-  ChevronDown,
-  Bookmark,
-  UserCheck
+  ChevronDown, 
+  Bookmark, 
+  UserCheck, 
+  ShieldCheck, 
+  Clock, 
+  Sparkles 
 } from 'lucide-react';
+import { ScrollReveal } from '@/components/common/ScrollReveal';
 import { ProjectBriefModal } from '@/components/modals/ProjectBriefModal';
 import { creatorService } from '@/services/creatorService';
 import { DEFAULT_CREATORS } from '@/data/defaultCreators';
@@ -55,6 +59,7 @@ const LOCATION_OPTIONS = [
 export const JelajahKreatorPage: React.FC<JelajahKreatorPageProps> = ({
   currentUser: propUser,
   onNavigate,
+  onViewCreatorProfile,
 }) => {
   const router = useRouter();
   const { user: authUser } = useAuth();
@@ -96,6 +101,25 @@ export const JelajahKreatorPage: React.FC<JelajahKreatorPageProps> = ({
     setBookmarkedIds((prev) => 
       prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]
     );
+  };
+
+  const handleCreatorClick = (creator: Creator) => {
+    if (onViewCreatorProfile) {
+      onViewCreatorProfile(creator);
+    } else {
+      router.push(`/creator/${creator.id}`);
+    }
+  };
+
+  const handleOpenBrief = (creator: Creator, e: React.MouseEvent) => {
+    e.stopPropagation();
+    setTargetCreatorForBrief(creator);
+    setIsBriefModalOpen(true);
+  };
+
+  const toggleSave = (creatorId: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    toggleBookmark(creatorId);
   };
 
   const filteredCreators = useMemo(() => {
@@ -401,259 +425,279 @@ export const JelajahKreatorPage: React.FC<JelajahKreatorPageProps> = ({
           </p>
         </div>
 
-        {/* Creator Cards Vertical List Matching Figma node #4785:762 */}
+        {/* Creator Cards Vertical List - Cloned from Home Screen */}
         {filteredCreators.length > 0 ? (
           <div className="space-y-6">
-            {filteredCreators.map((creator) => {
-              const ratingVal =
-                Number(creator.rating || 0) > 0
-                  ? Number(creator.rating).toFixed(1)
-                  : creator.careerScore?.clientRating
-                  ? Number(creator.careerScore.clientRating).toFixed(1)
-                  : '5.0';
-              const reviewsCount = creator.reviewCount ?? creator.careerScore?.completedProjects ?? 88;
-              const completedCount = creator.careerScore?.completedProjects ?? reviewsCount ?? 88;
-              const isBookmarked = bookmarkedIds.includes(creator.id);
-
-              // 4 Showcase items for this creator
-              interface CreatorShowcaseItem {
-                id: string;
-                tag: string;
-                title: string;
-                price: string;
-                deliveryDays: string;
-                image: string;
-                serviceId?: string;
-              }
-
-              const showcaseItems: CreatorShowcaseItem[] = (creator.services && creator.services.length >= 4)
-                ? creator.services.slice(0, 4).map((s) => ({
-                    id: s.id,
-                    tag: s.tag || 'Layanan Unggulan',
-                    title: s.title,
-                    price: s.formattedPrice || `Rp${(s.price || 100000).toLocaleString('id-ID')}`,
-                    deliveryDays: s.deliveryDays || '3 Hari Kerja',
-                    image: s.coverImage || '/creatorin/service-pattern-1.png',
-                    serviceId: s.id,
-                  }))
-                : [
-                    {
-                      id: `${creator.id}-showcase-1`,
-                      tag: 'Brand Identity',
-                      title: 'Desain Identitas Brand & Logo UMKM',
-                      price: 'Rp100.000',
-                      deliveryDays: '3 Hari Kerja',
-                      image: '/creatorin/service-pattern-1.png',
-                    },
-                    {
-                      id: `${creator.id}-showcase-2`,
-                      tag: 'Feed Instagram',
-                      title: 'Desain Feed Instagram Aesthetic (9 Grid)',
-                      price: 'Rp50.000',
-                      deliveryDays: '2 Hari Kerja',
-                      image: '/creatorin/service-pattern-2.png',
-                    },
-                    {
-                      id: `${creator.id}-showcase-3`,
-                      tag: 'Kemasan',
-                      title: 'Packaging & Label Design Siap Cetak',
-                      price: 'Rp70.000',
-                      deliveryDays: '3 Hari Kerja',
-                      image: '/creatorin/service-pattern-3.png',
-                    },
-                    {
-                      id: `${creator.id}-showcase-4`,
-                      tag: 'Banner',
-                      title: 'Banner Promo E-Commerce & Marketplace',
-                      price: 'Rp120.000',
-                      deliveryDays: '1 Hari Kerja',
-                      image: '/creatorin/service-pattern-4.png',
-                    },
-                  ];
+            {filteredCreators.map((creator, cIdx) => {
+              const isSaved = bookmarkedIds.includes(creator.id);
 
               return (
-                <article
+                <ScrollReveal
                   key={creator.id}
-                  className="rounded-[24px] border border-neutral-200/80 bg-white p-6 sm:p-8 shadow-xs hover:shadow-md transition-all duration-200"
+                  distance={32}
+                  delay={Math.min(cIdx * 60, 240)}
+                  duration={600}
                 >
-                  {/* Top Row: Avatar + Info + CTAs */}
-                  <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                    <div className="flex items-center gap-4 min-w-0">
+                  <div
+                    id={`creator-card-${creator.id}`}
+                    onClick={() => {
+                      handleCreatorClick(creator);
+                    }}
+                    className="group bg-white rounded-2xl sm:rounded-3xl border border-neutral-200/80 hover:border-neutral-300 p-6 sm:p-8 transition-all shadow-xs hover:shadow-md cursor-pointer text-left"
+                  >
+                  
+                  {/* BARIS 1: Header Profil Kreator, Badges, & Action Buttons */}
+                  <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+                    
+                    {/* Identitas Kreator */}
+                    <div className="flex items-start sm:items-center gap-4">
                       
-                      {/* Avatar with Verified Checkmark */}
+                      {/* Avatar Kreator dengan Badge */}
                       <div className="relative shrink-0">
                         <img
                           src={creator.avatar || '/creatorin/avatar.png'}
                           alt={creator.name}
-                          className="w-16 h-16 rounded-full object-cover ring-2 ring-[#F5F5F5]"
+                          className="w-14 h-14 sm:w-16 sm:h-16 rounded-full object-cover ring-2 ring-neutral-100"
                         />
-                        <div
-                          className="absolute -bottom-0.5 -right-0.5 w-5 h-5 rounded-full bg-[#0D0C22] ring-2 ring-white text-white flex items-center justify-center shadow-xs"
-                          title="Kreator Terverifikasi"
-                        >
-                          <Check className="w-3 h-3 stroke-[3]" />
-                        </div>
+                        {(creator.careerScore?.overall ?? 95) >= 95 && (
+                          <div className="absolute -bottom-1 -right-1 bg-[#0d0c22] text-white p-1 rounded-full ring-2 ring-white">
+                            <ShieldCheck className="w-3 h-3 text-amber-400" />
+                          </div>
+                        )}
                       </div>
 
-                      {/* Info: Name, Ratings, Completed, Promoted, Rates */}
-                      <div className="min-w-0">
-                        <div className="flex items-center gap-2 flex-wrap">
-                          <Link
-                            href={`/creator/${creator.id}`}
-                            className="text-lg sm:text-xl font-bold text-[#0D0C22] hover:text-[#155DFC] transition-colors truncate"
-                          >
+                      {/* Detail Nama & Status Promoted */}
+                      <div>
+                        <div className="flex flex-wrap items-center gap-2">
+                          <h3 className="text-lg sm:text-xl font-bold tracking-tight text-[#0d0c22]">
                             {creator.name}
-                          </Link>
+                          </h3>
 
-                          {/* Star Rating */}
-                          <div className="flex items-center gap-1 text-xs font-bold text-[#262626]">
-                            <Star className="w-3.5 h-3.5 fill-[#EAB308] text-[#EAB308]" />
-                            <span>{ratingVal}</span>
-                            <span className="font-normal text-[#A1A1A1]">({reviewsCount})</span>
+                          {creator.proBadge && (
+                            <span
+                              className="uppercase px-2 py-0.5 rounded bg-[#0d0c22] tracking-[0.62px] leading-[15px]"
+                              style={{
+                                color: '#FFF',
+                                fontFamily: '"SF Pro", -apple-system, BlinkMacSystemFont, sans-serif',
+                                fontSize: '10px',
+                                fontStyle: 'normal',
+                                fontWeight: 900,
+                              }}
+                            >
+                              PRO
+                            </span>
+                          )}
+
+                          <div className="flex items-center gap-1 text-xs font-bold text-neutral-800">
+                            <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
+                            <span>{creator.careerScore?.clientRating ?? '5.0'}</span>
+                            <span className="text-neutral-400 font-normal">({creator.careerScore?.completedProjects ?? 88})</span>
                           </div>
 
-                          {/* Proyek Selesai */}
-                          <div className="flex items-center gap-1 text-xs font-semibold text-[#404040]">
-                            <Check className="w-3.5 h-3.5 text-[#404040]" />
-                            <span>{completedCount} proyek selesai</span>
+                          <div className="flex items-center gap-1 text-xs font-semibold text-neutral-700 ml-1">
+                            <Check className="w-3.5 h-3.5 text-neutral-900 stroke-[3]" />
+                            <span>{creator.careerScore?.completedProjects ?? 88} proyek selesai</span>
                           </div>
 
-                          {/* Promoted Pill */}
-                          <span className="text-[11px] font-medium text-[#A1A1A1] px-2 py-0.5 rounded-full bg-[#F5F5F5]">
-                            Promoted
-                          </span>
-                        </div>
-
-                        {/* Sub Info Line */}
-                        <div className="mt-1.5 flex items-center gap-2.5 sm:gap-3 text-xs text-[#737373] flex-wrap">
-                          <span className="font-semibold text-[#262626]">
-                            Mulai {creator.formattedRate || `Rp${(creator.startingRate || 200000).toLocaleString('id-ID')}`}/proyek
-                          </span>
-                          <span className="text-neutral-300">•</span>
-                          <span className="flex items-center gap-1">
-                            <MapPin className="w-3 h-3 text-[#737373]" />
-                            <span>{creator.location || 'Indonesia'}</span>
-                          </span>
-                          <span className="text-neutral-300">•</span>
-                          <span>
-                            <strong className="font-black text-[#0D0C22]">{creator.careerScore?.overall ?? 95}%</strong> Skor Karir
-                          </span>
-                          <span className="text-neutral-300">•</span>
-                          <span>
-                            {creator.servicesAvailableCount || (creator.services?.length ? creator.services.length : 10)} Layanan tersedia
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Right Action Buttons */}
-                    <div className="flex items-center gap-2.5 shrink-0 self-start md:self-center">
-                      
-                      {/* Bookmark Button */}
-                      <button
-                        type="button"
-                        onClick={() => toggleBookmark(creator.id)}
-                        className={`w-10 h-10 rounded-full border border-[#E5E5E5] flex items-center justify-center transition-colors cursor-pointer ${
-                          isBookmarked
-                            ? 'bg-neutral-100 text-[#0D0C22]'
-                            : 'bg-white text-neutral-600 hover:text-neutral-900 hover:bg-neutral-50'
-                        }`}
-                        title="Simpan Kreator"
-                      >
-                        <Bookmark className={`w-4 h-4 ${isBookmarked ? 'fill-current' : ''}`} />
-                      </button>
-
-                      {/* Hubungi Button */}
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setTargetCreatorForBrief(creator);
-                          setIsBriefModalOpen(true);
-                        }}
-                        className="px-6 py-2.5 rounded-full bg-[#0D0C22] hover:bg-[#1a1936] text-white text-sm font-semibold transition-all shadow-xs cursor-pointer"
-                      >
-                        Hubungi
-                      </button>
-                    </div>
-                  </div>
-
-                  {/* Middle Row: 4-Item Showcase Grid */}
-                  <div className="border-t border-[#F5F5F5] pt-4 mt-5 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                    {showcaseItems.map((item) => (
-                      <div
-                        key={item.id}
-                        onClick={() => {
-                          if (item.serviceId) {
-                            router.push(`/jelajah/layanan?serviceId=${item.serviceId}`);
-                          } else {
-                            setTargetCreatorForBrief(creator);
-                            setIsBriefModalOpen(true);
-                          }
-                        }}
-                        className="group/item flex flex-col cursor-pointer"
-                      >
-                        <div className="aspect-[16/11] rounded-[16px] overflow-hidden relative bg-[#171717]">
-                          <img
-                            src={item.image}
-                            alt={item.title}
-                            className="w-full h-full object-cover group-hover/item:scale-105 transition-transform duration-300"
-                          />
-                          {item.tag && (
-                            <span className="absolute top-3 left-3 px-2.5 py-1 rounded-full bg-black/60 backdrop-blur-xs text-white text-[11px] font-medium">
-                              {item.tag}
+                          {creator.isPromoted && (
+                            <span className="text-[11px] font-medium text-neutral-400 ml-1">
+                              Promoted
                             </span>
                           )}
                         </div>
-                        <h4 className="text-sm font-semibold text-[#0D0C22] line-clamp-1 group-hover/item:text-[#155DFC] transition-colors mt-2.5">
-                          {item.title}
-                        </h4>
-                        <div className="flex items-center justify-between mt-1 text-xs">
-                          <span className="text-sm font-bold text-[#0D0C22]">
-                            {item.price}
+
+                        {/* Sub-info Row (Harga, Lokasi, Respon, Layanan) */}
+                        <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-neutral-500 mt-2">
+                          <span className="font-semibold text-neutral-800">
+                            Mulai {creator.formattedRate || `Rp${(creator.startingRate || 200000).toLocaleString('id-ID')}`}
                           </span>
-                          <span className="text-xs text-[#737373]">
-                            {item.deliveryDays}
+                          <span>•</span>
+                          <span className="flex items-center gap-1">
+                            <MapPin className="w-3 h-3 text-neutral-400" />
+                            {creator.location || 'Indonesia'}
                           </span>
+                          <span>•</span>
+                          <span className="flex items-center gap-1">
+                            <Clock className="w-3 h-3 text-neutral-400" />
+                            {creator.responseTime || 'Merespons cepat'}
+                          </span>
+                          <span>•</span>
+                          <span>{creator.servicesAvailableCount || (creator.services?.length || 8)} Layanan tersedia</span>
                         </div>
+
                       </div>
-                    ))}
+
+                    </div>
+
+                    {/* Sisi Kanan: Bookmark & Tombol "Hubungi" (Get in touch) */}
+                    <div className="flex items-center gap-2.5 self-end lg:self-center shrink-0">
+                      
+                      {/* Save Button */}
+                      <button
+                        type="button"
+                        onClick={(e) => toggleSave(creator.id, e)}
+                        className={`p-2.5 rounded-full border transition cursor-pointer ${
+                          isSaved 
+                            ? 'bg-blue-50 border-blue-200 text-blue-600' 
+                            : 'border-neutral-200 text-neutral-600 hover:bg-neutral-50 hover:border-neutral-300'
+                        }`}
+                        title="Simpan Kreator"
+                      >
+                        <Bookmark className={`w-4 h-4 ${isSaved ? 'fill-blue-600' : ''}`} />
+                      </button>
+
+                      {/* Tombol Get in touch */}
+                      <button
+                        type="button"
+                        onClick={(e) => handleOpenBrief(creator, e)}
+                        className="h-10 px-5 sm:px-6 rounded-xl bg-[#0B1F3A] hover:bg-[#123B8C] text-white text-xs sm:text-sm font-semibold transition-all shadow-2xs hover:shadow-xs cursor-pointer flex items-center gap-2"
+                      >
+                        <span>Hubungi</span>
+                      </button>
+
+                    </div>
+
                   </div>
 
-                  {/* Bottom Row: Skill Tags */}
-                  <div className="border-t border-[#F5F5F5] pt-4 mt-5 flex items-center gap-2 flex-wrap">
-                    {(creator.skills || ['Brand Identity', 'Product Photography', 'Packaging', 'Social Media Feed', 'UI Mockups']).slice(0, 5).map((skill) => (
+                  {/* Layanan yang benar-benar diterbitkan kreator */}
+                  {(() => {
+                    const servicesList = (creator.services && creator.services.length > 0)
+                      ? creator.services.slice(0, 4)
+                      : [
+                          {
+                            id: `${creator.id}-showcase-1`,
+                            tag: 'Brand Identity',
+                            title: 'Desain Identitas Brand & Logo UMKM',
+                            formattedPrice: 'Rp100.000',
+                            deliveryDays: '3 Hari Kerja',
+                            coverImage: '/creatorin/service-pattern-1.png',
+                          },
+                          {
+                            id: `${creator.id}-showcase-2`,
+                            tag: 'Feed Instagram',
+                            title: 'Desain Feed Instagram Aesthetic (9 Grid)',
+                            formattedPrice: 'Rp50.000',
+                            deliveryDays: '2 Hari Kerja',
+                            coverImage: '/creatorin/service-pattern-2.png',
+                          },
+                          {
+                            id: `${creator.id}-showcase-3`,
+                            tag: 'Kemasan',
+                            title: 'Packaging & Label Design Siap Cetak',
+                            formattedPrice: 'Rp70.000',
+                            deliveryDays: '3 Hari Kerja',
+                            coverImage: '/creatorin/service-pattern-3.png',
+                          },
+                          {
+                            id: `${creator.id}-showcase-4`,
+                            tag: 'Banner',
+                            title: 'Banner Promo E-Commerce & Marketplace',
+                            formattedPrice: 'Rp120.000',
+                            deliveryDays: '1 Hari Kerja',
+                            coverImage: '/creatorin/service-pattern-4.png',
+                          },
+                        ];
+
+                    if (!servicesList.length) return null;
+
+                    return (
+                      <div className="mt-5 pt-4 border-t border-neutral-100">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-3.5 lg:gap-4">
+                          {servicesList.map((service) => {
+                            const imageSrc = service.coverImage || '';
+
+                            return (
+                              <div
+                                key={service.id}
+                                id={`service-card-${service.id}`}
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleOpenBrief(creator, e);
+                                }}
+                                className="group/srv flex flex-col cursor-pointer text-left select-none"
+                              >
+                                {/* Cover Image Preview (Clean Rounded, No Outer Stroke) */}
+                                <div className="aspect-[4/3] w-full rounded-2xl overflow-hidden bg-neutral-900 relative shadow-2xs group-hover/srv:shadow-md transition-all duration-300">
+                                  {imageSrc && <img src={imageSrc} alt={service.title} className="w-full h-full object-cover" loading="lazy" />}
+                                  
+                                  {service.tag && (
+                                    <div className="absolute top-2.5 left-2.5 bg-black/60 backdrop-blur-md text-white text-[10px] font-semibold px-2.5 py-0.5 rounded-full tracking-wide">
+                                      {service.tag}
+                                    </div>
+                                  )}
+
+                                  <div className="absolute bottom-2.5 right-2.5 opacity-0 group-hover/srv:opacity-100 transition-all duration-300 transform translate-y-1 group-hover/srv:translate-y-0">
+                                    <span className="bg-white text-[#171717] text-[11px] font-bold px-3 py-1 rounded-full shadow-md flex items-center gap-1">
+                                      <span>Order</span>
+                                      <span className="text-blue-600 font-bold">→</span>
+                                    </span>
+                                  </div>
+                                </div>
+
+                                {/* Clean Title & Price Below Image */}
+                                <div className="pt-3 px-0.5 space-y-1">
+                                  <h4 className="text-[13px] sm:text-[14px] font-bold text-[#171717] group-hover/srv:text-blue-600 transition-colors line-clamp-1 leading-snug">
+                                    {service.title}
+                                  </h4>
+
+                                  <div className="flex items-center justify-between pt-0.5">
+                                    <span className="text-[13px] sm:text-[14px] font-black text-[#171717] tracking-tight">
+                                      {service.formattedPrice}
+                                    </span>
+                                    {service.deliveryDays && (
+                                      <span className="text-[11px] font-medium text-neutral-400">
+                                        {service.deliveryDays}
+                                      </span>
+                                    )}
+                                  </div>
+                                </div>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    );
+                  })()}
+
+                  {/* BARIS 3: Tag Keahlian / Skills */}
+                  <div className="mt-5 pt-4 border-t border-neutral-100 flex flex-wrap items-center gap-2">
+                    {(creator.skills || []).slice(0, 5).map((skill, idx) => (
                       <span
-                        key={skill}
-                        className="px-3 py-1 bg-[#F5F5F5] hover:bg-[#EDEDED] rounded-full text-xs font-medium text-[#404040] transition-colors"
+                        key={idx}
+                        className="px-3 py-1 rounded-full bg-neutral-100 text-neutral-700 text-xs font-medium hover:bg-neutral-200 transition"
                       >
                         {skill}
                       </span>
                     ))}
                     {creator.skills && creator.skills.length > 5 && (
-                      <span className="text-[#A1A1A1] text-xs font-medium">
+                      <span className="text-xs font-medium text-neutral-400 hover:text-neutral-700">
                         +{creator.skills.length - 5} keahlian lainnya
                       </span>
                     )}
                   </div>
-                </article>
-              );
-            })}
-          </div>
-        ) : (
-          <div className="bg-white rounded-2xl border border-black/10 p-12 text-center max-w-lg mx-auto">
-            <UserCheck className="w-12 h-12 text-neutral-300 mx-auto mb-3" />
-            <h3 className="text-base font-bold text-[#0D0C22]">Tidak Ada Kreator yang Cocok</h3>
-            <p className="text-xs text-neutral-500 mt-1 max-w-sm mx-auto">
-              Coba gunakan kata kunci lain, pilih kategori umum, atau bersihkan filter pencarian.
-            </p>
+
+                </div>
+              </ScrollReveal>
+            );
+          })}
+        </div>
+      ) : (
+        <div className="text-center py-16 bg-white rounded-3xl border border-neutral-200">
+          <Sparkles className="w-10 h-10 text-neutral-300 mx-auto mb-3" />
+          <h3 className="text-lg font-bold text-[#0D0C22]">Tidak Ada Kreator yang Sesuai</h3>
+          <p className="text-xs text-neutral-500 max-w-sm mx-auto mt-1">
+            Coba sesuaikan kata kunci pencarian atau reset filter untuk melihat kreator berbakat lainnya.
+          </p>
+          {activeFiltersCount > 0 && (
             <button
               onClick={resetFilters}
               className="mt-4 px-4 py-2 rounded-xl bg-[#0D0C22] text-white text-xs font-semibold hover:bg-neutral-800 transition-colors cursor-pointer"
             >
               Reset Semua Filter
             </button>
-          </div>
-        )}
+          )}
+        </div>
+      )}
 
       </main>
 

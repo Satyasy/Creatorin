@@ -414,7 +414,7 @@ export const ProjectDetailModal: React.FC<ProjectDetailModalProps> = ({
                     className={`aspect-[4/3] rounded-xl overflow-hidden relative cursor-pointer transition-all ${
                       isActive
                         ? 'ring-2 ring-[#0D0C22] ring-offset-2 opacity-100'
-                        : 'opacity-75 hover:opacity-100 hover:scale-[1.02]'
+                        : 'opacity-75 hover:opacity-100'
                     }`}
                   >
                     <img
@@ -473,11 +473,11 @@ export const ProjectDetailModal: React.FC<ProjectDetailModalProps> = ({
                   <img
                     src={item.mediaUrl}
                     alt={item.title}
-                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                    className="w-full h-full object-cover"
                     loading="lazy"
                   />
                   {/* Play Badge Top Right */}
-                  <div className="absolute top-3 right-3 w-7 h-7 rounded-full bg-black/50 flex items-center justify-center text-white shadow-xs group-hover:scale-110 transition-transform">
+                  <div className="absolute top-3 right-3 w-7 h-7 rounded-full bg-black/50 flex items-center justify-center text-white shadow-xs">
                     <Play className="w-3.5 h-3.5 fill-white text-white ml-0.5" />
                   </div>
                   {/* Dark Gradient Overlay Bottom */}

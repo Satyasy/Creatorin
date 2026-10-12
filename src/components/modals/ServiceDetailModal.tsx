@@ -507,7 +507,7 @@ export const ServiceDetailModal: React.FC<ServiceDetailModalProps> = ({
                         <img
                           src={item.image}
                           alt={item.title}
-                          className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                          className="w-full h-full object-cover"
                           loading="lazy"
                         />
                       </div>

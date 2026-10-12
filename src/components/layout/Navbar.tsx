@@ -161,14 +161,14 @@ export const Navbar: React.FC<NavbarProps> = ({
       id="main-header" 
       className={`sticky top-0 z-40 w-full transition-all duration-300 ease-in-out font-sans ${
         isScrolled 
-          ? 'bg-white/92 backdrop-blur-md shadow-xs border-b border-neutral-200/80' 
+          ? 'bg-white/95 backdrop-blur-md shadow-xs border-b border-[#E1E3EA]' 
           : isHomeActive 
             ? 'bg-transparent border-b border-transparent' 
-            : 'bg-white border-b border-neutral-200/60'
+            : 'bg-white border-b border-[#E1E3EA]'
       }`}
     >
       <div className={`max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 transition-all duration-300 ease-in-out flex items-center justify-between gap-4 ${
-        isScrolled ? 'h-16' : 'h-20'
+        isScrolled ? 'h-16' : 'h-[72px]'
       }`}>
         
         {/* Sisi Kiri: Logo Brand & Search Bar Dribbble Style */}
@@ -178,16 +178,16 @@ export const Navbar: React.FC<NavbarProps> = ({
           <button
             id="nav-logo-btn"
             onClick={() => navigateTo('home', '/')}
-            className="inline-flex items-center gap-2 shrink-0 group text-left cursor-pointer focus:outline-hidden"
+            className="inline-flex items-center gap-2.5 shrink-0 group text-left cursor-pointer focus:outline-hidden"
             aria-label="Creatorin"
           >
             <img
               src="/creatorin/logo.svg"
               alt=""
-              className={`shrink-0 transition-all duration-300 ease-in-out ${isScrolled ? 'h-[28px] w-[30px]' : 'h-[32px] w-[34px]'}`}
+              className={`shrink-0 transition-all duration-300 ease-in-out ${isScrolled ? 'h-7 w-[30px]' : 'h-8 w-[34px]'}`}
               aria-hidden="true"
             />
-            <span className={`font-medium leading-none tracking-[-0.714px] text-black font-[var(--font-logo)] transition-all duration-300 ease-in-out ${isScrolled ? 'text-[21px]' : 'text-[23.794px]'}`}>
+            <span className={`font-display font-bold leading-none tracking-tight text-[#0D0C22] transition-all duration-300 ease-in-out ${isScrolled ? 'text-xl' : 'text-[22px]'}`}>
               Creatorin
             </span>
           </button>
@@ -195,7 +195,7 @@ export const Navbar: React.FC<NavbarProps> = ({
           {isSearchVisible && (
             <form 
               onSubmit={handleSearchSubmit}
-              className="hidden md:flex items-center w-full max-w-md bg-[#F3F3F4] hover:bg-neutral-200/50 focus-within:bg-white focus-within:ring-2 focus-within:ring-[#155DFC]/20 focus-within:border-[#155DFC] rounded-full p-1.5 pl-4 transition-all border border-neutral-200/70"
+              className="hidden md:flex items-center w-full max-w-md bg-[#F3F3F4] hover:bg-[#E9EAF0] focus-within:bg-white focus-within:ring-2 focus-within:ring-[#155DFC]/20 focus-within:border-[#155DFC] rounded-full p-1 pl-4 transition-all border border-[#E1E3EA]"
             >
               <input
                 type="text"
@@ -206,7 +206,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                   if (onSearch) onSearch(e.target.value);
                 }}
                 placeholder="Cari kreator, keahlian, atau video UGC..."
-                className="w-full bg-transparent text-xs sm:text-sm text-[#0D0B0B] placeholder:text-neutral-400 focus:outline-hidden"
+                className="w-full bg-transparent text-sm font-normal text-[#0D0C22] placeholder:text-[#55576A]/60 focus:outline-hidden font-sans"
               />
               
               {/* Brand Blue Round Search Button */}
@@ -223,16 +223,16 @@ export const Navbar: React.FC<NavbarProps> = ({
         </div>
 
         {/* Tengah: Nav Link (Beranda, Jelajah & Brief) */}
-        <nav className="hidden lg:flex items-center gap-8 xl:gap-9 text-sm font-semibold text-[#0D0B0B]">
+        <nav className="hidden lg:flex items-center gap-7 xl:gap-8 text-sm font-sans">
           
           {/* Nav Link Beranda */}
           <button
             id="nav-beranda-link"
             onClick={() => navigateTo('home', '/')}
-            className={`transition-colors flex items-center gap-1.5 cursor-pointer font-semibold ${
+            className={`transition-colors flex items-center gap-1.5 cursor-pointer text-sm py-1.5 ${
               isHomeActive
-                ? 'text-[#0D0C22]'
-                : 'text-[#404040] hover:text-[#0D0C22]'
+                ? 'text-[#0D0C22] font-semibold'
+                : 'text-[#55576A] font-medium hover:text-[#0D0C22]'
             }`}
           >
             <span>Beranda</span>
@@ -243,42 +243,50 @@ export const Navbar: React.FC<NavbarProps> = ({
             <button
               id="nav-explore-link"
               onClick={() => navigateTo('explore', '/explore')}
-              className={`transition-colors flex items-center gap-1.5 cursor-pointer font-bold ${
-                pathname?.startsWith('/explore') ? 'text-[#155DFC]' : 'text-[#404040] hover:text-[#0D0C22]'
+              className={`transition-colors flex items-center gap-1.5 cursor-pointer text-sm py-1.5 ${
+                pathname?.startsWith('/explore') 
+                  ? 'text-[#155DFC] font-semibold' 
+                  : 'text-[#55576A] font-medium hover:text-[#0D0C22]'
               }`}
             >
               <span>Explore</span>
             </button>
           ) : (
             <div 
-              className={`relative group/explore transition-all duration-300 ${isScrolled ? 'py-4' : 'py-6'}`}
+              className="relative group/explore py-3"
               onMouseEnter={() => setExploreDropdownOpen(true)}
               onMouseLeave={() => setExploreDropdownOpen(false)}
               ref={exploreDropdownRef}
             >
               <button
                 onClick={() => navigateTo('services', '/jelajah/layanan')}
-                className={`transition-colors flex items-center gap-1.5 cursor-pointer font-bold ${
-                  pathname?.startsWith('/jelajah') ? 'text-[#155DFC]' : 'text-[#0D0C22]'
+                className={`transition-colors flex items-center gap-1 cursor-pointer text-sm py-1.5 ${
+                  pathname?.startsWith('/jelajah') 
+                    ? 'text-[#155DFC] font-semibold' 
+                    : 'text-[#55576A] font-medium hover:text-[#0D0C22]'
                 } group-hover/explore:text-[#155DFC]`}
               >
                 <span>Jelajah</span>
-                <ChevronDown className="w-3.5 h-3.5 transition-transform duration-200 text-[#0D0C22] group-hover/explore:rotate-180 group-hover/explore:text-[#155DFC]" />
+                <ChevronDown className="w-3.5 h-3.5 transition-transform duration-200 text-current group-hover/explore:rotate-180" />
               </button>
 
               {exploreDropdownOpen && (
                 <div 
-                  className="absolute top-full -left-8 w-48 bg-white rounded-[12px] border border-black/10 shadow-lg py-2 z-50 animate-in fade-in zoom-in-95 duration-150"
+                  className="absolute top-full -left-4 w-44 bg-white rounded-xl border border-[#E1E3EA] shadow-md py-1.5 z-50 animate-in fade-in zoom-in-95 duration-150"
                 >
-                  <div className="px-2">
+                  <div className="px-1.5 space-y-0.5 font-sans">
                     <button
                       onClick={() => {
                         setExploreDropdownOpen(false);
                         navigateTo('creator-profile', '/jelajah/kreator');
                       }}
-                      className="w-full rounded-[8px] px-3 py-2.5 text-left text-sm font-semibold text-[#0D0C22] transition-colors hover:bg-[#F3F3F4] hover:text-[#155DFC] cursor-pointer"
+                      className={`w-full rounded-lg px-3 py-2 text-left text-sm transition-colors cursor-pointer flex items-center justify-between ${
+                        pathname?.startsWith('/jelajah/kreator')
+                          ? 'font-semibold text-[#155DFC] bg-[#E8F0FF]'
+                          : 'font-medium text-[#0D0C22] hover:bg-[#F3F3F4] hover:text-[#155DFC]'
+                      }`}
                     >
-                      Profil
+                      <span>Kreator</span>
                     </button>
 
                     <button
@@ -286,9 +294,13 @@ export const Navbar: React.FC<NavbarProps> = ({
                         setExploreDropdownOpen(false);
                         navigateTo('services', '/jelajah/layanan');
                       }}
-                      className="w-full rounded-[8px] px-3 py-2.5 text-left text-sm font-semibold text-[#0D0C22] transition-colors hover:bg-[#F3F3F4] hover:text-[#155DFC] cursor-pointer"
+                      className={`w-full rounded-lg px-3 py-2 text-left text-sm transition-colors cursor-pointer flex items-center justify-between ${
+                        pathname?.startsWith('/jelajah/layanan')
+                          ? 'font-semibold text-[#155DFC] bg-[#E8F0FF]'
+                          : 'font-medium text-[#0D0C22] hover:bg-[#F3F3F4] hover:text-[#155DFC]'
+                      }`}
                     >
-                      Layanan
+                      <span>Layanan</span>
                     </button>
 
                     <button
@@ -296,9 +308,13 @@ export const Navbar: React.FC<NavbarProps> = ({
                         setExploreDropdownOpen(false);
                         navigateTo('projects', '/jelajah/proyek');
                       }}
-                      className="w-full rounded-[8px] px-3 py-2.5 text-left text-sm font-semibold text-[#0D0C22] transition-colors hover:bg-[#F3F3F4] hover:text-[#155DFC] cursor-pointer"
+                      className={`w-full rounded-lg px-3 py-2 text-left text-sm transition-colors cursor-pointer flex items-center justify-between ${
+                        pathname?.startsWith('/jelajah/proyek')
+                          ? 'font-semibold text-[#155DFC] bg-[#E8F0FF]'
+                          : 'font-medium text-[#0D0C22] hover:bg-[#F3F3F4] hover:text-[#155DFC]'
+                      }`}
                     >
-                      Proyek
+                      <span>Proyek</span>
                     </button>
                   </div>
                 </div>
@@ -310,8 +326,10 @@ export const Navbar: React.FC<NavbarProps> = ({
           <button
             id="nav-briefs-link"
             onClick={() => navigateTo('briefs', '/briefs')}
-            className={`transition-colors flex items-center gap-1.5 cursor-pointer font-semibold ${
-              pathname?.startsWith('/briefs') ? 'text-[#155DFC]' : 'text-[#404040] hover:text-[#0D0C22]'
+            className={`transition-colors flex items-center gap-1.5 cursor-pointer text-sm py-1.5 ${
+              pathname?.startsWith('/briefs') 
+                ? 'text-[#155DFC] font-semibold' 
+                : 'text-[#55576A] font-medium hover:text-[#0D0C22]'
             }`}
           >
             <span>Brief Proyek</span>
@@ -320,7 +338,7 @@ export const Navbar: React.FC<NavbarProps> = ({
         </nav>
 
         {/* Sisi Kanan: Action Buttons & User Profile */}
-        <div className="flex items-center gap-3 shrink-0">
+        <div className="flex items-center gap-3 shrink-0 font-sans">
           
           {currentUser && (
             <>
@@ -328,7 +346,7 @@ export const Navbar: React.FC<NavbarProps> = ({
               <button
                 id="nav-chat-btn"
                 onClick={() => navigateTo('chat', '/chat')}
-                className="w-10 h-10 rounded-full hover:bg-[#F3F3F4] flex items-center justify-center text-neutral-600 hover:text-[#0D0C22] transition-colors relative cursor-pointer"
+                className="w-10 h-10 rounded-full hover:bg-[#F3F3F4] flex items-center justify-center text-[#55576A] hover:text-[#0D0C22] transition-colors relative cursor-pointer"
                 aria-label="Messages"
                 title="Buka Ruang Obrolan & Pesan"
               >
@@ -344,13 +362,13 @@ export const Navbar: React.FC<NavbarProps> = ({
               <button
                 id="nav-notifications-btn"
                 onClick={() => navigateTo('notifications', '/notifications')}
-                className="w-10 h-10 rounded-full hover:bg-[#F3F3F4] flex items-center justify-center text-neutral-600 hover:text-[#0D0C22] transition-colors relative cursor-pointer"
+                className="w-10 h-10 rounded-full hover:bg-[#F3F3F4] flex items-center justify-center text-[#55576A] hover:text-[#0D0C22] transition-colors relative cursor-pointer"
                 aria-label="Notifications"
                 title="Buka Notifikasi"
               >
                 <Bell className="w-5 h-5" />
                 {unreadNotifications > 0 && (
-                  <span className="absolute -top-0.5 -right-0.5 bg-rose-600 text-white text-[10px] font-bold px-1.5 py-0.2 rounded-full min-w-4 text-center leading-tight">
+                  <span className="absolute -top-0.5 -right-0.5 bg-[#D92D20] text-white text-[10px] font-bold px-1.5 py-0.2 rounded-full min-w-4 text-center leading-tight">
                     {unreadNotifications > 99 ? '99+' : unreadNotifications}
                   </span>
                 )}
@@ -361,28 +379,39 @@ export const Navbar: React.FC<NavbarProps> = ({
           {/* User Profile Avatar / Sign In Buttons */}
           {currentUser ? (
             <div className="relative" ref={userDropdownRef}>
-              <button
-                id="nav-user-profile-logo-btn"
-                onClick={() => setUserDropdownOpen(!userDropdownOpen)}
-                className="flex items-center gap-1.5 p-1 rounded-full hover:bg-[#F3F3F4] transition cursor-pointer"
-                title="Buka menu profil"
-                aria-expanded={userDropdownOpen}
-              >
-                <div className="relative">
-                  <img
-                    src={currentUser.avatar || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100&auto=format&fit=crop&q=80'}
-                    alt={currentUser.name}
-                    className="w-9 h-9 rounded-full object-cover ring-1 ring-black/10"
-                  />
-                </div>
-                <ChevronDown className={`w-3.5 h-3.5 text-neutral-500 transition-transform ${userDropdownOpen ? 'rotate-180' : ''}`} />
-              </button>
+              <div className="flex items-center gap-1">
+                <button
+                  id="nav-user-profile-logo-btn"
+                  onClick={() => navigateTo('creator-profile', '/profile')}
+                  className="flex items-center p-0.5 rounded-full hover:ring-2 hover:ring-[#155DFC]/30 transition-all cursor-pointer group"
+                  title="Buka Profil Saya"
+                  aria-label="Buka Profil Saya"
+                >
+                  <div className="relative">
+                    <img
+                      src={currentUser.avatar || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100&auto=format&fit=crop&q=80'}
+                      alt={currentUser.name}
+                      className="w-9 h-9 rounded-full object-cover ring-1 ring-black/10 group-hover:ring-2 group-hover:ring-[#155DFC] transition-all"
+                    />
+                  </div>
+                </button>
+
+                <button
+                  id="nav-user-menu-toggle-btn"
+                  onClick={() => setUserDropdownOpen(!userDropdownOpen)}
+                  className="p-1 rounded-full text-[#55576A] hover:text-[#0D0C22] hover:bg-[#F3F3F4] transition cursor-pointer"
+                  title="Buka menu akun"
+                  aria-expanded={userDropdownOpen}
+                >
+                  <ChevronDown className={`w-3.5 h-3.5 transition-transform ${userDropdownOpen ? 'rotate-180' : ''}`} />
+                </button>
+              </div>
 
               {userDropdownOpen && (
-                <div className="absolute right-0 mt-2 w-56 bg-white rounded-[16px] border border-black/10 shadow-lg py-1.5 z-50 animate-in fade-in zoom-in-95">
-                  <div className="px-4 py-2 border-b border-black/5">
-                    <p className="text-xs font-bold text-[#0D0C22] truncate">{currentUser.name}</p>
-                    <p className="text-[11px] text-neutral-500 truncate">{currentUser.email}</p>
+                <div className="absolute right-0 mt-2 w-56 bg-white rounded-xl border border-[#E1E3EA] shadow-md py-1.5 z-50 animate-in fade-in zoom-in-95 font-sans">
+                  <div className="px-4 py-2 border-b border-[#E1E3EA]">
+                    <p className="text-xs font-semibold text-[#0D0C22] truncate">{currentUser.name}</p>
+                    <p className="text-[11px] text-[#55576A] truncate">{currentUser.email}</p>
                   </div>
 
                   <button
@@ -391,9 +420,9 @@ export const Navbar: React.FC<NavbarProps> = ({
                       setUserDropdownOpen(false);
                       navigateTo('creator-profile', '/profile');
                     }}
-                    className="w-full px-4 py-2.5 text-left text-xs font-semibold text-neutral-700 hover:bg-[#F3F3F4] hover:text-[#0D0C22] flex items-center gap-2.5 cursor-pointer transition-colors"
+                    className="w-full px-4 py-2.5 text-left text-xs font-medium text-[#55576A] hover:bg-[#F3F3F4] hover:text-[#0D0C22] flex items-center gap-2.5 cursor-pointer transition-colors"
                   >
-                    <User className="w-4 h-4 text-neutral-500" />
+                    <User className="w-4 h-4 text-[#55576A]" />
                     <span>Profil Saya</span>
                   </button>
 
@@ -403,9 +432,9 @@ export const Navbar: React.FC<NavbarProps> = ({
                       setUserDropdownOpen(false);
                       router.push('/wallet');
                     }}
-                    className="w-full px-4 py-2.5 text-left text-xs font-semibold text-neutral-700 hover:bg-[#F3F3F4] hover:text-[#0D0C22] flex items-center gap-2.5 cursor-pointer transition-colors"
+                    className="w-full px-4 py-2.5 text-left text-xs font-medium text-[#55576A] hover:bg-[#F3F3F4] hover:text-[#0D0C22] flex items-center gap-2.5 cursor-pointer transition-colors"
                   >
-                    <WalletCards className="w-4 h-4 text-neutral-500" />
+                    <WalletCards className="w-4 h-4 text-[#55576A]" />
                     <span>Dompet & Saldo</span>
                   </button>
 
@@ -416,9 +445,9 @@ export const Navbar: React.FC<NavbarProps> = ({
                         setUserDropdownOpen(false);
                         router.push('/contracts');
                       }}
-                      className="w-full px-4 py-2.5 text-left text-xs font-semibold text-neutral-700 hover:bg-[#F3F3F4] hover:text-[#0D0C22] flex items-center gap-2.5 cursor-pointer transition-colors"
+                      className="w-full px-4 py-2.5 text-left text-xs font-medium text-[#55576A] hover:bg-[#F3F3F4] hover:text-[#0D0C22] flex items-center gap-2.5 cursor-pointer transition-colors"
                     >
-                      <FileCheck2 className="w-4 h-4 text-neutral-500" />
+                      <FileCheck2 className="w-4 h-4 text-[#55576A]" />
                       <span>Kontrak Saya</span>
                     </button>
                   )}
@@ -430,9 +459,9 @@ export const Navbar: React.FC<NavbarProps> = ({
                         setUserDropdownOpen(false);
                         router.push('/dashboard/school');
                       }}
-                      className="w-full px-4 py-2.5 text-left text-xs font-semibold text-neutral-700 hover:bg-[#F3F3F4] hover:text-[#0D0C22] flex items-center gap-2.5 cursor-pointer transition-colors"
+                      className="w-full px-4 py-2.5 text-left text-xs font-medium text-[#55576A] hover:bg-[#F3F3F4] hover:text-[#0D0C22] flex items-center gap-2.5 cursor-pointer transition-colors"
                     >
-                      <GraduationCap className="w-4 h-4 text-neutral-500" />
+                      <GraduationCap className="w-4 h-4 text-[#55576A]" />
                       <span>Dashboard Sekolah</span>
                     </button>
                   )}
@@ -443,13 +472,13 @@ export const Navbar: React.FC<NavbarProps> = ({
                       setUserDropdownOpen(false);
                       navigateTo('settings', '/settings');
                     }}
-                    className="w-full px-4 py-2.5 text-left text-xs font-semibold text-neutral-700 hover:bg-[#F3F3F4] hover:text-[#0D0C22] flex items-center gap-2.5 cursor-pointer transition-colors"
+                    className="w-full px-4 py-2.5 text-left text-xs font-medium text-[#55576A] hover:bg-[#F3F3F4] hover:text-[#0D0C22] flex items-center gap-2.5 cursor-pointer transition-colors"
                   >
-                    <Settings className="w-4 h-4 text-neutral-500" />
+                    <Settings className="w-4 h-4 text-[#55576A]" />
                     <span>Pengaturan</span>
                   </button>
 
-                  <div className="my-1 border-t border-black/5" />
+                  <div className="my-1 border-t border-[#E1E3EA]" />
 
                   <button
                     id="nav-user-logout-btn"
@@ -457,24 +486,32 @@ export const Navbar: React.FC<NavbarProps> = ({
                       setUserDropdownOpen(false);
                       await handleSignOutAction();
                     }}
-                    className="w-full px-4 py-2.5 text-left text-xs font-semibold text-rose-600 hover:bg-rose-50 flex items-center gap-2.5 cursor-pointer transition-colors"
+                    className="w-full px-4 py-2.5 text-left text-xs font-medium text-[#D92D20] hover:bg-[#FEE4E2] flex items-center gap-2.5 cursor-pointer transition-colors"
                   >
-                    <LogOut className="w-4 h-4 text-rose-500" />
+                    <LogOut className="w-4 h-4 text-[#D92D20]" />
                     <span>Keluar</span>
                   </button>
                 </div>
               )}
             </div>
           ) : (
-            <div className="flex items-center">
+            <div className="flex items-center gap-2 sm:gap-3">
+              <button
+                id="nav-signin-btn"
+                onClick={() => navigateTo('signin', '/sign-in')}
+                className="px-3.5 py-2 text-sm font-medium text-[#55576A] hover:text-[#0D0C22] rounded-lg hover:bg-[#F3F3F4] transition-colors cursor-pointer"
+              >
+                Masuk
+              </button>
+
               <button
                 id="nav-signup-btn"
-                onClick={() => navigateTo('signup', '/sign-up')}
-                className="inline-flex items-center gap-2.5 pl-4 sm:pl-4.5 pr-1.5 py-1.5 bg-[#155DFC] hover:bg-[#1248C7] active:bg-[#0E3A9E] text-white text-xs sm:text-sm font-medium rounded-full shadow-[0px_1px_2px_0px_rgba(0,0,0,0.05)] transition-all group cursor-pointer"
+                onClick={() => navigateTo('signin', '/sign-in')}
+                className="inline-flex items-center gap-2 pl-4 pr-1.5 py-1.5 bg-[#155DFC] hover:bg-[#1248C7] active:bg-[#0E3A9E] text-white text-sm font-semibold rounded-full shadow-xs transition-all group cursor-pointer"
               >
                 <span>Mulai Gratis</span>
-                <span className="w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-white flex items-center justify-center text-[#155DFC] shadow-xs group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform">
-                  <ArrowUpRight className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                <span className="w-7 h-7 rounded-full bg-white flex items-center justify-center text-[#155DFC] shadow-xs group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform">
+                  <ArrowUpRight className="w-3.5 h-3.5 stroke-[2.5]" />
                 </span>
               </button>
             </div>
@@ -484,7 +521,7 @@ export const Navbar: React.FC<NavbarProps> = ({
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             aria-label={mobileMenuOpen ? "Tutup menu navigasi" : "Buka menu navigasi"}
-            className="p-2 lg:hidden text-neutral-700 hover:text-[#0D0C22] rounded-[8px] hover:bg-[#F3F3F4] cursor-pointer"
+            className="p-2 lg:hidden text-[#55576A] hover:text-[#0D0C22] rounded-lg hover:bg-[#F3F3F4] cursor-pointer"
           >
             {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
           </button>
@@ -495,9 +532,9 @@ export const Navbar: React.FC<NavbarProps> = ({
 
       {/* Mobile Drawer Menu */}
       {mobileMenuOpen && (
-        <div className="lg:hidden border-t border-neutral-200 bg-white px-6 py-5 space-y-4 shadow-lg animate-in slide-in-from-top duration-200">
+        <div className="lg:hidden border-t border-[#E1E3EA] bg-white px-6 py-5 space-y-4 shadow-lg animate-in slide-in-from-top duration-200 font-sans">
           {isSearchVisible && (
-            <form onSubmit={handleSearchSubmit} className="flex items-center bg-[#F3F3F4] rounded-full p-1.5 pl-4 border border-neutral-200">
+            <form onSubmit={handleSearchSubmit} className="flex items-center bg-[#F3F3F4] rounded-full p-1 pl-4 border border-[#E1E3EA]">
               <input
                 type="text"
                 value={navSearchInput}
@@ -505,8 +542,8 @@ export const Navbar: React.FC<NavbarProps> = ({
                   setNavSearchInput(e.target.value);
                   if (onSearch) onSearch(e.target.value);
                 }}
-                placeholder="Cari talenta atau keahlian..."
-                className="w-full bg-transparent text-sm text-[#0D0C22] placeholder:text-neutral-400 focus:outline-hidden"
+                placeholder="Cari kreator, keahlian, atau video UGC..."
+                className="w-full bg-transparent text-sm font-normal text-[#0D0C22] placeholder:text-[#55576A]/60 focus:outline-hidden"
               />
               <button 
                 type="submit" 
@@ -518,13 +555,17 @@ export const Navbar: React.FC<NavbarProps> = ({
             </form>
           )}
 
-          <div className="flex flex-col space-y-2 pt-2 text-sm font-semibold text-[#0d0c22]">
+          <div className="flex flex-col space-y-1 pt-2 text-sm">
             <button
               onClick={() => {
                 setMobileMenuOpen(false);
                 navigateTo('home', '/');
               }}
-              className="py-2 text-left hover:text-blue-600 text-neutral-800 font-bold"
+              className={`py-2 px-3 text-left rounded-lg transition-colors ${
+                isHomeActive 
+                  ? 'text-[#0D0C22] font-semibold bg-[#F3F3F4]' 
+                  : 'text-[#55576A] font-medium hover:text-[#0D0C22]'
+              }`}
             >
               Beranda
             </button>
@@ -534,8 +575,10 @@ export const Navbar: React.FC<NavbarProps> = ({
                   setMobileMenuOpen(false);
                   navigateTo('explore', '/explore');
                 }}
-                className={`py-2 text-left hover:text-blue-600 ${
-                  pathname?.startsWith('/explore') ? 'text-blue-600 font-bold' : 'text-neutral-600'
+                className={`py-2 px-3 text-left rounded-lg transition-colors ${
+                  pathname?.startsWith('/explore') 
+                    ? 'text-[#155DFC] font-semibold bg-[#E8F0FF]' 
+                    : 'text-[#55576A] font-medium hover:text-[#0D0C22]'
                 }`}
               >
                 Explore
@@ -547,19 +590,23 @@ export const Navbar: React.FC<NavbarProps> = ({
                     setMobileMenuOpen(false);
                     navigateTo('creator-profile', '/jelajah/kreator');
                   }}
-                  className={`py-2 text-left hover:text-blue-600 ${
-                    pathname?.startsWith('/jelajah/kreator') ? 'text-blue-600 font-bold' : 'text-neutral-600'
+                  className={`py-2 px-3 text-left rounded-lg transition-colors ${
+                    pathname?.startsWith('/jelajah/kreator') 
+                      ? 'text-[#155DFC] font-semibold bg-[#E8F0FF]' 
+                      : 'text-[#55576A] font-medium hover:text-[#0D0C22]'
                   }`}
                 >
-                  Profil
+                  Kreator
                 </button>
                 <button
                   onClick={() => {
                     setMobileMenuOpen(false);
                     navigateTo('services', '/jelajah/layanan');
                   }}
-                  className={`py-2 text-left hover:text-blue-600 ${
-                    pathname?.startsWith('/jelajah/layanan') ? 'text-blue-600 font-bold' : 'text-neutral-600'
+                  className={`py-2 px-3 text-left rounded-lg transition-colors ${
+                    pathname?.startsWith('/jelajah/layanan') 
+                      ? 'text-[#155DFC] font-semibold bg-[#E8F0FF]' 
+                      : 'text-[#55576A] font-medium hover:text-[#0D0C22]'
                   }`}
                 >
                   Layanan
@@ -569,8 +616,10 @@ export const Navbar: React.FC<NavbarProps> = ({
                     setMobileMenuOpen(false);
                     navigateTo('projects', '/jelajah/proyek');
                   }}
-                  className={`py-2 text-left hover:text-blue-600 ${
-                    pathname?.startsWith('/jelajah/proyek') ? 'text-blue-600 font-bold' : 'text-neutral-600'
+                  className={`py-2 px-3 text-left rounded-lg transition-colors ${
+                    pathname?.startsWith('/jelajah/proyek') 
+                      ? 'text-[#155DFC] font-semibold bg-[#E8F0FF]' 
+                      : 'text-[#55576A] font-medium hover:text-[#0D0C22]'
                   }`}
                 >
                   Proyek
@@ -582,20 +631,24 @@ export const Navbar: React.FC<NavbarProps> = ({
                 setMobileMenuOpen(false);
                 navigateTo('briefs', '/briefs');
               }}
-              className="py-2 text-left hover:text-blue-600 text-neutral-600"
+              className={`py-2 px-3 text-left rounded-lg transition-colors ${
+                pathname?.startsWith('/briefs') 
+                  ? 'text-[#155DFC] font-semibold bg-[#E8F0FF]' 
+                  : 'text-[#55576A] font-medium hover:text-[#0D0C22]'
+              }`}
             >
               Brief Proyek
             </button>
           </div>
 
           {!currentUser && (
-            <div className="pt-4 border-t border-neutral-100 flex gap-3">
+            <div className="pt-4 border-t border-[#E1E3EA] flex gap-3">
               <button
                 onClick={() => {
                   setMobileMenuOpen(false);
                   navigateTo('signin', '/sign-in');
                 }}
-                className="flex-1 py-2.5 text-center text-sm font-semibold text-[#0d0c22] border border-neutral-200 rounded-xl"
+                className="flex-1 py-2.5 text-center text-sm font-semibold text-[#0D0C22] border border-[#E1E3EA] rounded-xl hover:bg-[#F3F3F4] transition-colors"
               >
                 Masuk
               </button>
@@ -604,9 +657,9 @@ export const Navbar: React.FC<NavbarProps> = ({
                   setMobileMenuOpen(false);
                   navigateTo('signup', '/sign-up');
                 }}
-                className="flex-1 py-2.5 text-center text-sm font-semibold text-white bg-blue-600 rounded-xl"
+                className="flex-1 py-2.5 text-center text-sm font-semibold text-white bg-[#155DFC] hover:bg-[#1248C7] rounded-xl transition-colors shadow-xs"
               >
-                Daftar
+                Mulai Gratis
               </button>
             </div>
           )}

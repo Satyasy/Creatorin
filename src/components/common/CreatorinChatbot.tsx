@@ -144,7 +144,7 @@ export function CreatorinChatbot() {
           }}
           className="relative group w-14 h-14 rounded-full bg-[#0B1F3A] hover:bg-[#155DFC] text-white flex items-center justify-center shadow-xl hover:shadow-2xl transition-all duration-300 cursor-pointer focus:outline-hidden"
           title="Tanya Creatorin AI Assistant"
-          aria-label="AI Guide - Buka Chatbot Creatorin"
+          aria-label="Buka Chatbot Creatorin"
         >
           <Bot className="w-7 h-7 stroke-[1.8] group-hover:scale-110 transition-transform" />
 
@@ -152,13 +152,6 @@ export function CreatorinChatbot() {
           <div className="absolute -top-1 -right-1 w-5 h-5 bg-[#155DFC] rounded-full border-2 border-white flex items-center justify-center text-white" aria-hidden="true">
             <Sparkles className="w-2.5 h-2.5" />
           </div>
-
-          {/* Unread Notice Indicator */}
-          {hasUnreadNotice && (
-            <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 bg-[#0B1F3A] text-white text-[9px] font-bold px-2 py-0.5 rounded-full whitespace-nowrap shadow-xs border border-white/30">
-              AI Guide
-            </span>
-          )}
         </button>
       )}
 

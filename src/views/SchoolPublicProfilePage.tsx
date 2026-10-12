@@ -160,7 +160,7 @@ export function SchoolPublicProfilePage({ slug = 'smk-kreatif-indonesia' }: Scho
                 <img
                   src={proj.thumbnail}
                   alt={proj.title}
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                  className="w-full h-full object-cover"
                 />
                 <div className="absolute top-2.5 left-2.5 bg-[#0D0C22]/80 backdrop-blur-sm text-white text-[10px] font-semibold px-2.5 py-0.5 rounded-full">
                   {proj.category}
@@ -519,7 +519,7 @@ export function SchoolPublicProfilePage({ slug = 'smk-kreatif-indonesia' }: Scho
                   <img
                     src={proj.thumbnail}
                     alt={proj.title}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                    className="w-full h-full object-cover"
                   />
                   <div className="absolute top-2 left-2 bg-[#0D0C22]/80 backdrop-blur-sm text-white text-[10px] font-semibold px-2 py-0.5 rounded-full">
                     {proj.category}
