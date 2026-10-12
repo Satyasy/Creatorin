@@ -93,6 +93,7 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({
                 : 'bg-black/50 hover:bg-black/80 text-white border border-white/15'
             }`}
             title={isSaved ? 'Hapus Simpan' : 'Simpan Proyek'}
+            aria-label={isSaved ? 'Hapus simpan proyek' : 'Simpan proyek ke koleksi'}
           >
             <Bookmark className={`w-3.5 h-3.5 ${isSaved ? 'fill-white' : ''}`} />
           </button>

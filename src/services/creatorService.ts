@@ -78,4 +78,14 @@ export const creatorService = {
     const data = await response.json();
     return (data.projects || []).map((project: any) => toFeedProject(project));
   },
+  async toggleFollow(creatorId: string, follow: boolean): Promise<{ success: boolean; isFollowing: boolean; followersCount: number }> {
+    const response = await fetch(`/api/creators/${encodeURIComponent(creatorId)}/follow`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ follow }),
+    });
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.error || 'Gagal memperbarui status follow.');
+    return data;
+  },
 };
