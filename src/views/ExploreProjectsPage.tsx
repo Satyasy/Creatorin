@@ -31,7 +31,9 @@ import {
   ArrowRight,
   TrendingUp,
   Tag,
-  UserCheck
+  UserCheck,
+  User,
+  Package
 } from 'lucide-react';
 import { ProjectBriefModal } from '@/components/modals/ProjectBriefModal';
 import { ProjectDetailModal } from '@/components/modals/ProjectDetailModal';
@@ -277,87 +279,32 @@ export const ExploreProjectsPage: React.FC<ExploreProjectsPageProps> = ({
       {/* Main Container */}
       <main className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10">
         
-        {/* Breadcrumbs Navigation */}
-        <div className="flex items-center gap-2 text-xs font-medium text-neutral-400 mb-2.5">
-          <button 
-            onClick={() => navigateTo('landing', '/landing')}
-            className="hover:text-neutral-900 transition cursor-pointer"
+        {/* Sub-Navigation Switcher Tabs for UMKM Jelajah */}
+        <div className="flex items-center gap-2 sm:gap-3 mb-6 overflow-x-auto no-scrollbar">
+          <Link
+            href="/jelajah/kreator"
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-xs sm:text-sm font-semibold transition-all text-[#55576A] hover:text-[#0D0C22] hover:bg-[#F8F9FC]"
           >
-            Jelajah
-          </button>
-          <span>/</span>
-          <span className="text-neutral-800 font-semibold">Proyek Kreator</span>
+            <User className="w-4 h-4 text-inherit" />
+            <span>Creator</span>
+          </Link>
+
+          <Link
+            href="/jelajah/layanan"
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-xs sm:text-sm font-semibold transition-all text-[#55576A] hover:text-[#0D0C22] hover:bg-[#F8F9FC]"
+          >
+            <Package className="w-4 h-4 text-inherit" />
+            <span>Layanan</span>
+          </Link>
+
+          <Link
+            href="/jelajah/proyek"
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-xs sm:text-sm font-semibold transition-all bg-[#F4F5F7] text-[#0D0C22] shadow-xs ring-1 ring-black/5 font-bold"
+          >
+            <Layers className="w-4 h-4 text-inherit" />
+            <span>Proyek</span>
+          </Link>
         </div>
-
-        {/* Page Title & Subtitle Header */}
-        <ScrollReveal distance={20} duration={600}>
-          <div className="mb-6 space-y-2">
-            <div>
-              <h1 className="text-2xl sm:text-3xl lg:text-[40px] font-bold text-[#0F172A] tracking-tight leading-tight lg:leading-[48px]">
-                Jelajah Proyek & Portofolio Kreator
-              </h1>
-              <p className="text-sm sm:text-base text-[#64748B] mt-2 max-w-2xl leading-normal font-normal">
-                Temukan portofolio nyata, video Reels, konten TikTok, dan sistem desain yang telah diproduksi oleh kreator top terverifikasi Creatorin.
-              </p>
-            </div>
-
-            {/* Sub-Navigation Switcher Tabs for UMKM Jelajah */}
-            <div className="pt-2 flex items-center gap-2 border-b border-black/5 pb-3 overflow-x-auto no-scrollbar">
-              <Link
-                href="/jelajah/layanan"
-                className="px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold text-neutral-600 hover:text-[#0D0C22] hover:bg-neutral-100 transition-colors flex items-center gap-2 shrink-0"
-              >
-                <Briefcase className="w-4 h-4 text-neutral-500" />
-                <span>Layanan Kreator</span>
-              </Link>
-              <Link
-                href="/jelajah/proyek"
-                className="px-4 py-2 rounded-xl text-xs sm:text-sm font-bold bg-white text-[#155DFC] shadow-xs border border-black/10 flex items-center gap-2 shrink-0"
-              >
-                <TrendingUp className="w-4 h-4 text-[#155DFC]" />
-                <span>Portofolio Proyek</span>
-              </Link>
-              <Link
-                href="/jelajah/kreator"
-                className="px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold text-neutral-600 hover:text-[#0D0C22] hover:bg-neutral-100 transition-colors flex items-center gap-2 shrink-0"
-              >
-                <UserCheck className="w-4 h-4 text-neutral-500" />
-                <span>Profil Kreator</span>
-              </Link>
-            </div>
-
-            {/* Popular Tag Pills */}
-            <div className="pt-3 flex flex-wrap items-center gap-1.5">
-              <span className="text-xs font-semibold text-[#64748B] mr-1 flex items-center gap-1">
-                <span>Tagar Populer:</span>
-              </span>
-              {POPULAR_PROJECT_TAGS.map((tag) => {
-                const isSelected = selectedTag === tag;
-                return (
-                  <button
-                    key={tag}
-                    onClick={() => setSelectedTag(isSelected ? null : tag)}
-                    className={`px-3 py-1 rounded-full text-xs font-medium border transition-all cursor-pointer ${
-                      isSelected 
-                        ? 'bg-[#0B1F3A] text-white border-[#0B1F3A] shadow-2xs font-semibold' 
-                        : 'bg-white text-[#64748B] border-[#E2E8F0] hover:border-[#64748B] hover:text-[#0F172A] hover:bg-[#F8FAFC]'
-                    }`}
-                  >
-                    {tag}
-                  </button>
-                );
-              })}
-              {selectedTag && (
-                <button
-                  onClick={() => setSelectedTag(null)}
-                  className="text-xs text-[#1D4ED8] font-semibold hover:underline ml-1.5 cursor-pointer"
-                >
-                  Reset Tagar
-                </button>
-              )}
-            </div>
-          </div>
-        </ScrollReveal>
 
         {/* Section Heading & Filter Toolbar */}
         <section className="pt-4 pb-4 border-t border-[#E2E8F0] mb-6 relative">
