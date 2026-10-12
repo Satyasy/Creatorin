@@ -3,88 +3,19 @@
 import React from 'react';
 import { ArrowRight, BriefcaseBusiness, Check, Coins, GraduationCap, MessageSquare, Palette, ShieldCheck } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import { HomeHeroSection } from '@/components/home/HomeHeroSection';
 
 export const GuestLandingPage = () => {
   const router = useRouter();
 
   return (
     <div className="bg-white text-[var(--ink)]">
-      {/* Hero Section */}
-      <section className="overflow-hidden border-b border-[var(--outline)]">
-        <div className="container-creatorin grid min-h-[620px] items-center gap-10 py-16 lg:grid-cols-[.95fr_1.05fr] lg:py-20">
-          <div className="max-w-2xl">
-            <p className="text-sm font-semibold text-primary">Marketplace kerja kreatif untuk UMKM Indonesia</p>
-            <h1 className="mt-4 text-[clamp(2.75rem,6vw,4rem)] font-semibold leading-[1.08]">
-              Temukan creator. Bayar aman. Selesaikan proyek di satu tempat.
-            </h1>
-            <p className="mt-6 max-w-xl text-lg leading-8 text-[#55576A]">
-              Creatorin menghubungkan UMKM dengan talenta desain dan konten. Brief, pesan, invoice, escrow, revisi, dan hasil akhir tersimpan dalam alur kerja yang jelas.
-            </p>
-            <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-              <button 
-                onClick={() => router.push('/sign-up')} 
-                className="h-12 rounded-xl bg-primary px-5 text-sm font-semibold text-white hover:bg-[#1248C7]"
-              >
-                Buat akun Creatorin
-              </button>
-              <button 
-                onClick={() => router.push('/jelajah/layanan')} 
-                className="h-12 rounded-xl border border-[#B7BBC9] bg-white px-5 text-sm font-semibold hover:border-[#A9C3FF] hover:bg-[#E8F0FF]"
-              >
-                Lihat layanan creator
-              </button>
-            </div>
-            <div className="mt-8 flex flex-wrap gap-x-6 gap-y-3 text-sm text-[#55576A]">
-              <span className="flex items-center gap-2">
-                <ShieldCheck className="h-5 w-5 text-primary" /> Koin ditahan di escrow
-              </span>
-              <span className="flex items-center gap-2">
-                <Check className="h-5 w-5 text-[#16803C]" /> Revisi tercatat di invoice
-              </span>
-            </div>
-          </div>
-
-          {/* Authentic Collaboration Room Mockup */}
-          <div className="relative">
-            <div className="rounded-[20px] border border-[#A9C3FF] bg-[#E8F0FF] p-4 shadow-[0_16px_40px_rgba(13,12,34,.14)] sm:p-6">
-              <div className="rounded-2xl border border-[var(--outline)] bg-white p-5">
-                <div className="flex flex-col justify-between gap-3 border-b border-[var(--outline)] pb-4 sm:flex-row sm:items-center">
-                  <div>
-                    <p className="text-xs font-semibold text-primary">Collaboration Room</p>
-                    <h2 className="mt-1 text-xl font-semibold">Identitas visual Kopi Lereng</h2>
-                  </div>
-                  <span className="w-fit rounded-full bg-[#E1F6FF] px-3 py-1 text-xs font-semibold text-[#07557D]">
-                    Koin dalam escrow
-                  </span>
-                </div>
-                <div className="mt-5 grid gap-3 sm:grid-cols-4">
-                  {['Brief disepakati', 'Produksi', 'Tinjauan hasil', 'Selesai'].map((step, index) => (
-                    <div 
-                      key={step} 
-                      className={`rounded-lg border p-3 ${index === 2 ? 'border-primary bg-[#E8F0FF]' : 'border-[var(--outline)] bg-[#F8F9FC]'}`}
-                    >
-                      <span className="text-xs font-semibold text-[#55576A]">0{index + 1}</span>
-                      <p className="mt-2 text-sm font-semibold">{step}</p>
-                    </div>
-                  ))}
-                </div>
-                <div className="mt-5 rounded-xl bg-[#F8F9FC] p-4">
-                  <p className="text-sm font-semibold">Hasil versi 2 siap ditinjau</p>
-                  <p className="mt-1 text-sm text-[#55576A]">UMKM dapat menyetujui hasil atau memakai sisa kuota revisi.</p>
-                  <div className="mt-4 flex flex-wrap gap-2">
-                    <button className="min-h-11 rounded-lg border border-[#B7BBC9] bg-white px-4 text-sm font-semibold">
-                      Minta revisi
-                    </button>
-                    <button className="min-h-11 rounded-lg bg-primary px-4 text-sm font-semibold text-white">
-                      Setujui hasil
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
+      {/* Symmetrical Hero Section matching Figma 4816-18898 */}
+      <HomeHeroSection
+        onExploreClick={() => router.push('/jelajah/kreator')}
+        secondaryText="Bergabung Creatorin"
+        secondaryHref="/sign-up"
+      />
 
       {/* Two Paths Section */}
       <section className="container-creatorin py-16 sm:py-20">

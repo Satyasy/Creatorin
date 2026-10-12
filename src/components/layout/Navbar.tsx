@@ -14,7 +14,8 @@ import {
   Settings,
   GraduationCap,
   WalletCards,
-  FileCheck2
+  FileCheck2,
+  ArrowUpRight
 } from 'lucide-react';
 import { ActivePage, AuthState } from '@/types';
 import { useAuth } from '@/providers/AuthProvider';
@@ -126,7 +127,9 @@ export const Navbar: React.FC<NavbarProps> = ({
       className={`sticky top-0 z-40 w-full transition-all duration-300 ease-in-out font-sans ${
         isScrolled 
           ? 'bg-white/92 backdrop-blur-md shadow-xs border-b border-neutral-200/80' 
-          : 'bg-white border-b border-neutral-200/60'
+          : isHomeActive 
+            ? 'bg-transparent border-b border-transparent' 
+            : 'bg-white border-b border-neutral-200/60'
       }`}
     >
       <div className={`max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 transition-all duration-300 ease-in-out flex items-center justify-between gap-4 ${
@@ -191,10 +194,10 @@ export const Navbar: React.FC<NavbarProps> = ({
           <button
             id="nav-beranda-link"
             onClick={() => navigateTo('home', '/')}
-            className={`transition-colors flex items-center gap-1.5 cursor-pointer ${
+            className={`transition-colors flex items-center gap-1.5 cursor-pointer font-semibold ${
               isHomeActive
-                ? 'text-[#155DFC] font-bold'
-                : 'text-neutral-600 hover:text-[#155DFC]'
+                ? 'text-[#0D0C22]'
+                : 'text-[#404040] hover:text-[#0D0C22]'
             }`}
           >
             <span>Beranda</span>
@@ -206,7 +209,7 @@ export const Navbar: React.FC<NavbarProps> = ({
               id="nav-explore-link"
               onClick={() => navigateTo('explore', '/explore')}
               className={`transition-colors flex items-center gap-1.5 cursor-pointer font-bold ${
-                pathname?.startsWith('/explore') ? 'text-[#155DFC]' : 'text-neutral-600 hover:text-[#155DFC]'
+                pathname?.startsWith('/explore') ? 'text-[#155DFC]' : 'text-[#404040] hover:text-[#0D0C22]'
               }`}
             >
               <span>Explore</span>
@@ -220,12 +223,12 @@ export const Navbar: React.FC<NavbarProps> = ({
             >
               <button
                 onClick={() => navigateTo('services', '/jelajah/layanan')}
-                className={`hover:text-[#155DFC] transition-colors flex items-center gap-1.5 cursor-pointer font-bold ${
+                className={`transition-colors flex items-center gap-1.5 cursor-pointer font-bold ${
                   pathname?.startsWith('/jelajah') ? 'text-[#155DFC]' : 'text-[#0D0C22]'
                 } group-hover/explore:text-[#155DFC]`}
               >
                 <span>Jelajah</span>
-                <ChevronDown className="w-3.5 h-3.5 transition-transform duration-200 text-neutral-500 group-hover/explore:rotate-180 group-hover/explore:text-[#155DFC]" />
+                <ChevronDown className="w-3.5 h-3.5 transition-transform duration-200 text-[#0D0C22] group-hover/explore:rotate-180 group-hover/explore:text-[#155DFC]" />
               </button>
 
               {exploreDropdownOpen && (
@@ -272,8 +275,8 @@ export const Navbar: React.FC<NavbarProps> = ({
           <button
             id="nav-briefs-link"
             onClick={() => navigateTo('briefs', '/briefs')}
-            className={`transition-colors flex items-center gap-1.5 cursor-pointer ${
-              pathname?.startsWith('/briefs') ? 'text-[#155DFC] font-bold' : 'text-neutral-600 hover:text-[#155DFC]'
+            className={`transition-colors flex items-center gap-1.5 cursor-pointer font-semibold ${
+              pathname?.startsWith('/briefs') ? 'text-[#155DFC]' : 'text-[#404040] hover:text-[#0D0C22]'
             }`}
           >
             <span>Brief Proyek</span>
@@ -420,20 +423,16 @@ export const Navbar: React.FC<NavbarProps> = ({
               )}
             </div>
           ) : (
-            <div className="flex items-center gap-2">
-              <button
-                id="nav-signin-btn"
-                onClick={() => navigateTo('signin', '/sign-in')}
-                className="hidden sm:inline-flex h-10 px-4 text-xs sm:text-sm font-semibold text-[#0D0B0B] hover:text-[#155DFC] hover:bg-[#F3F3F4] rounded-xl transition-colors cursor-pointer items-center justify-center shrink-0 border border-transparent"
-              >
-                Masuk
-              </button>
+            <div className="flex items-center">
               <button
                 id="nav-signup-btn"
                 onClick={() => navigateTo('signup', '/sign-up')}
-                className="inline-flex h-10 px-4 sm:px-5 text-xs sm:text-sm font-semibold text-white bg-[#155DFC] hover:bg-[#0E4CD1] rounded-xl transition-colors cursor-pointer items-center justify-center shrink-0 shadow-2xs"
+                className="inline-flex items-center gap-2.5 pl-4 sm:pl-4.5 pr-1.5 py-1.5 bg-[#155DFC] hover:bg-[#1248C7] active:bg-[#0E3A9E] text-white text-xs sm:text-sm font-medium rounded-full shadow-[0px_1px_2px_0px_rgba(0,0,0,0.05)] transition-all group cursor-pointer"
               >
-                Daftar
+                <span>Mulai Gratis</span>
+                <span className="w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-white flex items-center justify-center text-[#155DFC] shadow-xs group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform">
+                  <ArrowUpRight className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                </span>
               </button>
             </div>
           )}
