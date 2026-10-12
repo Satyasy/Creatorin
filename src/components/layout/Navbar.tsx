@@ -195,7 +195,7 @@ export const Navbar: React.FC<NavbarProps> = ({
           {isSearchVisible && (
             <form 
               onSubmit={handleSearchSubmit}
-              className="hidden md:flex items-center w-full max-w-md bg-[#F3F3F4] hover:bg-neutral-200/60 focus-within:bg-white focus-within:ring-2 focus-within:ring-[#155DFC] rounded-[8px] p-1 pl-4 transition-all border border-black/10 focus-within:border-transparent"
+              className="hidden md:flex items-center w-full max-w-md bg-[#F3F3F4] hover:bg-neutral-200/50 focus-within:bg-white focus-within:ring-2 focus-within:ring-[#155DFC]/20 focus-within:border-[#155DFC] rounded-full p-1.5 pl-4 transition-all border border-neutral-200/70"
             >
               <input
                 type="text"
@@ -209,13 +209,13 @@ export const Navbar: React.FC<NavbarProps> = ({
                 className="w-full bg-transparent text-xs sm:text-sm text-[#0D0B0B] placeholder:text-neutral-400 focus:outline-hidden"
               />
               
-              {/* Brand Blue Search Button */}
+              {/* Brand Blue Round Search Button */}
               <button
                 type="submit"
-                className="w-8 h-8 rounded-[6px] bg-[#155DFC] hover:bg-[#0E4CD1] text-white flex items-center justify-center shrink-0 transition cursor-pointer ml-2"
+                className="w-8 h-8 rounded-full bg-[#155DFC] hover:bg-[#1248C7] active:bg-[#0E3A9E] text-white flex items-center justify-center shrink-0 transition-colors cursor-pointer shadow-xs ml-2"
                 aria-label="Cari"
               >
-                <Search className="w-4 h-4" />
+                <Search className="w-4 h-4 text-white" />
               </button>
             </form>
           )}
@@ -497,7 +497,7 @@ export const Navbar: React.FC<NavbarProps> = ({
       {mobileMenuOpen && (
         <div className="lg:hidden border-t border-neutral-200 bg-white px-6 py-5 space-y-4 shadow-lg animate-in slide-in-from-top duration-200">
           {isSearchVisible && (
-            <form onSubmit={handleSearchSubmit} className="flex items-center bg-neutral-100 rounded-full p-2 pl-4">
+            <form onSubmit={handleSearchSubmit} className="flex items-center bg-[#F3F3F4] rounded-full p-1.5 pl-4 border border-neutral-200">
               <input
                 type="text"
                 value={navSearchInput}
@@ -506,10 +506,14 @@ export const Navbar: React.FC<NavbarProps> = ({
                   if (onSearch) onSearch(e.target.value);
                 }}
                 placeholder="Cari talenta atau keahlian..."
-                className="w-full bg-transparent text-sm text-[#0d0c22] focus:outline-hidden"
+                className="w-full bg-transparent text-sm text-[#0D0C22] placeholder:text-neutral-400 focus:outline-hidden"
               />
-              <button type="submit" className="w-7 h-7 bg-blue-600 text-white rounded-full flex items-center justify-center" aria-label="Cari">
-                <Search className="w-3.5 h-3.5" />
+              <button 
+                type="submit" 
+                className="w-8 h-8 bg-[#155DFC] hover:bg-[#1248C7] text-white rounded-full flex items-center justify-center shrink-0 transition-colors shadow-xs ml-2" 
+                aria-label="Cari"
+              >
+                <Search className="w-4 h-4 text-white" />
               </button>
             </form>
           )}

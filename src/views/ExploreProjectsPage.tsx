@@ -6,8 +6,7 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from '@/providers/AuthProvider';
 import { 
   Search, 
-  Play, 
-  Layers, 
+  Play,
   Heart, 
   MessageCircle, 
   Share2, 
@@ -31,9 +30,7 @@ import {
   ArrowRight,
   TrendingUp,
   Tag,
-  UserCheck,
-  User,
-  Package
+  UserCheck
 } from 'lucide-react';
 import { ProjectBriefModal } from '@/components/modals/ProjectBriefModal';
 import { ProjectDetailModal } from '@/components/modals/ProjectDetailModal';
@@ -76,6 +73,521 @@ const POPULAR_PROJECT_TAGS = [
   '#FigmaCommunity',
   '#PackagingDesign',
   '#ASMRCoffee'
+];
+
+const MOCK_FEED_PROJECTS: FeedProject[] = [
+  {
+    id: 'proj-1',
+    title: 'Skincare Barrier Restoring Serum 14-Day Honest Review (TikTok UGC Viral)',
+    description: 'Video review jujur skincare organik untuk audiens wanita muda TikTok, terbukti meningkatkan konversi penjualan.',
+    coverImage: 'https://images.unsplash.com/photo-1556228720-195a672e8a03?w=800&auto=format&fit=crop&q=80',
+    mediaUrl: 'https://images.unsplash.com/photo-1556228720-195a672e8a03?w=800&auto=format&fit=crop&q=80',
+    mediaType: 'video',
+    creatorId: 'c-maya',
+    category: 'Video Tiktok',
+    platform: 'tiktok',
+    socialHandle: '@mayaangelina.ugc',
+    viewsCount: '710.0k',
+    likesCount: 42000,
+    commentsCount: 380,
+    sharesCount: 1540,
+    creator: {
+      id: 'c-maya',
+      name: 'Maya Angelina',
+      username: 'mayaangelina',
+      handle: '@mayaangelina.ugc',
+      avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150',
+      category: 'Video',
+      roleTitle: 'Beauty & Lifestyle UGC Creator',
+      bio: 'Spesialis video TikTok & Reels konversi tinggi.',
+      location: 'Jakarta',
+      startingRate: 350000,
+      formattedRate: 'Rp350.000',
+      careerScore: { overall: 96, deadlineAccuracy: 98, revisionRate: 1.0, completionRate: 100, clientRating: 4.9, completedProjects: 48, tier: 'Top Tier' },
+      skills: ['UGC Review', 'TikTok Ads', 'Beauty'],
+      joinedDate: '2023',
+    }
+  },
+  {
+    id: 'proj-2',
+    title: 'Visual Identity & Packaging Box Concept untuk Artisan Coffee Roasters',
+    description: 'Sistem identitas merek lengkap dengan mock up packaging siap cetak untuk UMKM kopi lokal.',
+    coverImage: 'https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?w=800&auto=format&fit=crop&q=80',
+    mediaUrl: 'https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?w=800&auto=format&fit=crop&q=80',
+    mediaType: 'image',
+    creatorId: 'c-aditya',
+    category: 'Logo & Branding',
+    platform: 'direct',
+    socialHandle: '@adityadesign',
+    viewsCount: '542.1k',
+    likesCount: 31000,
+    commentsCount: 210,
+    sharesCount: 980,
+    creator: {
+      id: 'c-aditya',
+      name: 'Aditya Pratama',
+      username: 'adityadesign',
+      handle: '@adityadesign',
+      avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150',
+      category: 'Image',
+      roleTitle: 'Brand & Packaging Designer',
+      bio: 'Membantu brand F&B memiliki packaging berdaya saing tinggi.',
+      location: 'Bandung',
+      startingRate: 400000,
+      formattedRate: 'Rp400.000',
+      careerScore: { overall: 98, deadlineAccuracy: 100, revisionRate: 1.0, completionRate: 100, clientRating: 5.0, completedProjects: 62, tier: 'Top Tier' },
+      skills: ['Brand Identity', 'Packaging', 'Vector'],
+      joinedDate: '2022',
+    }
+  },
+  {
+    id: 'proj-3',
+    title: '15-detik Cinematic Reels B-Roll Promo Makanan Nusantara Pedas Gurih',
+    description: 'Video sinematik menggugah selera untuk peluncuran menu baru restoran UMKM.',
+    coverImage: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=800&auto=format&fit=crop&q=80',
+    mediaUrl: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=800&auto=format&fit=crop&q=80',
+    mediaType: 'video',
+    creatorId: 'c-rendy',
+    category: 'Reels Instagram',
+    platform: 'instagram',
+    socialHandle: '@rendy.visuals',
+    viewsCount: '890.3k',
+    likesCount: 65000,
+    commentsCount: 520,
+    sharesCount: 3100,
+    creator: {
+      id: 'c-rendy',
+      name: 'Rendy Visuals',
+      username: 'rendyvisuals',
+      handle: '@rendy.visuals',
+      avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150',
+      category: 'Video',
+      roleTitle: 'Food & Commercial Videographer',
+      bio: 'B-roll komersial berkualitas bioskop untuk kuliner.',
+      location: 'Surabaya',
+      startingRate: 500000,
+      formattedRate: 'Rp500.000',
+      careerScore: { overall: 95, deadlineAccuracy: 96, revisionRate: 1.1, completionRate: 100, clientRating: 4.9, completedProjects: 40, tier: 'Top Tier' },
+      skills: ['Cinematic B-Roll', 'Food Video', 'Color Grading'],
+      joinedDate: '2023',
+    }
+  },
+  {
+    id: 'proj-4',
+    title: 'Clean Minimalist UI Mockup & Design System Mobile Commerce App',
+    description: 'Desain antarmuka aplikasi belanja mobile dengan fokus pada kenyamanan check-out pengguna.',
+    coverImage: 'https://images.unsplash.com/photo-1581291518857-4e27b48ff24e?w=800&auto=format&fit=crop&q=80',
+    mediaUrl: 'https://images.unsplash.com/photo-1581291518857-4e27b48ff24e?w=800&auto=format&fit=crop&q=80',
+    mediaType: 'carousel',
+    creatorId: 'c-clara',
+    category: 'UI/UX Design',
+    platform: 'direct',
+    socialHandle: '@claraux',
+    viewsCount: '412.5k',
+    likesCount: 28000,
+    commentsCount: 190,
+    sharesCount: 890,
+    creator: {
+      id: 'c-clara',
+      name: 'Clara Sinta',
+      username: 'claraux',
+      handle: '@claraux',
+      avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150',
+      category: 'Image',
+      roleTitle: 'UI/UX Product Designer',
+      bio: 'Desainer produk digital berorientasi konversi UX.',
+      location: 'Yogyakarta',
+      startingRate: 450000,
+      formattedRate: 'Rp450.000',
+      careerScore: { overall: 97, deadlineAccuracy: 99, revisionRate: 1.0, completionRate: 100, clientRating: 4.9, completedProjects: 55, tier: 'Top Tier' },
+      skills: ['Figma', 'UI Design', 'Design System'],
+      joinedDate: '2023',
+    }
+  },
+  {
+    id: 'proj-5',
+    title: 'Studio Lighting Product Photography Seri Hijab Casual Pastel',
+    description: 'Foto katalog produk profesional dengan model dan pencahayaan studio softbox lembut.',
+    coverImage: 'https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=800&auto=format&fit=crop&q=80',
+    mediaUrl: 'https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=800&auto=format&fit=crop&q=80',
+    mediaType: 'image',
+    creatorId: 'c-dimas',
+    category: 'Foto Produk',
+    platform: 'instagram',
+    socialHandle: '@dimas.fashionphoto',
+    viewsCount: '625.0k',
+    likesCount: 39000,
+    commentsCount: 310,
+    sharesCount: 1200,
+    creator: {
+      id: 'c-dimas',
+      name: 'Dimas Anggara',
+      username: 'dimasfashion',
+      handle: '@dimas.fashionphoto',
+      avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150',
+      category: 'Image',
+      roleTitle: 'Fashion & Product Photographer',
+      bio: 'Menghidupkan lookbook fashion UMKM.',
+      location: 'Jakarta',
+      startingRate: 350000,
+      formattedRate: 'Rp350.000',
+      careerScore: { overall: 94, deadlineAccuracy: 95, revisionRate: 1.2, completionRate: 100, clientRating: 4.8, completedProjects: 36, tier: 'Rising Star' },
+      skills: ['Fashion Photo', 'Lighting', 'Editing'],
+      joinedDate: '2023',
+    }
+  },
+  {
+    id: 'proj-6',
+    title: '9-Grid Aesthetic Instagram Feed Design Tematik Natural Skincare',
+    description: 'Rancangan feed Instagram berkesinambungan untuk menciptakan reputasi visual premium bagi brand.',
+    coverImage: 'https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?w=800&auto=format&fit=crop&q=80',
+    mediaUrl: 'https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?w=800&auto=format&fit=crop&q=80',
+    mediaType: 'carousel',
+    creatorId: 'c-anisa',
+    category: 'Feed Instagram',
+    platform: 'direct',
+    socialHandle: '@anisa_creative',
+    viewsCount: '488.2k',
+    likesCount: 34000,
+    commentsCount: 240,
+    sharesCount: 1450,
+    creator: {
+      id: 'c-anisa',
+      name: 'Anisa Rahma',
+      username: 'anisacreative',
+      handle: '@anisa_creative',
+      avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150',
+      category: 'Image',
+      roleTitle: 'Visual Feed Specialist',
+      bio: 'Pakar visual layout feed media sosial.',
+      location: 'Semarang',
+      startingRate: 250000,
+      formattedRate: 'Rp250.000',
+      careerScore: { overall: 96, deadlineAccuracy: 98, revisionRate: 1.0, completionRate: 100, clientRating: 5.0, completedProjects: 50, tier: 'Top Tier' },
+      skills: ['Feed Instagram', 'Canva', 'Photoshop'],
+      joinedDate: '2022',
+    }
+  },
+  {
+    id: 'proj-7',
+    title: 'E-Commerce Mega Promo Banner & Carousel Ads Siap Pakai 11.11',
+    description: 'Seri banner promosi teroptimasi CTR tinggi untuk marketplace Shopee, Tokopedia, dan TikTok Shop.',
+    coverImage: 'https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?w=800&auto=format&fit=crop&q=80',
+    mediaUrl: 'https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?w=800&auto=format&fit=crop&q=80',
+    mediaType: 'image',
+    creatorId: 'c-kevin',
+    category: 'Logo & Branding',
+    platform: 'direct',
+    socialHandle: '@kevinsanjaya',
+    viewsCount: '730.4k',
+    likesCount: 52000,
+    commentsCount: 380,
+    sharesCount: 2100,
+    creator: {
+      id: 'c-kevin',
+      name: 'Kevin Sanjaya',
+      username: 'kevinsanjaya',
+      handle: '@kevinsanjaya',
+      avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150',
+      category: 'Video',
+      roleTitle: 'E-Commerce Creative Director',
+      bio: 'Desain konversi tinggi untuk campaign penjualan online.',
+      location: 'Bandung',
+      startingRate: 400000,
+      formattedRate: 'Rp400.000',
+      careerScore: { overall: 98, deadlineAccuracy: 100, revisionRate: 1.0, completionRate: 100, clientRating: 5.0, completedProjects: 65, tier: 'Top Tier' },
+      skills: ['Banner Ads', 'Marketplace', 'Promotion'],
+      joinedDate: '2022',
+    }
+  },
+  {
+    id: 'proj-8',
+    title: 'ASMR Unboxing & Packaging Experience Produk Kerajinan Tangan Kulit',
+    description: 'Video ASMR dengan visual detail tekstur bahan kulit asli dan packing estetik ramah lingkungan.',
+    coverImage: 'https://images.unsplash.com/photo-1544816155-12df9643f363?w=800&auto=format&fit=crop&q=80',
+    mediaUrl: 'https://images.unsplash.com/photo-1544816155-12df9643f363?w=800&auto=format&fit=crop&q=80',
+    mediaType: 'video',
+    creatorId: 'c-nadia',
+    category: 'Video Tiktok',
+    platform: 'tiktok',
+    socialHandle: '@nadiaputri',
+    viewsCount: '915.2k',
+    likesCount: 84000,
+    commentsCount: 670,
+    sharesCount: 4200,
+    creator: {
+      id: 'c-nadia',
+      name: 'Nadia Putri',
+      username: 'nadiaputri',
+      handle: '@nadiaputri',
+      avatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150',
+      category: 'Video',
+      roleTitle: 'UGC & Lifestyle Content Creator',
+      bio: 'Konten organik otentik berorientasi engagement.',
+      location: 'Semarang',
+      startingRate: 300000,
+      formattedRate: 'Rp300.000',
+      careerScore: { overall: 95, deadlineAccuracy: 98, revisionRate: 1.0, completionRate: 100, clientRating: 4.9, completedProjects: 45, tier: 'Top Tier' },
+      skills: ['ASMR Video', 'Unboxing', 'Lifestyle'],
+      joinedDate: '2023',
+    }
+  },
+  {
+    id: 'proj-9',
+    title: 'Video Teaser Peluncuran Koleksi Baju Gamis Lebaran 2026',
+    description: 'Reels video sinematik dengan musik trend dan hook cepat 3 detik pertama.',
+    coverImage: 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=800&auto=format&fit=crop&q=80',
+    mediaUrl: 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=800&auto=format&fit=crop&q=80',
+    mediaType: 'video',
+    creatorId: 'c-maya',
+    category: 'Reels Instagram',
+    platform: 'instagram',
+    socialHandle: '@mayaangelina.ugc',
+    viewsCount: '680.1k',
+    likesCount: 45000,
+    commentsCount: 390,
+    sharesCount: 1800,
+    creator: {
+      id: 'c-maya',
+      name: 'Maya Angelina',
+      username: 'mayaangelina',
+      handle: '@mayaangelina.ugc',
+      avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150',
+      category: 'Video',
+      roleTitle: 'Beauty & Lifestyle UGC Creator',
+      bio: 'Spesialis video TikTok & Reels konversi tinggi.',
+      location: 'Jakarta',
+      startingRate: 350000,
+      formattedRate: 'Rp350.000',
+      careerScore: { overall: 96, deadlineAccuracy: 98, revisionRate: 1.0, completionRate: 100, clientRating: 4.9, completedProjects: 48, tier: 'Top Tier' },
+      skills: ['UGC Review', 'TikTok Ads', 'Beauty'],
+      joinedDate: '2023',
+    }
+  },
+  {
+    id: 'proj-10',
+    title: 'Logo Mark & Typography Identity untuk Kedai Teh Herbal Tradisional',
+    description: 'Logo modern dengan sentuhan nusantara warisan budaya, mudah diaplikasikan di packaging cup.',
+    coverImage: 'https://images.unsplash.com/photo-1576092768241-dec231879fc3?w=800&auto=format&fit=crop&q=80',
+    mediaUrl: 'https://images.unsplash.com/photo-1576092768241-dec231879fc3?w=800&auto=format&fit=crop&q=80',
+    mediaType: 'image',
+    creatorId: 'c-aditya',
+    category: 'Logo & Branding',
+    platform: 'direct',
+    socialHandle: '@adityadesign',
+    viewsCount: '340.8k',
+    likesCount: 22000,
+    commentsCount: 160,
+    sharesCount: 740,
+    creator: {
+      id: 'c-aditya',
+      name: 'Aditya Pratama',
+      username: 'adityadesign',
+      handle: '@adityadesign',
+      avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150',
+      category: 'Image',
+      roleTitle: 'Brand & Packaging Designer',
+      bio: 'Membantu brand F&B memiliki packaging berdaya saing tinggi.',
+      location: 'Bandung',
+      startingRate: 400000,
+      formattedRate: 'Rp400.000',
+      careerScore: { overall: 98, deadlineAccuracy: 100, revisionRate: 1.0, completionRate: 100, clientRating: 5.0, completedProjects: 62, tier: 'Top Tier' },
+      skills: ['Brand Identity', 'Packaging', 'Vector'],
+      joinedDate: '2022',
+    }
+  },
+  {
+    id: 'proj-11',
+    title: 'Flatlay & Macro Photography Perhiasan Emas & Aksesoris Lokal',
+    description: 'Foto perhiasan beresolusi ultra tajam dengan pantulan cahaya berkilau mewah.',
+    coverImage: 'https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=800&auto=format&fit=crop&q=80',
+    mediaUrl: 'https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=800&auto=format&fit=crop&q=80',
+    mediaType: 'image',
+    creatorId: 'c-dimas',
+    category: 'Foto Produk',
+    platform: 'instagram',
+    socialHandle: '@dimas.fashionphoto',
+    viewsCount: '512.9k',
+    likesCount: 37000,
+    commentsCount: 280,
+    sharesCount: 1100,
+    creator: {
+      id: 'c-dimas',
+      name: 'Dimas Anggara',
+      username: 'dimasfashion',
+      handle: '@dimas.fashionphoto',
+      avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150',
+      category: 'Image',
+      roleTitle: 'Fashion & Product Photographer',
+      bio: 'Menghidupkan lookbook fashion UMKM.',
+      location: 'Jakarta',
+      startingRate: 350000,
+      formattedRate: 'Rp350.000',
+      careerScore: { overall: 94, deadlineAccuracy: 95, revisionRate: 1.2, completionRate: 100, clientRating: 4.8, completedProjects: 36, tier: 'Rising Star' },
+      skills: ['Fashion Photo', 'Lighting', 'Editing'],
+      joinedDate: '2023',
+    }
+  },
+  {
+    id: 'proj-12',
+    title: 'Desain Kemasan Pouch Kopi Arabika Specialty Khas Gayo Aceh',
+    description: 'Konsep pouch matte finishing foil dengan ilustrasi orisinil pegunungan nusantara.',
+    coverImage: 'https://images.unsplash.com/photo-1559525839-8f8ec328b228?w=800&auto=format&fit=crop&q=80',
+    mediaUrl: 'https://images.unsplash.com/photo-1559525839-8f8ec328b228?w=800&auto=format&fit=crop&q=80',
+    mediaType: 'image',
+    creatorId: 'c-aditya',
+    category: 'Logo & Branding',
+    platform: 'direct',
+    socialHandle: '@adityadesign',
+    viewsCount: '425.6k',
+    likesCount: 29000,
+    commentsCount: 195,
+    sharesCount: 890,
+    creator: {
+      id: 'c-aditya',
+      name: 'Aditya Pratama',
+      username: 'adityadesign',
+      handle: '@adityadesign',
+      avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150',
+      category: 'Image',
+      roleTitle: 'Brand & Packaging Designer',
+      bio: 'Membantu brand F&B memiliki packaging berdaya saing tinggi.',
+      location: 'Bandung',
+      startingRate: 400000,
+      formattedRate: 'Rp400.000',
+      careerScore: { overall: 98, deadlineAccuracy: 100, revisionRate: 1.0, completionRate: 100, clientRating: 5.0, completedProjects: 62, tier: 'Top Tier' },
+      skills: ['Brand Identity', 'Packaging', 'Vector'],
+      joinedDate: '2022',
+    }
+  },
+  {
+    id: 'proj-13',
+    title: 'Tutorial 3 Menit Resep Masakan Simple dengan Produk Bumbu Instan',
+    description: 'Video memasak step-by-step dengan sudut pandang POV eye-level yang engaging.',
+    coverImage: 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=800&auto=format&fit=crop&q=80',
+    mediaUrl: 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=800&auto=format&fit=crop&q=80',
+    mediaType: 'video',
+    creatorId: 'c-rendy',
+    category: 'Video Tiktok',
+    platform: 'tiktok',
+    socialHandle: '@rendy.visuals',
+    viewsCount: '780.0k',
+    likesCount: 58000,
+    commentsCount: 430,
+    sharesCount: 2900,
+    creator: {
+      id: 'c-rendy',
+      name: 'Rendy Visuals',
+      username: 'rendyvisuals',
+      handle: '@rendy.visuals',
+      avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150',
+      category: 'Video',
+      roleTitle: 'Food & Commercial Videographer',
+      bio: 'B-roll komersial berkualitas bioskop untuk kuliner.',
+      location: 'Surabaya',
+      startingRate: 500000,
+      formattedRate: 'Rp500.000',
+      careerScore: { overall: 95, deadlineAccuracy: 96, revisionRate: 1.1, completionRate: 100, clientRating: 4.9, completedProjects: 40, tier: 'Top Tier' },
+      skills: ['Cinematic B-Roll', 'Food Video', 'Color Grading'],
+      joinedDate: '2023',
+    }
+  },
+  {
+    id: 'proj-14',
+    title: 'Infografis Carousel Edukasi Finansial Pengelolaan Kas UMKM',
+    description: 'Desain carousel edukatif 7 slide dengan tipografi modern dan ilustrasi ikonik.',
+    coverImage: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&auto=format&fit=crop&q=80',
+    mediaUrl: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&auto=format&fit=crop&q=80',
+    mediaType: 'carousel',
+    creatorId: 'c-anisa',
+    category: 'Feed Instagram',
+    platform: 'instagram',
+    socialHandle: '@anisa_creative',
+    viewsCount: '390.5k',
+    likesCount: 26000,
+    commentsCount: 180,
+    sharesCount: 1300,
+    creator: {
+      id: 'c-anisa',
+      name: 'Anisa Rahma',
+      username: 'anisacreative',
+      handle: '@anisa_creative',
+      avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150',
+      category: 'Image',
+      roleTitle: 'Visual Feed Specialist',
+      bio: 'Pakar visual layout feed media sosial.',
+      location: 'Semarang',
+      startingRate: 250000,
+      formattedRate: 'Rp250.000',
+      careerScore: { overall: 96, deadlineAccuracy: 98, revisionRate: 1.0, completionRate: 100, clientRating: 5.0, completedProjects: 50, tier: 'Top Tier' },
+      skills: ['Feed Instagram', 'Canva', 'Photoshop'],
+      joinedDate: '2022',
+    }
+  },
+  {
+    id: 'proj-15',
+    title: '3D Mockup Botol Serum Skincare Glass Minimalis dengan Dropper Gold',
+    description: 'Render visual 3D ultra realistis untuk keperluan landing page dan materi promosi UMKM kecantikan.',
+    coverImage: 'https://images.unsplash.com/photo-1620916566398-39f1143ab7be?w=800&auto=format&fit=crop&q=80',
+    mediaUrl: 'https://images.unsplash.com/photo-1620916566398-39f1143ab7be?w=800&auto=format&fit=crop&q=80',
+    mediaType: 'image',
+    creatorId: 'c-clara',
+    category: 'UI/UX Design',
+    platform: 'direct',
+    socialHandle: '@claraux',
+    viewsCount: '495.0k',
+    likesCount: 36000,
+    commentsCount: 245,
+    sharesCount: 1050,
+    creator: {
+      id: 'c-clara',
+      name: 'Clara Sinta',
+      username: 'claraux',
+      handle: '@claraux',
+      avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150',
+      category: 'Image',
+      roleTitle: 'UI/UX Product Designer',
+      bio: 'Desainer produk digital berorientasi konversi UX.',
+      location: 'Yogyakarta',
+      startingRate: 450000,
+      formattedRate: 'Rp450.000',
+      careerScore: { overall: 97, deadlineAccuracy: 99, revisionRate: 1.0, completionRate: 100, clientRating: 4.9, completedProjects: 55, tier: 'Top Tier' },
+      skills: ['Figma', 'UI Design', 'Design System'],
+      joinedDate: '2023',
+    }
+  },
+  {
+    id: 'proj-16',
+    title: 'Micro-documentary Kisah Perjuangan UMKM Sepatu Lokal Bandung',
+    description: 'Video storytelling emosional yang meningkatkan brand loyalty dan value produk kerajinan.',
+    coverImage: 'https://images.unsplash.com/photo-1549298916-b41d501d3772?w=800&auto=format&fit=crop&q=80',
+    mediaUrl: 'https://images.unsplash.com/photo-1549298916-b41d501d3772?w=800&auto=format&fit=crop&q=80',
+    mediaType: 'video',
+    creatorId: 'c-rendy',
+    category: 'Reels Instagram',
+    platform: 'instagram',
+    socialHandle: '@rendy.visuals',
+    viewsCount: '860.5k',
+    likesCount: 71000,
+    commentsCount: 540,
+    sharesCount: 3600,
+    creator: {
+      id: 'c-rendy',
+      name: 'Rendy Visuals',
+      username: 'rendyvisuals',
+      handle: '@rendy.visuals',
+      avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150',
+      category: 'Video',
+      roleTitle: 'Food & Commercial Videographer',
+      bio: 'B-roll komersial berkualitas bioskop untuk kuliner.',
+      location: 'Surabaya',
+      startingRate: 500000,
+      formattedRate: 'Rp500.000',
+      careerScore: { overall: 95, deadlineAccuracy: 96, revisionRate: 1.1, completionRate: 100, clientRating: 4.9, completedProjects: 40, tier: 'Top Tier' },
+      skills: ['Cinematic B-Roll', 'Food Video', 'Color Grading'],
+      joinedDate: '2023',
+    }
+  }
 ];
 
 export const ExploreProjectsPage: React.FC<ExploreProjectsPageProps> = ({
@@ -126,9 +638,18 @@ export const ExploreProjectsPage: React.FC<ExploreProjectsPageProps> = ({
 
   // Modal states
   const [selectedProject, setSelectedProject] = useState<FeedProject | null>(null);
-  const [projects, setProjects] = useState<FeedProject[]>([]);
+  const [projects, setProjects] = useState<FeedProject[]>(MOCK_FEED_PROJECTS);
   useEffect(() => {
-    creatorService.getFeedProjects().then(setProjects).catch(() => setProjects([]));
+    creatorService
+      .getFeedProjects()
+      .then((fetched) => {
+        if (fetched && fetched.length > 0) {
+          setProjects(fetched);
+        } else {
+          setProjects(MOCK_FEED_PROJECTS);
+        }
+      })
+      .catch(() => setProjects(MOCK_FEED_PROJECTS));
   }, []);
   const [currentCarouselIndex, setCurrentCarouselIndex] = useState(0);
   const [isVideoPlaying, setIsVideoPlaying] = useState(true);
@@ -279,38 +800,22 @@ export const ExploreProjectsPage: React.FC<ExploreProjectsPageProps> = ({
       {/* Main Container */}
       <main className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10">
         
-        {/* Sub-Navigation Switcher Tabs for UMKM Jelajah */}
-        <div className="flex items-center gap-2 sm:gap-3 mb-6 overflow-x-auto no-scrollbar">
-          <Link
-            href="/jelajah/kreator"
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-xs sm:text-sm font-semibold transition-all text-[#55576A] hover:text-[#0D0C22] hover:bg-[#F8F9FC]"
-          >
-            <User className="w-4 h-4 text-inherit" />
-            <span>Creator</span>
-          </Link>
 
-          <Link
-            href="/jelajah/layanan"
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-xs sm:text-sm font-semibold transition-all text-[#55576A] hover:text-[#0D0C22] hover:bg-[#F8F9FC]"
-          >
-            <Package className="w-4 h-4 text-inherit" />
-            <span>Layanan</span>
-          </Link>
-
-          <Link
-            href="/jelajah/proyek"
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-xs sm:text-sm font-semibold transition-all bg-[#F4F5F7] text-[#0D0C22] shadow-xs ring-1 ring-black/5 font-bold"
-          >
-            <Layers className="w-4 h-4 text-inherit" />
-            <span>Proyek</span>
-          </Link>
+        {/* H1 Page Title & Subtitle Matching Figma */}
+        <div className="mb-6">
+          <h1 className="font-display font-extrabold text-2xl sm:text-3xl lg:text-[34px] leading-tight text-[#0D0C22] tracking-tight">
+            Jelajah Proyek & Portofolio Kreator
+          </h1>
+          <p className="text-sm text-[#737373] mt-1.5 max-w-2xl leading-relaxed">
+            Temukan portofolio nyata, video Reels, konten TikTok, dan sistem desain yang telah diproduksi oleh kreator top terverifikasi Creatorin.
+          </p>
         </div>
 
-        {/* Section Heading & Filter Toolbar */}
-        <section className="pt-4 pb-4 border-t border-[#E2E8F0] mb-6 relative">
+        {/* Section Heading & Filter Toolbar Matching Figma */}
+        <section className="pt-4 pb-4 border-t border-[#E5E5E5]/80 mb-6 relative">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
             
-            <h2 className="text-base sm:text-lg font-semibold text-[#0F172A]">
+            <h2 className="font-display font-bold text-base sm:text-lg text-[#0D0C22]">
               Cari Proyek berdasarkan Kategori
             </h2>
 
@@ -554,7 +1059,7 @@ export const ExploreProjectsPage: React.FC<ExploreProjectsPageProps> = ({
             </button>
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2">
             {filteredProjects.map((project, pIdx) => (
               <ScrollReveal
                 key={project.id}

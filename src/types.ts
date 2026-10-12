@@ -136,7 +136,7 @@ export interface FeedProject {
   creator: Creator;
   category: string;
   caption?: string;
-  tags: string[];
+  tags?: string[];
   likesCount: number;
   commentsCount: number;
   viewsCount: string;
