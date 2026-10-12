@@ -100,9 +100,11 @@ export const Navbar: React.FC<NavbarProps> = ({
 
     fetchUnread();
     const interval = setInterval(fetchUnread, 30000);
+    window.addEventListener('creatorin_notifications_updated', fetchUnread);
     return () => {
       isMounted = false;
       clearInterval(interval);
+      window.removeEventListener('creatorin_notifications_updated', fetchUnread);
     };
   }, [currentUser]);
 
