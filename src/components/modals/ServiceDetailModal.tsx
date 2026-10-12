@@ -49,15 +49,21 @@ export const ServiceDetailModal: React.FC<ServiceDetailModalProps> = ({
     setActiveImageIndex(0);
   }, [initialService]);
 
-  // Handle ESC key press
+  // Handle ESC key press and body scroll lock
   useEffect(() => {
+    const prevOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
         onClose();
       }
     };
     window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
+    return () => {
+      document.body.style.overflow = prevOverflow;
+      window.removeEventListener('keydown', handleKeyDown);
+    };
   }, [onClose]);
 
   const handleShare = () => {
@@ -118,6 +124,9 @@ export const ServiceDetailModal: React.FC<ServiceDetailModalProps> = ({
 
   return (
     <div
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="service-modal-title"
       className="fixed inset-0 z-50 flex flex-col bg-black/65 backdrop-blur-xs text-left animate-in fade-in duration-200 overflow-hidden"
       onClick={onClose}
     >

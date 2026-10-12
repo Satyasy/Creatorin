@@ -363,6 +363,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                 onClick={() => setUserDropdownOpen(!userDropdownOpen)}
                 className="flex items-center gap-1.5 p-1 rounded-full hover:bg-[#F3F3F4] transition cursor-pointer"
                 title="Buka menu profil"
+                aria-label="Buka menu profil pengguna"
                 aria-expanded={userDropdownOpen}
               >
                 <div className="relative">

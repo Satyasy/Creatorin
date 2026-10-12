@@ -61,6 +61,7 @@ import { ProjectDetailModal } from '@/components/modals/ProjectDetailModal';
 import { ServiceDetailModal } from '@/components/modals/ServiceDetailModal';
 import { UploadProjectModal } from '@/components/modals/UploadProjectModal';
 import { UploadServiceModal } from '@/components/modals/UploadServiceModal';
+import { AuthModal } from '@/components/modals/AuthModal';
 import { creatorService } from '@/services/creatorService';
 import { createClient } from '@/lib/supabase/client';
 import { ShaderFill } from '@/lib/custom-effect-runtime';
@@ -130,6 +131,20 @@ export const CreatorProfilePage: React.FC<CreatorProfilePageProps> = ({
   const [isSendingInquiry, setIsSendingInquiry] = useState(false);
   const [copiedLinkSuccess, setCopiedLinkSuccess] = useState(false);
 
+  // Auth modal & toast state for protected actions
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  const [authModalConfig, setAuthModalConfig] = useState({
+    title: 'Masuk ke Akun Creatorin',
+    description: 'Masuk untuk melanjutkan tindakan ini.',
+  });
+  const [toastMessage, setToastMessage] = useState<string | null>(null);
+  const [isFollowLoading, setIsFollowLoading] = useState(false);
+
+  const showToast = (msg: string) => {
+    setToastMessage(msg);
+    setTimeout(() => setToastMessage(null), 3500);
+  };
+
   // In-place inline edit profile state
   const [isEditModeActive, setIsEditModeActive] = useState(false);
   const [editingSection, setEditingSection] = useState<'name' | 'bio' | 'avatar' | 'banner' | null>(null);
@@ -161,20 +176,60 @@ export const CreatorProfilePage: React.FC<CreatorProfilePageProps> = ({
   const [isDetailMuted, setIsDetailMuted] = useState(true);
   const [detailMediaIndex, setDetailMediaIndex] = useState(0);
 
-  // Handle follow toggle
-  const toggleFollow = () => {
-    if (isFollowing) {
-      setIsFollowing(false);
-      setFollowersCount(prev => Math.max(0, prev - 1));
-    } else {
-      setIsFollowing(true);
-      setFollowersCount(prev => prev + 1);
+  // Handle follow toggle with auth check, optimistic state and server persistence
+  const toggleFollow = async () => {
+    if (!currentUser) {
+      setAuthModalConfig({
+        title: 'Masuk untuk Mengikuti Kreator',
+        description: `Masuk ke akun Creatorin Anda untuk mengikuti ${creator.name} dan mendapatkan pembaruan portofolio terbarunya.`,
+      });
+      setIsAuthModalOpen(true);
+      return;
+    }
+
+    if (isFollowLoading) return;
+
+    const previousFollowing = isFollowing;
+    const previousCount = followersCount;
+    const nextFollowing = !isFollowing;
+    const nextCount = nextFollowing ? previousCount + 1 : Math.max(0, previousCount - 1);
+
+    // Optimistic UI update
+    setIsFollowing(nextFollowing);
+    setFollowersCount(nextCount);
+    setIsFollowLoading(true);
+
+    try {
+      const res = await fetch(`/api/creators/${encodeURIComponent(creator.id)}/follow`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ follow: nextFollowing }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Gagal memperbarui status follow');
+
+      showToast(nextFollowing ? `Berhasil mengikuti ${creator.name}` : `Batal mengikuti ${creator.name}`);
+    } catch (err) {
+      // Rollback on network/server error
+      setIsFollowing(previousFollowing);
+      setFollowersCount(previousCount);
+      showToast(err instanceof Error ? err.message : 'Gagal memperbarui status follow.');
+    } finally {
+      setIsFollowLoading(false);
     }
   };
 
-  // Toggle like on shot/project
+  // Toggle like on shot/project with auth guard
   const toggleLikeShot = (id: string, e: React.MouseEvent) => {
     e.stopPropagation();
+    if (!currentUser) {
+      setAuthModalConfig({
+        title: 'Masuk untuk Menyukai Karya',
+        description: 'Masuk ke akun Anda untuk menyukai portofolio kreator ini.',
+      });
+      setIsAuthModalOpen(true);
+      return;
+    }
     setLikedShots(prev => {
       const next = new Set(prev);
       if (next.has(id)) {
@@ -188,29 +243,49 @@ export const CreatorProfilePage: React.FC<CreatorProfilePageProps> = ({
     });
   };
 
-  // Toggle bookmark on project
+  // Toggle bookmark on project with auth guard
   const toggleSaveProject = (id: string, e: React.MouseEvent) => {
     e.stopPropagation();
+    if (!currentUser) {
+      setAuthModalConfig({
+        title: 'Masuk untuk Menyimpan Proyek',
+        description: 'Masuk ke akun Anda untuk menyimpan karya ini ke koleksi Anda.',
+      });
+      setIsAuthModalOpen(true);
+      return;
+    }
     setSavedProjectIds(prev => {
       const next = new Set(prev);
       if (next.has(id)) {
         next.delete(id);
+        showToast('Karya dihapus dari koleksi tersimpan');
       } else {
         next.add(id);
+        showToast('Karya berhasil disimpan ke koleksi!');
       }
       return next;
     });
   };
 
-  // Toggle bookmark on service
+  // Toggle bookmark on service with auth guard
   const toggleSaveService = (id: string, e: React.MouseEvent) => {
     e.stopPropagation();
+    if (!currentUser) {
+      setAuthModalConfig({
+        title: 'Masuk untuk Menyimpan Layanan',
+        description: 'Masuk ke akun Anda untuk menandai paket layanan favorit ini.',
+      });
+      setIsAuthModalOpen(true);
+      return;
+    }
     setSavedServiceIds(prev => {
       const next = new Set(prev);
       if (next.has(id)) {
         next.delete(id);
+        showToast('Layanan dihapus dari simpanan');
       } else {
         next.add(id);
+        showToast('Layanan berhasil disimpan!');
       }
       return next;
     });
@@ -231,7 +306,11 @@ export const CreatorProfilePage: React.FC<CreatorProfilePageProps> = ({
     if (!text) return;
 
     if (!currentUser) {
-      router.push('/sign-in');
+      setAuthModalConfig({
+        title: 'Masuk untuk Mengirim Pesan',
+        description: `Masuk ke akun Anda untuk memulai obrolan langsung dengan ${creator.name}.`,
+      });
+      setIsAuthModalOpen(true);
       return;
     }
 
@@ -1668,12 +1747,28 @@ export const CreatorProfilePage: React.FC<CreatorProfilePageProps> = ({
         }}
       />
 
-      {/* Upload Service Modal */}
-      <UploadServiceModal
-        isOpen={isUploadServiceModalOpen}
-        onClose={() => setIsUploadServiceModalOpen(false)}
-        onSuccess={(newSrv) => setLiveServices((services) => [newSrv, ...services])}
+      {/* Contextual Auth Modal */}
+      <AuthModal
+        isOpen={isAuthModalOpen}
+        onClose={() => setIsAuthModalOpen(false)}
+        title={authModalConfig.title}
+        description={authModalConfig.description}
+        onSuccess={() => {
+          showToast('Berhasil masuk! Silakan ulangi tindakan Anda.');
+        }}
       />
+
+      {/* Toast Notification Banner */}
+      {toastMessage && (
+        <div
+          role="status"
+          aria-live="polite"
+          className="fixed bottom-6 right-6 z-50 flex items-center gap-2.5 px-4 py-3 rounded-xl bg-neutral-900 text-white text-xs sm:text-sm font-medium shadow-xl border border-white/10 animate-in fade-in slide-in-from-bottom-3 duration-200"
+        >
+          <Sparkles className="w-4 h-4 text-blue-400 shrink-0" />
+          <span>{toastMessage}</span>
+        </div>
+      )}
 
     </div>
   );

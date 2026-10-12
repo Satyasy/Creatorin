@@ -21,7 +21,8 @@ import {
   Send,
   Check,
   Pencil,
-  Trash2
+  Trash2,
+  Loader2
 } from 'lucide-react';
 import { FeedProject, Creator, ActivePage } from '@/types';
 import { useAuth } from '@/providers/AuthProvider';
@@ -73,6 +74,7 @@ export const ProjectDetailModal: React.FC<ProjectDetailModalProps> = ({
   const [isInfoOpen, setIsInfoOpen] = useState(false);
   const [comments, setComments] = useState<CommentItem[]>([]);
   const [newCommentText, setNewCommentText] = useState('');
+  const [isSubmittingComment, setIsSubmittingComment] = useState(false);
   const [editingCommentId, setEditingCommentId] = useState<string | null>(null);
   const [editingCommentText, setEditingCommentText] = useState('');
   const [toastMessage, setToastMessage] = useState<string | null>(null);
@@ -109,12 +111,18 @@ export const ProjectDetailModal: React.FC<ProjectDetailModalProps> = ({
   }, [currentProject.id, showToast, user?.id]);
 
   useEffect(() => {
+    const prevOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === 'Escape') onClose();
     };
 
     window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
+    return () => {
+      document.body.style.overflow = prevOverflow;
+      window.removeEventListener('keydown', handleKeyDown);
+    };
   }, [onClose]);
 
   const handleShare = () => {
@@ -127,6 +135,11 @@ export const ProjectDetailModal: React.FC<ProjectDetailModalProps> = ({
   const handleAddComment = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newCommentText.trim()) return;
+    if (!user) {
+      showToast('Harap masuk akun terlebih dahulu untuk berkomentar.');
+      return;
+    }
+    setIsSubmittingComment(true);
     try {
       const response = await fetch(`/api/projects/${currentProject.id}/comments`, {
         method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ content: newCommentText.trim() }),
@@ -137,6 +150,7 @@ export const ProjectDetailModal: React.FC<ProjectDetailModalProps> = ({
       setNewCommentText('');
       showToast('Komentar berhasil dikirim!');
     } catch (error) { showToast(error instanceof Error ? error.message : 'Gagal mengirim komentar'); }
+    finally { setIsSubmittingComment(false); }
   };
 
   const handleStartEdit = (item: CommentItem) => {
@@ -537,6 +551,9 @@ export const ProjectDetailModal: React.FC<ProjectDetailModalProps> = ({
 
   return (
     <div
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="project-modal-title"
       className="fixed inset-0 z-50 flex flex-col bg-black/65 text-left animate-in fade-in duration-200"
       onClick={onClose}
     >
@@ -915,11 +932,16 @@ export const ProjectDetailModal: React.FC<ProjectDetailModalProps> = ({
             />
             <button
               type="submit"
-              disabled={!newCommentText.trim()}
-              className="size-11 rounded-full bg-[#171717] disabled:bg-neutral-300 text-white flex items-center justify-center transition cursor-pointer shrink-0 shadow-xs hover:bg-neutral-800"
+              disabled={!newCommentText.trim() || isSubmittingComment}
+              className="size-11 rounded-full bg-[#171717] disabled:bg-neutral-300 text-white flex items-center justify-center transition cursor-pointer shrink-0 shadow-xs hover:bg-neutral-800 disabled:opacity-60 disabled:cursor-not-allowed focus-visible:ring-2 focus-visible:ring-[#155DFC] focus-visible:outline-hidden"
               title="Kirim Komentar"
+              aria-label="Kirim Komentar"
             >
-              <Send className="size-4" />
+              {isSubmittingComment ? (
+                <Loader2 className="size-4 animate-spin text-white" />
+              ) : (
+                <Send className="size-4" />
+              )}
             </button>
           </form>
         </aside>

@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { X, Send, CheckCircle2, ShieldCheck } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { X, Send, CheckCircle2, ShieldCheck, Loader2 } from 'lucide-react';
 import { Creator } from '@/types';
 import { briefService } from '@/services/briefService';
 
@@ -28,6 +28,32 @@ export const ProjectBriefModal: React.FC<ProjectBriefModalProps> = ({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState('');
 
+  const handleResetAndClose = () => {
+    setIsSubmitted(false);
+    setProjectTitle('');
+    setBriefDetails('');
+    onClose();
+  };
+
+  useEffect(() => {
+    if (!isOpen) return;
+    const prevOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        handleResetAndClose();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => {
+      document.body.style.overflow = prevOverflow;
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [isOpen]);
+
   if (!isOpen) return null;
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -41,23 +67,25 @@ export const ProjectBriefModal: React.FC<ProjectBriefModalProps> = ({
     onSuccess?.();
   };
 
-  const handleResetAndClose = () => {
-    setIsSubmitted(false);
-    setProjectTitle('');
-    setBriefDetails('');
-    onClose();
-  };
-
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-in fade-in duration-200">
+    <div
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="brief-modal-title"
+      aria-describedby="brief-modal-desc"
+      onClick={(e) => {
+        if (e.target === e.currentTarget) handleResetAndClose();
+      }}
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-in fade-in duration-200"
+    >
       <div className="bg-white rounded-[16px] border border-black/10 shadow-xl max-w-xl w-full overflow-hidden text-left max-h-[90vh] flex flex-col">
         {/* Header */}
         <div className="p-6 border-b border-black/10 flex items-center justify-between">
           <div>
-            <h3 className="text-lg font-bold text-[#0D0C22]">
+            <h3 id="brief-modal-title" className="text-lg font-bold text-[#0D0C22]">
               {selectedCreator ? `Hubungi ${selectedCreator.name}` : 'Buat Brief Proyek Baru'}
             </h3>
-            <p className="text-xs text-neutral-500 mt-0.5 font-normal">
+            <p id="brief-modal-desc" className="text-xs text-neutral-500 mt-0.5 font-normal">
               {selectedCreator 
                 ? 'Mulai kolaborasi aman dengan garansi Career Score.' 
                 : 'Kirim brief ke talenta terbaik di Creatorin untuk penawaran cepat.'}
@@ -65,8 +93,8 @@ export const ProjectBriefModal: React.FC<ProjectBriefModalProps> = ({
           </div>
           <button
             onClick={handleResetAndClose}
-            className="p-1.5 text-neutral-400 hover:text-neutral-700 rounded-[8px] hover:bg-[#F3F3F4] transition cursor-pointer"
-            aria-label="Tutup modal"
+            className="p-1.5 text-neutral-400 hover:text-neutral-700 rounded-[8px] hover:bg-[#F3F3F4] transition cursor-pointer focus-visible:ring-2 focus-visible:ring-[#155DFC] focus-visible:outline-hidden"
+            aria-label="Tutup dialog brief"
           >
             <X className="w-5 h-5" />
           </button>
@@ -212,10 +240,19 @@ export const ProjectBriefModal: React.FC<ProjectBriefModalProps> = ({
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="px-5 py-2 rounded-[8px] bg-[#155DFC] hover:bg-[#0E4CD1] text-white text-xs font-semibold flex items-center gap-2 transition cursor-pointer"
+                  className="px-5 py-2 rounded-[8px] bg-[#155DFC] hover:bg-[#0E4CD1] active:scale-[0.99] text-white text-xs font-semibold flex items-center gap-2 transition cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed shadow-xs focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#155DFC] focus-visible:outline-hidden"
                 >
-                  <Send className="w-3.5 h-3.5" />
-                  <span>{isSubmitting ? 'Menyimpan...' : 'Kirim Brief Proyek'}</span>
+                  {isSubmitting ? (
+                    <>
+                      <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                      <span>Mengirim Brief...</span>
+                    </>
+                  ) : (
+                    <>
+                      <Send className="w-3.5 h-3.5" />
+                      <span>Kirim Brief Proyek</span>
+                    </>
+                  )}
                 </button>
               </div>
             </form>

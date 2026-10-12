@@ -48,6 +48,7 @@ import {
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/providers/AuthProvider';
 import { creatorService } from '@/services/creatorService';
+import { AuthModal } from '@/components/modals/AuthModal';
 import { UMKMProfile, AuthState, ActivePage, ProjectListing, UMKMCompletedCollab, UMKMCreatorReview, Creator } from '@/types';
 
 interface UmkmProfilePageProps {
@@ -111,9 +112,18 @@ export const UmkmProfilePage: React.FC<UmkmProfilePageProps> = ({
   // Follow / Save Brand State
   const [isFollowing, setIsFollowing] = useState(false);
   const [followersCount, setFollowersCount] = useState(0);
-  useEffect(() => setProfile(initialProfile), [initialProfile]);
+  const [prevProfileId, setPrevProfileId] = useState(initialProfile.id);
+  if (initialProfile.id !== prevProfileId) {
+    setPrevProfileId(initialProfile.id);
+    setProfile(initialProfile);
+  }
   const [isMoreMenuOpen, setIsMoreMenuOpen] = useState(false);
   const [savedCollabIds, setSavedCollabIds] = useState<Set<string>>(new Set());
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  const [authModalConfig, setAuthModalConfig] = useState({
+    title: 'Masuk ke Akun Creatorin',
+    description: 'Masuk untuk melanjutkan tindakan ini.',
+  });
 
   // Filter Dropdown for Briefs / Collabs
   const [isFilterDropdownOpen, setIsFilterDropdownOpen] = useState(false);
@@ -239,14 +249,22 @@ export const UmkmProfilePage: React.FC<UmkmProfilePageProps> = ({
   };
 
   const toggleFollow = () => {
+    if (!currentUser) {
+      setAuthModalConfig({
+        title: 'Masuk untuk Mengikuti Brand',
+        description: `Masuk ke akun Creatorin Anda untuk mengikuti ${profile.brandName} dan menerima notifikasi saat ada lowongan brief baru.`,
+      });
+      setIsAuthModalOpen(true);
+      return;
+    }
     if (isFollowing) {
       setIsFollowing(false);
       setFollowersCount(prev => Math.max(0, prev - 1));
-      showToast('Batal mengikuti brand ini');
+      showToast(`Batal mengikuti ${profile.brandName}`);
     } else {
       setIsFollowing(true);
       setFollowersCount(prev => prev + 1);
-      showToast('Berhasil mengikuti! Anda akan menerima notifikasi brief baru.');
+      showToast(`Berhasil mengikuti ${profile.brandName}! Anda akan menerima notifikasi brief baru.`);
     }
   };
 
@@ -615,14 +633,40 @@ export const UmkmProfilePage: React.FC<UmkmProfilePageProps> = ({
                 <span>{isEditModeActive ? 'Selesai Edit' : 'Edit Profil'}</span>
               </button>
             ) : (
-              <button
-                id="btn-contact-brand"
-                onClick={() => navigateTo('chat', '/chat')}
-                className="px-5 py-2 sm:py-2.5 rounded-xl border border-neutral-300 bg-white hover:bg-neutral-50 text-neutral-900 text-xs sm:text-sm font-semibold transition cursor-pointer flex items-center gap-2"
-              >
-                <MessageSquare className="w-3.5 h-3.5" />
-                <span>Kirim Pesan</span>
-              </button>
+              <>
+                {/* Ikuti Brand Button */}
+                <button
+                  id="btn-follow-brand"
+                  onClick={toggleFollow}
+                  className={`px-4 sm:px-5 py-2 sm:py-2.5 rounded-xl border text-xs sm:text-sm font-semibold transition cursor-pointer flex items-center gap-1.5 ${
+                    isFollowing
+                      ? 'border-neutral-300 bg-white hover:bg-neutral-50 text-neutral-800'
+                      : 'border-[#0B1F3A] bg-[#0B1F3A] hover:bg-[#123B8C] text-white'
+                  }`}
+                >
+                  <Heart className={`w-3.5 h-3.5 ${isFollowing ? 'fill-red-500 text-red-500' : ''}`} />
+                  <span>{isFollowing ? 'Mengikuti' : 'Ikuti Brand'}</span>
+                </button>
+
+                <button
+                  id="btn-contact-brand"
+                  onClick={() => {
+                    if (!currentUser) {
+                      setAuthModalConfig({
+                        title: 'Masuk untuk Mengirim Pesan',
+                        description: `Masuk ke akun Anda untuk memulai percakapan langsung dengan ${profile.brandName}.`,
+                      });
+                      setIsAuthModalOpen(true);
+                      return;
+                    }
+                    navigateTo('chat', '/chat');
+                  }}
+                  className="px-5 py-2 sm:py-2.5 rounded-xl border border-neutral-300 bg-white hover:bg-neutral-50 text-neutral-900 text-xs sm:text-sm font-semibold transition cursor-pointer flex items-center gap-2"
+                >
+                  <MessageSquare className="w-3.5 h-3.5" />
+                  <span>Kirim Pesan</span>
+                </button>
+              </>
             )}
 
             {/* Button 3: Bagikan */}
@@ -2145,6 +2189,17 @@ export const UmkmProfilePage: React.FC<UmkmProfilePageProps> = ({
           </div>
         </div>
       )}
+
+      {/* Contextual Auth Modal */}
+      <AuthModal
+        isOpen={isAuthModalOpen}
+        onClose={() => setIsAuthModalOpen(false)}
+        title={authModalConfig.title}
+        description={authModalConfig.description}
+        onSuccess={() => {
+          showToast('Berhasil masuk! Silakan ulangi tindakan Anda.');
+        }}
+      />
 
     </div>
   );

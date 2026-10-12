@@ -1,3 +1,4 @@
+import { Suspense } from 'react';
 import { SignInPage } from '@/views/SignInPage';
 
 export const metadata = {
@@ -6,5 +7,9 @@ export const metadata = {
 };
 
 export default function SignInRoute() {
-  return <SignInPage />;
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-white" />}>
+      <SignInPage />
+    </Suspense>
+  );
 }
