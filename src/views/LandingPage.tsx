@@ -5,12 +5,12 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/providers/AuthProvider';
 import { creatorService } from '@/services/creatorService';
-import { Creator, CreatorCategory, AuthState, ActivePage } from '@/types';
+import { Creator, CreatorCategory, CreatorService, AuthState, ActivePage } from '@/types';
 import { ProfileModal } from '@/components/modals/ProfileModal';
 import { ProjectBriefModal } from '@/components/modals/ProjectBriefModal';
+import { ServiceDetailModal } from '@/components/modals/ServiceDetailModal';
 import { ScrollReveal } from '@/components/common/ScrollReveal';
 import { 
-  ShieldCheck, 
   Star, 
   Check, 
   MapPin, 
@@ -86,6 +86,10 @@ export const LandingPage: React.FC<LandingPageProps> = ({ currentUser: propUser,
   const [selectedCreatorForModal, setSelectedCreatorForModal] = useState<Creator | null>(null);
   const [targetCreatorForBrief, setTargetCreatorForBrief] = useState<Creator | null>(null);
   const [isBriefModalOpen, setIsBriefModalOpen] = useState(false);
+  const [selectedServiceForDetail, setSelectedServiceForDetail] = useState<{
+    service: CreatorService;
+    creator: Creator;
+  } | null>(null);
 
   // Toggle Save Creator
   const toggleSave = (id: string, e: React.MouseEvent) => {
@@ -106,6 +110,30 @@ export const LandingPage: React.FC<LandingPageProps> = ({ currentUser: propUser,
     if (e) e.stopPropagation();
     setTargetCreatorForBrief(creator || null);
     setIsBriefModalOpen(true);
+  };
+
+  // Open Service Detail Modal
+  const handleServiceClick = (service: Partial<CreatorService>, creator: Creator) => {
+    const priceNum = typeof service.price === 'number'
+      ? service.price
+      : parseInt((service.formattedPrice || '').replace(/[^0-9]/g, '')) || 350000;
+
+    const fullService: CreatorService = {
+      id: service.id || `srv-${Date.now()}`,
+      title: service.title || 'Layanan Kreatif Profesional',
+      price: priceNum,
+      formattedPrice: service.formattedPrice || `Rp${priceNum.toLocaleString('id-ID')}`,
+      deliveryDays: service.deliveryDays || '3 Hari Kerja',
+      tag: service.tag || 'Desain',
+      coverImage: service.coverImage || service.galleryImages?.[0] || '/creatorin/service-pattern-1.png',
+      description: service.description || 'Pengerjaan aset kreatif profesional dengan jaminan kepatuhan brief bisnis, komunikasi aktif, dan penyelarasan kebutuhan proyek Anda.',
+      revisions: service.revisions || '2x Revisi Gratis',
+      features: service.features || ['Revisi Cepat', 'File Resolusi Tinggi Siap Pakai', 'Konsultasi Kebutuhan Brand'],
+      galleryImages: service.galleryImages || (service.coverImage ? [service.coverImage] : []),
+      category: service.category || service.tag,
+    };
+
+    setSelectedServiceForDetail({ service: fullService, creator });
   };
 
   // Filtered Creators list
@@ -462,18 +490,13 @@ export const LandingPage: React.FC<LandingPageProps> = ({ currentUser: propUser,
                     {/* Identitas Kreator */}
                     <div className="flex items-start sm:items-center gap-4">
                       
-                      {/* Avatar Kreator dengan Badge */}
+                      {/* Avatar Kreator */}
                       <div className="relative shrink-0">
                         <img
                           src={creator.avatar}
                           alt={creator.name}
                           className="w-14 h-14 sm:w-16 sm:h-16 rounded-full object-cover ring-2 ring-neutral-100"
                         />
-                        {creator.careerScore.overall >= 95 && (
-                          <div className="absolute -bottom-1 -right-1 bg-[#0d0c22] text-white p-1 rounded-full ring-2 ring-white">
-                            <ShieldCheck className="w-3 h-3 text-amber-400" />
-                          </div>
-                        )}
                       </div>
 
                       {/* Detail Nama & Status Promoted */}
@@ -482,21 +505,6 @@ export const LandingPage: React.FC<LandingPageProps> = ({ currentUser: propUser,
                           <h3 className="text-lg sm:text-xl font-bold tracking-tight text-[#0d0c22]">
                             {creator.name}
                           </h3>
-
-                          {creator.proBadge && (
-                            <span
-                              className="uppercase px-2 py-0.5 rounded bg-[#0d0c22] tracking-[0.62px] leading-[15px]"
-                              style={{
-                                color: '#FFF',
-                                fontFamily: '"SF Pro", -apple-system, BlinkMacSystemFont, sans-serif',
-                                fontSize: '10px',
-                                fontStyle: 'normal',
-                                fontWeight: 900,
-                              }}
-                            >
-                              PRO
-                            </span>
-                          )}
 
                           <div className="flex items-center gap-1 text-xs font-bold text-neutral-800">
                             <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
@@ -585,7 +593,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ currentUser: propUser,
                                 id={`service-card-${service.id}`}
                                 onClick={(e) => {
                                   e.stopPropagation();
-                                  handleOpenBrief(creator, e);
+                                  handleServiceClick(service, creator);
                                 }}
                                 className="group/srv flex flex-col cursor-pointer text-left select-none"
                               >
@@ -671,6 +679,31 @@ export const LandingPage: React.FC<LandingPageProps> = ({ currentUser: propUser,
         onClose={() => setIsBriefModalOpen(false)}
         targetCreator={targetCreatorForBrief}
       />
+
+      {/* Service Detail Modal (Pop up dari bawah) */}
+      {selectedServiceForDetail && (
+        <ServiceDetailModal
+          service={selectedServiceForDetail.service}
+          creator={selectedServiceForDetail.creator}
+          onClose={() => setSelectedServiceForDetail(null)}
+          onOrderService={(srv, cr) => {
+            setSelectedServiceForDetail(null);
+            router.push(`/chat?creatorId=${cr.id}`);
+          }}
+          onViewCreatorProfile={(cr) => {
+            setSelectedServiceForDetail(null);
+            if (onViewCreatorProfile) {
+              onViewCreatorProfile(cr);
+            } else {
+              router.push(`/creator/${cr.id}`);
+            }
+          }}
+          onNavigate={onNavigate}
+          onSelectOtherService={(newSrv) => {
+            setSelectedServiceForDetail((prev) => (prev ? { ...prev, service: newSrv } : null));
+          }}
+        />
+      )}
 
     </div>
   );

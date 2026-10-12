@@ -389,14 +389,6 @@ export function ExplorePage() {
                                 {creator.name?.charAt(0)?.toUpperCase() || 'K'}
                               </div>
                             )}
-                            {creator.careerScore?.overall >= 90 && (
-                              <span
-                                className="absolute -bottom-1 -right-1 grid h-5 w-5 place-items-center rounded-full bg-[#155DFC] text-white ring-2 ring-white"
-                                title="Top Rated Creator"
-                              >
-                                <Check className="h-3 w-3" strokeWidth={3} />
-                              </span>
-                            )}
                           </div>
 
                           <div className="min-w-0 flex-1">
@@ -404,11 +396,6 @@ export function ExplorePage() {
                               <h3 className="truncate text-base sm:text-lg font-semibold tracking-[-0.02em] text-[#171714] transition-colors group-hover:text-[#155DFC]">
                                 {creator.name}
                               </h3>
-                              {creator.proBadge && (
-                                <span className="shrink-0 rounded bg-[#0D0C22] px-1.5 py-0.5 text-[10px] font-black uppercase tracking-wider text-white">
-                                  PRO
-                                </span>
-                              )}
                             </div>
 
                             <p className="truncate text-xs sm:text-sm font-medium text-[#62635E]">

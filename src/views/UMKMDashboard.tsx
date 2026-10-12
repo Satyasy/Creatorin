@@ -1103,9 +1103,6 @@ export const UMKMDashboard = () => {
                           className="w-12 h-12 rounded-full object-cover ring-1 ring-black/5"
                           loading="lazy"
                         />
-                        <div className="absolute -bottom-0.5 -right-0.5 w-4 h-4 rounded-full bg-[#0D0C22] text-white flex items-center justify-center text-[9px] ring-2 ring-white">
-                          <Check className="w-2.5 h-2.5 stroke-[3]" />
-                        </div>
                       </div>
 
                       <div className="min-w-0">
@@ -1116,11 +1113,6 @@ export const UMKMDashboard = () => {
                           >
                             {creator.name}
                           </h3>
-                          {creator.proBadge && (
-                            <span className="bg-[#0D0C22] text-white text-[11px] font-bold px-1.5 py-0.5 rounded-sm tracking-wide leading-none">
-                              PRO+
-                            </span>
-                          )}
                           <span className="inline-flex items-center gap-1 text-xs font-semibold text-[#0D0C22]">
                             <Star className="w-3.5 h-3.5 fill-[#F59E0B] text-[#F59E0B]" />
                             <span>{creator.rating}</span>
@@ -1179,7 +1171,10 @@ export const UMKMDashboard = () => {
                     {creator.services.map((service, idx) => (
                       <div
                         key={service.id || idx}
-                        onClick={() => handleServiceClick(service, creator)}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleServiceClick(service, creator);
+                        }}
                         className="rounded-xl overflow-hidden border border-[#E1E3EA] bg-white group cursor-pointer hover:shadow-md hover:border-[#A9C3FF] transition-all"
                       >
                         <div className="aspect-[16/10] relative overflow-hidden bg-neutral-100">
@@ -1466,6 +1461,9 @@ export const UMKMDashboard = () => {
           onViewCreatorProfile={(cr) => {
             setSelectedService(null);
             router.push(`/creator/${cr.id}`);
+          }}
+          onSelectOtherService={(newSrv) => {
+            setSelectedService((prev) => (prev ? { ...prev, service: newSrv } : null));
           }}
         />
       )}
