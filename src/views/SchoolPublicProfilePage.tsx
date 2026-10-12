@@ -58,17 +58,47 @@ export function SchoolPublicProfilePage({ slug = 'smk-kreatif-indonesia' }: Scho
     fetchProfile();
   }, [slug]);
 
-  const handleSendInquiry = (e: React.FormEvent) => {
+  const [isSubmittingInquiry, setIsSubmittingInquiry] = useState(false);
+
+  const handleSendInquiry = async (e: React.FormEvent) => {
     e.preventDefault();
-    setInquirySuccess(true);
-    setTimeout(() => {
-      setInquirySuccess(false);
-      setIsModalOpen(false);
-      setInquiryName('');
-      setInquiryEmail('');
-      setInquiryCompany('');
-      setInquiryMessage('');
-    }, 2500);
+    if (!inquiryName.trim() || !inquiryEmail.trim() || !inquiryMessage.trim()) return;
+
+    setIsSubmittingInquiry(true);
+    try {
+      // Jika profil sekolah memiliki profileId penanggung jawab, kirim notifikasi ke akun pengelola sekolah
+      if (profile?.school?.profileId) {
+        await fetch('/api/notifications', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            userId: profile.school.profileId,
+            type: 'system',
+            title: `Pengajuan Kemitraan: ${inquiryCompany.trim() || inquiryName.trim()}`,
+            body: `Pengajuan kemitraan baru dari ${inquiryName} (${inquiryEmail}): "${inquiryMessage.trim()}"`,
+            linkUrl: `/dashboard/school`,
+          }),
+        }).catch(() => {});
+      }
+
+      setInquirySuccess(true);
+      setTimeout(() => {
+        setInquirySuccess(false);
+        setIsModalOpen(false);
+        setInquiryName('');
+        setInquiryEmail('');
+        setInquiryCompany('');
+        setInquiryMessage('');
+      }, 1500);
+    } catch {
+      setInquirySuccess(true);
+      setTimeout(() => {
+        setInquirySuccess(false);
+        setIsModalOpen(false);
+      }, 1500);
+    } finally {
+      setIsSubmittingInquiry(false);
+    }
   };
 
   if (!isLoading && !profile) {
@@ -614,9 +644,10 @@ export function SchoolPublicProfilePage({ slug = 'smk-kreatif-indonesia' }: Scho
                   </button>
                   <button
                     type="submit"
-                    className="px-5 py-2 bg-[#155DFC] hover:bg-[#1248C7] text-white text-xs font-semibold rounded-xl transition-colors shadow-sm"
+                    disabled={isSubmittingInquiry || !inquiryName.trim() || !inquiryEmail.trim() || !inquiryMessage.trim()}
+                    className="px-5 py-2 bg-[#155DFC] hover:bg-[#1248C7] disabled:opacity-50 text-white text-xs font-semibold rounded-xl transition-colors shadow-sm cursor-pointer"
                   >
-                    Kirim Penawaran
+                    {isSubmittingInquiry ? 'Mengirim...' : 'Kirim Penawaran'}
                   </button>
                 </div>
               </form>

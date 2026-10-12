@@ -11,10 +11,11 @@ import {
   AlertCircle, 
   Sparkles, 
   Check, 
-  RotateCcw,
-  Coins,
-  RefreshCw,
-  FileText
+  RotateCcw, 
+  Coins, 
+  RefreshCw, 
+  FileText,
+  Star
 } from 'lucide-react';
 import { AuthState, ChatConversation, ChatInvoice } from '@/types';
 import { formatCoin } from '@/lib/coin';
@@ -82,6 +83,13 @@ export const CollaborationRoomView: React.FC<CollaborationRoomViewProps> = ({
   const [revisionFeedback, setRevisionFeedback] = useState('');
   const [remainingRevisions, setRemainingRevisions] = useState(2);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
+
+  // Modal review & rating UMKM untuk Kreator
+  const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
+  const [reviewRating, setReviewRating] = useState<number>(5);
+  const [reviewComment, setReviewComment] = useState('');
+  const [isSubmittingReview, setIsSubmittingReview] = useState(false);
+  const [hasSubmittedReview, setHasSubmittedReview] = useState(false);
 
   const showToast = (msg: string) => {
     setToastMessage(msg);
@@ -235,6 +243,45 @@ export const CollaborationRoomView: React.FC<CollaborationRoomViewProps> = ({
     }
   };
 
+  // Kirim ulasan dan rating UMKM ke API
+  const handleSendReview = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!reviewComment.trim()) return;
+    setIsSubmittingReview(true);
+    try {
+      const creatorId = roomData?.creatorId || conversation.creatorId || conversation.partnerId;
+      const roomId = roomData?.id;
+      if (!roomId || !creatorId) {
+        throw new Error('Informasi kolaborasi tidak lengkap.');
+      }
+      const res = await fetch('/api/reviews', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          creatorId,
+          roomId,
+          projectTitle,
+          rating: reviewRating,
+          comment: reviewComment.trim(),
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Gagal mengirim ulasan');
+
+      setHasSubmittedReview(true);
+      setIsReviewModalOpen(false);
+      showToast('Ulasan dan rating bintang berhasil dikirim!');
+
+      if (onSendChatMessage) {
+        onSendChatMessage(`[Collaboration Room] UMKM telah memberikan ulasan bintang ⭐ ${reviewRating}/5: "${reviewComment.trim()}"`);
+      }
+    } catch (err: any) {
+      alert(err.message || 'Gagal mengirim ulasan');
+    } finally {
+      setIsSubmittingReview(false);
+    }
+  };
+
   // UMKM menyetujui hasil karya & mencairkan escrow
   const handleApproveProject = async () => {
     const confirmApprove = window.confirm(`Apakah Anda yakin ingin menyetujui hasil karya ini? Setelah disetujui, dana Escrow sebesar 🪙 ${escrowDisplay} akan dicairkan ke saldo Kreator dan proyek dianggap selesai.`);
@@ -255,6 +302,11 @@ export const CollaborationRoomView: React.FC<CollaborationRoomViewProps> = ({
 
       if (onSendChatMessage) {
         onSendChatMessage(`[Collaboration Room] Selamat! UMKM telah MENYETUJUI hasil akhir pengerjaan. Dana Escrow 🪙 ${escrowDisplay} telah berhasil dicairkan.`);
+      }
+
+      // Langsung munculkan formulir ulasan jika UMKM
+      if (!isCreator && !hasSubmittedReview) {
+        setTimeout(() => setIsReviewModalOpen(true), 600);
       }
     } catch (err: any) {
       alert(err.message || 'Gagal menyetujui proyek');
@@ -508,6 +560,35 @@ export const CollaborationRoomView: React.FC<CollaborationRoomViewProps> = ({
           </div>
         )}
 
+        {/* Banner Status Selesai & Tombol Ulasan */}
+        {currentStep === 4 && (
+          <div className="bg-emerald-50 rounded-2xl border border-emerald-200 p-5 shadow-2xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center shrink-0">
+                <CheckCircle2 className="w-5 h-5" />
+              </div>
+              <div>
+                <h2 className="text-sm font-bold text-emerald-950">
+                  Proyek Telah Selesai & Disetujui
+                </h2>
+                <p className="text-xs text-emerald-700 mt-0.5">
+                  Dana Escrow sebesar 🪙 {escrowDisplay} telah dicairkan ke saldo dompet Kreator.
+                </p>
+              </div>
+            </div>
+            {!isCreator && (
+              <button
+                type="button"
+                onClick={() => setIsReviewModalOpen(true)}
+                className="px-4 py-2.5 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-semibold flex items-center justify-center gap-1.5 transition cursor-pointer shadow-xs"
+              >
+                <Star className="w-4 h-4 fill-amber-300 text-amber-300" />
+                <span>{hasSubmittedReview ? 'Edit Ulasan Kreator' : 'Beri Ulasan & Rating'}</span>
+              </button>
+            )}
+          </div>
+        )}
+
         {/* Daftar Hasil Karya / Deliverables History */}
         <div className="bg-white rounded-2xl border border-neutral-200/80 p-5 shadow-2xs space-y-4">
           <h2 className="text-sm font-bold text-neutral-900">
@@ -628,6 +709,95 @@ export const CollaborationRoomView: React.FC<CollaborationRoomViewProps> = ({
                     Kirim Catatan
                   </button>
                 </div>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL BERI ULASAN & RATING DARI UMKM (POST /api/reviews) */}
+      {isReviewModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-xs p-4">
+          <div className="w-full max-w-md bg-white rounded-2xl border border-neutral-200 p-6 shadow-xl space-y-4 animate-in fade-in zoom-in-95">
+            <div className="flex items-center justify-between pb-3 border-b border-neutral-100">
+              <div>
+                <h3 className="text-base font-bold text-neutral-900">
+                  Beri Ulasan & Rating Kreator
+                </h3>
+                <p className="text-xs text-neutral-500 mt-0.5">
+                  Proyek telah selesai. Ulasan Anda akan tercatat di profil publik kreator.
+                </p>
+              </div>
+              <button
+                onClick={() => setIsReviewModalOpen(false)}
+                className="text-neutral-400 hover:text-neutral-600 text-sm p-1 cursor-pointer"
+              >
+                ✕
+              </button>
+            </div>
+
+            <form onSubmit={handleSendReview} className="space-y-4">
+              <div>
+                <label className="block text-xs font-semibold text-neutral-700 mb-1.5">
+                  Rating Kualitas Kerja
+                </label>
+                <div className="flex items-center gap-2">
+                  {[1, 2, 3, 4, 5].map((star) => (
+                    <button
+                      key={star}
+                      type="button"
+                      onClick={() => setReviewRating(star)}
+                      className="p-1 hover:scale-110 transition cursor-pointer"
+                    >
+                      <Star
+                        className={`w-6 h-6 ${
+                          star <= reviewRating
+                            ? 'text-amber-400 fill-amber-400'
+                            : 'text-neutral-300'
+                        }`}
+                      />
+                    </button>
+                  ))}
+                  <span className="text-xs font-bold text-neutral-700 ml-2">
+                    {reviewRating} dari 5 Bintang
+                  </span>
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-neutral-700 mb-1.5">
+                  Testimoni / Catatan Kepuasan
+                </label>
+                <textarea
+                  required
+                  rows={4}
+                  placeholder="Ceritakan pengalaman kolaborasi Anda: komunikasi, ketepatan waktu, dan kualitas konten yang dihasilkan..."
+                  value={reviewComment}
+                  onChange={(e) => setReviewComment(e.target.value)}
+                  className="w-full text-xs p-3 rounded-xl border border-neutral-200 focus:outline-hidden focus:border-primary"
+                />
+              </div>
+
+              <div className="flex items-center justify-end gap-2 pt-2">
+                <button
+                  type="button"
+                  onClick={() => setIsReviewModalOpen(false)}
+                  className="px-4 py-2 rounded-xl text-xs font-medium text-neutral-600 hover:bg-neutral-100 cursor-pointer"
+                >
+                  Nanti Saja
+                </button>
+                <button
+                  type="submit"
+                  disabled={isSubmittingReview || !reviewComment.trim()}
+                  className="px-5 py-2.5 rounded-xl bg-primary hover:bg-[#123B8C] disabled:opacity-50 text-white text-xs font-semibold cursor-pointer shadow-xs flex items-center gap-1.5"
+                >
+                  {isSubmittingReview ? (
+                    <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+                  ) : (
+                    <CheckCircle2 className="w-3.5 h-3.5" />
+                  )}
+                  <span>Kirim Ulasan</span>
+                </button>
               </div>
             </form>
           </div>

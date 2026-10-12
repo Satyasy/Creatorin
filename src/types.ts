@@ -418,6 +418,7 @@ export type AssessmentStatus = 'not_started' | 'draft' | 'completed';
 
 export interface SchoolInfo {
   id: string;
+  profileId?: string;
   name: string;
   slug: string;
   logoUrl?: string;
