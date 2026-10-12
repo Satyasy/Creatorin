@@ -1,15 +1,16 @@
 'use client';
 
 import React, { useState, useMemo, useEffect } from 'react';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/providers/AuthProvider';
 import { creatorService } from '@/services/creatorService';
-import { Creator, CreatorCategory, AuthState, ActivePage } from '@/types';
+import { Creator, CreatorCategory, CreatorService, AuthState, ActivePage } from '@/types';
 import { ProfileModal } from '@/components/modals/ProfileModal';
 import { ProjectBriefModal } from '@/components/modals/ProjectBriefModal';
+import { ServiceDetailModal } from '@/components/modals/ServiceDetailModal';
 import { ScrollReveal } from '@/components/common/ScrollReveal';
 import { 
-  ShieldCheck, 
   Star, 
   Check, 
   MapPin, 
@@ -27,7 +28,9 @@ import {
   Filter,
   Eye,
   Heart,
-  Share2
+  Share2,
+  User,
+  Package
 } from 'lucide-react';
 
 interface LandingPageProps {
@@ -83,6 +86,10 @@ export const LandingPage: React.FC<LandingPageProps> = ({ currentUser: propUser,
   const [selectedCreatorForModal, setSelectedCreatorForModal] = useState<Creator | null>(null);
   const [targetCreatorForBrief, setTargetCreatorForBrief] = useState<Creator | null>(null);
   const [isBriefModalOpen, setIsBriefModalOpen] = useState(false);
+  const [selectedServiceForDetail, setSelectedServiceForDetail] = useState<{
+    service: CreatorService;
+    creator: Creator;
+  } | null>(null);
 
   // Toggle Save Creator
   const toggleSave = (id: string, e: React.MouseEvent) => {
@@ -103,6 +110,30 @@ export const LandingPage: React.FC<LandingPageProps> = ({ currentUser: propUser,
     if (e) e.stopPropagation();
     setTargetCreatorForBrief(creator || null);
     setIsBriefModalOpen(true);
+  };
+
+  // Open Service Detail Modal
+  const handleServiceClick = (service: Partial<CreatorService>, creator: Creator) => {
+    const priceNum = typeof service.price === 'number'
+      ? service.price
+      : parseInt((service.formattedPrice || '').replace(/[^0-9]/g, '')) || 350000;
+
+    const fullService: CreatorService = {
+      id: service.id || `srv-${Date.now()}`,
+      title: service.title || 'Layanan Kreatif Profesional',
+      price: priceNum,
+      formattedPrice: service.formattedPrice || `Rp${priceNum.toLocaleString('id-ID')}`,
+      deliveryDays: service.deliveryDays || '3 Hari Kerja',
+      tag: service.tag || 'Desain',
+      coverImage: service.coverImage || service.galleryImages?.[0] || '/creatorin/service-pattern-1.png',
+      description: service.description || 'Pengerjaan aset kreatif profesional dengan jaminan kepatuhan brief bisnis, komunikasi aktif, dan penyelarasan kebutuhan proyek Anda.',
+      revisions: service.revisions || '2x Revisi Gratis',
+      features: service.features || ['Revisi Cepat', 'File Resolusi Tinggi Siap Pakai', 'Konsultasi Kebutuhan Brand'],
+      galleryImages: service.galleryImages || (service.coverImage ? [service.coverImage] : []),
+      category: service.category || service.tag,
+    };
+
+    setSelectedServiceForDetail({ service: fullService, creator });
   };
 
   // Filtered Creators list
@@ -192,62 +223,32 @@ export const LandingPage: React.FC<LandingPageProps> = ({ currentUser: propUser,
       {/* Main Content Area */}
       <main className="flex-1 max-w-[1440px] w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10">
         
-        {/* Breadcrumbs Navigation */}
-        <div className="flex items-center gap-2 text-xs font-medium text-neutral-400 mb-2.5">
-          <button 
-            onClick={() => navigateTo('landing', '/landing')}
-            className="hover:text-neutral-900 transition cursor-pointer"
+        {/* Sub-Navigation Switcher Tabs for UMKM Jelajah */}
+        <div className="flex items-center gap-2 sm:gap-3 mb-6 overflow-x-auto no-scrollbar">
+          <Link
+            href="/jelajah/kreator"
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-xs sm:text-sm font-semibold transition-all bg-[#F4F5F7] text-[#0D0C22] shadow-xs ring-1 ring-black/5 font-bold"
           >
-            Jelajah
-          </button>
-          <span>/</span>
-          <span className="text-neutral-800 font-semibold">Profil Kreator</span>
+            <User className="w-4 h-4 text-inherit" />
+            <span>Creator</span>
+          </Link>
+
+          <Link
+            href="/jelajah/layanan"
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-xs sm:text-sm font-semibold transition-all text-[#55576A] hover:text-[#0D0C22] hover:bg-[#F8F9FC]"
+          >
+            <Package className="w-4 h-4 text-inherit" />
+            <span>Layanan</span>
+          </Link>
+
+          <Link
+            href="/jelajah/proyek"
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-xs sm:text-sm font-semibold transition-all text-[#55576A] hover:text-[#0D0C22] hover:bg-[#F8F9FC]"
+          >
+            <Layers className="w-4 h-4 text-inherit" />
+            <span>Proyek</span>
+          </Link>
         </div>
-
-        {/* Page Title & Subtitle Header */}
-        <ScrollReveal distance={20} duration={600}>
-          <div className="mb-6 space-y-3">
-            <div>
-              <h1 className="text-2xl sm:text-3xl lg:text-[40px] font-bold text-[#0F172A] tracking-tight leading-tight lg:leading-[48px]">
-                Jelajah Profil Kreator & Talenta Terverifikasi
-              </h1>
-              <p className="text-sm sm:text-base text-[#64748B] mt-2 max-w-2xl leading-normal font-normal">
-                Telusuri portofolio karya asli, bandingkan Career Score & performa nyata kreator, dan hubungi langsung.
-              </p>
-            </div>
-
-            {/* Popular Tag Pills */}
-            <div className="pt-2 flex flex-wrap items-center gap-1.5">
-              <span className="text-xs font-semibold text-[#64748B] mr-1 flex items-center gap-1">
-                <span>Tagar Populer:</span>
-              </span>
-              {POPULAR_TAGS.map((tag) => {
-                const isSelected = selectedTag === tag;
-                return (
-                  <button
-                    key={tag}
-                    onClick={() => setSelectedTag(isSelected ? null : tag)}
-                    className={`px-3 py-1 rounded-full text-xs font-medium border transition-all cursor-pointer ${
-                      isSelected 
-                        ? 'bg-[#0B1F3A] text-white border-[#0B1F3A] shadow-2xs font-semibold' 
-                        : 'bg-white text-[#64748B] border-[#E2E8F0] hover:border-[#64748B] hover:text-[#0F172A] hover:bg-[#F8FAFC]'
-                    }`}
-                  >
-                    {tag}
-                  </button>
-                );
-              })}
-              {selectedTag && (
-                <button
-                  onClick={() => setSelectedTag(null)}
-                  className="text-xs text-[#1D4ED8] font-semibold hover:underline ml-1.5 cursor-pointer"
-                >
-                  Reset Tagar
-                </button>
-              )}
-            </div>
-          </div>
-        </ScrollReveal>
 
         {/* Section Heading: Cari Talenta Berdasarkan Kategori & Filter Toolbar */}
         <div className="pt-4 pb-4 border-t border-[#E2E8F0]">
@@ -489,18 +490,13 @@ export const LandingPage: React.FC<LandingPageProps> = ({ currentUser: propUser,
                     {/* Identitas Kreator */}
                     <div className="flex items-start sm:items-center gap-4">
                       
-                      {/* Avatar Kreator dengan Badge */}
+                      {/* Avatar Kreator */}
                       <div className="relative shrink-0">
                         <img
                           src={creator.avatar}
                           alt={creator.name}
                           className="w-14 h-14 sm:w-16 sm:h-16 rounded-full object-cover ring-2 ring-neutral-100"
                         />
-                        {creator.careerScore.overall >= 95 && (
-                          <div className="absolute -bottom-1 -right-1 bg-[#0d0c22] text-white p-1 rounded-full ring-2 ring-white">
-                            <ShieldCheck className="w-3 h-3 text-amber-400" />
-                          </div>
-                        )}
                       </div>
 
                       {/* Detail Nama & Status Promoted */}
@@ -509,21 +505,6 @@ export const LandingPage: React.FC<LandingPageProps> = ({ currentUser: propUser,
                           <h3 className="text-lg sm:text-xl font-bold tracking-tight text-[#0d0c22]">
                             {creator.name}
                           </h3>
-
-                          {creator.proBadge && (
-                            <span
-                              className="uppercase px-2 py-0.5 rounded bg-[#0d0c22] tracking-[0.62px] leading-[15px]"
-                              style={{
-                                color: '#FFF',
-                                fontFamily: '"SF Pro", -apple-system, BlinkMacSystemFont, sans-serif',
-                                fontSize: '10px',
-                                fontStyle: 'normal',
-                                fontWeight: 900,
-                              }}
-                            >
-                              PRO
-                            </span>
-                          )}
 
                           <div className="flex items-center gap-1 text-xs font-bold text-neutral-800">
                             <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
@@ -612,7 +593,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ currentUser: propUser,
                                 id={`service-card-${service.id}`}
                                 onClick={(e) => {
                                   e.stopPropagation();
-                                  handleOpenBrief(creator, e);
+                                  handleServiceClick(service, creator);
                                 }}
                                 className="group/srv flex flex-col cursor-pointer text-left select-none"
                               >
@@ -698,6 +679,31 @@ export const LandingPage: React.FC<LandingPageProps> = ({ currentUser: propUser,
         onClose={() => setIsBriefModalOpen(false)}
         targetCreator={targetCreatorForBrief}
       />
+
+      {/* Service Detail Modal (Pop up dari bawah) */}
+      {selectedServiceForDetail && (
+        <ServiceDetailModal
+          service={selectedServiceForDetail.service}
+          creator={selectedServiceForDetail.creator}
+          onClose={() => setSelectedServiceForDetail(null)}
+          onOrderService={(srv, cr) => {
+            setSelectedServiceForDetail(null);
+            router.push(`/chat?creatorId=${cr.id}`);
+          }}
+          onViewCreatorProfile={(cr) => {
+            setSelectedServiceForDetail(null);
+            if (onViewCreatorProfile) {
+              onViewCreatorProfile(cr);
+            } else {
+              router.push(`/creator/${cr.id}`);
+            }
+          }}
+          onNavigate={onNavigate}
+          onSelectOtherService={(newSrv) => {
+            setSelectedServiceForDetail((prev) => (prev ? { ...prev, service: newSrv } : null));
+          }}
+        />
+      )}
 
     </div>
   );

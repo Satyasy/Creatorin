@@ -991,8 +991,8 @@ export const UMKMDashboard = () => {
       {/* Symmetrical Hero Section matching Figma 4816-18898 */}
       <HomeHeroSection
         onExploreClick={() => router.push('/jelajah/kreator')}
-        onSecondaryClick={() => setIsBriefModalOpen(true)}
-        secondaryText="Bergabung Creatorin"
+        onSecondaryClick={user ? () => setIsBriefModalOpen(true) : () => router.push('/sign-in')}
+        secondaryText={user ? 'Buat Brief Proyek' : 'Bergabung Creatorin'}
       />
 
       {/* Main Content Area */}
@@ -1103,9 +1103,6 @@ export const UMKMDashboard = () => {
                           className="w-12 h-12 rounded-full object-cover ring-1 ring-black/5"
                           loading="lazy"
                         />
-                        <div className="absolute -bottom-0.5 -right-0.5 w-4 h-4 rounded-full bg-[#0D0C22] text-white flex items-center justify-center text-[9px] ring-2 ring-white">
-                          <Check className="w-2.5 h-2.5 stroke-[3]" />
-                        </div>
                       </div>
 
                       <div className="min-w-0">
@@ -1116,11 +1113,6 @@ export const UMKMDashboard = () => {
                           >
                             {creator.name}
                           </h3>
-                          {creator.proBadge && (
-                            <span className="bg-[#0D0C22] text-white text-[11px] font-bold px-1.5 py-0.5 rounded-sm tracking-wide leading-none">
-                              PRO+
-                            </span>
-                          )}
                           <span className="inline-flex items-center gap-1 text-xs font-semibold text-[#0D0C22]">
                             <Star className="w-3.5 h-3.5 fill-[#F59E0B] text-[#F59E0B]" />
                             <span>{creator.rating}</span>
@@ -1179,7 +1171,10 @@ export const UMKMDashboard = () => {
                     {creator.services.map((service, idx) => (
                       <div
                         key={service.id || idx}
-                        onClick={() => handleServiceClick(service, creator)}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleServiceClick(service, creator);
+                        }}
                         className="rounded-xl overflow-hidden border border-[#E1E3EA] bg-white group cursor-pointer hover:shadow-md hover:border-[#A9C3FF] transition-all"
                       >
                         <div className="aspect-[16/10] relative overflow-hidden bg-neutral-100">
@@ -1189,7 +1184,7 @@ export const UMKMDashboard = () => {
                           <img
                             src={service.image}
                             alt={service.title}
-                            className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                            className="w-full h-full object-cover"
                             loading="lazy"
                           />
                         </div>
@@ -1259,7 +1254,7 @@ export const UMKMDashboard = () => {
                         <img
                           src={service.image}
                           alt={service.title}
-                          className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                          className="w-full h-full object-cover"
                           loading="lazy"
                         />
                       </div>
@@ -1371,12 +1366,12 @@ export const UMKMDashboard = () => {
                     <img
                       src={project.mediaUrl}
                       alt={project.title}
-                      className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                      className="w-full h-full object-cover"
                       loading="lazy"
                     />
 
                     {/* Top Right Video Play Badge */}
-                    <div className="absolute top-3 right-3 w-7 h-7 rounded-full bg-black/50 backdrop-blur-xs flex items-center justify-center text-white shadow-xs group-hover:scale-110 transition-transform">
+                    <div className="absolute top-3 right-3 w-7 h-7 rounded-full bg-black/50 backdrop-blur-xs flex items-center justify-center text-white shadow-xs">
                       <Play className="w-3.5 h-3.5 fill-white text-white ml-0.5" />
                     </div>
 
@@ -1466,6 +1461,9 @@ export const UMKMDashboard = () => {
           onViewCreatorProfile={(cr) => {
             setSelectedService(null);
             router.push(`/creator/${cr.id}`);
+          }}
+          onSelectOtherService={(newSrv) => {
+            setSelectedService((prev) => (prev ? { ...prev, service: newSrv } : null));
           }}
         />
       )}

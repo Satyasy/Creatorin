@@ -54,30 +54,11 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({ creator, isOpen = tr
                 alt={creator.name}
                 className="w-20 h-20 rounded-full object-cover ring-4 ring-neutral-100"
               />
-              {creator.careerScore.overall >= 90 && (
-                <span className="absolute -bottom-1 -right-1 bg-[#0B1F3A] text-white p-1 rounded-full ring-2 ring-white">
-                  <ShieldCheck className="w-3.5 h-3.5 text-amber-400" />
-                </span>
-              )}
             </div>
 
             <div>
               <div className="flex flex-wrap items-center gap-2">
                 <h3 className="text-2xl font-bold text-[#171717]">{creator.name}</h3>
-                {creator.proBadge && (
-                  <span
-                    className="uppercase px-2 py-0.5 rounded bg-[#0B1F3A] tracking-[0.62px] leading-[15px]"
-                    style={{
-                      color: '#FFF',
-                      fontFamily: '"SF Pro", -apple-system, BlinkMacSystemFont, sans-serif',
-                      fontSize: '10px',
-                      fontStyle: 'normal',
-                      fontWeight: 900,
-                    }}
-                  >
-                    PRO
-                  </span>
-                )}
                 <span className="inline-flex items-center gap-1 text-xs font-bold text-neutral-800">
                   <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
                   {creator.careerScore.clientRating}

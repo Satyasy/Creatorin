@@ -27,7 +27,8 @@ import {
   Layers,
   Filter,
   Users,
-  Edit3
+  Edit3,
+  CreditCard
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/providers/AuthProvider';
@@ -1009,140 +1010,202 @@ export const ProjectBriefsPage: React.FC<ProjectBriefsPageProps> = ({
       {/* MODAL: EDIT BRIEF                                                  */}
       {/* =================================================================== */}
       {editingBrief && (
-        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto">
-          <div className="bg-white rounded-3xl max-w-lg w-full p-6 sm:p-7 space-y-4 shadow-2xl relative animate-in fade-in zoom-in-95 my-8">
-            <div className="flex items-center justify-between pb-3 border-b border-neutral-100">
-              <div className="flex items-center gap-2.5">
-                <div className="w-9 h-9 rounded-xl bg-[#f3f3f4] text-[#171717] flex items-center justify-center">
-                  <Edit3 className="w-5 h-5 text-blue-600" />
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-3 sm:p-5 md:p-6 overflow-y-auto animate-in fade-in duration-200">
+          <div className="bg-white rounded-[24px] sm:rounded-[28px] border border-[#E5E5E5] shadow-2xl max-w-4xl lg:max-w-[940px] w-full overflow-hidden text-left max-h-[92vh] flex flex-col animate-in zoom-in-95 duration-200">
+            {/* Top Header Bar */}
+            <div className="px-6 sm:px-8 py-5 border-b border-[#E5E5E5] flex items-center justify-between bg-white/95">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-blue-50 text-[#155DFC] flex items-center justify-center shrink-0">
+                  <Edit3 className="w-5 h-5" />
                 </div>
                 <div>
-                  <h3 className="text-base font-bold text-[#171717]">Edit Brief Proyek</h3>
-                  <p className="text-xs text-neutral-500">Perbarui rincian kebutuhan dan kriteria kolaborasi brief</p>
+                  <h3 className="text-base sm:text-lg font-bold text-[#0D0C22]">Edit Brief Proyek</h3>
+                  <p className="text-xs text-neutral-500">Perbarui rincian kebutuhan dan kriteria kolaborasi brief proyek</p>
                 </div>
               </div>
               <button
                 type="button"
                 onClick={() => setEditingBrief(null)}
-                className="w-8 h-8 rounded-full hover:bg-neutral-100 flex items-center justify-center text-neutral-400 hover:text-neutral-700 cursor-pointer"
+                className="w-9 h-9 rounded-full hover:bg-neutral-100 flex items-center justify-center text-neutral-400 hover:text-neutral-700 transition cursor-pointer"
+                aria-label="Tutup modal"
               >
-                <X className="w-4 h-4" />
+                <X className="w-5 h-5" />
               </button>
             </div>
 
-            <form onSubmit={handleSaveEditBrief} className="space-y-4 text-xs sm:text-sm">
-              <div>
-                <label className="block text-xs font-semibold text-neutral-700 mb-1">Judul Brief Proyek</label>
-                <input
-                  type="text"
-                  value={editBriefForm.title}
-                  onChange={(e) => setEditBriefForm({ ...editBriefForm, title: e.target.value })}
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-neutral-200 focus:border-neutral-900 focus:outline-hidden"
-                  required
-                />
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <div>
-                  <label className="block text-xs font-semibold text-neutral-700 mb-1">Kategori Proyek</label>
-                  <select
-                    value={editBriefForm.category}
-                    onChange={(e) => setEditBriefForm({ ...editBriefForm, category: e.target.value })}
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-neutral-200 focus:border-neutral-900 focus:outline-hidden bg-white"
-                  >
-                    <option value="Reels Instagram">Reels Instagram</option>
-                    <option value="Video TikTok">Video TikTok</option>
-                    <option value="Foto Produk">Foto Produk</option>
-                    <option value="Logo & Branding">Logo & Branding</option>
-                    <option value="Feed Instagram">Feed Instagram</option>
-                    <option value="UI/UX Design">UI/UX Design</option>
-                  </select>
+            {/* Modal Body */}
+            <div className="px-6 sm:px-8 py-6 sm:py-8 overflow-y-auto flex-1">
+              <form onSubmit={handleSaveEditBrief} className="space-y-6">
+                
+                {/* 1. Category Dropdown */}
+                <div className="relative inline-block">
+                  <div className="h-[38px] px-3.5 rounded-xl border border-[#CFCFCF]/90 bg-[#FBFBFB]/80 text-black flex items-center gap-2.5 shadow-[0_1px_0_0_rgba(0,0,0,0.05)]">
+                    <Layers className="w-4 h-4 text-neutral-700 shrink-0" />
+                    <select
+                      value={editBriefForm.category}
+                      onChange={(e) => setEditBriefForm({ ...editBriefForm, category: e.target.value })}
+                      className="text-xs sm:text-sm font-bold text-[#0D0C22] bg-transparent outline-none cursor-pointer"
+                    >
+                      <option value="Video Reels & TikTok">Video Reels & TikTok</option>
+                      <option value="Reels Instagram">Reels Instagram</option>
+                      <option value="Video TikTok">Video TikTok</option>
+                      <option value="Foto Produk">Foto Produk</option>
+                      <option value="Logo & Branding">Logo & Branding</option>
+                      <option value="Feed Instagram">Feed Instagram</option>
+                      <option value="UI/UX Design">UI/UX Design</option>
+                      <option value="Packaging & Kemasan">Packaging & Kemasan</option>
+                      <option value="Banner & Poster">Banner & Poster</option>
+                    </select>
+                  </div>
                 </div>
 
-                <div>
-                  <label className="block text-xs font-semibold text-neutral-700 mb-1">Tenggat Waktu</label>
+                {/* 2. Title Input */}
+                <div className="border-b border-[#E5E5E5] pb-3">
                   <input
                     type="text"
-                    value={editBriefForm.deadline}
-                    onChange={(e) => setEditBriefForm({ ...editBriefForm, deadline: e.target.value })}
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-neutral-200 focus:border-neutral-900 focus:outline-hidden"
                     required
+                    value={editBriefForm.title}
+                    onChange={(e) => setEditBriefForm({ ...editBriefForm, title: e.target.value })}
+                    placeholder="Ketik judul proyek..."
+                    className="w-full text-2xl sm:text-3xl md:text-[34px] leading-tight font-extrabold tracking-tight text-[#0D0C22] placeholder:text-[#D4D4D4] outline-none bg-transparent"
                   />
                 </div>
-              </div>
 
-              <div>
-                <label className="block text-xs font-semibold text-neutral-700 mb-1">Estimasi Anggaran (Rp)</label>
-                <input
-                  type="number"
-                  value={editBriefForm.budgetMin}
-                  onChange={(e) => setEditBriefForm({ ...editBriefForm, budgetMin: e.target.value })}
-                  placeholder="Contoh: 1500000"
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-neutral-200 focus:border-neutral-900 focus:outline-hidden"
-                  required
-                />
-              </div>
+                {/* 3. Three Metrics Grid */}
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5 sm:gap-4">
+                  {/* Card 1: HARGA (RP) */}
+                  <div className="rounded-2xl border border-[#E5E5E5] bg-white p-4 shadow-[0_1px_0_0_rgba(0,0,0,0.05)] flex flex-col justify-between gap-3">
+                    <div className="flex items-center justify-between">
+                      <span className="text-[11px] font-bold text-[#737373] tracking-[0.055em] uppercase">
+                        Harga (Rp)
+                      </span>
+                      <div className="w-8 h-8 rounded-xl bg-[#F5F5F5] flex items-center justify-center text-[#737373]">
+                        <CreditCard className="w-4 h-4" />
+                      </div>
+                    </div>
+                    <div className="h-[42px] px-3 rounded-xl border border-[#E5E5E5] bg-white flex items-center gap-1.5 focus-within:border-[#155DFC] focus-within:ring-2 focus-within:ring-[#155DFC]/10 transition-all">
+                      <span className="text-xs font-bold text-[#A1A1A1] select-none">Rp</span>
+                      <input
+                        type="number"
+                        required
+                        value={editBriefForm.budgetMin}
+                        onChange={(e) => setEditBriefForm({ ...editBriefForm, budgetMin: e.target.value })}
+                        placeholder="0"
+                        className="text-base font-black text-[#0D0C22] placeholder:text-[#D4D4D4] w-full bg-transparent outline-none tracking-tight"
+                      />
+                    </div>
+                  </div>
 
-              <div>
-                <label className="block text-xs font-semibold text-neutral-700 mb-1">Deskripsi Kebutuhan & Konsep</label>
-                <textarea
-                  rows={3}
-                  value={editBriefForm.description}
-                  onChange={(e) => setEditBriefForm({ ...editBriefForm, description: e.target.value })}
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-neutral-200 focus:border-neutral-900 focus:outline-hidden resize-none"
-                  required
-                />
-              </div>
+                  {/* Card 2: WAKTU PENGERJAAN */}
+                  <div className="rounded-2xl border border-[#E5E5E5] bg-white p-4 shadow-[0_1px_0_0_rgba(0,0,0,0.05)] flex flex-col justify-between gap-3">
+                    <div className="flex items-center justify-between">
+                      <span className="text-[11px] font-bold text-[#737373] tracking-[0.055em] uppercase">
+                        Waktu Pengerjaan
+                      </span>
+                      <div className="w-8 h-8 rounded-xl bg-[#F5F5F5] flex items-center justify-center text-[#737373]">
+                        <Clock className="w-4 h-4" />
+                      </div>
+                    </div>
+                    <div className="h-[42px] px-3 rounded-xl border border-[#E5E5E5] bg-white flex items-center gap-2 focus-within:border-[#155DFC] focus-within:ring-2 focus-within:ring-[#155DFC]/10 transition-all">
+                      <input
+                        type="text"
+                        required
+                        value={editBriefForm.deadline}
+                        onChange={(e) => setEditBriefForm({ ...editBriefForm, deadline: e.target.value })}
+                        placeholder="3 Hari Kerja"
+                        className="text-base font-black text-[#0D0C22] placeholder:text-[#D4D4D4] w-full bg-transparent outline-none tracking-tight"
+                      />
+                    </div>
+                  </div>
 
-              <div>
-                <label className="block text-xs font-semibold text-neutral-700 mb-1">Daftar Hasil yang Diharapkan (1 per baris)</label>
-                <textarea
-                  rows={2}
-                  value={editBriefForm.deliverables}
-                  onChange={(e) => setEditBriefForm({ ...editBriefForm, deliverables: e.target.value })}
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-neutral-200 focus:border-neutral-900 focus:outline-hidden resize-none font-mono text-xs"
-                />
-              </div>
+                  {/* Card 3: PELAMAR TERDAFTAR */}
+                  <div className="rounded-2xl border border-[#E5E5E5]/90 bg-[#FAFAFA]/70 p-4 flex flex-col justify-between gap-3">
+                    <div className="flex items-center justify-between">
+                      <span className="text-[11px] font-bold text-[#A1A1A1] tracking-[0.055em] uppercase">
+                        Pelamar Terdaftar
+                      </span>
+                      <div className="w-8 h-8 rounded-xl bg-[#EFF6FF] flex items-center justify-center text-[#155DFC]">
+                        <Users className="w-4 h-4" />
+                      </div>
+                    </div>
+                    <div className="flex items-baseline gap-1.5 h-[42px] items-center">
+                      <span className="text-2xl font-black text-[#0D0C22] tracking-tight">
+                        {editingBrief.proposalsCount || 0}
+                      </span>
+                      <span className="text-sm font-semibold text-[#737373]">
+                        Pelamar
+                      </span>
+                    </div>
+                  </div>
+                </div>
 
-              <div>
-                <label className="block text-xs font-semibold text-neutral-700 mb-1">Skill yang Dibutuhkan (Pisahkan dengan koma)</label>
-                <input
-                  type="text"
-                  value={editBriefForm.skills}
-                  onChange={(e) => setEditBriefForm({ ...editBriefForm, skills: e.target.value })}
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-neutral-200 focus:border-neutral-900 focus:outline-hidden"
-                />
-              </div>
+                {/* 4. Deskripsi Proyek */}
+                <div>
+                  <label className="block text-xs font-bold text-[#737373] tracking-[0.05em] uppercase mb-2">
+                    Deskripsi Proyek
+                  </label>
+                  <div className="rounded-2xl border border-[#E5E5E5] bg-[#FAFAFA] p-4 focus-within:bg-white focus-within:border-[#155DFC] focus-within:ring-2 focus-within:ring-[#155DFC]/10 transition-all">
+                    <textarea
+                      rows={4}
+                      required
+                      value={editBriefForm.description}
+                      onChange={(e) => setEditBriefForm({ ...editBriefForm, description: e.target.value })}
+                      placeholder="Tuliskan detail kebutuhan proyek, konsep, atau tujuan yang ingin dicapai..."
+                      className="w-full min-h-[140px] bg-transparent outline-none text-sm sm:text-base text-[#0D0C22] placeholder:text-[#A1A1A1] leading-relaxed resize-y"
+                    />
+                  </div>
+                </div>
 
-              <div className="flex items-center gap-2 p-3 rounded-2xl bg-neutral-50 border border-neutral-200/80">
-                <input
-                  type="checkbox"
-                  id="edit-shipping-check-briefs"
-                  checked={editBriefForm.productShipping}
-                  onChange={(e) => setEditBriefForm({ ...editBriefForm, productShipping: e.target.checked })}
-                  className="w-4 h-4 text-blue-600 rounded-sm"
-                />
-                <label htmlFor="edit-shipping-check-briefs" className="text-xs text-neutral-700 font-medium cursor-pointer">
-                  UMKM akan mengirimkan produk fisik gratis ke studio kreator
-                </label>
-              </div>
+                {/* 5. Tagar & Deliverables */}
+                <div>
+                  <label className="block text-xs font-bold text-[#737373] tracking-[0.05em] uppercase mb-2">
+                    Tagar & Output yang Diharapkan
+                  </label>
+                  <div className="rounded-2xl border border-[#E5E5E5] bg-[#FAFAFA] p-3 focus-within:bg-white focus-within:border-[#155DFC] focus-within:ring-2 focus-within:ring-[#155DFC]/10 transition-all">
+                    <input
+                      type="text"
+                      value={editBriefForm.skills}
+                      onChange={(e) => setEditBriefForm({ ...editBriefForm, skills: e.target.value })}
+                      placeholder="Ketik tagar atau skill yang dibutuhkan (pisahkan dengan koma)"
+                      className="w-full bg-transparent outline-none text-xs sm:text-sm text-[#0D0C22] placeholder:text-[#A1A1A1]"
+                    />
+                  </div>
+                </div>
 
-              <div className="flex items-center justify-end gap-2.5 pt-3 border-t border-neutral-100">
-                <button
-                  type="button"
-                  onClick={() => setEditingBrief(null)}
-                  className="px-4 py-2 rounded-xl border border-[#E2E8F0] text-neutral-700 font-semibold hover:bg-neutral-50 transition cursor-pointer"
-                >
-                  Batal
-                </button>
-                <button
-                  type="submit"
-                  className="px-5 py-2 rounded-xl bg-[#0B1F3A] hover:bg-[#123B8C] text-white font-semibold transition cursor-pointer shadow-xs"
-                >
-                  Simpan Perubahan
-                </button>
-              </div>
-            </form>
+                {/* Product shipping checkbox */}
+                <div className="flex items-center gap-2.5 p-3 rounded-2xl bg-neutral-50 border border-neutral-200/80">
+                  <input
+                    type="checkbox"
+                    id="edit-shipping-check-briefs"
+                    checked={editBriefForm.productShipping}
+                    onChange={(e) => setEditBriefForm({ ...editBriefForm, productShipping: e.target.checked })}
+                    className="w-4 h-4 text-blue-600 rounded-sm cursor-pointer"
+                  />
+                  <label htmlFor="edit-shipping-check-briefs" className="text-xs text-neutral-700 font-medium cursor-pointer">
+                    UMKM akan mengirimkan sampel produk fisik ke studio kreator
+                  </label>
+                </div>
+
+                {/* Footer Buttons */}
+                <div className="flex items-center justify-end gap-3 pt-4 border-t border-[#E5E5E5]">
+                  <button
+                    type="button"
+                    onClick={() => setEditingBrief(null)}
+                    className="px-5 py-2.5 rounded-xl border border-[#E2E8F0] text-neutral-700 font-semibold text-xs sm:text-sm hover:bg-neutral-50 transition cursor-pointer"
+                  >
+                    Batal
+                  </button>
+                  <button
+                    type="submit"
+                    className="px-6 py-2.5 rounded-xl bg-[#0B1F3A] hover:bg-[#123B8C] text-white font-semibold text-xs sm:text-sm transition cursor-pointer shadow-xs flex items-center gap-2"
+                  >
+                    <Check className="w-4 h-4" />
+                    <span>Simpan Perubahan</span>
+                  </button>
+                </div>
+
+              </form>
+            </div>
           </div>
         </div>
       )}

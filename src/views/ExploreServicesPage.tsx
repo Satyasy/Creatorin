@@ -170,20 +170,456 @@ export const ExploreServicesPage: React.FC<ExploreServicesPageProps> = ({
     selectedScore
   ]);
 
+const DEFAULT_SERVICES: ServiceWithCreator[] = [
+  {
+    id: 'srv-1',
+    title: '1x Video TikTok UGC & Review Viral',
+    description: 'Pengerjaan profesional dengan jaminan kepatuhan brief dan revisi cepat.',
+    price: 1500000,
+    formattedPrice: 'Rp1.500.000',
+    deliveryDays: '2 Hari Kerja',
+    tag: 'TIKTOK UGC',
+    coverImage: 'https://images.unsplash.com/photo-1556228720-195a672e8a03?w=800&auto=format&fit=crop&q=80',
+    creator: {
+      id: 'c-sobakhul',
+      name: 'Sobakhul Munir Siroj',
+      username: 'sobakhulmunir',
+      handle: '@sobakhulmunir',
+      avatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150',
+      category: 'Video',
+      roleTitle: 'TikTok & Short-Form Specialist',
+      bio: 'Konten kreator TikTok viral dengan pengalaman kolaborasi brand terpercaya.',
+      location: 'Bandung',
+      startingRate: 1500000,
+      formattedRate: 'Rp1.500.000',
+      careerScore: { overall: 96, deadlineAccuracy: 98, revisionRate: 1.0, completionRate: 100, clientRating: 4.9, completedProjects: 42, tier: 'Top Tier' },
+      skills: ['TikTok UGC', 'Video Viral', 'Short-form'],
+      joinedDate: '2023',
+    }
+  },
+  {
+    id: 'srv-2',
+    title: '3x Reels Instagram Hook Kuat & Edukasi Produk',
+    description: 'Paket konten video reels vertikal dengan visual hook dalam 3 detik pertama.',
+    price: 2500000,
+    formattedPrice: 'Rp2.500.000',
+    deliveryDays: '3 Hari Kerja',
+    tag: 'REELS INSTAGRAM',
+    coverImage: 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=800&auto=format&fit=crop&q=80',
+    creator: {
+      id: 'c-sarah',
+      name: 'Sarah Amelia',
+      username: 'sarah.amelia',
+      handle: '@sarah.amelia',
+      avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150',
+      category: 'Video',
+      roleTitle: 'UGC & Video Content Creator',
+      bio: 'Spesialis video TikTok & Reels berorientasi konversi untuk produk kecantikan.',
+      location: 'Jakarta Selatan',
+      startingRate: 250000,
+      formattedRate: 'Rp250.000',
+      careerScore: { overall: 96, deadlineAccuracy: 98, revisionRate: 1.1, completionRate: 100, clientRating: 4.9, completedProjects: 38, tier: 'Top Tier' },
+      skills: ['Video TikTok', 'Reels Instagram', 'UGC Content'],
+      joinedDate: '2023',
+    }
+  },
+  {
+    id: 'srv-3',
+    title: 'Desain Identitas Brand & Logo UMKM Siap Pakai',
+    description: 'Paket logo profesional lengkap dengan color guide, font pairing, dan master file.',
+    price: 850000,
+    formattedPrice: 'Rp850.000',
+    deliveryDays: '3 Hari Kerja',
+    tag: 'LOGO & BRANDING',
+    coverImage: 'https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?w=800&auto=format&fit=crop&q=80',
+    creator: {
+      id: 'c-kevin',
+      name: 'Kevin Sanjaya',
+      username: 'kevinsanjaya',
+      handle: '@kevinsanjaya',
+      avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150',
+      category: 'Video',
+      roleTitle: 'Motion Designer & Visual Branding',
+      bio: 'Membantu UMKM membangun identitas visual modern.',
+      location: 'Bandung',
+      startingRate: 400000,
+      formattedRate: 'Rp400.000',
+      careerScore: { overall: 98, deadlineAccuracy: 100, revisionRate: 1.0, completionRate: 100, clientRating: 5.0, completedProjects: 45, tier: 'Top Tier' },
+      skills: ['Motion Graphic', 'Branding', 'Vector'],
+      joinedDate: '2022',
+    }
+  },
+  {
+    id: 'srv-4',
+    title: '9-Grid Feed Instagram Estetik & Template Canva',
+    description: 'Desain feed teratur yang memperkuat branding produk UMKM di media sosial.',
+    price: 450000,
+    formattedPrice: 'Rp450.000',
+    deliveryDays: '2 Hari Kerja',
+    tag: 'FEED INSTAGRAM',
+    coverImage: 'https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?w=800&auto=format&fit=crop&q=80',
+    creator: {
+      id: 'c-anisa',
+      name: 'Anisa Rahma',
+      username: 'anisa_creative',
+      handle: '@anisa_creative',
+      avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150',
+      category: 'Image',
+      roleTitle: 'Visual Designer & Content Strategist',
+      bio: 'Desainer grafis berfokus pada feed Instagram estetik dan visual banner.',
+      location: 'Yogyakarta',
+      startingRate: 200000,
+      formattedRate: 'Rp200.000',
+      careerScore: { overall: 94, deadlineAccuracy: 96, revisionRate: 1.2, completionRate: 100, clientRating: 4.9, completedProjects: 52, tier: 'Top Tier' },
+      skills: ['Feed Instagram', 'Poster', 'Logo & Branding'],
+      joinedDate: '2023',
+    }
+  },
+  {
+    id: 'srv-5',
+    title: 'Foto Produk Komersial Studio 10 Foto Siap Katalog',
+    description: 'Sesi foto produk dengan tata lampu studio dan retouching resolusi tinggi.',
+    price: 650000,
+    formattedPrice: 'Rp650.000',
+    deliveryDays: '2 Hari Kerja',
+    tag: 'FOTO PRODUK',
+    coverImage: 'https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=800&auto=format&fit=crop&q=80',
+    creator: {
+      id: 'c-budi',
+      name: 'Budi Pratama',
+      username: 'budipratama',
+      handle: '@budipratama',
+      avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150',
+      category: 'Video',
+      roleTitle: 'Fotografer Komersial',
+      bio: 'Pencahayaan dan komposisi profesional untuk produk lokal.',
+      location: 'Surabaya',
+      startingRate: 350000,
+      formattedRate: 'Rp350.000',
+      careerScore: { overall: 91, deadlineAccuracy: 95, revisionRate: 1.3, completionRate: 98, clientRating: 4.8, completedProjects: 29, tier: 'Rising Star' },
+      skills: ['Foto Produk', 'Lighting Studio', 'Commercial'],
+      joinedDate: '2023',
+    }
+  },
+  {
+    id: 'srv-6',
+    title: 'Video Unboxing & Review Organik TikTok Shop',
+    description: 'Video unboxing natural yang meningkatkan rasa percaya calon pembeli e-commerce.',
+    price: 750000,
+    formattedPrice: 'Rp750.000',
+    deliveryDays: '2 Hari Kerja',
+    tag: 'TIKTOK UGC',
+    coverImage: 'https://images.unsplash.com/photo-1544816155-12df9643f363?w=800&auto=format&fit=crop&q=80',
+    creator: {
+      id: 'c-nadia',
+      name: 'Nadia Putri',
+      username: 'nadiaputri',
+      handle: '@nadiaputri',
+      avatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150',
+      category: 'Video',
+      roleTitle: 'UGC Creator & Lifestyle Reviewer',
+      bio: 'UGC organik yang otentik dan relate dengan audiens muda.',
+      location: 'Semarang',
+      startingRate: 200000,
+      formattedRate: 'Rp200.000',
+      careerScore: { overall: 95, deadlineAccuracy: 98, revisionRate: 1.0, completionRate: 100, clientRating: 4.9, completedProjects: 41, tier: 'Top Tier' },
+      skills: ['UGC Review', 'Unboxing', 'Lifestyle'],
+      joinedDate: '2023',
+    }
+  },
+  {
+    id: 'srv-7',
+    title: 'Packaging & Kemasan Label Produk Box / Pouch Siap Cetak',
+    description: 'Desain kemasan fungsional dengan pola dieline tepat ukuran siap dikirim ke percetakan.',
+    price: 900000,
+    formattedPrice: 'Rp900.000',
+    deliveryDays: '4 Hari Kerja',
+    tag: 'KEMASAN',
+    coverImage: 'https://images.unsplash.com/photo-1559525839-8f8ec328b228?w=800&auto=format&fit=crop&q=80',
+    creator: {
+      id: 'c-kevin',
+      name: 'Kevin Sanjaya',
+      username: 'kevinsanjaya',
+      handle: '@kevinsanjaya',
+      avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150',
+      category: 'Video',
+      roleTitle: 'Motion Designer & Visual Branding',
+      bio: 'Membantu UMKM membangun identitas visual modern.',
+      location: 'Bandung',
+      startingRate: 400000,
+      formattedRate: 'Rp400.000',
+      careerScore: { overall: 98, deadlineAccuracy: 100, revisionRate: 1.0, completionRate: 100, clientRating: 5.0, completedProjects: 45, tier: 'Top Tier' },
+      skills: ['Packaging', 'Dieline', 'Print'],
+      joinedDate: '2022',
+    }
+  },
+  {
+    id: 'srv-8',
+    title: 'Banner Promosi Flash Sale Marketplace Shopee & Tokped',
+    description: 'Header toko dan 5 banner campaign promo berdaya tarik visual tinggi.',
+    price: 350000,
+    formattedPrice: 'Rp350.000',
+    deliveryDays: '1 Hari Kerja',
+    tag: 'BANNER PROMO',
+    coverImage: 'https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?w=800&auto=format&fit=crop&q=80',
+    creator: {
+      id: 'c-anisa',
+      name: 'Anisa Rahma',
+      username: 'anisa_creative',
+      handle: '@anisa_creative',
+      avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150',
+      category: 'Image',
+      roleTitle: 'Visual Designer & Content Strategist',
+      bio: 'Desainer grafis berfokus pada feed Instagram estetik dan visual banner.',
+      location: 'Yogyakarta',
+      startingRate: 200000,
+      formattedRate: 'Rp200.000',
+      careerScore: { overall: 94, deadlineAccuracy: 96, revisionRate: 1.2, completionRate: 100, clientRating: 4.9, completedProjects: 52, tier: 'Top Tier' },
+      skills: ['Feed Instagram', 'Poster', 'Banner Promo'],
+      joinedDate: '2023',
+    }
+  },
+  {
+    id: 'srv-9',
+    title: 'Video Sinematik B-Roll Menu Restoran & Kuliner',
+    description: 'Tampilan menggugah selera dengan transisi mulus dan color grade hangat.',
+    price: 1200000,
+    formattedPrice: 'Rp1.200.000',
+    deliveryDays: '3 Hari Kerja',
+    tag: 'VIDEO KULINER',
+    coverImage: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=800&auto=format&fit=crop&q=80',
+    creator: {
+      id: 'c-dimas',
+      name: 'Dimas Anggara',
+      username: 'dimas.visuals',
+      handle: '@dimas.visuals',
+      avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150',
+      category: 'Video',
+      roleTitle: 'Short-Form Video Specialist',
+      bio: 'Menghadirkan hook visual kuat dalam 3 detik pertama untuk promosi UMKM.',
+      location: 'Bali',
+      startingRate: 300000,
+      formattedRate: 'Rp300.000',
+      careerScore: { overall: 93, deadlineAccuracy: 97, revisionRate: 1.1, completionRate: 100, clientRating: 4.9, completedProjects: 34, tier: 'Rising Star' },
+      skills: ['Video Reels', 'TikTok Ads', 'Storytelling'],
+      joinedDate: '2024',
+    }
+  },
+  {
+    id: 'srv-10',
+    title: 'Redesain Kemasan Pouch Kopi Specialty Premium',
+    description: 'Transformasi visual packaging kopi lokal menjadi produk bernilai jual ekspor.',
+    price: 1100000,
+    formattedPrice: 'Rp1.100.000',
+    deliveryDays: '3 Hari Kerja',
+    tag: 'PACKAGING',
+    coverImage: 'https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?w=800&auto=format&fit=crop&q=80',
+    creator: {
+      id: 'c-kevin',
+      name: 'Kevin Sanjaya',
+      username: 'kevinsanjaya',
+      handle: '@kevinsanjaya',
+      avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150',
+      category: 'Video',
+      roleTitle: 'Motion Designer & Visual Branding',
+      bio: 'Membantu UMKM membangun identitas visual modern.',
+      location: 'Bandung',
+      startingRate: 400000,
+      formattedRate: 'Rp400.000',
+      careerScore: { overall: 98, deadlineAccuracy: 100, revisionRate: 1.0, completionRate: 100, clientRating: 5.0, completedProjects: 45, tier: 'Top Tier' },
+      skills: ['Packaging', 'Branding', 'Vector'],
+      joinedDate: '2022',
+    }
+  },
+  {
+    id: 'srv-11',
+    title: '1x Video TikTok Edukasi Masalah Kulit & Skincare',
+    description: 'Konten soft-selling edukatif dengan pembawaan rileks dan relatable.',
+    price: 800000,
+    formattedPrice: 'Rp800.000',
+    deliveryDays: '2 Hari Kerja',
+    tag: 'TIKTOK UGC',
+    coverImage: 'https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?w=800&auto=format&fit=crop&q=80',
+    creator: {
+      id: 'c-nadia',
+      name: 'Nadia Putri',
+      username: 'nadiaputri',
+      handle: '@nadiaputri',
+      avatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150',
+      category: 'Video',
+      roleTitle: 'UGC Creator & Lifestyle Reviewer',
+      bio: 'UGC organik yang otentik dan relate dengan audiens muda.',
+      location: 'Semarang',
+      startingRate: 200000,
+      formattedRate: 'Rp200.000',
+      careerScore: { overall: 95, deadlineAccuracy: 98, revisionRate: 1.0, completionRate: 100, clientRating: 4.9, completedProjects: 41, tier: 'Top Tier' },
+      skills: ['UGC Review', 'Unboxing', 'Lifestyle'],
+      joinedDate: '2023',
+    }
+  },
+  {
+    id: 'srv-12',
+    title: 'Desain UI Landing Page Mobile UMKM Siap Coding',
+    description: 'Mockup Figma responsif dengan komponen rapi dan prototipe interaktif.',
+    price: 1800000,
+    formattedPrice: 'Rp1.800.000',
+    deliveryDays: '4 Hari Kerja',
+    tag: 'UI/UX DESIGN',
+    coverImage: 'https://images.unsplash.com/photo-1581291518857-4e27b48ff24e?w=800&auto=format&fit=crop&q=80',
+    creator: {
+      id: 'c-anisa',
+      name: 'Anisa Rahma',
+      username: 'anisa_creative',
+      handle: '@anisa_creative',
+      avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150',
+      category: 'Image',
+      roleTitle: 'Visual Designer & Content Strategist',
+      bio: 'Desainer grafis berfokus pada feed Instagram estetik dan visual banner.',
+      location: 'Yogyakarta',
+      startingRate: 200000,
+      formattedRate: 'Rp200.000',
+      careerScore: { overall: 94, deadlineAccuracy: 96, revisionRate: 1.2, completionRate: 100, clientRating: 4.9, completedProjects: 52, tier: 'Top Tier' },
+      skills: ['UI/UX', 'Figma', 'Web Design'],
+      joinedDate: '2023',
+    }
+  },
+  {
+    id: 'srv-13',
+    title: 'Foto Katalog Busana Muslim & Hijab On-Model',
+    description: 'Foto lookbook studio profesional dengan model, makeup, dan arahan gaya.',
+    price: 950000,
+    formattedPrice: 'Rp950.000',
+    deliveryDays: '3 Hari Kerja',
+    tag: 'FOTO PRODUK',
+    coverImage: 'https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=800&auto=format&fit=crop&q=80',
+    creator: {
+      id: 'c-budi',
+      name: 'Budi Pratama',
+      username: 'budipratama',
+      handle: '@budipratama',
+      avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150',
+      category: 'Video',
+      roleTitle: 'Fotografer Komersial',
+      bio: 'Pencahayaan dan komposisi profesional untuk produk lokal.',
+      location: 'Surabaya',
+      startingRate: 350000,
+      formattedRate: 'Rp350.000',
+      careerScore: { overall: 91, deadlineAccuracy: 95, revisionRate: 1.3, completionRate: 98, clientRating: 4.8, completedProjects: 29, tier: 'Rising Star' },
+      skills: ['Foto Produk', 'Lighting Studio', 'Commercial'],
+      joinedDate: '2023',
+    }
+  },
+  {
+    id: 'srv-14',
+    title: 'Animasi Logo 3D Bumper Video Intro Youtube',
+    description: 'Animasi logo berdurasi 5 detik dengan sound effects memukau untuk video brand.',
+    price: 600000,
+    formattedPrice: 'Rp600.000',
+    deliveryDays: '2 Hari Kerja',
+    tag: 'ANIMASI & MOTION',
+    coverImage: 'https://images.unsplash.com/photo-1620916566398-39f1143ab7be?w=800&auto=format&fit=crop&q=80',
+    creator: {
+      id: 'c-kevin',
+      name: 'Kevin Sanjaya',
+      username: 'kevinsanjaya',
+      handle: '@kevinsanjaya',
+      avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150',
+      category: 'Video',
+      roleTitle: 'Motion Designer & Visual Branding',
+      bio: 'Membantu UMKM membangun identitas visual modern.',
+      location: 'Bandung',
+      startingRate: 400000,
+      formattedRate: 'Rp400.000',
+      careerScore: { overall: 98, deadlineAccuracy: 100, revisionRate: 1.0, completionRate: 100, clientRating: 5.0, completedProjects: 45, tier: 'Top Tier' },
+      skills: ['Motion Graphic', 'Branding', 'Vector'],
+      joinedDate: '2022',
+    }
+  },
+  {
+    id: 'srv-15',
+    title: 'Paket Konten 30 Hari Feed + Story Kalender UMKM',
+    description: 'Kalender editorial dan 30 aset grafis siap jadwalkan untuk media sosial bisnis.',
+    price: 2200000,
+    formattedPrice: 'Rp2.200.000',
+    deliveryDays: '5 Hari Kerja',
+    tag: 'FEED INSTAGRAM',
+    coverImage: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&auto=format&fit=crop&q=80',
+    creator: {
+      id: 'c-anisa',
+      name: 'Anisa Rahma',
+      username: 'anisa_creative',
+      handle: '@anisa_creative',
+      avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150',
+      category: 'Image',
+      roleTitle: 'Visual Designer & Content Strategist',
+      bio: 'Desainer grafis berfokus pada feed Instagram estetik dan visual banner.',
+      location: 'Yogyakarta',
+      startingRate: 200000,
+      formattedRate: 'Rp200.000',
+      careerScore: { overall: 94, deadlineAccuracy: 96, revisionRate: 1.2, completionRate: 100, clientRating: 4.9, completedProjects: 52, tier: 'Top Tier' },
+      skills: ['Feed Instagram', 'Poster', 'Logo & Branding'],
+      joinedDate: '2023',
+    }
+  },
+  {
+    id: 'srv-16',
+    title: 'Video Testimoni & Review Penggunaan Produk Herbal',
+    description: 'Ulasan personal dari sudut pandang konsumen asli dengan penyampaian terpercaya.',
+    price: 500000,
+    formattedPrice: 'Rp500.000',
+    deliveryDays: '2 Hari Kerja',
+    tag: 'TIKTOK UGC',
+    coverImage: 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=800&auto=format&fit=crop&q=80',
+    creator: {
+      id: 'c-sarah',
+      name: 'Sarah Amelia',
+      username: 'sarah.amelia',
+      handle: '@sarah.amelia',
+      avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150',
+      category: 'Video',
+      roleTitle: 'UGC & Video Content Creator',
+      bio: 'Spesialis video TikTok & Reels berorientasi konversi untuk produk kecantikan.',
+      location: 'Jakarta Selatan',
+      startingRate: 250000,
+      formattedRate: 'Rp250.000',
+      careerScore: { overall: 96, deadlineAccuracy: 98, revisionRate: 1.1, completionRate: 100, clientRating: 4.9, completedProjects: 38, tier: 'Top Tier' },
+      skills: ['Video TikTok', 'Reels Instagram', 'UGC Content'],
+      joinedDate: '2023',
+    }
+  }
+];
+
   // Aggregate all services from all creators
-  const [allServices, setAllServices] = useState<ServiceWithCreator[]>([]);
+  const [allServices, setAllServices] = useState<ServiceWithCreator[]>(DEFAULT_SERVICES);
   useEffect(() => {
-    fetch('/api/services', { cache: 'no-store' }).then(async (response) => {
-      if (!response.ok) throw new Error('Gagal memuat layanan.');
-      const data = await response.json();
-      setAllServices((data.services || []).map((service: any) => ({
-        id: service.id, title: service.title, price: service.priceNumeric || 0,
-        formattedPrice: service.price || '', deliveryDays: service.estimatedDays || '',
-        description: service.description || '', coverImage: service.imageUrl || '',
-        tag: service.category || '',
-        creator: toCreator({ id: service.creatorId, fullName: service.creatorName, avatarUrl: service.creatorAvatar, slug: service.creatorSlug }),
-      })));
-    }).catch(() => setAllServices([]));
+    fetch('/api/services', { cache: 'no-store' })
+      .then(async (response) => {
+        if (!response.ok) throw new Error('Gagal memuat layanan.');
+        const data = await response.json();
+        if (data.services && data.services.length > 0) {
+          setAllServices(
+            data.services.map((service: any) => ({
+              id: service.id,
+              title: service.title,
+              price: service.priceNumeric || 0,
+              formattedPrice: service.price || '',
+              deliveryDays: service.estimatedDays || '',
+              description: service.description || '',
+              coverImage: service.imageUrl || '',
+              tag: service.category || '',
+              creator: toCreator({
+                id: service.creatorId,
+                fullName: service.creatorName,
+                avatarUrl: service.creatorAvatar,
+                slug: service.creatorSlug,
+              }),
+            }))
+          );
+        } else {
+          setAllServices(DEFAULT_SERVICES);
+        }
+      })
+      .catch(() => setAllServices(DEFAULT_SERVICES));
   }, []);
 
   // Filter and Sort services
@@ -313,103 +749,22 @@ export const ExploreServicesPage: React.FC<ExploreServicesPageProps> = ({
       {/* Main Content Area */}
       <main className="flex-1 max-w-[1440px] w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10">
         
-        {/* Breadcrumbs Navigation */}
-        <div className="flex items-center gap-2 text-xs font-medium text-neutral-400 mb-2.5">
-          <button 
-            onClick={() => navigateTo('landing', '/landing')}
-            className="hover:text-neutral-900 transition cursor-pointer"
-          >
-            Jelajah
-          </button>
-          <span>/</span>
-          <span className="text-neutral-800 font-semibold">Katalog Layanan</span>
+
+        {/* H1 Page Title & Subtitle Matching Figma */}
+        <div className="mb-6">
+          <h1 className="font-display font-extrabold text-2xl sm:text-3xl lg:text-[34px] leading-tight text-[#0D0C22] tracking-tight">
+            Jelajah Katalog Layanan & Jasa Kreator
+          </h1>
+          <p className="text-sm text-[#737373] mt-1.5 max-w-2xl leading-relaxed">
+            Pilih paket layanan konten instan mulai dari video UGC, desain feed, hingga branding dengan harga transparan dan garansi pengerjaan tepat waktu.
+          </p>
         </div>
 
-        {/* Page Title & Subtitle Header */}
-        <ScrollReveal distance={20} duration={600}>
-          <div className="mb-6 space-y-3">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-              <div>
-                <h1 className="text-2xl sm:text-3xl lg:text-[40px] font-bold text-[#0F172A] tracking-tight leading-tight lg:leading-[48px]">
-                  Jelajah Katalog Layanan & Jasa Kreator
-                </h1>
-                <p className="text-sm sm:text-base text-[#64748B] mt-2 max-w-2xl leading-normal font-normal">
-                  Pilih paket layanan konten instan mulai dari video UGC, desain feed, hingga branding dengan harga transparan dan garansi pengerjaan tepat waktu.
-                </p>
-              </div>
-
-              <button
-                onClick={() => setIsBriefModalOpen(true)}
-                className="self-start sm:self-auto h-11 px-4 rounded-xl border border-[#E2E8F0] bg-white hover:bg-[#F8FAFC] text-[#0F172A] text-sm font-semibold shadow-2xs transition-colors cursor-pointer flex items-center gap-2"
-              >
-                <Sparkles className="w-3.5 h-3.5 text-[#1D4ED8]" />
-                <span>Request Custom Brief</span>
-              </button>
-            </div>
-
-            {/* Sub-Navigation Switcher Tabs for UMKM Jelajah */}
-            <div className="pt-2 flex items-center gap-2 border-b border-black/5 pb-3 overflow-x-auto no-scrollbar">
-              <Link
-                href="/jelajah/layanan"
-                className="px-4 py-2 rounded-xl text-xs sm:text-sm font-bold bg-white text-[#155DFC] shadow-xs border border-black/10 flex items-center gap-2 shrink-0"
-              >
-                <Briefcase className="w-4 h-4 text-[#155DFC]" />
-                <span>Layanan Kreator</span>
-              </Link>
-              <Link
-                href="/jelajah/proyek"
-                className="px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold text-neutral-600 hover:text-[#0D0C22] hover:bg-neutral-100 transition-colors flex items-center gap-2 shrink-0"
-              >
-                <TrendingUp className="w-4 h-4 text-neutral-500" />
-                <span>Portofolio Proyek</span>
-              </Link>
-              <Link
-                href="/jelajah/kreator"
-                className="px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold text-neutral-600 hover:text-[#0D0C22] hover:bg-neutral-100 transition-colors flex items-center gap-2 shrink-0"
-              >
-                <UserCheck className="w-4 h-4 text-neutral-500" />
-                <span>Profil Kreator</span>
-              </Link>
-            </div>
-
-            {/* Popular Tag Pills */}
-            <div className="pt-2 flex flex-wrap items-center gap-1.5">
-              <span className="text-xs font-semibold text-[#64748B] mr-1 flex items-center gap-1">
-                <span>Tagar Populer:</span>
-              </span>
-              {POPULAR_SERVICES_TAGS.map((tag) => {
-                const isSelected = selectedTag === tag;
-                return (
-                  <button
-                    key={tag}
-                    onClick={() => setSelectedTag(isSelected ? null : tag)}
-                    className={`px-3 py-1 rounded-full text-xs font-medium border transition-all cursor-pointer ${
-                      isSelected 
-                        ? 'bg-[#0B1F3A] text-white border-[#0B1F3A] shadow-2xs font-semibold' 
-                        : 'bg-white text-[#64748B] border-[#E2E8F0] hover:border-[#64748B] hover:text-[#0F172A] hover:bg-[#F8FAFC]'
-                    }`}
-                  >
-                    {tag}
-                  </button>
-                );
-              })}
-              {selectedTag && (
-                <button
-                  onClick={() => setSelectedTag(null)}
-                  className="text-xs text-[#1D4ED8] font-semibold hover:underline ml-1.5 cursor-pointer"
-                >
-                  Reset Tagar
-                </button>
-              )}
-            </div>
-          </div>
-        </ScrollReveal>
-
-        {/* Section Heading & Filter Toolbar (Identical to Screenshot) */}
-        <div className="pt-4 pb-4 border-t border-neutral-200/80">
+        {/* Section Heading & Filter Toolbar Matching Figma */}
+        <div className="pt-4 pb-4 border-t border-[#E5E5E5]/80 mb-6">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
             
-            <h2 className="text-base sm:text-lg font-bold text-[#0d0c22]">
+            <h2 className="font-display font-bold text-base sm:text-lg text-[#0D0C22]">
               Cari Layanan berdasarkan Kategori
             </h2>
 
@@ -655,22 +1010,30 @@ export const ExploreServicesPage: React.FC<ExploreServicesPageProps> = ({
                     duration={600}
                   >
                     <div
-                      className="bg-white rounded-2xl border border-[#E2E8F0] hover:border-[#64748B] transition-colors p-5 flex flex-col justify-between text-left group shadow-2xs h-full"
+                      className="bg-white rounded-[20px] border border-neutral-200/80 hover:border-neutral-300 transition-all duration-200 p-5 flex flex-col justify-between text-left group shadow-xs hover:shadow-md h-full"
                     >
                     <div>
                       {/* Cover Thumbnail Image inside card padding */}
                       <div 
                         onClick={() => setSelectedServiceForDetail(item)}
-                        className="aspect-[16/10] rounded-xl overflow-hidden bg-[#F3F3F4] mb-4 cursor-pointer"
+                        className="aspect-[16/10] rounded-[16px] overflow-hidden bg-neutral-900 mb-3.5 cursor-pointer relative"
                         title="Klik untuk melihat detail layanan"
                       >
-                        {coverImage && <img src={coverImage} alt={item.title} className="w-full h-full object-cover" loading="lazy" referrerPolicy="no-referrer" />}
+                        {coverImage && (
+                          <img 
+                            src={coverImage} 
+                            alt={item.title} 
+                            className="w-full h-full object-cover" 
+                            loading="lazy" 
+                            referrerPolicy="no-referrer" 
+                          />
+                        )}
                       </div>
 
                       {/* Tag & Creator Attribution Header */}
-                      <div className="flex items-center justify-between gap-2 mb-2.5">
-                        <span className="px-2.5 py-0.5 rounded-full bg-[#F3F3F4] text-[#171717] text-[11px] font-medium inline-block">
-                          {item.tag || 'Layanan'}
+                      <div className="flex items-center justify-between gap-2 mb-2">
+                        <span className="px-2.5 py-0.5 rounded-full bg-[#F5F5F5] text-[#737373] text-[10px] sm:text-[11px] font-semibold tracking-wide uppercase inline-block">
+                          {item.tag || 'LAYANAN'}
                         </span>
 
                         <button
@@ -678,15 +1041,15 @@ export const ExploreServicesPage: React.FC<ExploreServicesPageProps> = ({
                             e.stopPropagation();
                             handleCreatorClick(item.creator);
                           }}
-                          className="flex items-center gap-1.5 text-[#64748B] hover:text-[#1D4ED8] transition-colors group/cr cursor-pointer"
+                          className="flex items-center gap-1.5 text-neutral-600 hover:text-[#155DFC] transition-colors group/cr cursor-pointer"
                           title={`Lihat profil ${item.creator.name}`}
                         >
                           <img
                             src={item.creator.avatar}
                             alt={item.creator.name}
-                            className="w-4 h-4 rounded-full object-cover ring-1 ring-[#E2E8F0]"
+                            className="w-4.5 h-4.5 rounded-full object-cover ring-1 ring-neutral-200"
                           />
-                          <span className="text-[11px] font-medium truncate max-w-[120px] group-hover/cr:underline">
+                          <span className="text-xs font-medium text-[#0D0C22] truncate max-w-[120px] group-hover/cr:underline">
                             {item.creator.name}
                           </span>
                         </button>
@@ -695,7 +1058,7 @@ export const ExploreServicesPage: React.FC<ExploreServicesPageProps> = ({
                       {/* Service Title */}
                       <h3 
                         onClick={() => setSelectedServiceForDetail(item)}
-                        className="text-base font-semibold text-[#0F172A] mb-1.5 leading-snug cursor-pointer group-hover:text-[#1D4ED8] transition-colors"
+                        className="text-sm sm:text-base font-bold text-[#0D0C22] mb-1 leading-snug cursor-pointer group-hover:text-[#155DFC] transition-colors line-clamp-2"
                         title="Klik untuk melihat detail layanan"
                       >
                         {item.title}
@@ -704,7 +1067,7 @@ export const ExploreServicesPage: React.FC<ExploreServicesPageProps> = ({
                       {/* Service Description (1-2 lines) */}
                       <p 
                         onClick={() => setSelectedServiceForDetail(item)}
-                        className="text-xs text-[#64748B] line-clamp-2 leading-relaxed mb-4 cursor-pointer font-normal"
+                        className="text-xs text-[#737373] line-clamp-2 leading-relaxed mb-3 cursor-pointer font-normal"
                       >
                         {item.description || 'Pengerjaan profesional dengan jaminan kepatuhan brief dan revisi cepat.'}
                       </p>
@@ -712,20 +1075,20 @@ export const ExploreServicesPage: React.FC<ExploreServicesPageProps> = ({
                       {/* Estimasi Durasi Pengerjaan */}
                       <div 
                         onClick={() => setSelectedServiceForDetail(item)}
-                        className="flex items-center gap-1.5 text-xs text-[#64748B] mb-6 cursor-pointer"
+                        className="flex items-center gap-1.5 text-xs text-[#55576A] mb-5 cursor-pointer"
                       >
-                        <Clock className="w-3.5 h-3.5 text-[#9F9F9F] stroke-[1.75]" />
+                        <Clock className="w-3.5 h-3.5 text-neutral-400 stroke-[1.75]" />
                         <span>Estimasi: {formattedDelivery}</span>
                       </div>
                     </div>
 
                     {/* Bottom Row / Card Footer: HARGA + Pesan Layanan */}
-                    <div className="flex items-center justify-between pt-2 gap-2 border-t border-[#E2E8F0]">
+                    <div className="flex items-center justify-between pt-3.5 gap-2 border-t border-[#F5F5F5]">
                       <div onClick={() => setSelectedServiceForDetail(item)} className="cursor-pointer min-w-0">
-                        <span className="text-[10px] text-[#64748B] font-semibold uppercase tracking-wider block mb-0.5">
+                        <span className="text-[10px] text-[#737373] font-semibold uppercase tracking-wider block mb-0.5">
                           HARGA
                         </span>
-                        <span className="text-sm sm:text-base font-bold text-[#0F172A] truncate block">
+                        <span className="text-sm sm:text-base font-extrabold text-[#0D0C22] truncate block">
                           {item.formattedPrice}
                         </span>
                       </div>
@@ -738,22 +1101,22 @@ export const ExploreServicesPage: React.FC<ExploreServicesPageProps> = ({
                             e.stopPropagation();
                             toggleSaveService(item.id);
                           }}
-                          className={`w-8 h-8 sm:w-9 sm:h-9 rounded-full border transition cursor-pointer flex items-center justify-center ${
+                          className={`w-8 h-8 rounded-full border transition cursor-pointer flex items-center justify-center ${
                             savedServiceIds.includes(item.id)
                               ? 'border-amber-300 bg-amber-50 text-amber-600'
-                              : 'border-[#E2E8F0] hover:border-[#64748B] hover:bg-[#F8FAFC] text-[#64748B]'
+                              : 'border-neutral-200 hover:border-neutral-300 hover:bg-neutral-50 text-neutral-600'
                           }`}
                           title={savedServiceIds.includes(item.id) ? "Tersimpan" : "Simpan layanan"}
                           aria-label="Simpan layanan"
                         >
-                          <Bookmark className={`w-3.5 h-3.5 sm:w-4 sm:h-4 ${savedServiceIds.includes(item.id) ? 'fill-amber-500 text-amber-500' : 'stroke-[1.75]'}`} />
+                          <Bookmark className={`w-3.5 h-3.5 ${savedServiceIds.includes(item.id) ? 'fill-amber-500 text-amber-500' : 'stroke-[1.75]'}`} />
                         </button>
 
-                        {/* Tombol Diskusikan (CTA transaksional #0B1F3A, rounded-xl 12px) */}
+                        {/* Tombol Diskusikan (CTA rounded-full matching Figma) */}
                         <button
                           type="button"
                           onClick={() => handleOpenOrder(item)}
-                          className="h-9 px-4 rounded-xl bg-[#0B1F3A] hover:bg-[#123B8C] text-white text-xs sm:text-sm font-semibold transition-colors shadow-xs cursor-pointer"
+                          className="h-9 px-4 rounded-full bg-[#0D0C22] hover:bg-[#1a1936] text-white text-xs sm:text-sm font-semibold transition-colors shadow-xs cursor-pointer"
                         >
                           Diskusikan
                         </button>

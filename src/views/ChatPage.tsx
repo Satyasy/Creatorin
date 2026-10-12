@@ -861,7 +861,7 @@ export const ChatPage: React.FC<ChatPageProps> = ({
                             <img
                               src={msg.attachment.url}
                               alt={msg.attachment.name}
-                              className="w-full max-h-60 object-cover group-hover:scale-101 transition duration-200"
+                              className="w-full max-h-60 object-cover"
                             />
                             <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition flex items-center justify-center opacity-0 group-hover:opacity-100 text-white font-medium text-xs">
                               <span className="bg-black/60 px-3 py-1.5 rounded-lg backdrop-blur-xs flex items-center gap-1.5">
