@@ -8,6 +8,7 @@ import { ProjectCard } from '@/components/common/ProjectCard';
 import { creatorService } from '@/services/creatorService';
 import { useAuth } from '@/providers/AuthProvider';
 import { FeedProject } from '@/types';
+import { HomeHeroSection } from '@/components/home/HomeHeroSection';
 
 const ProjectDetailModal = dynamic(
   () => import('@/components/modals/ProjectDetailModal').then((mod) => mod.ProjectDetailModal),
@@ -101,34 +102,51 @@ export const UMKMDashboard = () => {
 
   return (
     <div className="min-h-screen bg-white text-[var(--ink)]">
-      <section className="border-b border-[var(--outline)] bg-white">
-        <div className="container-creatorin grid gap-10 pb-12 pt-14 lg:grid-cols-[1fr_420px] lg:items-end lg:pb-16 lg:pt-20">
-          <div className="max-w-3xl">
-            <p className="mb-4 text-sm font-semibold text-primary">Selamat datang, {user?.name || 'pemilik usaha'}</p>
-            <h1 className="max-w-[760px] text-[40px] font-semibold leading-[1.04] tracking-[-0.045em] text-[var(--ink)] sm:text-5xl lg:text-[64px]">
-              Cari karya yang membuat brandmu terlihat serius.
-            </h1>
-            <p className="mt-5 max-w-2xl text-base leading-7 text-[var(--muted)] sm:text-lg">
-              Lihat hasil kerja creator, bandingkan gaya visualnya, lalu kirim brief saat kamu sudah menemukan yang cocok.
-            </p>
-            <form className="mt-8 flex max-w-2xl items-center rounded-2xl border border-[#B7BBC9] bg-[#F8F9FC] p-2 focus-within:border-primary focus-within:bg-white focus-within:shadow-[var(--focus-ring)]" onSubmit={(event) => event.preventDefault()}>
-              <Search className="ml-3 h-5 w-5 shrink-0 text-[#6F7285]" />
-              <label htmlFor="umkm-work-search" className="sr-only">Cari karya atau creator</label>
-              <input id="umkm-work-search" value={searchQuery} onChange={(event) => { setSearchQuery(event.target.value); setVisibleCount(8); }} placeholder="Cari video, foto produk, branding, atau creator" className="min-w-0 flex-1 bg-transparent px-3 py-2.5 text-sm outline-none placeholder:text-[#6F7285] sm:text-base" />
-              {searchQuery && <button type="button" onClick={() => setSearchQuery('')} aria-label="Hapus pencarian" className="grid h-11 w-11 place-items-center rounded-xl text-[#55576A] hover:bg-white hover:text-[var(--ink)]"><X className="h-4 w-4" /></button>}
-              <button type="submit" className="hidden h-12 rounded-xl bg-primary px-5 text-sm font-semibold text-white hover:bg-primary-hover sm:block">Cari karya</button>
-            </form>
-          </div>
+      {/* Symmetrical Hero Section matching Figma 4816-18898 */}
+      <HomeHeroSection
+        onExploreClick={() => router.push('/jelajah/kreator')}
+        onSecondaryClick={() => setIsBriefModalOpen(true)}
+        secondaryText="Buat Brief Proyek"
+      />
 
-          <aside className="border-l-0 border-[var(--outline)] lg:border-l lg:pl-10" aria-label="Mulai proyek baru">
-            <p className="text-sm font-semibold text-[var(--ink)]">Sudah punya kebutuhan?</p>
-            <p className="mt-2 max-w-sm text-sm leading-6 text-[var(--muted)]">Tulis kebutuhan sekali. Creator yang relevan dapat mengirim proposal dan contoh kerja.</p>
-            <button onClick={() => setIsBriefModalOpen(true)} className="mt-5 inline-flex h-12 items-center gap-2 rounded-xl bg-[#0D0C22] px-5 text-sm font-semibold text-white hover:bg-[#29283D]">
-              <Plus className="h-4 w-4" /> Buat brief proyek
+      {/* Symmetrical Search Bar Floating Under Hero */}
+      <div className="container-creatorin -mt-6 sm:-mt-7 relative z-20">
+        <form
+          className="mx-auto flex max-w-2xl items-center rounded-2xl border border-[#B7BBC9] bg-white p-2 shadow-lg shadow-black/5 focus-within:border-primary focus-within:shadow-[var(--focus-ring)] transition-all"
+          onSubmit={(event) => event.preventDefault()}
+        >
+          <Search className="ml-3 h-5 w-5 shrink-0 text-[#6F7285]" />
+          <label htmlFor="umkm-work-search" className="sr-only">
+            Cari karya atau creator
+          </label>
+          <input
+            id="umkm-work-search"
+            value={searchQuery}
+            onChange={(event) => {
+              setSearchQuery(event.target.value);
+              setVisibleCount(8);
+            }}
+            placeholder="Cari video, foto produk, branding, atau creator"
+            className="min-w-0 flex-1 bg-transparent px-3 py-2 text-sm outline-none placeholder:text-[#6F7285] sm:text-base"
+          />
+          {searchQuery && (
+            <button
+              type="button"
+              onClick={() => setSearchQuery('')}
+              aria-label="Hapus pencarian"
+              className="grid h-10 w-10 place-items-center rounded-xl text-[#55576A] hover:bg-neutral-100 hover:text-[var(--ink)] cursor-pointer"
+            >
+              <X className="h-4 w-4" />
             </button>
-          </aside>
-        </div>
-      </section>
+          )}
+          <button
+            type="submit"
+            className="hidden h-11 rounded-xl bg-primary px-5 text-sm font-semibold text-white hover:bg-primary-hover transition-colors sm:block cursor-pointer"
+          >
+            Cari karya
+          </button>
+        </form>
+      </div>
 
       <section className="container-creatorin py-10 sm:py-12" aria-labelledby="category-heading">
         <div className="mb-5 flex items-end justify-between gap-4">
