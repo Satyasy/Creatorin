@@ -71,6 +71,41 @@ export const Navbar: React.FC<NavbarProps> = ({
   const isCreator = currentUser?.role === 'creator';
   const isSearchVisible = showSearch || pathname?.startsWith('/explore') || pathname?.startsWith('/jelajah') || pathname?.startsWith('/briefs');
 
+  // Dynamic Unread Notification & Message Counts (No fake dots!)
+  const [unreadNotifications, setUnreadNotifications] = useState(0);
+  const [unreadMessages, setUnreadMessages] = useState(0);
+
+  useEffect(() => {
+    if (!currentUser) {
+      setUnreadNotifications(0);
+      setUnreadMessages(0);
+      return;
+    }
+
+    let isMounted = true;
+    const fetchUnread = async () => {
+      try {
+        const notifRes = await fetch('/api/notifications', { cache: 'no-store' });
+        if (notifRes.ok) {
+          const data = await notifRes.json();
+          if (isMounted && Array.isArray(data.notifications)) {
+            const unreadCount = data.notifications.filter((n: any) => !n.isRead).length;
+            setUnreadNotifications(unreadCount);
+          }
+        }
+      } catch {
+        // Ignore network errors in silent polling
+      }
+    };
+
+    fetchUnread();
+    const interval = setInterval(fetchUnread, 30000);
+    return () => {
+      isMounted = false;
+      clearInterval(interval);
+    };
+  }, [currentUser]);
+
   // Close dropdown on outside click
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -298,7 +333,11 @@ export const Navbar: React.FC<NavbarProps> = ({
                 title="Buka Ruang Obrolan & Pesan"
               >
                 <MessageSquare className="w-5 h-5" />
-                <span className="absolute top-2 right-2 w-2 h-2 bg-[#155DFC] rounded-full ring-2 ring-white"></span>
+                {unreadMessages > 0 && (
+                  <span className="absolute -top-0.5 -right-0.5 bg-[#155DFC] text-white text-[10px] font-bold px-1.5 py-0.2 rounded-full min-w-4 text-center leading-tight">
+                    {unreadMessages > 99 ? '99+' : unreadMessages}
+                  </span>
+                )}
               </button>
 
               {/* Ikon Notifikasi */}
@@ -310,7 +349,11 @@ export const Navbar: React.FC<NavbarProps> = ({
                 title="Buka Notifikasi"
               >
                 <Bell className="w-5 h-5" />
-                <span className="absolute top-2 right-2 w-2 h-2 bg-rose-500 rounded-full ring-2 ring-white"></span>
+                {unreadNotifications > 0 && (
+                  <span className="absolute -top-0.5 -right-0.5 bg-rose-600 text-white text-[10px] font-bold px-1.5 py-0.2 rounded-full min-w-4 text-center leading-tight">
+                    {unreadNotifications > 99 ? '99+' : unreadNotifications}
+                  </span>
+                )}
               </button>
             </>
           )}

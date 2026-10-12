@@ -79,7 +79,7 @@ export async function POST(
       type: "application",
       title: "Lamaran Diterima!",
       body: `Klien ${user.fullName} menerima lamaran Anda untuk brief: ${brief.title}. Ruang obrolan telah dibuka.`,
-      linkUrl: `/pesan?conversationId=${conv.id}`,
+      linkUrl: `/chat?conversationId=${conv.id}`,
     });
 
     return NextResponse.json({

@@ -225,6 +225,7 @@ export const messages = pgTable("messages", {
   attachmentUrl: text("attachment_url"),
   serviceQuoteId: uuid("service_quote_id").references(() => services.id, { onDelete: "set null" }),
   isRead: boolean("is_read").default(false).notNull(),
+  metadata: jsonb("metadata").$type<Record<string, any>>().default({}),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 

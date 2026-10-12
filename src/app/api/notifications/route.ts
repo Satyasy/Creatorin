@@ -48,3 +48,33 @@ export async function PUT(req: NextRequest) {
     return NextResponse.json({ error: err.message }, { status: 500 });
   }
 }
+
+export async function POST(req: NextRequest) {
+  const db = getDb();
+  if (!db) return NextResponse.json({ error: "Database not connected" }, { status: 503 });
+
+  try {
+    const body = await req.json();
+    const { userId, type, title, body: contentBody, linkUrl } = body;
+
+    if (!userId || !title || !contentBody) {
+      return NextResponse.json({ error: "Data notifikasi tidak lengkap" }, { status: 400 });
+    }
+
+    const [created] = await db
+      .insert(notifications)
+      .values({
+        userId,
+        type: type || "system",
+        title,
+        body: contentBody,
+        linkUrl: linkUrl || null,
+        isRead: false,
+      })
+      .returning();
+
+    return NextResponse.json({ success: true, notification: created }, { status: 201 });
+  } catch (err: any) {
+    return NextResponse.json({ error: err.message }, { status: 500 });
+  }
+}

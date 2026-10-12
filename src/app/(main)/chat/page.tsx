@@ -1,3 +1,4 @@
+import { Suspense } from 'react';
 import { ChatPage } from '@/views/ChatPage';
 
 export const metadata = {
@@ -6,5 +7,9 @@ export const metadata = {
 };
 
 export default function ChatRoute() {
-  return <ChatPage />;
+  return (
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center text-sm text-neutral-500">Memuat obrolan...</div>}>
+      <ChatPage />
+    </Suspense>
+  );
 }

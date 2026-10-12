@@ -35,6 +35,7 @@ export async function GET(req: NextRequest) {
         content: messages.content,
         attachmentUrl: messages.attachmentUrl,
         serviceQuoteId: messages.serviceQuoteId,
+        metadata: messages.metadata,
         isRead: messages.isRead,
         createdAt: messages.createdAt,
         senderName: profiles.fullName,
@@ -59,7 +60,7 @@ export async function POST(req: NextRequest) {
   if (!db) return NextResponse.json({ error: "Database not connected" }, { status: 503 });
 
   const body = await req.json();
-  const { conversationId, content, attachmentUrl, serviceQuoteId } = body;
+  const { conversationId, content, attachmentUrl, serviceQuoteId, metadata } = body;
 
   if (!conversationId || !content) {
     return NextResponse.json({ error: "conversationId dan content wajib diisi." }, { status: 400 });
@@ -75,6 +76,7 @@ export async function POST(req: NextRequest) {
         content,
         attachmentUrl,
         serviceQuoteId,
+        metadata: metadata || {},
         isRead: false,
       })
       .returning();

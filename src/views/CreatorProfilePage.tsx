@@ -127,6 +127,7 @@ export const CreatorProfilePage: React.FC<CreatorProfilePageProps> = ({
   const [isUploadServiceModalOpen, setIsUploadServiceModalOpen] = useState(false);
   const [inquiryMessage, setInquiryMessage] = useState('');
   const [inquirySentSuccess, setInquirySentSuccess] = useState(false);
+  const [isSendingInquiry, setIsSendingInquiry] = useState(false);
   const [copiedLinkSuccess, setCopiedLinkSuccess] = useState(false);
 
   // In-place inline edit profile state
@@ -223,17 +224,53 @@ export const CreatorProfilePage: React.FC<CreatorProfilePageProps> = ({
     setTimeout(() => setCopiedLinkSuccess(false), 3000);
   };
 
-  // Send message handler
-  const handleSendInquiry = (e: React.FormEvent) => {
+  // Send message handler - Connects to real conversation and message APIs
+  const handleSendInquiry = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!inquiryMessage.trim()) return;
-    setInquirySentSuccess(true);
-    setTimeout(() => {
-      setInquirySentSuccess(false);
-      setIsGetInTouchOpen(false);
-      setInquiryMessage('');
-      navigateTo('chat', '/chat');
-    }, 1200);
+    const text = inquiryMessage.trim();
+    if (!text) return;
+
+    if (!currentUser) {
+      router.push('/sign-in');
+      return;
+    }
+
+    setIsSendingInquiry(true);
+    try {
+      // 1. Inisiasi atau cari percakapan yang sudah ada dengan kreator ini
+      const convRes = await fetch('/api/conversations', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ recipientId: creator.id }),
+      });
+      const convData = await convRes.json();
+      if (!convRes.ok) throw new Error(convData.error || 'Gagal memulai percakapan');
+
+      const conversationId = convData.conversation?.id;
+      if (conversationId) {
+        // 2. Kirim pesan pengantar awal
+        await fetch('/api/messages', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            conversationId,
+            content: text,
+          }),
+        });
+      }
+
+      setInquirySentSuccess(true);
+      setTimeout(() => {
+        setInquirySentSuccess(false);
+        setIsGetInTouchOpen(false);
+        setInquiryMessage('');
+        router.push(conversationId ? `/chat?conversationId=${conversationId}` : '/chat');
+      }, 900);
+    } catch (err: any) {
+      alert(err.message || 'Gagal mengirim pesan penawaran ke kreator.');
+    } finally {
+      setIsSendingInquiry(false);
+    }
   };
 
   const creatorProjects = liveProjects;
@@ -1318,10 +1355,11 @@ export const CreatorProfilePage: React.FC<CreatorProfilePageProps> = ({
                     </button>
                     <button
                       type="submit"
-                      className="px-6 py-2.5 rounded-full bg-[#0d0c22] text-white text-xs font-bold hover:bg-neutral-800 flex items-center gap-2 cursor-pointer"
+                      disabled={isSendingInquiry || !inquiryMessage.trim()}
+                      className="px-6 py-2.5 rounded-full bg-[#0d0c22] disabled:opacity-50 text-white text-xs font-bold hover:bg-neutral-800 flex items-center gap-2 cursor-pointer transition"
                     >
-                      <Send className="w-3.5 h-3.5" />
-                      <span>Kirim Pesan</span>
+                      <Send className={`w-3.5 h-3.5 ${isSendingInquiry ? 'animate-pulse' : ''}`} />
+                      <span>{isSendingInquiry ? 'Mengirim...' : 'Kirim Pesan'}</span>
                     </button>
                   </div>
                 </>

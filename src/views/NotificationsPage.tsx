@@ -46,7 +46,8 @@ export const NotificationsPage = ({ onNavigate }: NotificationsPageProps) => {
       const success = await notificationService.markAsRead(item.id);
       if (success) setNotifications((items) => items.map((entry) => entry.id === item.id ? { ...entry, read: true } : entry));
     }
-    if (item.actionUrl?.startsWith('/')) router.push(item.actionUrl);
+    const targetUrl = item.actionUrl ? item.actionUrl.replace('/pesan', '/chat') : '';
+    if (targetUrl?.startsWith('/')) router.push(targetUrl);
     else if (item.targetPage && onNavigate) onNavigate(item.targetPage);
   };
 
