@@ -19,11 +19,16 @@ import {
 } from 'lucide-react';
 import { creatorService } from '@/services/creatorService';
 import { useAuth } from '@/providers/AuthProvider';
-import { FeedProject } from '@/types';
+import { FeedProject, CreatorService, Creator } from '@/types';
 import { HomeHeroSection } from '@/components/home/HomeHeroSection';
 
 const ProjectDetailModal = dynamic(
   () => import('@/components/modals/ProjectDetailModal').then((mod) => mod.ProjectDetailModal),
+  { ssr: false }
+);
+
+const ServiceDetailModal = dynamic(
+  () => import('@/components/modals/ServiceDetailModal').then((mod) => mod.ServiceDetailModal),
   { ssr: false }
 );
 
@@ -656,6 +661,7 @@ export const UMKMDashboard = () => {
   const [visibleServicesCount, setVisibleServicesCount] = useState(8);
   const [visibleProjectsCount, setVisibleProjectsCount] = useState(8);
   const [selectedProject, setSelectedProject] = useState<FeedProject | null>(null);
+  const [selectedService, setSelectedService] = useState<{ service: CreatorService; creator: Creator } | null>(null);
   const [isBriefModalOpen, setIsBriefModalOpen] = useState(false);
   const [showcaseCreators, setShowcaseCreators] = useState<ShowcaseCreator[]>(INITIAL_SHOWCASE_CREATORS);
   const [showcaseServices, setShowcaseServices] = useState<HomeServiceItem[]>(INITIAL_SHOWCASE_SERVICES);
@@ -812,93 +818,83 @@ export const UMKMDashboard = () => {
   }, [showcaseProjects, searchQuery]);
 
   const handleServiceClick = (service: ShowcaseService, creator: ShowcaseCreator) => {
-    const feedProjectMock: FeedProject = {
+    const creatorServiceMock: CreatorService = {
       id: service.id,
       title: service.title,
-      description: `${service.title} oleh ${creator.name}. Pengerjaan estimasi ${service.duration} dengan jaminan revisi dan proteksi escrow.`,
+      price: parseInt(service.price.replace(/[^0-9]/g, '')) || 3800000,
+      formattedPrice: service.price,
+      deliveryDays: service.duration,
+      tag: service.tag,
       coverImage: service.image,
-      mediaUrl: service.image,
-      mediaType: 'image',
-      creatorId: creator.id,
-      creator: {
-        id: creator.id,
-        name: creator.name,
-        username: creator.slug || creator.id,
-        avatar: creator.avatar,
-        category: 'Image',
-        roleTitle: creator.location,
-        bio: `${creator.name} di Creatorin`,
-        location: creator.location,
-        startingRate: 200000,
-        formattedRate: creator.startingRateText,
-        careerScore: {
-          overall: creator.careerScore,
-          deadlineAccuracy: 95,
-          revisionRate: 1,
-          completionRate: 100,
-          clientRating: creator.rating,
-          completedProjects: creator.completedProjects,
-          tier: 'Top Tier',
-        },
-        rating: creator.rating,
-        reviewCount: creator.reviewCount,
-        skills: creator.skills,
-        joinedDate: '2024',
-      },
-      category: service.tag,
-      platform: 'direct',
-      tags: [service.tag.replace(/\s+/g, '')],
-      likesCount: creator.reviewCount,
-      commentsCount: 12,
-      viewsCount: '1.2k',
-      sharesCount: 18,
+      description: 'Pengerjaan aset kreatif profesional dengan jaminan kepatuhan brief bisnis, komunikasi aktif, dan penyelarasan kebutuhan proyek Anda.',
+      revisions: '2x Revisi Gratis',
     };
-    setSelectedProject(feedProjectMock);
+    const creatorMock: Creator = {
+      id: creator.id,
+      name: creator.name,
+      username: creator.slug || creator.id,
+      avatar: creator.avatar,
+      category: 'Image',
+      roleTitle: creator.location,
+      bio: `${creator.name} di Creatorin`,
+      location: creator.location,
+      startingRate: 200000,
+      formattedRate: creator.startingRateText,
+      careerScore: {
+        overall: creator.careerScore,
+        deadlineAccuracy: 95,
+        revisionRate: 1,
+        completionRate: 100,
+        clientRating: creator.rating,
+        completedProjects: creator.completedProjects,
+        tier: 'Top Tier',
+      },
+      rating: creator.rating,
+      reviewCount: creator.reviewCount,
+      skills: creator.skills,
+      joinedDate: '2024',
+    };
+    setSelectedService({ service: creatorServiceMock, creator: creatorMock });
   };
 
   const handleLayananCardClick = (service: HomeServiceItem) => {
-    const feedProjectMock: FeedProject = {
+    const creatorServiceMock: CreatorService = {
       id: service.id,
       title: service.title,
-      description: `${service.description} Dikerjakan oleh ${service.creatorName} dengan estimasi pengerjaan ${service.duration}.`,
+      price: parseInt(service.price.replace(/[^0-9]/g, '')) || 3800000,
+      formattedPrice: service.price,
+      deliveryDays: service.duration,
+      tag: service.tag,
       coverImage: service.image,
-      mediaUrl: service.image,
-      mediaType: 'image',
-      creatorId: service.creatorId,
-      creator: {
-        id: service.creatorId,
-        name: service.creatorName,
-        username: service.creatorSlug || service.creatorId,
-        avatar: service.creatorAvatar,
-        category: (service.tag.toLowerCase().includes('video') || service.tag.toLowerCase().includes('tiktok') || service.tag.toLowerCase().includes('reels')) ? 'Video' : 'Image',
-        roleTitle: 'Kreator Terverifikasi',
-        bio: `${service.creatorName} di Creatorin`,
-        location: 'Indonesia',
-        startingRate: 250000,
-        formattedRate: service.price,
-        careerScore: {
-          overall: 96,
-          deadlineAccuracy: 98,
-          revisionRate: 1,
-          completionRate: 100,
-          clientRating: 4.9,
-          completedProjects: 48,
-          tier: 'Top Tier',
-        },
-        rating: 4.9,
-        reviewCount: 48,
-        skills: [service.tag, 'Desain & Kreatif'],
-        joinedDate: '2024',
-      },
-      category: service.tag,
-      platform: 'direct',
-      tags: [service.tag.replace(/\s+/g, '')],
-      likesCount: 88,
-      commentsCount: 10,
-      viewsCount: '1.5k',
-      sharesCount: 16,
+      description: service.description || 'Pengerjaan aset kreatif profesional dengan jaminan kepatuhan brief bisnis, komunikasi aktif, dan penyelarasan kebutuhan proyek Anda.',
+      revisions: '2x Revisi Gratis',
     };
-    setSelectedProject(feedProjectMock);
+    const creatorMock: Creator = {
+      id: service.creatorId,
+      name: service.creatorName,
+      username: service.creatorSlug || service.creatorId,
+      avatar: service.creatorAvatar,
+      category: 'Image',
+      roleTitle: 'Kreator Profesional',
+      bio: `${service.creatorName} di Creatorin`,
+      location: 'Indonesia',
+      startingRate: 250000,
+      formattedRate: service.price,
+      careerScore: {
+        overall: 96,
+        deadlineAccuracy: 98,
+        revisionRate: 1,
+        completionRate: 100,
+        clientRating: 4.9,
+        completedProjects: 48,
+        tier: 'Top Tier',
+      },
+      rating: 4.9,
+      reviewCount: 48,
+      skills: [service.tag, 'Desain & Kreatif'],
+      joinedDate: '2024',
+    };
+    setSelectedService({ service: creatorServiceMock, creator: creatorMock });
   };
 
   const handleProjectCardClick = (project: HomeProjectItem) => {
@@ -945,6 +941,50 @@ export const UMKMDashboard = () => {
     };
     setSelectedProject(feedProjectMock);
   };
+
+  const allFeedProjects = useMemo<FeedProject[]>(() => {
+    return showcaseProjects.map((p) => ({
+      id: p.id,
+      title: p.title,
+      description: p.description,
+      coverImage: p.mediaUrl,
+      mediaUrl: p.mediaUrl,
+      mediaType: 'image',
+      creatorId: p.creatorId,
+      creator: {
+        id: p.creatorId,
+        name: p.creatorName,
+        username: p.creatorHandle.replace('@', ''),
+        avatar: p.creatorAvatar,
+        category: 'Image',
+        roleTitle: 'Kreator Profesional',
+        bio: `${p.creatorName} di Creatorin`,
+        location: 'Indonesia',
+        startingRate: 250000,
+        formattedRate: 'Rp250.000',
+        careerScore: {
+          overall: 95,
+          deadlineAccuracy: 98,
+          revisionRate: 1,
+          completionRate: 100,
+          clientRating: 4.9,
+          completedProjects: 45,
+          tier: 'Top Tier',
+        },
+        rating: 4.9,
+        reviewCount: 38,
+        skills: [p.category, 'Kreator Digital'],
+        joinedDate: '2024',
+      },
+      category: p.category,
+      platform: 'direct',
+      tags: [p.category.replace(/\s+/g, '')],
+      likesCount: 142,
+      commentsCount: 18,
+      viewsCount: p.viewsCount,
+      sharesCount: 12,
+    }));
+  }, [showcaseProjects]);
 
   return (
     <div className="min-h-screen bg-white text-[var(--ink)]">
@@ -1400,6 +1440,7 @@ export const UMKMDashboard = () => {
         <ProjectDetailModal
           project={selectedProject}
           onClose={() => setSelectedProject(null)}
+          onSelectProject={setSelectedProject}
           onViewCreatorProfile={(creator) => {
             setSelectedProject(null);
             router.push(`/creator/${creator.id}`);
@@ -1408,7 +1449,24 @@ export const UMKMDashboard = () => {
             setSelectedProject(null);
             router.push(`/chat?creatorId=${creator.id}`);
           }}
-          allProjects={[selectedProject]}
+          allProjects={allFeedProjects}
+        />
+      )}
+
+      {/* Lightbox / Service Detail Modal */}
+      {selectedService && (
+        <ServiceDetailModal
+          service={selectedService.service}
+          creator={selectedService.creator}
+          onClose={() => setSelectedService(null)}
+          onOrderService={(srv, cr) => {
+            setSelectedService(null);
+            router.push(`/chat?creatorId=${cr.id}`);
+          }}
+          onViewCreatorProfile={(cr) => {
+            setSelectedService(null);
+            router.push(`/creator/${cr.id}`);
+          }}
         />
       )}
 
