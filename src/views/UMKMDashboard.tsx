@@ -57,17 +57,6 @@ interface ShowcaseCreator {
   skills: string[];
 }
 
-const POPULAR_TAGS = [
-  'dashboard',
-  'landing page',
-  'mobile app',
-  'portfolio',
-  'ecommerce',
-  'animation',
-  'illustration',
-  'onboarding',
-];
-
 const INITIAL_SHOWCASE_CREATORS: ShowcaseCreator[] = [
   {
     id: 'creator-qaesyaar-aqeel',
@@ -326,14 +315,11 @@ export const UMKMDashboard = () => {
   const { user } = useAuth();
   const [activeTab, setActiveTab] = useState<'creator' | 'layanan' | 'proyek'>('creator');
   const [searchQuery, setSearchQuery] = useState('');
-  const [followingFilter, setFollowingFilter] = useState('Following');
-  const [isFollowingOpen, setIsFollowingOpen] = useState(false);
   const [savedCreators, setSavedCreators] = useState<Record<string, boolean>>({});
   const [visibleCount, setVisibleCount] = useState(5);
   const [selectedProject, setSelectedProject] = useState<FeedProject | null>(null);
   const [isBriefModalOpen, setIsBriefModalOpen] = useState(false);
   const [showcaseCreators, setShowcaseCreators] = useState<ShowcaseCreator[]>(INITIAL_SHOWCASE_CREATORS);
-  const followingButtonRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
     creatorService
@@ -369,17 +355,6 @@ export const UMKMDashboard = () => {
       });
   }, []);
 
-  useEffect(() => {
-    if (!isFollowingOpen) return;
-    const closeOnEscape = (event: KeyboardEvent) => {
-      if (event.key !== 'Escape') return;
-      setIsFollowingOpen(false);
-      followingButtonRef.current?.focus();
-    };
-    document.addEventListener('keydown', closeOnEscape);
-    return () => document.removeEventListener('keydown', closeOnEscape);
-  }, [isFollowingOpen]);
-
   const toggleBookmark = (creatorId: string) => {
     setSavedCreators((prev) => ({
       ...prev,
@@ -412,16 +387,8 @@ export const UMKMDashboard = () => {
       });
     }
 
-    if (followingFilter === 'Rating Tertinggi') {
-      list.sort((a, b) => b.rating - a.rating);
-    } else if (followingFilter === 'Skor Karir') {
-      list.sort((a, b) => b.careerScore - a.careerScore);
-    } else if (followingFilter === 'Proyek Terbanyak') {
-      list.sort((a, b) => b.completedProjects - a.completedProjects);
-    }
-
     return list;
-  }, [showcaseCreators, searchQuery, followingFilter]);
+  }, [showcaseCreators, searchQuery]);
 
   const handleServiceClick = (service: ShowcaseService, creator: ShowcaseCreator) => {
     const feedProjectMock: FeedProject = {
@@ -522,7 +489,7 @@ export const UMKMDashboard = () => {
         {/* 2. Full-Width Search Input Bar */}
         <form
           onSubmit={(e) => e.preventDefault()}
-          className="relative w-full max-w-full rounded-full bg-[#F4F5F7] hover:bg-[#ECEEF2] focus-within:bg-white focus-within:ring-2 focus-within:ring-[#155DFC] focus-within:border-transparent border border-[#E1E3EA] px-4 sm:px-5 py-2 sm:py-2.5 flex items-center justify-between gap-3 transition-all my-5"
+          className="relative w-full max-w-full rounded-full bg-[#F4F5F7] hover:bg-[#ECEEF2] focus-within:bg-white focus-within:ring-2 focus-within:ring-[#155DFC] focus-within:border-transparent border border-[#E1E3EA] px-4 sm:px-5 py-2 sm:py-2.5 flex items-center justify-between gap-3 transition-all mt-5 mb-8 sm:mb-10"
         >
           <input
             type="text"
@@ -549,71 +516,6 @@ export const UMKMDashboard = () => {
             <Search className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-white" />
           </button>
         </form>
-
-        {/* 3. Popular Tags Filter & Following Dropdown */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-8">
-          <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none">
-            <span className="text-xs sm:text-sm font-semibold text-[#0D0C22] shrink-0 mr-1 font-display">
-              Popular:
-            </span>
-            {POPULAR_TAGS.map((tag) => {
-              const active = searchQuery.toLowerCase() === tag.toLowerCase();
-              return (
-                <button
-                  key={tag}
-                  type="button"
-                  onClick={() => setSearchQuery(active ? '' : tag)}
-                  className={`px-3 py-1 rounded-full text-xs font-medium shrink-0 transition-all cursor-pointer border ${
-                    active
-                      ? 'border-[#0D0C22] bg-[#0D0C22] text-white font-semibold'
-                      : 'border-dashed border-[#B7BBC9] bg-white text-[#55576A] hover:border-[#155DFC] hover:text-[#155DFC]'
-                  }`}
-                >
-                  {tag}
-                </button>
-              );
-            })}
-          </div>
-
-          <div className="relative shrink-0 self-start sm:self-auto">
-            <button
-              ref={followingButtonRef}
-              type="button"
-              onClick={() => setIsFollowingOpen(!isFollowingOpen)}
-              aria-expanded={isFollowingOpen}
-              className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-[#E1E3EA] bg-white hover:border-[#B7BBC9] text-xs font-semibold text-[#0D0C22] transition-colors cursor-pointer"
-            >
-              <span>{followingFilter}</span>
-              <ChevronDown className="w-3.5 h-3.5 text-[#55576A]" />
-            </button>
-
-            {isFollowingOpen && (
-              <div className="absolute right-0 z-30 mt-2 w-44 rounded-xl border border-[#E1E3EA] bg-white p-1.5 shadow-[0_16px_40px_rgba(13,12,34,.12)] animate-in fade-in zoom-in-95">
-                {[
-                  'Following',
-                  'Rating Tertinggi',
-                  'Skor Karir',
-                  'Proyek Terbanyak',
-                ].map((item) => (
-                  <button
-                    key={item}
-                    type="button"
-                    onClick={() => {
-                      setFollowingFilter(item);
-                      setIsFollowingOpen(false);
-                    }}
-                    className={`flex w-full items-center justify-between rounded-lg px-3 py-2 text-left text-xs font-medium transition-colors hover:bg-[#F8F9FC] cursor-pointer ${
-                      followingFilter === item ? 'font-semibold text-[#155DFC] bg-[#F0F6FF]' : 'text-[#0D0C22]'
-                    }`}
-                  >
-                    <span>{item}</span>
-                    {followingFilter === item && <Check className="w-3.5 h-3.5 text-[#155DFC]" />}
-                  </button>
-                ))}
-              </div>
-            )}
-          </div>
-        </div>
 
         {/* 4. Creator Cards List */}
         <section aria-label="Daftar Rekomendasi Kreator" className="space-y-6">
