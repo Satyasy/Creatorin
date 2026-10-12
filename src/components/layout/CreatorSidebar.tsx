@@ -1,5 +1,6 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Bell, BriefcaseBusiness, CircleHelp, House, LogOut, MessageSquareText, Search, SlidersHorizontal, Wallet } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
@@ -30,7 +31,41 @@ export function CreatorSidebar() {
   const pathname = usePathname();
   const router = useRouter();
   const { user, signOut } = useAuth();
+  const [unreadNotifications, setUnreadNotifications] = useState(0);
   const isActive = (href: string) => href === '/' ? pathname === '/' : pathname.startsWith(href);
+
+  useEffect(() => {
+    if (!user) {
+      setUnreadNotifications(0);
+      return;
+    }
+
+    let isMounted = true;
+    const fetchUnread = async () => {
+      try {
+        const notifRes = await fetch('/api/notifications', { cache: 'no-store' });
+        if (notifRes.ok) {
+          const data = await notifRes.json();
+          if (isMounted && Array.isArray(data.notifications)) {
+            const count = data.notifications.filter((n: any) => !n.isRead).length;
+            setUnreadNotifications(count);
+          }
+        }
+      } catch {
+        // Silently ignore network errors in polling
+      }
+    };
+
+    fetchUnread();
+    const interval = setInterval(fetchUnread, 30000);
+    window.addEventListener('creatorin_notifications_updated', fetchUnread);
+
+    return () => {
+      isMounted = false;
+      clearInterval(interval);
+      window.removeEventListener('creatorin_notifications_updated', fetchUnread);
+    };
+  }, [user]);
 
   const handleLogout = async () => {
     await signOut();
@@ -69,7 +104,11 @@ export function CreatorSidebar() {
         className={`relative grid h-11 w-11 shrink-0 place-items-center rounded-md transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary ${active ? 'bg-[#DFE6EF] text-[var(--ink)]' : 'text-[#121212] hover:bg-[#E7EBF0]'}`}
       >
         <Icon className="h-5 w-5" strokeWidth={1.35} aria-hidden="true" />
-        {isNotification && <span className="absolute right-2 top-2 h-2.5 w-2.5 rounded-full bg-[#EB4D4B]" aria-hidden="true" />}
+        {isNotification && unreadNotifications > 0 && (
+          <span className="absolute -top-0.5 -right-0.5 bg-rose-600 text-white text-[10px] font-bold px-1.5 py-0.2 rounded-full min-w-4 text-center leading-tight">
+            {unreadNotifications > 99 ? '99+' : unreadNotifications}
+          </span>
+        )}
       </Link>
     );
   };

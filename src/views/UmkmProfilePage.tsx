@@ -50,6 +50,7 @@ import { useAuth } from '@/providers/AuthProvider';
 import { creatorService } from '@/services/creatorService';
 import { AuthModal } from '@/components/modals/AuthModal';
 import { UMKMProfile, AuthState, ActivePage, ProjectListing, UMKMCompletedCollab, UMKMCreatorReview, Creator } from '@/types';
+import { BriefDetailPage } from '@/views/BriefDetailPage';
 
 interface UmkmProfilePageProps {
   currentUser?: AuthState['user'];
@@ -1856,78 +1857,14 @@ export const UmkmProfilePage: React.FC<UmkmProfilePageProps> = ({
       {/* MODAL: DETAIL BRIEF */}
       {/* ========================================================================= */}
       {selectedBriefDetail && (
-        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto">
-          <div className="bg-white rounded-3xl max-w-lg w-full p-6 sm:p-7 space-y-4 shadow-2xl relative animate-in fade-in zoom-in-95 my-8">
-            <div className="flex items-start justify-between gap-3 pb-3 border-b border-neutral-100">
-              <div>
-                <span className="px-2.5 py-0.5 rounded-full bg-[#f3f3f4] text-[#171717] text-xs font-semibold">
-                  {selectedBriefDetail.category}
-                </span>
-                <h3 className="text-base font-bold text-[#171717] mt-2">
-                  {selectedBriefDetail.title}
-                </h3>
-              </div>
-              <button
-                onClick={() => setSelectedBriefDetail(null)}
-                className="w-8 h-8 rounded-full hover:bg-neutral-100 flex items-center justify-center text-neutral-400 hover:text-neutral-700 cursor-pointer"
-              >
-                <X className="w-4 h-4" />
-              </button>
-            </div>
-
-            <div className="space-y-3 text-xs sm:text-sm">
-              <div className="flex items-center justify-between p-3.5 rounded-2xl bg-[#fafafa] border border-neutral-100">
-                <div>
-                  <div className="text-[11px] text-neutral-500">Anggaran Proyek</div>
-                  <div className="font-extrabold text-[#171717] text-sm">
-                    {formatDisplayBudget(selectedBriefDetail.formattedBudget, selectedBriefDetail.budgetMin)}
-                  </div>
-                </div>
-                <div>
-                  <div className="text-[11px] text-neutral-500">Tenggat Waktu</div>
-                  <div className="font-bold text-neutral-800 text-xs">{selectedBriefDetail.deadline}</div>
-                </div>
-              </div>
-
-              <div>
-                <div className="font-bold text-neutral-800 mb-1">Deskripsi Lengkap:</div>
-                <p className="text-neutral-600 leading-relaxed text-xs">
-                  {selectedBriefDetail.description}
-                </p>
-              </div>
-
-              <div className="space-y-1.5">
-                <div className="font-bold text-neutral-800">Daftar Hasil yang Diserahkan:</div>
-                {selectedBriefDetail.deliverables.map((item, idx) => (
-                  <div key={idx} className="flex items-center gap-2 text-neutral-600 text-xs">
-                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
-                    <span>{item}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            <div className="flex items-center justify-end gap-2 pt-3 border-t border-neutral-100">
-              <button
-                onClick={() => setSelectedBriefDetail(null)}
-                className="px-4 py-2 rounded-xl border border-[#E2E8F0] text-neutral-700 text-xs font-semibold cursor-pointer"
-              >
-                Tutup
-              </button>
-              <button
-                onClick={() => {
-                  const b = selectedBriefDetail;
-                  setSelectedBriefDetail(null);
-                  handleOpenEditBrief(b);
-                }}
-                className="px-5 py-2 rounded-xl bg-[#0B1F3A] hover:bg-[#123B8C] text-white text-xs font-semibold cursor-pointer shadow-xs flex items-center gap-1.5"
-              >
-                <Edit3 className="w-3.5 h-3.5" />
-                <span>Edit brief</span>
-              </button>
-            </div>
-          </div>
-        </div>
+        <BriefDetailPage
+          brief={selectedBriefDetail}
+          currentUser={currentUser}
+          onNavigate={onNavigate}
+          onClose={() => setSelectedBriefDetail(null)}
+          onViewCreatorProfile={onViewCreatorProfile}
+          onEditBrief={(b) => handleOpenEditBrief(b)}
+        />
       )}
 
       {/* ========================================================================= */}

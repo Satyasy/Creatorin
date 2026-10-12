@@ -89,8 +89,8 @@ export const SignUpPage: React.FC<Props> = ({ onNavigate, onLoginSuccess }) => {
       return;
     }
 
-    onNavigate?.('explore');
-    router.push('/explore');
+    onNavigate?.('home');
+    router.push('/');
   };
 
   return (
