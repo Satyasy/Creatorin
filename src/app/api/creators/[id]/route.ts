@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { getAuthenticatedUser } from "@/lib/api-auth";
 import { getDb } from "@/lib/db";
 import { profiles, creatorProfiles, services, projects, reviews, collaborationRooms } from "@/lib/db/schema";
 import { eq, or, desc, and } from "drizzle-orm";
@@ -59,12 +60,19 @@ export async function GET(
 
     const creator = creatorList[0];
 
+    // Check if requester is profile owner
+    const caller = await getAuthenticatedUser(_req);
+    const isOwner = caller?.id === creator.id;
+    const serviceCondition = isOwner
+      ? eq(services.creatorId, creator.id)
+      : and(eq(services.creatorId, creator.id), eq(services.isActive, true));
+
     // 2. Parallel fetch services, projects, reviews, and completed rooms
     const [creatorServices, creatorProjects, creatorReviews, completedRooms] = await Promise.all([
       db
         .select()
         .from(services)
-        .where(and(eq(services.creatorId, creator.id), eq(services.isActive, true)))
+        .where(serviceCondition)
         .orderBy(desc(services.createdAt)),
       db
         .select()

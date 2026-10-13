@@ -59,6 +59,7 @@ export const creatorService = {
           id: service.id, title: service.title, price: service.priceNumeric || 0,
           formattedPrice: service.price || '', deliveryDays: service.estimatedDays || '',
           description: service.description || '', coverImage: service.imageUrl || '', tag: service.category || '',
+          isActive: service.isActive !== undefined ? service.isActive : true,
         }));
         creator.reviewsList = (data.reviews || []).map((review: any) => ({
           id: review.id,
