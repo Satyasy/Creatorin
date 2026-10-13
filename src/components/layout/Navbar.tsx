@@ -66,12 +66,12 @@ export const Navbar: React.FC<NavbarProps> = ({
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [navSearchInput, setNavSearchInput] = useState('');
   const [userDropdownOpen, setUserDropdownOpen] = useState(false);
-  const [exploreDropdownOpen, setExploreDropdownOpen] = useState(false);
-  const exploreDropdownRef = useRef<HTMLDivElement>(null);
+  const [jelajahDropdownOpen, setJelajahDropdownOpen] = useState(false);
+  const jelajahDropdownRef = useRef<HTMLDivElement>(null);
   const userDropdownRef = useRef<HTMLDivElement>(null);
 
   const isCreator = currentUser?.role === 'creator';
-  const isSearchVisible = showSearch || pathname?.startsWith('/explore') || pathname?.startsWith('/jelajah') || pathname?.startsWith('/briefs');
+  const isSearchVisible = showSearch || pathname?.startsWith('/jelajah') || pathname?.startsWith('/briefs');
 
   // Dynamic Unread Notification & Message Counts (No fake dots!)
   const [unreadNotifications, setUnreadNotifications] = useState(0);
@@ -111,8 +111,8 @@ export const Navbar: React.FC<NavbarProps> = ({
   // Close dropdown on outside click
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (exploreDropdownRef.current && !exploreDropdownRef.current.contains(event.target as Node)) {
-        setExploreDropdownOpen(false);
+      if (jelajahDropdownRef.current && !jelajahDropdownRef.current.contains(event.target as Node)) {
+        setJelajahDropdownOpen(false);
       }
       if (userDropdownRef.current && !userDropdownRef.current.contains(event.target as Node)) {
         setUserDropdownOpen(false);
@@ -148,8 +148,8 @@ export const Navbar: React.FC<NavbarProps> = ({
       onSearch(navSearchInput);
     }
     if (isCreator) {
-      if (!pathname?.startsWith('/explore')) {
-        router.push(`/explore?q=${encodeURIComponent(navSearchInput)}`);
+      if (!pathname?.startsWith('/jelajah')) {
+        router.push(`/jelajah/kreator?q=${encodeURIComponent(navSearchInput)}`);
       }
     } else {
       if (!pathname?.startsWith('/jelajah')) {
@@ -240,103 +240,66 @@ export const Navbar: React.FC<NavbarProps> = ({
             <span>{t('nav.home', 'Beranda')}</span>
           </button>
 
-          {/* Navigasi Eksplorasi: Explore untuk Kreator, Jelajah untuk UMKM/Guest */}
-          {isCreator ? (
+          <div
+            ref={jelajahDropdownRef}
+            className="relative py-3"
+            onMouseEnter={() => setJelajahDropdownOpen(true)}
+            onMouseLeave={() => setJelajahDropdownOpen(false)}
+          >
             <button
-              id="nav-explore-link"
-              onClick={() => navigateTo('explore', '/explore')}
-              className={`transition-colors flex items-center gap-1.5 cursor-pointer text-sm py-1.5 ${
-                pathname?.startsWith('/explore') 
-                  ? 'text-[#155DFC] font-semibold' 
-                  : 'text-[#55576A] font-medium hover:text-[#0D0C22]'
+              id="nav-jelajah-link"
+              type="button"
+              aria-haspopup="menu"
+              aria-expanded={jelajahDropdownOpen}
+              onClick={() => setJelajahDropdownOpen((open) => !open)}
+              className={`flex items-center gap-1 py-1.5 text-sm transition-colors cursor-pointer ${
+                pathname?.startsWith('/jelajah')
+                  ? 'font-semibold text-[#155DFC]'
+                  : 'font-medium text-[#55576A] hover:text-[#0D0C22]'
               }`}
             >
-              <span>{t('nav.explore', 'Explore')}</span>
+              <span>{t('nav.browse', 'Jelajah')}</span>
+              <ChevronDown className={`h-3.5 w-3.5 transition-transform ${jelajahDropdownOpen ? 'rotate-180' : ''}`} />
             </button>
-          ) : (
-            <div 
-              className="relative group/explore py-3"
-              onMouseEnter={() => setExploreDropdownOpen(true)}
-              onMouseLeave={() => setExploreDropdownOpen(false)}
-              ref={exploreDropdownRef}
-            >
-              <button
-                onClick={() => navigateTo('services', '/jelajah/layanan')}
-                className={`transition-colors flex items-center gap-1 cursor-pointer text-sm py-1.5 ${
-                  pathname?.startsWith('/jelajah') || pathname === '/explore'
-                    ? 'text-[#155DFC] font-semibold' 
-                    : 'text-[#55576A] font-medium hover:text-[#0D0C22]'
-                } group-hover/explore:text-[#155DFC]`}
-              >
-                <span>{t('nav.browse', 'Jelajah')}</span>
-                <ChevronDown className="w-3.5 h-3.5 transition-transform duration-200 text-current group-hover/explore:rotate-180" />
-              </button>
 
-              {exploreDropdownOpen && (
-                <div 
-                  className="absolute top-full -left-4 w-48 bg-white rounded-xl border border-[#E1E3EA] shadow-md py-1.5 z-50 animate-in fade-in zoom-in-95 duration-150"
+            {jelajahDropdownOpen && (
+              <div role="menu" className="absolute top-full -left-4 z-50 w-44 rounded-xl border border-[#E1E3EA] bg-white p-1.5 shadow-md">
+                <button
+                  role="menuitem"
+                  type="button"
+                  onClick={() => {
+                    setJelajahDropdownOpen(false);
+                    navigateTo('creator-profile', '/jelajah/kreator');
+                  }}
+                  className={`w-full rounded-lg px-3 py-2 text-left text-sm ${pathname?.startsWith('/jelajah/kreator') ? 'bg-[#E8F0FF] font-semibold text-[#155DFC]' : 'font-medium text-[#0D0C22] hover:bg-[#F3F3F4]'}`}
                 >
-                  <div className="px-1.5 space-y-0.5 font-sans">
-                    <button
-                      onClick={() => {
-                        setExploreDropdownOpen(false);
-                        navigateTo('explore', '/explore');
-                      }}
-                      className={`w-full rounded-lg px-3 py-2 text-left text-sm transition-colors cursor-pointer flex items-center justify-between ${
-                        pathname === '/explore'
-                          ? 'font-semibold text-[#155DFC] bg-[#E8F0FF]'
-                          : 'font-medium text-[#0D0C22] hover:bg-[#F3F3F4] hover:text-[#155DFC]'
-                      }`}
-                    >
-                      <span>{t('nav.allCategories', 'Semua (Explore Hub)')}</span>
-                    </button>
-
-                    <button
-                      onClick={() => {
-                        setExploreDropdownOpen(false);
-                        navigateTo('creator-profile', '/jelajah/kreator');
-                      }}
-                      className={`w-full rounded-lg px-3 py-2 text-left text-sm transition-colors cursor-pointer flex items-center justify-between ${
-                        pathname?.startsWith('/jelajah/kreator')
-                          ? 'font-semibold text-[#155DFC] bg-[#E8F0FF]'
-                          : 'font-medium text-[#0D0C22] hover:bg-[#F3F3F4] hover:text-[#155DFC]'
-                      }`}
-                    >
-                      <span>{t('nav.creators', 'Kreator')}</span>
-                    </button>
-
-                    <button
-                      onClick={() => {
-                        setExploreDropdownOpen(false);
-                        navigateTo('services', '/jelajah/layanan');
-                      }}
-                      className={`w-full rounded-lg px-3 py-2 text-left text-sm transition-colors cursor-pointer flex items-center justify-between ${
-                        pathname?.startsWith('/jelajah/layanan')
-                          ? 'font-semibold text-[#155DFC] bg-[#E8F0FF]'
-                          : 'font-medium text-[#0D0C22] hover:bg-[#F3F3F4] hover:text-[#155DFC]'
-                      }`}
-                    >
-                      <span>{t('nav.services', 'Layanan')}</span>
-                    </button>
-
-                    <button
-                      onClick={() => {
-                        setExploreDropdownOpen(false);
-                        navigateTo('projects', '/jelajah/proyek');
-                      }}
-                      className={`w-full rounded-lg px-3 py-2 text-left text-sm transition-colors cursor-pointer flex items-center justify-between ${
-                        pathname?.startsWith('/jelajah/proyek')
-                          ? 'font-semibold text-[#155DFC] bg-[#E8F0FF]'
-                          : 'font-medium text-[#0D0C22] hover:bg-[#F3F3F4] hover:text-[#155DFC]'
-                      }`}
-                    >
-                      <span>{t('nav.projects', 'Proyek')}</span>
-                    </button>
-                  </div>
-                </div>
-              )}
-            </div>
-          )}
+                  {t('nav.creators', 'Kreator')}
+                </button>
+                <button
+                  role="menuitem"
+                  type="button"
+                  onClick={() => {
+                    setJelajahDropdownOpen(false);
+                    navigateTo('services', '/jelajah/layanan');
+                  }}
+                  className={`w-full rounded-lg px-3 py-2 text-left text-sm ${pathname?.startsWith('/jelajah/layanan') ? 'bg-[#E8F0FF] font-semibold text-[#155DFC]' : 'font-medium text-[#0D0C22] hover:bg-[#F3F3F4]'}`}
+                >
+                  {t('nav.services', 'Layanan')}
+                </button>
+                <button
+                  role="menuitem"
+                  type="button"
+                  onClick={() => {
+                    setJelajahDropdownOpen(false);
+                    navigateTo('projects', '/jelajah/proyek');
+                  }}
+                  className={`w-full rounded-lg px-3 py-2 text-left text-sm ${pathname?.startsWith('/jelajah/proyek') ? 'bg-[#E8F0FF] font-semibold text-[#155DFC]' : 'font-medium text-[#0D0C22] hover:bg-[#F3F3F4]'}`}
+                >
+                  {t('nav.projects', 'Proyek')}
+                </button>
+              </div>
+            )}
+          </div>
 
           {/* Nav Link Brief Proyek */}
           <button
@@ -636,76 +599,34 @@ export const Navbar: React.FC<NavbarProps> = ({
             >
               {t('nav.home', 'Beranda')}
             </button>
-            {isCreator ? (
-              <button
-                onClick={() => {
-                  setMobileMenuOpen(false);
-                  navigateTo('explore', '/explore');
-                }}
-                className={`py-2 px-3 text-left rounded-lg transition-colors ${
-                  pathname?.startsWith('/explore') 
-                    ? 'text-[#155DFC] font-semibold bg-[#E8F0FF]' 
-                    : 'text-[#55576A] font-medium hover:text-[#0D0C22]'
-                }`}
-              >
-                {t('nav.explore', 'Explore')}
-              </button>
-            ) : (
-              <>
-                <button
-                  onClick={() => {
-                    setMobileMenuOpen(false);
-                    navigateTo('explore', '/explore');
-                  }}
-                  className={`py-2 px-3 text-left rounded-lg transition-colors ${
-                    pathname === '/explore' 
-                      ? 'text-[#155DFC] font-semibold bg-[#E8F0FF]' 
-                      : 'text-[#55576A] font-medium hover:text-[#0D0C22]'
-                  }`}
-                >
-                  {t('nav.allCategories', 'Semua (Explore Hub)')}
-                </button>
-                <button
-                  onClick={() => {
-                    setMobileMenuOpen(false);
-                    navigateTo('creator-profile', '/jelajah/kreator');
-                  }}
-                  className={`py-2 px-3 text-left rounded-lg transition-colors ${
-                    pathname?.startsWith('/jelajah/kreator') 
-                      ? 'text-[#155DFC] font-semibold bg-[#E8F0FF]' 
-                      : 'text-[#55576A] font-medium hover:text-[#0D0C22]'
-                  }`}
-                >
-                  {t('nav.creators', 'Kreator')}
-                </button>
-                <button
-                  onClick={() => {
-                    setMobileMenuOpen(false);
-                    navigateTo('services', '/jelajah/layanan');
-                  }}
-                  className={`py-2 px-3 text-left rounded-lg transition-colors ${
-                    pathname?.startsWith('/jelajah/layanan') 
-                      ? 'text-[#155DFC] font-semibold bg-[#E8F0FF]' 
-                      : 'text-[#55576A] font-medium hover:text-[#0D0C22]'
-                  }`}
-                >
-                  {t('nav.services', 'Layanan')}
-                </button>
-                <button
-                  onClick={() => {
-                    setMobileMenuOpen(false);
-                    navigateTo('projects', '/jelajah/proyek');
-                  }}
-                  className={`py-2 px-3 text-left rounded-lg transition-colors ${
-                    pathname?.startsWith('/jelajah/proyek') 
-                      ? 'text-[#155DFC] font-semibold bg-[#E8F0FF]' 
-                      : 'text-[#55576A] font-medium hover:text-[#0D0C22]'
-                  }`}
-                >
-                  {t('nav.projects', 'Proyek')}
-                </button>
-              </>
-            )}
+            <p className="px-3 pt-2 text-xs font-semibold text-[#737373]">{t('nav.browse', 'Jelajah')}</p>
+            <button
+              onClick={() => {
+                setMobileMenuOpen(false);
+                navigateTo('creator-profile', '/jelajah/kreator');
+              }}
+              className={`rounded-lg px-3 py-2 text-left transition-colors ${pathname?.startsWith('/jelajah/kreator') ? 'bg-[#E8F0FF] font-semibold text-[#155DFC]' : 'font-medium text-[#55576A] hover:text-[#0D0C22]'}`}
+            >
+              {t('nav.creators', 'Kreator')}
+            </button>
+            <button
+              onClick={() => {
+                setMobileMenuOpen(false);
+                navigateTo('services', '/jelajah/layanan');
+              }}
+              className={`rounded-lg px-3 py-2 text-left transition-colors ${pathname?.startsWith('/jelajah/layanan') ? 'bg-[#E8F0FF] font-semibold text-[#155DFC]' : 'font-medium text-[#55576A] hover:text-[#0D0C22]'}`}
+            >
+              {t('nav.services', 'Layanan')}
+            </button>
+            <button
+              onClick={() => {
+                setMobileMenuOpen(false);
+                navigateTo('projects', '/jelajah/proyek');
+              }}
+              className={`rounded-lg px-3 py-2 text-left transition-colors ${pathname?.startsWith('/jelajah/proyek') ? 'bg-[#E8F0FF] font-semibold text-[#155DFC]' : 'font-medium text-[#55576A] hover:text-[#0D0C22]'}`}
+            >
+              {t('nav.projects', 'Proyek')}
+            </button>
             <button
               onClick={() => {
                 setMobileMenuOpen(false);

@@ -33,7 +33,7 @@ Creatorin memfasilitasi pembuatan brief proyek, kolaborasi produksi konten (vide
 2. Jelajah Layanan (/jelajah/layanan): Paket jasa kreatif instan untuk UMKM.
 3. Jelajah Proyek (/jelajah/proyek): Galeri karya dan portofolio kreator untuk UMKM.
 4. Profil Kreator (/jelajah/kreator): Direktori talenta kreator terverifikasi untuk UMKM.
-5. Explore (/explore): Jelajah video komunitas dan direktori UMKM untuk Kreator.
+5. Jelajah (/jelajah): Pusat layanan, proyek, dan direktori kreator.
 
 4. Contracts (/contracts): Daftar brief yang dilamar kreator, termasuk status accepted atau menunggu review.
 5. Brief Proyek (/briefs): Tempat UMKM memasang brief proyek baru dan melihat daftar brief yang sedang aktif.
@@ -42,7 +42,7 @@ Creatorin memfasilitasi pembuatan brief proyek, kolaborasi produksi konten (vide
 8. Profil Publik Sekolah (/school/smk-kreatif-indonesia): Etalase publik karya siswa SMK, prestasi sekolah, dan pengajuan kemitraan industri.
 9. Notifikasi (/notifications): Pusat pemberitahuan aktivitas proyek, penawaran brief, dan pembaruan invoice.
 10. Profil Saya (/profile): Mengatur portofolio, bio, dan kredensial kreator.`,
-    relatedRoute: '/explore',
+    relatedRoute: '/jelajah',
   },
   {
     id: 'kb-escrow',
@@ -121,7 +121,7 @@ Skor dihitung dari:
 - Penilaian ulasan klien (Client Rating)
 - Penilaian asesmen kompetensi dari sekolah vokasi (khusus siswa SMK).
 Skor tinggi membantu kreator dan siswa mendapatkan prioritas kurasi di halaman Jelajah dan tawaran proyek dari brand besar.`,
-    relatedRoute: '/explore/projects',
+    relatedRoute: '/jelajah/proyek',
   }
 ];
 

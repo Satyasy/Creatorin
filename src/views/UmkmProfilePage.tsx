@@ -95,7 +95,7 @@ export const UmkmProfilePage: React.FC<UmkmProfilePageProps> = ({
       const routeMap: Record<string, string> = {
         'home': '/',
         'landing': '/landing',
-        'explore': '/explore',
+        'explore': '/jelajah',
         'explore-projects': '/jelajah/proyek',
         'explore-services': '/jelajah/layanan',
         'chat': '/chat',
@@ -105,7 +105,7 @@ export const UmkmProfilePage: React.FC<UmkmProfilePageProps> = ({
         'signin': '/sign-in',
         'signup': '/sign-up',
       };
-      router.push(routeMap[page] || '/explore');
+      router.push(routeMap[page] || '/jelajah');
     }
   };
   const [profile, setProfile] = useState<UMKMProfile>(initialProfile);
@@ -2082,7 +2082,7 @@ export const UmkmProfilePage: React.FC<UmkmProfilePageProps> = ({
                         router.push(`/creator/${creatorId}`);
                       }
                     } else {
-                      navigateTo('explore', '/explore');
+                      navigateTo('explore', '/jelajah');
                     }
                   }}
                   className="px-5 py-2 rounded-xl bg-[#0B1F3A] hover:bg-[#123B8C] text-white text-xs font-semibold transition cursor-pointer"
