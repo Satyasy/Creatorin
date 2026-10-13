@@ -10,8 +10,10 @@ export const viewport: Viewport = {
   initialScale: 1,
 };
 
+const APP_URL = process.env.NEXT_PUBLIC_APP_URL || "https://creatorin.my.id";
+
 export const metadata: Metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || "https://creatorin.id"),
+  metadataBase: new URL(APP_URL),
   title: {
     default: "Creatorin | Platform Kolaborasi Kreatif UMKM & Kreator",
     template: "%s | Creatorin",
@@ -32,7 +34,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Creatorin | Platform Kolaborasi Kreatif UMKM & Kreator",
     description: "Platform kolaborasi UMKM dan content creator terverifikasi dengan career score, escrow aman, dan portofolio vokasi terbaik.",
-    url: "https://creatorin.id",
+    url: APP_URL,
     siteName: "Creatorin",
     locale: "id_ID",
     type: "website",
@@ -77,21 +79,21 @@ const jsonLd = {
   "@graph": [
     {
       "@type": "WebSite",
-      "@id": "https://creatorin.id/#website",
-      "url": "https://creatorin.id",
+      "@id": `${APP_URL}/#website`,
+      "url": APP_URL,
       "name": "Creatorin",
       "description": "Platform kolaborasi UMKM dan content creator terverifikasi",
       "publisher": {
-        "@id": "https://creatorin.id/#organization"
+        "@id": `${APP_URL}/#organization`
       },
       "inLanguage": "id-ID"
     },
     {
       "@type": "Organization",
-      "@id": "https://creatorin.id/#organization",
+      "@id": `${APP_URL}/#organization`,
       "name": "Creatorin",
-      "url": "https://creatorin.id",
-      "logo": "https://creatorin.id/creatorin/logo.svg",
+      "url": APP_URL,
+      "logo": `${APP_URL}/creatorin/logo.svg`,
       "sameAs": []
     }
   ]

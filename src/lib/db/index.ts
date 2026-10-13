@@ -5,11 +5,13 @@ import * as schema from "./schema";
 let dbInstance: ReturnType<typeof drizzle<typeof schema>> | null = null;
 
 export function getDb() {
-  const connectionString = process.env.DATABASE_URL;
+  let connectionString = process.env.DATABASE_URL?.trim();
 
   if (!connectionString) {
     return null;
   }
+
+  connectionString = connectionString.replace(/^["']|["']$/g, '');
 
   if (!dbInstance) {
     const isLocal = connectionString.includes("127.0.0.1") || connectionString.includes("localhost");

@@ -1,79 +1,138 @@
-'use client';
+import { Metadata } from 'next';
+import { notFound, redirect, RedirectType } from 'next/navigation';
+import { getCreatorServerData } from '@/lib/server/creators';
+import { CreatorProfileClient } from './CreatorProfileClient';
 
-import { useEffect, useState, useCallback } from 'react';
-import { useParams, useRouter } from 'next/navigation';
-import Link from 'next/link';
-import { AlertCircle, ArrowLeft, RefreshCw } from 'lucide-react';
-import { CreatorProfilePage } from '@/views/CreatorProfilePage';
-import { CreatorProfileSkeleton } from '@/components/common/CreatorProfileSkeleton';
-import { creatorService } from '@/services/creatorService';
-import type { Creator } from '@/types';
+interface CreatorRouteProps {
+  params: Promise<{ id: string }>;
+}
 
-export default function CreatorRoute() {
-  const { id } = useParams<{ id: string }>();
-  const router = useRouter();
-  const [creator, setCreator] = useState<Creator | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+const APP_URL = (process.env.NEXT_PUBLIC_APP_URL || 'https://creatorin.my.id').replace(/\/$/, '');
 
-  const fetchCreator = useCallback(() => {
-    if (!id) return;
-    setLoading(true);
-    setError(null);
-    creatorService
-      .getCreatorDetail(id)
-      .then((data) => {
-        if (!data) {
-          setError('Profil kreator tidak ditemukan.');
-        } else {
-          setCreator(data);
-        }
-      })
-      .catch((err) => {
-        setError(err instanceof Error ? err.message : 'Gagal memuat profil kreator.');
-      })
-      .finally(() => setLoading(false));
-  }, [id]);
+export async function generateMetadata({ params }: CreatorRouteProps): Promise<Metadata> {
+  const { id } = await params;
+  const data = await getCreatorServerData(id);
 
-  useEffect(() => {
-    fetchCreator();
-  }, [fetchCreator]);
-
-  if (loading) {
-    return <CreatorProfileSkeleton />;
+  if (!data) {
+    return {
+      title: 'Profil Kreator Tidak Ditemukan | Creatorin',
+      description: 'Profil kreator ini mungkin telah diubah, dinonaktifkan, atau tautan tidak valid.',
+    };
   }
 
-  if (error || !creator) {
-    return (
-      <main className="min-h-[70vh] flex items-center justify-center p-6 bg-[#FDFCFB]">
-        <div className="max-w-md w-full text-center bg-white p-8 rounded-2xl border border-neutral-200 shadow-sm space-y-4">
-          <div className="w-12 h-12 bg-amber-50 text-amber-600 rounded-full flex items-center justify-center mx-auto ring-6 ring-amber-50/50">
-            <AlertCircle className="w-6 h-6" />
-          </div>
-          <h1 className="text-xl font-bold text-neutral-900">Profil Tidak Ditemukan</h1>
-          <p className="text-sm text-neutral-600 leading-relaxed">
-            {error || 'Profil kreator ini mungkin telah diubah, dinonaktifkan, atau tautan tidak valid.'}
-          </p>
-          <div className="pt-2 flex flex-col sm:flex-row items-center justify-center gap-3">
-            <button
-              onClick={fetchCreator}
-              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl border border-neutral-200 text-sm font-semibold text-neutral-700 hover:bg-neutral-50 transition cursor-pointer"
-            >
-              <RefreshCw className="w-4 h-4" />
-              <span>Coba Lagi</span>
-            </button>
-            <Link
-              href="/explore"
-              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-[#155DFC] hover:bg-[#0E4CD1] text-sm font-semibold text-white transition shadow-sm"
-            >
-              <ArrowLeft className="w-4 h-4" />
-              <span>Jelajahi Kreator Lain</span>
-            </Link>
-          </div>
-        </div>
-      </main>
-    );
+  const { raw } = data;
+  const canonicalPath = raw.slug ? `/creator/${raw.slug}` : `/creator/${raw.id}`;
+  const canonicalUrl = `${APP_URL}${canonicalPath}`;
+  const headline = raw.headline ? ` - ${raw.headline}` : '';
+  const title = `${raw.fullName}${headline} | Creatorin`;
+  const description = raw.bio || `${raw.fullName} adalah konten kreator terverifikasi di Creatorin dengan keahlian ${raw.skills.slice(0, 3).join(', ')}.`;
+
+  return {
+    title,
+    description,
+    alternates: {
+      canonical: canonicalUrl,
+    },
+    openGraph: {
+      title,
+      description,
+      url: canonicalUrl,
+      type: 'profile',
+      images: raw.avatarUrl
+        ? [
+            {
+              url: raw.avatarUrl,
+              width: 600,
+              height: 600,
+              alt: raw.fullName,
+            },
+          ]
+        : [
+            {
+              url: `${APP_URL}/creatorin/logo.svg`,
+              width: 1200,
+              height: 630,
+              alt: raw.fullName,
+            },
+          ],
+    },
+    twitter: {
+      card: 'summary',
+      title,
+      description,
+      images: raw.avatarUrl ? [raw.avatarUrl] : [`${APP_URL}/creatorin/logo.svg`],
+    },
+  };
+}
+
+export default async function CreatorRoute({ params }: CreatorRouteProps) {
+  const { id } = await params;
+  const data = await getCreatorServerData(id);
+
+  // If visited via raw UUID, redirect 301 to SEO-friendly slug when available
+  const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id);
+  if (data && isUuid && data.raw.slug && data.raw.slug !== id) {
+    redirect(`/creator/${data.raw.slug}`, RedirectType.replace);
   }
 
-  return <CreatorProfilePage creator={creator} />;
+  const schemaJsonLd = data
+    ? {
+        '@context': 'https://schema.org',
+        '@graph': [
+          {
+            '@type': 'ProfilePage',
+            '@id': `${APP_URL}/creator/${data.raw.slug || data.raw.id}#webpage`,
+            url: `${APP_URL}/creator/${data.raw.slug || data.raw.id}`,
+            name: `${data.raw.fullName} - Profil Kreator di Creatorin`,
+            isPartOf: {
+              '@type': 'WebSite',
+              '@id': `${APP_URL}/#website`,
+              name: 'Creatorin',
+              url: APP_URL,
+            },
+            mainEntity: {
+              '@id': `${APP_URL}/creator/${data.raw.slug || data.raw.id}#person`,
+            },
+          },
+          {
+            '@type': 'Person',
+            '@id': `${APP_URL}/creator/${data.raw.slug || data.raw.id}#person`,
+            name: data.raw.fullName,
+            alternateName: `@${data.raw.slug || data.raw.id}`,
+            jobTitle: data.raw.headline || 'Content Creator',
+            description: data.raw.bio || undefined,
+            image: data.raw.avatarUrl || undefined,
+            address: data.raw.location
+              ? {
+                  '@type': 'PostalAddress',
+                  addressLocality: data.raw.location,
+                  addressCountry: 'ID',
+                }
+              : undefined,
+            knowsAbout: data.raw.skills.length > 0 ? data.raw.skills : undefined,
+            ...(Number(data.raw.rating) > 0 && {
+              aggregateRating: {
+                '@type': 'AggregateRating',
+                ratingValue: Number(data.raw.rating).toFixed(1),
+                reviewCount: Math.max(1, data.raw.reviewsCount || 1),
+                bestRating: '5',
+                worstRating: '1',
+              },
+            }),
+          },
+        ],
+      }
+    : null;
+
+  return (
+    <>
+      {schemaJsonLd && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(schemaJsonLd) }}
+        />
+      )}
+      <CreatorProfileClient id={id} initialCreator={data?.creator} />
+    </>
+  );
 }

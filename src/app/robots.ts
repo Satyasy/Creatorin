@@ -1,7 +1,7 @@
 import type { MetadataRoute } from 'next';
 
 export default function robots(): MetadataRoute.Robots {
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://creatorin.id';
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://creatorin.my.id';
 
   return {
     rules: {
@@ -9,6 +9,8 @@ export default function robots(): MetadataRoute.Robots {
       allow: '/',
       disallow: [
         '/api/',
+        '/admin',
+        '/admin/',
         '/chat',
         '/contracts',
         '/dashboard/',
@@ -16,6 +18,8 @@ export default function robots(): MetadataRoute.Robots {
         '/notifications',
         '/profile',
         '/settings',
+        '/wallet',
+        '/auth/callback',
       ],
     },
     sitemap: `${baseUrl}/sitemap.xml`,
