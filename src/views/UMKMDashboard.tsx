@@ -15,12 +15,15 @@ import {
   Search, 
   Star, 
   User, 
-  X 
+  X,
+  Loader2
 } from 'lucide-react';
 import { creatorService } from '@/services/creatorService';
 import { useAuth } from '@/providers/AuthProvider';
-import { FeedProject, CreatorService, Creator } from '@/types';
+import { FeedProject, CreatorService, Creator, AuthState } from '@/types';
 import { HomeHeroSection } from '@/components/home/HomeHeroSection';
+import { startRouteProgress } from '@/components/common/RouteProgressBar';
+import { AuthModal } from '@/components/modals/AuthModal';
 
 const ProjectDetailModal = dynamic(
   () => import('@/components/modals/ProjectDetailModal').then((mod) => mod.ProjectDetailModal),
@@ -663,6 +666,40 @@ export const UMKMDashboard = () => {
   const [selectedProject, setSelectedProject] = useState<FeedProject | null>(null);
   const [selectedService, setSelectedService] = useState<{ service: CreatorService; creator: Creator } | null>(null);
   const [isBriefModalOpen, setIsBriefModalOpen] = useState(false);
+  const [loadingCreatorId, setLoadingCreatorId] = useState<string | null>(null);
+
+  // AuthModal state for protected actions
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  const [authModalConfig, setAuthModalConfig] = useState<{
+    title: string;
+    description: string;
+    action?: (user?: NonNullable<AuthState['user']>) => void;
+  }>({
+    title: 'Masuk ke Akun Creatorin',
+    description: 'Masuk untuk melanjutkan tindakan ini dan membuka akses ke seluruh fitur kolaborasi.',
+  });
+
+  const handleNavigateToCreator = (creatorIdOrSlug: string, id: string) => {
+    setLoadingCreatorId(id);
+    startRouteProgress();
+    router.push(`/creator/${creatorIdOrSlug}`);
+  };
+
+  const handleOpenChatWithCreator = (creatorId: string) => {
+    if (!user) {
+      setAuthModalConfig({
+        title: 'Masuk untuk Menghubungi Kreator',
+        description: 'Anda harus masuk ke akun Creatorin Anda terlebih dahulu untuk memulai obrolan langsung dan mendiskusikan kebutuhan kolaborasi.',
+        action: () => {
+          router.push(`/chat?creatorId=${creatorId}`);
+        },
+      });
+      setIsAuthModalOpen(true);
+      return;
+    }
+    router.push(`/chat?creatorId=${creatorId}`);
+  };
+
   const [showcaseCreators, setShowcaseCreators] = useState<ShowcaseCreator[]>(INITIAL_SHOWCASE_CREATORS);
   const [showcaseServices, setShowcaseServices] = useState<HomeServiceItem[]>(INITIAL_SHOWCASE_SERVICES);
   const [showcaseProjects, setShowcaseProjects] = useState<HomeProjectItem[]>(INITIAL_SHOWCASE_PROJECTS);
@@ -1095,7 +1132,10 @@ export const UMKMDashboard = () => {
                 >
                   {/* Header: Avatar, Name, PRO+, Stats, Actions */}
                   <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4">
-                    <div className="flex items-center gap-3.5 min-w-0">
+                    <div 
+                      onMouseEnter={() => router.prefetch(`/creator/${creator.slug || creator.id}`)}
+                      className="flex items-center gap-3.5 min-w-0"
+                    >
                       <div className="relative shrink-0">
                         <img
                           src={creator.avatar}
@@ -1103,15 +1143,23 @@ export const UMKMDashboard = () => {
                           className="w-12 h-12 rounded-full object-cover ring-1 ring-black/5"
                           loading="lazy"
                         />
+                        {loadingCreatorId === creator.id && (
+                          <div className="absolute inset-0 bg-neutral-900/40 rounded-full flex items-center justify-center text-white backdrop-blur-[1px]">
+                            <Loader2 className="w-4 h-4 animate-spin" />
+                          </div>
+                        )}
                       </div>
 
                       <div className="min-w-0">
                         <div className="flex flex-wrap items-center gap-2">
                           <h3
-                            onClick={() => router.push(`/creator/${creator.slug || creator.id}`)}
-                            className="font-semibold text-base sm:text-[17px] text-[#0D0C22] hover:text-[#155DFC] cursor-pointer transition-colors truncate font-display"
+                            onClick={() => handleNavigateToCreator(creator.slug || creator.id, creator.id)}
+                            className="font-semibold text-base sm:text-[17px] text-[#0D0C22] hover:text-[#155DFC] cursor-pointer transition-colors truncate font-display inline-flex items-center gap-1.5"
                           >
-                            {creator.name}
+                            <span>{creator.name}</span>
+                            {loadingCreatorId === creator.id && (
+                              <Loader2 className="w-3.5 h-3.5 animate-spin text-[#155DFC]" />
+                            )}
                           </h3>
                           <span className="inline-flex items-center gap-1 text-xs font-semibold text-[#0D0C22]">
                             <Star className="w-3.5 h-3.5 fill-[#F59E0B] text-[#F59E0B]" />
@@ -1158,7 +1206,7 @@ export const UMKMDashboard = () => {
                       </button>
                       <button
                         type="button"
-                        onClick={() => router.push(`/chat?creatorId=${creator.id}`)}
+                        onClick={() => handleOpenChatWithCreator(creator.id)}
                         className="rounded-full bg-[#0D0C22] hover:bg-black active:bg-neutral-900 text-white px-5 py-2 text-xs sm:text-sm font-semibold transition-all cursor-pointer shadow-xs active:scale-95"
                       >
                         Hubungi
@@ -1265,7 +1313,7 @@ export const UMKMDashboard = () => {
                           {service.tag}
                         </span>
                         <div
-                          onClick={() => router.push(`/creator/${service.creatorSlug || service.creatorId}`)}
+                          onClick={() => handleNavigateToCreator(service.creatorSlug || service.creatorId, service.creatorId)}
                           className="flex items-center gap-1.5 cursor-pointer hover:opacity-80 transition-opacity min-w-0"
                         >
                           <img
@@ -1326,7 +1374,7 @@ export const UMKMDashboard = () => {
 
                         <button
                           type="button"
-                          onClick={() => router.push(`/chat?creatorId=${service.creatorId}`)}
+                          onClick={() => handleOpenChatWithCreator(service.creatorId)}
                           className="rounded-full bg-[#0D0C22] hover:bg-black active:bg-neutral-900 text-white px-3.5 sm:px-4 py-1.5 text-xs font-semibold transition-all cursor-pointer shadow-xs active:scale-95"
                         >
                           Diskusikan
@@ -1438,11 +1486,11 @@ export const UMKMDashboard = () => {
           onSelectProject={setSelectedProject}
           onViewCreatorProfile={(creator) => {
             setSelectedProject(null);
-            router.push(`/creator/${creator.id}`);
+            handleNavigateToCreator(creator.id, creator.id);
           }}
           onGetInTouch={(creator) => {
             setSelectedProject(null);
-            router.push(`/chat?creatorId=${creator.id}`);
+            handleOpenChatWithCreator(creator.id);
           }}
           allProjects={allFeedProjects}
         />
@@ -1456,11 +1504,11 @@ export const UMKMDashboard = () => {
           onClose={() => setSelectedService(null)}
           onOrderService={(srv, cr) => {
             setSelectedService(null);
-            router.push(`/chat?creatorId=${cr.id}`);
+            handleOpenChatWithCreator(cr.id);
           }}
           onViewCreatorProfile={(cr) => {
             setSelectedService(null);
-            router.push(`/creator/${cr.id}`);
+            handleNavigateToCreator(cr.id, cr.id);
           }}
           onSelectOtherService={(newSrv) => {
             setSelectedService((prev) => (prev ? { ...prev, service: newSrv } : null));
@@ -1472,6 +1520,20 @@ export const UMKMDashboard = () => {
       <ProjectBriefModal
         isOpen={isBriefModalOpen}
         onClose={() => setIsBriefModalOpen(false)}
+      />
+
+      {/* Contextual Auth Modal */}
+      <AuthModal
+        isOpen={isAuthModalOpen}
+        onClose={() => setIsAuthModalOpen(false)}
+        title={authModalConfig.title}
+        description={authModalConfig.description}
+        onSuccess={(loggedUser) => {
+          setIsAuthModalOpen(false);
+          if (authModalConfig.action) {
+            authModalConfig.action(loggedUser);
+          }
+        }}
       />
     </div>
   );

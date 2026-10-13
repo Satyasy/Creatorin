@@ -94,10 +94,28 @@ export function RouteProgressBar() {
 
     window.addEventListener('popstate', handlePopState);
 
+    const handleNavigationStart = () => {
+      setIsNavigating(true);
+      setProgress(25);
+      clearInterval(progressInterval);
+      progressInterval = setInterval(() => {
+        setProgress((prev) => {
+          if (prev >= 85) {
+            clearInterval(progressInterval);
+            return prev;
+          }
+          return prev + (prev < 50 ? 20 : 8);
+        });
+      }, 150);
+    };
+
+    window.addEventListener('creatorin:navigation-start', handleNavigationStart);
+
     return () => {
       clearInterval(progressInterval);
       observer.disconnect();
       window.removeEventListener('popstate', handlePopState);
+      window.removeEventListener('creatorin:navigation-start', handleNavigationStart);
       const anchors = document.querySelectorAll('a[href^="/"]');
       anchors.forEach((a) => {
         a.removeEventListener('click', handleAnchorClick as EventListener);
@@ -125,3 +143,10 @@ export function RouteProgressBar() {
     </div>
   );
 }
+
+export function startRouteProgress() {
+  if (typeof window !== 'undefined') {
+    window.dispatchEvent(new CustomEvent('creatorin:navigation-start'));
+  }
+}
+
