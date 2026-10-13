@@ -246,8 +246,8 @@ export function CreatorServicesPage() {
             className="group relative flex min-h-[300px] sm:min-h-[320px] w-full flex-col items-center justify-center rounded-2xl border border-dashed border-[#ACACAC] bg-white p-5 sm:p-6 text-center transition-all hover:border-[#0D0C22] hover:bg-neutral-50/50 cursor-pointer shadow-xs hover:shadow-md"
           >
             <div className="flex flex-col items-center justify-center max-w-[240px]">
-              {/* Scaled Plus Vector Icon */}
-              <div className="flex items-center justify-center transition-transform duration-300 group-hover:scale-110">
+              {/* Plus Vector Icon */}
+              <div className="flex items-center justify-center">
                 <svg
                   width="44"
                   height="36"
@@ -292,7 +292,7 @@ export function CreatorServicesPage() {
                     <img
                       src={srv.coverImage}
                       alt={srv.title}
-                      className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.02]"
+                      className="h-full w-full object-cover"
                       onError={(e) => {
                         (e.currentTarget as HTMLImageElement).src = '/figma/service-figma.png';
                       }}
@@ -306,29 +306,11 @@ export function CreatorServicesPage() {
                   )}
                 </div>
 
-                {/* Badges Row (Category Tag & Status Badge) */}
-                <div className="flex items-center justify-between gap-2 mt-3">
-                  {/* Category Tag */}
+                {/* Category Tag */}
+                <div className="mt-3">
                   <span className="inline-block rounded bg-[#F3F4F6] px-2 py-0.5 text-[10px] sm:text-[11px] font-semibold uppercase tracking-wide text-[#55576A]">
                     {srv.tag || srv.category || 'Layanan'}
                   </span>
-
-                  {/* Status Badge */}
-                  {srv.isActive !== false ? (
-                    <div className="flex items-center gap-1.5 rounded-full border border-[#A4F4CF] bg-[#ECFDF5] px-2 py-0.5">
-                      <span className="size-1.5 rounded-full bg-[#00BC7D] opacity-65" />
-                      <span className="text-[10px] font-bold leading-none tracking-wide text-[#007A55]">
-                        Aktif Tayang
-                      </span>
-                    </div>
-                  ) : (
-                    <div className="flex items-center gap-1.5 rounded-full border border-[#E5E5E5] bg-[#F5F5F5] px-2 py-0.5">
-                      <span className="size-1.5 rounded-full bg-[#A1A1A1]" />
-                      <span className="text-[10px] font-bold leading-none tracking-wide text-[#525252]">
-                        Draft
-                      </span>
-                    </div>
-                  )}
                 </div>
 
                 {/* Service Title */}

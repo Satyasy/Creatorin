@@ -254,37 +254,49 @@ export function CreatorSidebar() {
                 title={label}
                 aria-label={label}
                 aria-current={active ? 'page' : undefined}
-                className={`flex h-[52px] min-w-[58px] shrink-0 flex-col items-center justify-center gap-1 rounded-xl px-1 text-xs font-normal leading-4 transition-colors duration-150 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#155DFC] lg:h-[58px] lg:w-[67px] ${
-                  active
-                    ? 'bg-[#DFE6EF] text-[#0D0C22] font-semibold'
-                    : 'text-[#222222] hover:bg-[#F3F5F8] hover:text-[#0D0B0B]'
-                }`}
+                className="group flex min-w-[58px] shrink-0 flex-col items-center justify-center gap-1 rounded-xl py-1 text-center transition-all duration-150 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#155DFC] lg:w-[67px]"
               >
-                <Icon className="h-5 w-5 shrink-0" />
-                <span className="max-w-[65px] truncate text-center text-xs leading-4">{label}</span>
+                <div
+                  className={`flex h-9 w-9 items-center justify-center rounded-xl transition-all duration-200 ${
+                    active
+                      ? 'bg-[#0D0C22] text-white shadow-[0_2px_8px_rgba(13,12,34,0.18)]'
+                      : 'text-[#60637A] group-hover:bg-[#F3F5F8] group-hover:text-[#0D0C22]'
+                  }`}
+                >
+                  <Icon className="h-5 w-5 shrink-0" />
+                </div>
+                <span
+                  className={`max-w-[65px] truncate text-[11px] leading-tight transition-colors duration-150 ${
+                    active
+                      ? 'font-bold text-[#0D0C22]'
+                      : 'font-medium text-[#717488] group-hover:text-[#0D0C22]'
+                  }`}
+                >
+                  {label}
+                </span>
               </Link>
             );
           })}
 
           {/* 4. Bottom Utility Items (Container:align mt-auto, gap-2) */}
-          <div className="ml-auto flex items-center gap-1 lg:ml-0 lg:mt-auto lg:w-[67px] lg:flex-col lg:items-center lg:gap-2 lg:pt-4">
-            {/* Notifikasi (44x44 rounded-xl) */}
+          <div className="ml-auto flex items-center gap-1.5 lg:ml-0 lg:mt-auto lg:w-[67px] lg:flex-col lg:items-center lg:gap-2 lg:pt-4">
+            {/* Notifikasi (40x40 rounded-xl) */}
             <Link
               href="/notifications"
               title="Notifikasi"
               aria-label="Notifikasi"
               aria-current={isActive('/notifications') ? 'page' : undefined}
-              className={`relative grid h-11 w-11 shrink-0 place-items-center rounded-xl transition-colors duration-150 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#155DFC] ${
+              className={`relative flex h-10 w-10 shrink-0 items-center justify-center rounded-xl transition-all duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#155DFC] ${
                 isActive('/notifications')
-                  ? 'bg-[#DFE6EF] text-[#0D0C22]'
-                  : 'text-[#222222] hover:bg-[#F3F5F8] hover:text-[#0D0B0B]'
+                  ? 'bg-[#0D0C22] text-white shadow-[0_2px_8px_rgba(13,12,34,0.18)]'
+                  : 'text-[#60637A] hover:bg-[#F3F5F8] hover:text-[#0D0C22]'
               }`}
             >
               <NotifikasiIcon className="h-5 w-5 shrink-0" />
               {unreadNotifications > 0 && (
                 <>
                   <span
-                    className="absolute top-3 right-3.5 h-[5px] w-[5px] rounded-full bg-[#EB4D4B]"
+                    className="absolute top-2 right-2 h-2 w-2 rounded-full bg-[#EB4D4B] ring-2 ring-white"
                     aria-hidden="true"
                   />
                   <span className="sr-only">{unreadNotifications} notifikasi baru</span>
@@ -292,28 +304,28 @@ export function CreatorSidebar() {
               )}
             </Link>
 
-            {/* Pengaturan (44x44 rounded-xl) */}
+            {/* Pengaturan (40x40 rounded-xl) */}
             <Link
               href="/settings"
               title="Pengaturan"
               aria-label="Pengaturan"
               aria-current={isActive('/settings') ? 'page' : undefined}
-              className={`grid h-11 w-11 shrink-0 place-items-center rounded-xl transition-colors duration-150 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#155DFC] ${
+              className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl transition-all duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#155DFC] ${
                 isActive('/settings')
-                  ? 'bg-[#DFE6EF] text-[#0D0C22]'
-                  : 'text-[#222222] hover:bg-[#F3F5F8] hover:text-[#0D0B0B]'
+                  ? 'bg-[#0D0C22] text-white shadow-[0_2px_8px_rgba(13,12,34,0.18)]'
+                  : 'text-[#60637A] hover:bg-[#F3F5F8] hover:text-[#0D0C22]'
               }`}
             >
               <PengaturanIcon className="h-5 w-5 shrink-0" />
             </Link>
 
-            {/* Logout (44x44 rounded-xl) */}
+            {/* Logout (40x40 rounded-xl) */}
             <button
               type="button"
               onClick={handleLogout}
               title="Logout"
               aria-label="Logout"
-              className="grid h-11 w-11 shrink-0 place-items-center rounded-xl text-[#222222] transition-colors duration-150 hover:bg-[#FEE4E2]/70 hover:text-[#D92D20] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#155DFC] cursor-pointer"
+              className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl text-[#60637A] transition-colors duration-150 hover:bg-[#FEE4E2]/70 hover:text-[#D92D20] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#155DFC] cursor-pointer"
             >
               <LogoutIcon className="h-5 w-5 shrink-0" />
             </button>

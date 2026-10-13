@@ -1146,7 +1146,7 @@ export const CreatorProfilePage: React.FC<CreatorProfilePageProps> = ({
                   className="group relative flex min-h-[300px] sm:min-h-[320px] w-full flex-col items-center justify-center rounded-2xl border border-dashed border-[#acacac] bg-white p-5 sm:p-6 text-center transition-all hover:border-[#0d0c22] hover:bg-neutral-50/50 cursor-pointer shadow-xs hover:shadow-md"
                 >
                   <div className="flex flex-col items-center justify-center max-w-[240px]">
-                    <div className="flex items-center justify-center transition-transform duration-300 group-hover:scale-110">
+                    <div className="flex items-center justify-center">
                       <svg width="44" height="36" viewBox="0 0 64 53" fill="none" xmlns="http://www.w3.org/2000/svg" className="text-[#b0b0b0] group-hover:text-[#0d0c22] transition-colors">
                         <path d="M32.3297 0V52.9998" stroke="currentColor" strokeWidth="4" />
                         <path d="M63.729 26.8841H0.000499456" stroke="currentColor" strokeWidth="4" />
@@ -1179,7 +1179,7 @@ export const CreatorProfilePage: React.FC<CreatorProfilePageProps> = ({
                         <img
                           src={srv.coverImage}
                           alt={srv.title}
-                          className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.02]"
+                          className="h-full w-full object-cover"
                           onError={(e) => {
                             (e.currentTarget as HTMLImageElement).src = '/figma/service-figma.png';
                           }}
@@ -1191,29 +1191,11 @@ export const CreatorProfilePage: React.FC<CreatorProfilePageProps> = ({
                       )}
                     </div>
 
-                    {/* Tag & Status Row */}
-                    <div className="flex items-center justify-between gap-2 mt-3">
-                      {/* Category Tag */}
+                    {/* Category Tag */}
+                    <div className="mt-3">
                       <span className="inline-block rounded bg-[#F3F4F6] px-2 py-0.5 text-[10px] sm:text-[11px] font-semibold uppercase tracking-wide text-[#55576A]">
                         {srv.tag || srv.category || 'Layanan'}
                       </span>
-
-                      {/* Status Badge */}
-                      {srv.isActive !== false ? (
-                        <div className="flex items-center gap-1.5 rounded-full border border-[#a4f4cf] bg-[#ecfdf5] px-2 py-0.5">
-                          <span className="size-1.5 rounded-full bg-[#00bc7d] opacity-65" />
-                          <span className="text-[10px] font-bold leading-none tracking-wide text-[#007a55]">
-                            Aktif Tayang
-                          </span>
-                        </div>
-                      ) : (
-                        <div className="flex items-center gap-1.5 rounded-full border border-[#e5e5e5] bg-[#f5f5f5] px-2 py-0.5">
-                          <span className="size-1.5 rounded-full bg-[#a1a1a1]" />
-                          <span className="text-[10px] font-bold leading-none tracking-wide text-[#525252]">
-                            Draft
-                          </span>
-                        </div>
-                      )}
                     </div>
 
                     {/* Title */}
