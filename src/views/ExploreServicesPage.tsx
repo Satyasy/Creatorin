@@ -1123,24 +1123,6 @@ const DEFAULT_SERVICES: ServiceWithCreator[] = [
                       </div>
 
                       <div className="flex items-center gap-1.5 shrink-0">
-                        {/* Tombol Icon Simpan */}
-                        <button
-                          type="button"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            toggleSaveService(item.id);
-                          }}
-                          className={`w-8 h-8 rounded-full border transition cursor-pointer flex items-center justify-center ${
-                            savedServiceIds.includes(item.id)
-                              ? 'border-amber-300 bg-amber-50 text-amber-600'
-                              : 'border-neutral-200 hover:border-neutral-300 hover:bg-neutral-50 text-neutral-600'
-                          }`}
-                          title={savedServiceIds.includes(item.id) ? "Tersimpan" : "Simpan layanan"}
-                          aria-label="Simpan layanan"
-                        >
-                          <Bookmark className={`w-3.5 h-3.5 ${savedServiceIds.includes(item.id) ? 'fill-amber-500 text-amber-500' : 'stroke-[1.75]'}`} />
-                        </button>
-
                         {/* Tombol Diskusikan (CTA rounded-full matching Figma) */}
                         <button
                           type="button"

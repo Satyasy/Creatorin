@@ -1002,21 +1002,6 @@ export const CreatorProfilePage: React.FC<CreatorProfilePageProps> = ({
                       </div>
 
                       <div className="flex items-center gap-1.5 shrink-0">
-                        {/* Tombol Icon Simpan */}
-                        <button
-                          type="button"
-                          onClick={(e) => toggleSaveService(srv.id, e)}
-                          className={`flex size-9 items-center justify-center rounded-full border transition cursor-pointer ${
-                            savedServiceIds.has(srv.id)
-                              ? 'border-amber-300 bg-amber-50 text-amber-600'
-                              : 'border-neutral-200 hover:border-neutral-300 hover:bg-neutral-100 text-neutral-600'
-                          }`}
-                          title={savedServiceIds.has(srv.id) ? 'Tersimpan' : 'Simpan layanan'}
-                          aria-label="Simpan layanan"
-                        >
-                          <Bookmark className={`w-3.5 h-3.5 sm:w-4 sm:h-4 ${savedServiceIds.has(srv.id) ? 'fill-amber-500 text-amber-500' : 'stroke-[1.75]'}`} />
-                        </button>
-
                         {/* Tombol Diskusikan */}
                         <button
                           type="button"
