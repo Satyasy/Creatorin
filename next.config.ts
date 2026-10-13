@@ -20,6 +20,8 @@ const nextConfig: NextConfig = {
     return [
       { source: '/login', destination: '/sign-in', permanent: true },
       { source: '/signup', destination: '/sign-up', permanent: true },
+      { source: '/collaboration', destination: '/chat', permanent: true },
+      { source: '/collaboration/:path*', destination: '/chat', permanent: true },
     ];
   },
   async headers() {
