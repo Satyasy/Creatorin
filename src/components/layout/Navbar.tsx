@@ -19,6 +19,7 @@ import {
 } from 'lucide-react';
 import { ActivePage, AuthState } from '@/types';
 import { useAuth } from '@/providers/AuthProvider';
+import { useLanguage } from '@/providers/LanguageProvider';
 
 interface NavbarProps {
   currentUser?: AuthState['user'];
@@ -42,6 +43,7 @@ export const Navbar: React.FC<NavbarProps> = ({
   const router = useRouter();
   const pathname = usePathname();
   const { user: authUser, signOut: authSignOut } = useAuth();
+  const { language, setLanguage, t } = useLanguage();
   const currentUser = propUser !== undefined ? propUser : authUser;
   const isHomeActive = activePage === 'home' || pathname === '/' || pathname === '/dashboard';
 
@@ -205,7 +207,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                   setNavSearchInput(e.target.value);
                   if (onSearch) onSearch(e.target.value);
                 }}
-                placeholder="Cari kreator, keahlian, atau video UGC..."
+                placeholder={t('nav.searchPlaceholder', 'Cari kreator, keahlian, atau video UGC...')}
                 className="w-full bg-transparent text-sm font-normal text-[#0D0C22] placeholder:text-[#55576A]/60 focus:outline-hidden font-sans"
               />
               
@@ -235,7 +237,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                 : 'text-[#55576A] font-medium hover:text-[#0D0C22]'
             }`}
           >
-            <span>Beranda</span>
+            <span>{t('nav.home', 'Beranda')}</span>
           </button>
 
           {/* Navigasi Eksplorasi: Explore untuk Kreator, Jelajah untuk UMKM/Guest */}
@@ -249,7 +251,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                   : 'text-[#55576A] font-medium hover:text-[#0D0C22]'
               }`}
             >
-              <span>Explore</span>
+              <span>{t('nav.explore', 'Explore')}</span>
             </button>
           ) : (
             <div 
@@ -261,20 +263,34 @@ export const Navbar: React.FC<NavbarProps> = ({
               <button
                 onClick={() => navigateTo('services', '/jelajah/layanan')}
                 className={`transition-colors flex items-center gap-1 cursor-pointer text-sm py-1.5 ${
-                  pathname?.startsWith('/jelajah') 
+                  pathname?.startsWith('/jelajah') || pathname === '/explore'
                     ? 'text-[#155DFC] font-semibold' 
                     : 'text-[#55576A] font-medium hover:text-[#0D0C22]'
                 } group-hover/explore:text-[#155DFC]`}
               >
-                <span>Jelajah</span>
+                <span>{t('nav.browse', 'Jelajah')}</span>
                 <ChevronDown className="w-3.5 h-3.5 transition-transform duration-200 text-current group-hover/explore:rotate-180" />
               </button>
 
               {exploreDropdownOpen && (
                 <div 
-                  className="absolute top-full -left-4 w-44 bg-white rounded-xl border border-[#E1E3EA] shadow-md py-1.5 z-50 animate-in fade-in zoom-in-95 duration-150"
+                  className="absolute top-full -left-4 w-48 bg-white rounded-xl border border-[#E1E3EA] shadow-md py-1.5 z-50 animate-in fade-in zoom-in-95 duration-150"
                 >
                   <div className="px-1.5 space-y-0.5 font-sans">
+                    <button
+                      onClick={() => {
+                        setExploreDropdownOpen(false);
+                        navigateTo('explore', '/explore');
+                      }}
+                      className={`w-full rounded-lg px-3 py-2 text-left text-sm transition-colors cursor-pointer flex items-center justify-between ${
+                        pathname === '/explore'
+                          ? 'font-semibold text-[#155DFC] bg-[#E8F0FF]'
+                          : 'font-medium text-[#0D0C22] hover:bg-[#F3F3F4] hover:text-[#155DFC]'
+                      }`}
+                    >
+                      <span>{t('nav.allCategories', 'Semua (Explore Hub)')}</span>
+                    </button>
+
                     <button
                       onClick={() => {
                         setExploreDropdownOpen(false);
@@ -286,7 +302,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                           : 'font-medium text-[#0D0C22] hover:bg-[#F3F3F4] hover:text-[#155DFC]'
                       }`}
                     >
-                      <span>Kreator</span>
+                      <span>{t('nav.creators', 'Kreator')}</span>
                     </button>
 
                     <button
@@ -300,7 +316,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                           : 'font-medium text-[#0D0C22] hover:bg-[#F3F3F4] hover:text-[#155DFC]'
                       }`}
                     >
-                      <span>Layanan</span>
+                      <span>{t('nav.services', 'Layanan')}</span>
                     </button>
 
                     <button
@@ -314,7 +330,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                           : 'font-medium text-[#0D0C22] hover:bg-[#F3F3F4] hover:text-[#155DFC]'
                       }`}
                     >
-                      <span>Proyek</span>
+                      <span>{t('nav.projects', 'Proyek')}</span>
                     </button>
                   </div>
                 </div>
@@ -332,14 +348,40 @@ export const Navbar: React.FC<NavbarProps> = ({
                 : 'text-[#55576A] font-medium hover:text-[#0D0C22]'
             }`}
           >
-            <span>Brief Proyek</span>
+            <span>{t('nav.briefs', 'Brief Proyek')}</span>
           </button>
 
         </nav>
 
         {/* Sisi Kanan: Action Buttons & User Profile */}
-        <div className="flex items-center gap-3 shrink-0 font-sans">
+        <div className="flex items-center gap-2.5 sm:gap-3 shrink-0 font-sans">
           
+          {/* Language Switcher Pill */}
+          <div className="flex items-center bg-[#F3F3F4] rounded-full p-0.5 border border-[#E1E3EA] text-xs font-semibold">
+            <button
+              type="button"
+              onClick={() => setLanguage('id')}
+              className={`px-2 py-0.5 rounded-full transition-colors cursor-pointer text-[11px] font-bold ${
+                language === 'id' ? 'bg-[#155DFC] text-white shadow-xs' : 'text-[#55576A] hover:text-[#0D0C22]'
+              }`}
+              title="Bahasa Indonesia"
+              aria-label="Bahasa Indonesia"
+            >
+              ID
+            </button>
+            <button
+              type="button"
+              onClick={() => setLanguage('en')}
+              className={`px-2 py-0.5 rounded-full transition-colors cursor-pointer text-[11px] font-bold ${
+                language === 'en' ? 'bg-[#155DFC] text-white shadow-xs' : 'text-[#55576A] hover:text-[#0D0C22]'
+              }`}
+              title="English"
+              aria-label="English"
+            >
+              EN
+            </button>
+          </div>
+
           {currentUser && (
             <>
               {/* Ikon Pesan */}
@@ -423,7 +465,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                     className="w-full px-4 py-2.5 text-left text-xs font-medium text-[#55576A] hover:bg-[#F3F3F4] hover:text-[#0D0C22] flex items-center gap-2.5 cursor-pointer transition-colors"
                   >
                     <User className="w-4 h-4 text-[#55576A]" />
-                    <span>Profil Saya</span>
+                    <span>{t('nav.profile', 'Profil Saya')}</span>
                   </button>
 
                   <button
@@ -435,7 +477,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                     className="w-full px-4 py-2.5 text-left text-xs font-medium text-[#55576A] hover:bg-[#F3F3F4] hover:text-[#0D0C22] flex items-center gap-2.5 cursor-pointer transition-colors"
                   >
                     <WalletCards className="w-4 h-4 text-[#55576A]" />
-                    <span>Dompet & Saldo</span>
+                    <span>{t('nav.wallet', 'Dompet & Saldo')}</span>
                   </button>
 
                   {currentUser.role === 'creator' && (
@@ -448,7 +490,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                       className="w-full px-4 py-2.5 text-left text-xs font-medium text-[#55576A] hover:bg-[#F3F3F4] hover:text-[#0D0C22] flex items-center gap-2.5 cursor-pointer transition-colors"
                     >
                       <FileCheck2 className="w-4 h-4 text-[#55576A]" />
-                      <span>Kontrak Saya</span>
+                      <span>{t('nav.contracts', 'Kontrak Saya')}</span>
                     </button>
                   )}
 
@@ -462,7 +504,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                       className="w-full px-4 py-2.5 text-left text-xs font-medium text-[#55576A] hover:bg-[#F3F3F4] hover:text-[#0D0C22] flex items-center gap-2.5 cursor-pointer transition-colors"
                     >
                       <GraduationCap className="w-4 h-4 text-[#55576A]" />
-                      <span>Dashboard Sekolah</span>
+                      <span>{t('nav.schoolDashboard', 'Dashboard Sekolah')}</span>
                     </button>
                   )}
 
@@ -475,7 +517,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                     className="w-full px-4 py-2.5 text-left text-xs font-medium text-[#55576A] hover:bg-[#F3F3F4] hover:text-[#0D0C22] flex items-center gap-2.5 cursor-pointer transition-colors"
                   >
                     <Settings className="w-4 h-4 text-[#55576A]" />
-                    <span>Pengaturan</span>
+                    <span>{t('nav.settings', 'Pengaturan')}</span>
                   </button>
 
                   <div className="my-1 border-t border-[#E1E3EA]" />
@@ -489,7 +531,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                     className="w-full px-4 py-2.5 text-left text-xs font-medium text-[#D92D20] hover:bg-[#FEE4E2] flex items-center gap-2.5 cursor-pointer transition-colors"
                   >
                     <LogOut className="w-4 h-4 text-[#D92D20]" />
-                    <span>Keluar</span>
+                    <span>{t('nav.signOut', 'Keluar')}</span>
                   </button>
                 </div>
               )}
@@ -501,7 +543,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                 onClick={() => navigateTo('signin', '/sign-in')}
                 className="px-3.5 py-2 text-sm font-medium text-[#55576A] hover:text-[#0D0C22] rounded-lg hover:bg-[#F3F3F4] transition-colors cursor-pointer"
               >
-                Masuk
+                {t('nav.signIn', 'Masuk')}
               </button>
 
               <button
@@ -509,7 +551,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                 onClick={() => navigateTo('signin', '/sign-in')}
                 className="inline-flex items-center gap-2 pl-4 pr-1.5 py-1.5 bg-[#155DFC] hover:bg-[#1248C7] active:bg-[#0E3A9E] text-white text-sm font-semibold rounded-full shadow-xs transition-all group cursor-pointer"
               >
-                <span>Mulai Gratis</span>
+                <span>{t('nav.signUp', 'Mulai Gratis')}</span>
                 <span className="w-7 h-7 rounded-full bg-white flex items-center justify-center text-[#155DFC] shadow-xs group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform">
                   <ArrowUpRight className="w-3.5 h-3.5 stroke-[2.5]" />
                 </span>
@@ -556,6 +598,31 @@ export const Navbar: React.FC<NavbarProps> = ({
           )}
 
           <div className="flex flex-col space-y-1 pt-2 text-sm">
+            {/* Mobile Language Switcher */}
+            <div className="flex items-center justify-between py-2 px-3 mb-1 bg-[#F3F3F4] rounded-xl border border-[#E1E3EA]">
+              <span className="text-xs font-semibold text-[#55576A]">{t('settings.languageLabel', 'Bahasa Antarmuka')}</span>
+              <div className="flex items-center bg-white rounded-full p-0.5 border border-[#E1E3EA] text-xs font-semibold">
+                <button
+                  type="button"
+                  onClick={() => setLanguage('id')}
+                  className={`px-2.5 py-1 rounded-full transition-colors cursor-pointer text-xs font-bold ${
+                    language === 'id' ? 'bg-[#155DFC] text-white shadow-xs' : 'text-[#55576A]'
+                  }`}
+                >
+                  ID
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setLanguage('en')}
+                  className={`px-2.5 py-1 rounded-full transition-colors cursor-pointer text-xs font-bold ${
+                    language === 'en' ? 'bg-[#155DFC] text-white shadow-xs' : 'text-[#55576A]'
+                  }`}
+                >
+                  EN
+                </button>
+              </div>
+            </div>
+
             <button
               onClick={() => {
                 setMobileMenuOpen(false);
@@ -567,7 +634,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                   : 'text-[#55576A] font-medium hover:text-[#0D0C22]'
               }`}
             >
-              Beranda
+              {t('nav.home', 'Beranda')}
             </button>
             {isCreator ? (
               <button
@@ -581,10 +648,23 @@ export const Navbar: React.FC<NavbarProps> = ({
                     : 'text-[#55576A] font-medium hover:text-[#0D0C22]'
                 }`}
               >
-                Explore
+                {t('nav.explore', 'Explore')}
               </button>
             ) : (
               <>
+                <button
+                  onClick={() => {
+                    setMobileMenuOpen(false);
+                    navigateTo('explore', '/explore');
+                  }}
+                  className={`py-2 px-3 text-left rounded-lg transition-colors ${
+                    pathname === '/explore' 
+                      ? 'text-[#155DFC] font-semibold bg-[#E8F0FF]' 
+                      : 'text-[#55576A] font-medium hover:text-[#0D0C22]'
+                  }`}
+                >
+                  {t('nav.allCategories', 'Semua (Explore Hub)')}
+                </button>
                 <button
                   onClick={() => {
                     setMobileMenuOpen(false);
@@ -596,7 +676,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                       : 'text-[#55576A] font-medium hover:text-[#0D0C22]'
                   }`}
                 >
-                  Kreator
+                  {t('nav.creators', 'Kreator')}
                 </button>
                 <button
                   onClick={() => {
@@ -609,7 +689,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                       : 'text-[#55576A] font-medium hover:text-[#0D0C22]'
                   }`}
                 >
-                  Layanan
+                  {t('nav.services', 'Layanan')}
                 </button>
                 <button
                   onClick={() => {
@@ -622,7 +702,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                       : 'text-[#55576A] font-medium hover:text-[#0D0C22]'
                   }`}
                 >
-                  Proyek
+                  {t('nav.projects', 'Proyek')}
                 </button>
               </>
             )}
@@ -637,7 +717,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                   : 'text-[#55576A] font-medium hover:text-[#0D0C22]'
               }`}
             >
-              Brief Proyek
+              {t('nav.briefs', 'Brief Proyek')}
             </button>
           </div>
 
@@ -650,7 +730,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                 }}
                 className="flex-1 py-2.5 text-center text-sm font-semibold text-[#0D0C22] border border-[#E1E3EA] rounded-xl hover:bg-[#F3F3F4] transition-colors"
               >
-                Masuk
+                {t('nav.signIn', 'Masuk')}
               </button>
               <button
                 onClick={() => {
@@ -659,7 +739,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                 }}
                 className="flex-1 py-2.5 text-center text-sm font-semibold text-white bg-[#155DFC] hover:bg-[#1248C7] rounded-xl transition-colors shadow-xs"
               >
-                Mulai Gratis
+                {t('nav.signUp', 'Mulai Gratis')}
               </button>
             </div>
           )}

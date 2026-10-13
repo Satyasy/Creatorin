@@ -64,7 +64,8 @@ import { UploadProjectModal } from '@/components/modals/UploadProjectModal';
 import { UploadServiceModal } from '@/components/modals/UploadServiceModal';
 import { AuthModal } from '@/components/modals/AuthModal';
 import { creatorService } from '@/services/creatorService';
-import { chatService } from '@/services/chatService';
+import { useToast } from '@/providers/ToastProvider';
+import { useLanguage } from '@/providers/LanguageProvider';
 import { createClient } from '@/lib/supabase/client';
 import { ShaderFill } from '@/lib/custom-effect-runtime';
 import { setup as setupConcentric, render as renderConcentric, manifest as manifestConcentric } from '@/lib/custom-effects/CodeComponentId_c2b302fbdfce8a1ec92a5a80b10a5916ab506ed7_430';
@@ -94,6 +95,8 @@ export const CreatorProfilePage: React.FC<CreatorProfilePageProps> = ({
 }) => {
   const router = useRouter();
   const { user: authUser, updateUser, refreshUser } = useAuth();
+  const { showToast } = useToast();
+  const { t } = useLanguage();
   const currentUser = propUser !== undefined ? propUser : authUser;
   const isEffectiveOwner = Boolean(isOwnProfile);
   const isCreatorShell = currentUser?.role === 'creator';
@@ -181,23 +184,15 @@ export const CreatorProfilePage: React.FC<CreatorProfilePageProps> = ({
     if (isTogglingFollow) return;
 
     if (!currentUser) {
-      setAuthModalConfig({
-        title: 'Masuk untuk Mengikuti Kreator',
-        description: 'Anda harus masuk ke akun Creatorin terlebih dahulu untuk mengikuti kreator ini dan memantau pembaruan karya mereka.',
-        action: async () => {
-          try {
-            setIsTogglingFollow(true);
-            const res = await creatorService.toggleFollow(creator.id, true);
-            setIsFollowing(true);
-            setFollowersCount(res.followersCount);
-          } catch (err) {
-            console.error('Follow failed after auth:', err);
-          } finally {
-            setIsTogglingFollow(false);
-          }
+      showToast({
+        type: 'warning',
+        title: t('toast.authRequired', 'Perlu Masuk Akun'),
+        message: t('toast.followAuth', 'Anda harus masuk ke akun Creatorin terlebih dahulu untuk mengikuti profil kreator ini.'),
+        action: {
+          label: t('action.signIn', 'Masuk ke Akun'),
+          onClick: () => router.push('/sign-in'),
         },
       });
-      setIsAuthModalOpen(true);
       return;
     }
 
@@ -247,6 +242,18 @@ export const CreatorProfilePage: React.FC<CreatorProfilePageProps> = ({
   // Toggle bookmark on service
   const toggleSaveService = (id: string, e: React.MouseEvent) => {
     e.stopPropagation();
+    if (!currentUser) {
+      showToast({
+        type: 'warning',
+        title: t('toast.authRequired', 'Perlu Masuk Akun'),
+        message: t('toast.saveServiceAuth', 'Anda harus masuk ke akun Creatorin terlebih dahulu untuk menyimpan layanan favorit.'),
+        action: {
+          label: t('action.signIn', 'Masuk ke Akun'),
+          onClick: () => router.push('/sign-in'),
+        },
+      });
+      return;
+    }
     setSavedServiceIds(prev => {
       const next = new Set(prev);
       if (next.has(id)) {
@@ -260,74 +267,49 @@ export const CreatorProfilePage: React.FC<CreatorProfilePageProps> = ({
 
   // Copy link
   const handleCopyLink = () => {
-    navigator.clipboard?.writeText?.(window.location.href);
+    const canonicalUrl = `${window.location.origin}/creator/${creator.slug || creator.id}`;
+    navigator.clipboard?.writeText?.(canonicalUrl);
     setCopiedLinkSuccess(true);
     setIsMoreMenuOpen(false);
+    showToast({
+      type: 'success',
+      message: t('toast.profileCopied', 'Tautan profil berhasil disalin!'),
+    });
     setTimeout(() => setCopiedLinkSuccess(false), 3000);
-  };
-
-  // Contact creator directly - creates/finds conversation room and redirects to chat
-  const [isStartingChat, setIsStartingChat] = useState(false);
-  const handleContactCreator = async () => {
-    if (!currentUser) {
-      setAuthModalConfig({
-        title: 'Masuk untuk Menghubungi Kreator',
-        description: 'Silakan masuk ke akun Creatorin Anda terlebih dahulu untuk memulai obrolan dengan kreator ini.',
-        action: async () => {
-          await executeContactCreator();
-        },
-      });
-      setIsAuthModalOpen(true);
-      return;
-    }
-    await executeContactCreator();
-  };
-
-  const executeContactCreator = async () => {
-    setIsStartingChat(true);
-    try {
-      const res = await chatService.initiateChatWithProfile(
-        {
-          id: creator.id,
-          name: creatorName || creator.name,
-          avatar: creatorAvatar || creator.avatar,
-          roleTitle: creatorRoleTitle || creator.roleTitle || 'Kreator',
-          role: 'creator',
-        },
-        currentUser
-      );
-      router.push(`/chat?conversationId=${res.conversationId}&creatorId=${creator.id}`);
-    } catch {
-      router.push(`/chat?creatorId=${creator.id}`);
-    } finally {
-      setIsStartingChat(false);
-    }
   };
 
   // Internal executor for sending inquiry message
   const executeSendInquiry = async (text: string) => {
     setIsSendingInquiry(true);
     try {
-      const res = await chatService.initiateChatWithProfile(
-        {
-          id: creator.id,
-          name: creatorName || creator.name,
-          avatar: creatorAvatar || creator.avatar,
-          roleTitle: creatorRoleTitle || creator.roleTitle || 'Kreator',
-          role: 'creator',
-        },
-        currentUser
-      );
+      // 1. Inisiasi atau cari percakapan yang sudah ada dengan kreator ini
+      const convRes = await fetch('/api/conversations', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ recipientId: creator.id }),
+      });
+      const convData = await convRes.json();
+      if (!convRes.ok) throw new Error(convData.error || 'Gagal memulai percakapan');
 
-      const conversationId = res.conversationId;
-      await chatService.sendMessage(conversationId, text);
+      const conversationId = convData.conversation?.id;
+      if (conversationId) {
+        // 2. Kirim pesan pengantar awal
+        await fetch('/api/messages', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            conversationId,
+            content: text,
+          }),
+        });
+      }
 
       setInquirySentSuccess(true);
       setTimeout(() => {
         setInquirySentSuccess(false);
         setIsGetInTouchOpen(false);
         setInquiryMessage('');
-        router.push(`/chat?conversationId=${conversationId}&creatorId=${creator.id}`);
+        router.push(conversationId ? `/chat?conversationId=${conversationId}` : '/chat');
       }, 900);
     } catch (err: any) {
       alert(err.message || 'Gagal mengirim pesan penawaran ke kreator.');
@@ -530,7 +512,7 @@ export const CreatorProfilePage: React.FC<CreatorProfilePageProps> = ({
                   <button
                     onClick={() => {
                       setIsMoreMenuOpen(false);
-                      handleContactCreator();
+                      setIsGetInTouchOpen(true);
                     }}
                     className="w-full px-4 py-2.5 text-xs font-semibold text-neutral-700 hover:bg-neutral-50 flex items-center gap-2.5 cursor-pointer"
                   >
@@ -566,7 +548,16 @@ export const CreatorProfilePage: React.FC<CreatorProfilePageProps> = ({
                 {/* Own Profile: Edit Profil Mode Toggle */}
                 <button
                   id="btn-edit-profile"
-                  onClick={() => setIsEditModeActive(!isEditModeActive)}
+                  onClick={() => {
+                    if (!isEditModeActive) {
+                      setIsEditModeActive(true);
+                      setTempName(creatorName);
+                      setTempRoleTitle(creatorRoleTitle);
+                      setEditingSection('name');
+                    } else {
+                      setIsEditModeActive(false);
+                    }
+                  }}
                   className={`flex items-center gap-2 h-10 px-5 rounded-xl text-sm font-semibold transition-colors cursor-pointer shadow-xs ${
                     isEditModeActive
                       ? 'bg-emerald-600 hover:bg-emerald-700 text-white'
@@ -574,7 +565,7 @@ export const CreatorProfilePage: React.FC<CreatorProfilePageProps> = ({
                   }`}
                 >
                   {isEditModeActive ? <Check className="w-3.5 h-3.5" /> : <Pencil className="w-3.5 h-3.5" />}
-                  <span>{isEditModeActive ? 'Selesai Edit' : 'Edit Profil'}</span>
+                  <span>{isEditModeActive ? t('action.finishEdit', 'Selesai Edit') : t('action.editProfile', 'Edit Profil')}</span>
                 </button>
               </>
             ) : (
@@ -594,15 +585,14 @@ export const CreatorProfilePage: React.FC<CreatorProfilePageProps> = ({
                   <span>{isFollowing ? 'Following' : 'Follow'}</span>
                 </button>
 
-                {/* Public Profile: Hubungi */}
+                {/* Public Profile: Kirim Pesan */}
                 <button
                   id="btn-send-message-primary"
-                  onClick={handleContactCreator}
-                  disabled={isStartingChat}
-                  className="flex items-center gap-2 h-10 px-5 rounded-xl bg-[#0B1F3A] hover:bg-[#123B8C] text-sm font-semibold text-white shadow-xs transition-colors cursor-pointer disabled:opacity-75"
+                  onClick={() => setIsGetInTouchOpen(true)}
+                  className="flex items-center gap-2 h-10 px-5 rounded-xl bg-[#0B1F3A] hover:bg-[#123B8C] text-sm font-semibold text-white shadow-xs transition-colors cursor-pointer"
                 >
-                  <Mail className={`w-3.5 h-3.5 ${isStartingChat ? 'animate-spin' : ''}`} />
-                  <span>{isStartingChat ? 'Menghubungkan...' : 'Hubungi'}</span>
+                  <Mail className="w-3.5 h-3.5" />
+                  <span>Kirim Pesan</span>
                 </button>
               </>
             )}
@@ -1002,6 +992,21 @@ export const CreatorProfilePage: React.FC<CreatorProfilePageProps> = ({
                       </div>
 
                       <div className="flex items-center gap-1.5 shrink-0">
+                        {/* Tombol Icon Simpan */}
+                        <button
+                          type="button"
+                          onClick={(e) => toggleSaveService(srv.id, e)}
+                          className={`flex size-9 items-center justify-center rounded-full border transition cursor-pointer ${
+                            savedServiceIds.has(srv.id)
+                              ? 'border-amber-300 bg-amber-50 text-amber-600'
+                              : 'border-neutral-200 hover:border-neutral-300 hover:bg-neutral-100 text-neutral-600'
+                          }`}
+                          title={savedServiceIds.has(srv.id) ? 'Tersimpan' : 'Simpan layanan'}
+                          aria-label="Simpan layanan"
+                        >
+                          <Bookmark className={`w-3.5 h-3.5 sm:w-4 sm:h-4 ${savedServiceIds.has(srv.id) ? 'fill-amber-500 text-amber-500' : 'stroke-[1.75]'}`} />
+                        </button>
+
                         {/* Tombol Diskusikan */}
                         <button
                           type="button"

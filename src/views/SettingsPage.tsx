@@ -3,6 +3,8 @@
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/providers/AuthProvider';
+import { useLanguage } from '@/providers/LanguageProvider';
+import { useToast } from '@/providers/ToastProvider';
 import { 
   User, 
   Mail, 
@@ -41,9 +43,12 @@ export const SettingsPage: React.FC = () => {
     setBio(user?.bio || '');
   }
   
+  // Global hooks
+  const { language, setLanguage, t } = useLanguage();
+  const { showToast } = useToast();
+
   // Notification states
   const [notifyPush, setNotifyPush] = useState(true);
-  const [language, setLanguage] = useState<'id' | 'en'>('id');
 
   // Password states
   const [oldPassword, setOldPassword] = useState('');
@@ -62,10 +67,12 @@ export const SettingsPage: React.FC = () => {
         const result = await response.json();
         if (!response.ok) throw new Error(result.error || 'Gagal memuat preferensi.');
         setNotifyPush(result.settings.notifyPush);
-        setLanguage(result.settings.language === 'en' ? 'en' : 'id');
+        if (result.settings.language) {
+          setLanguage(result.settings.language === 'en' ? 'en' : 'id');
+        }
       })
       .catch((caught) => setSaveError(caught instanceof Error ? caught.message : 'Gagal memuat preferensi.'));
-  }, [user]);
+  }, [user, setLanguage]);
 
   const handleSaveProfile = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -104,6 +111,10 @@ export const SettingsPage: React.FC = () => {
 
       await refreshUser();
       setIsSavedToast(true);
+      showToast({
+        type: 'success',
+        message: t('settings.saveSuccess', 'Pengaturan berhasil disimpan!'),
+      });
       setTimeout(() => setIsSavedToast(false), 3500);
     } catch (caught) {
       setSaveError(caught instanceof Error ? caught.message : 'Gagal menyimpan pengaturan.');
@@ -128,7 +139,7 @@ export const SettingsPage: React.FC = () => {
             </button>
             <div>
               <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-[#171717]">
-                Pengaturan Akun
+                {t('settings.title', 'Pengaturan Akun')}
               </h1>
               <p className="text-xs sm:text-sm text-neutral-500 mt-0.5">
                 Kelola informasi profil, preferensi notifikasi, dan keamanan akun Anda.
@@ -148,7 +159,7 @@ export const SettingsPage: React.FC = () => {
             }`}
           >
             <User className="w-4 h-4" />
-            <span>Profil Utama</span>
+            <span>{t('settings.profileTab', 'Profil Utama')}</span>
           </button>
           <button
             onClick={() => setActiveTab('preferences')}
@@ -159,7 +170,7 @@ export const SettingsPage: React.FC = () => {
             }`}
           >
             <Bell className="w-4 h-4" />
-            <span>Notifikasi & Bahasa</span>
+            <span>{t('settings.preferencesTab', 'Notifikasi & Bahasa')}</span>
           </button>
           <button
             onClick={() => setActiveTab('security')}
@@ -170,7 +181,7 @@ export const SettingsPage: React.FC = () => {
             }`}
           >
             <Lock className="w-4 h-4" />
-            <span>Keamanan & Sandi</span>
+            <span>{t('settings.securityTab', 'Keamanan & Sandi')}</span>
           </button>
         </div>
 
@@ -304,7 +315,7 @@ export const SettingsPage: React.FC = () => {
 
               <div className="pt-4 border-t border-[#E2E8F0]">
                 <label className="block text-xs font-bold text-neutral-700 mb-2">
-                  Bahasa Antarmuka
+                  {t('settings.languageLabel', 'Bahasa Antarmuka')}
                 </label>
                 <div className="flex items-center gap-3">
                   <button
@@ -409,7 +420,7 @@ export const SettingsPage: React.FC = () => {
               className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl bg-[#0B1F3A] hover:bg-[#123B8C] active:scale-95 text-white text-xs sm:text-sm font-semibold transition shadow-xs cursor-pointer disabled:opacity-50"
             >
               <Save className="w-4 h-4" />
-              <span>{isSaving ? 'Menyimpan...' : 'Simpan Perubahan'}</span>
+              <span>{isSaving ? t('action.saving', 'Menyimpan...') : t('action.save', 'Simpan Perubahan')}</span>
             </button>
           </div>
 

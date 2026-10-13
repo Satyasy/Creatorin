@@ -46,9 +46,12 @@ export async function GET(
       .from(creatorProfiles)
       .innerJoin(profiles, eq(creatorProfiles.profileId, profiles.id));
 
+    const strippedId = id.replace(/^creator-/, '');
     const creatorList = isUuid
       ? await creatorQuery.where(eq(profiles.id, id)).limit(1)
-      : await creatorQuery.where(eq(creatorProfiles.slug, id)).limit(1);
+      : await creatorQuery
+          .where(or(eq(creatorProfiles.slug, id), eq(creatorProfiles.slug, strippedId)))
+          .limit(1);
 
     if (!creatorList || creatorList.length === 0) {
       return NextResponse.json({ error: "Creator not found" }, { status: 404 });

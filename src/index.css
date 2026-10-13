@@ -221,6 +221,15 @@
   }
 }
 
+@keyframes shrinkToastProgress {
+  from {
+    width: 100%;
+  }
+  to {
+    width: 0%;
+  }
+}
+
 /* Compatibility layer for legacy screens while all views share DESIGN.md tokens. */
 [class~="bg-[#F8FAFC]"], [class~="bg-[#FDFDFD]"] { background-color: #F8F9FC !important; }
 [class~="bg-[#E2E8F0]"] { background-color: #E1E3EA !important; }

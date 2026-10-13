@@ -10,11 +10,14 @@ import {
   Play,
   ArrowUpRight,
   Check,
+  ChevronLeft,
+  ChevronRight,
 } from 'lucide-react';
 import { FeedProject, Creator, ActivePage } from '@/types';
 import { Footer } from '@/components/layout/Footer';
-import { ProjectCard } from '@/components/common/ProjectCard';
 import { useAuth } from '@/providers/AuthProvider';
+import { useToast } from '@/providers/ToastProvider';
+import { useLanguage } from '@/providers/LanguageProvider';
 import { AuthModal } from '@/components/modals/AuthModal';
 import { startRouteProgress } from '@/components/common/RouteProgressBar';
 
@@ -92,13 +95,9 @@ export const ProjectDetailModal: React.FC<ProjectDetailModalProps> = ({
   const [mounted, setMounted] = useState(false);
   const [isClosing, setIsClosing] = useState(false);
 
-  // Sync state if initialProject changes
-  useEffect(() => {
-    setCurrentProject(initialProject);
-    setActiveImageIndex(0);
-  }, [initialProject]);
-
   const { user } = useAuth();
+  const { showToast } = useToast();
+  const { t } = useLanguage();
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [authModalConfig, setAuthModalConfig] = useState<{
     title: string;
@@ -132,16 +131,6 @@ export const ProjectDetailModal: React.FC<ProjectDetailModalProps> = ({
       onClose();
     }, 240);
   }, [onClose]);
-
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
-        handleSmoothClose();
-      }
-    };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [handleSmoothClose]);
 
   // Derive creator and metadata
   const creator = currentProject.creator;
@@ -193,6 +182,28 @@ export const ProjectDetailModal: React.FC<ProjectDetailModalProps> = ({
     return list;
   }, [currentProject]);
 
+  const handlePrevImage = useCallback(() => {
+    setActiveImageIndex((prev) => (prev > 0 ? prev - 1 : galleryImages.length - 1));
+  }, [galleryImages.length]);
+
+  const handleNextImage = useCallback(() => {
+    setActiveImageIndex((prev) => (prev < galleryImages.length - 1 ? prev + 1 : 0));
+  }, [galleryImages.length]);
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        handleSmoothClose();
+      } else if (e.key === 'ArrowLeft') {
+        handlePrevImage();
+      } else if (e.key === 'ArrowRight') {
+        handleNextImage();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [handleSmoothClose, handlePrevImage, handleNextImage]);
+
   // Related projects list
   const similarProjects: SimilarProjectItem[] = useMemo(() => {
     const list: SimilarProjectItem[] = [];
@@ -227,9 +238,14 @@ export const ProjectDetailModal: React.FC<ProjectDetailModalProps> = ({
   }, [allProjects, currentProject.id]);
 
   const handleShare = () => {
+    const canonicalUrl = `${window.location.origin}/jelajah/proyek?projectId=${currentProject.id}`;
     if (typeof window !== 'undefined' && navigator.clipboard) {
-      navigator.clipboard.writeText(window.location.href);
-      setToastMessage('Tautan proyek berhasil disalin!');
+      navigator.clipboard.writeText(canonicalUrl);
+      showToast({
+        type: 'success',
+        message: t('toast.projectCopied', 'Tautan proyek berhasil disalin!'),
+      });
+      setToastMessage(t('toast.projectCopied', 'Tautan proyek berhasil disalin!'));
       setTimeout(() => setToastMessage(null), 2500);
     }
   };
@@ -336,235 +352,245 @@ export const ProjectDetailModal: React.FC<ProjectDetailModalProps> = ({
     <div
       role="dialog"
       aria-modal="true"
-      aria-label={`Detail Proyek: ${currentProject.title}`}
-      className="fixed inset-0 z-50 overflow-hidden flex flex-col justify-end"
+      aria-label={currentProject.title}
+      onClick={handleSmoothClose}
+      className={`fixed inset-0 z-50 flex flex-col justify-end bg-black/60 transition-opacity duration-300 transform-gpu ${
+        mounted && !isClosing ? 'opacity-100' : 'opacity-0'
+      }`}
     >
       {/* Toast Notification */}
       {toastMessage && (
-        <div className="fixed top-6 left-1/2 -translate-x-1/2 z-60 bg-[#0D0C22] text-white text-xs sm:text-sm px-4 py-2.5 rounded-full shadow-lg flex items-center gap-2 animate-fade-in">
-          <Check className="w-4 h-4 text-emerald-400" />
+        <div className="fixed bottom-10 right-6 z-60 bg-[#0D0C22] text-white px-4 py-2.5 rounded-xl shadow-lg text-xs font-semibold flex items-center gap-2 animate-in fade-in duration-200">
+          <Check className="w-4 h-4 text-emerald-400 shrink-0" />
           <span>{toastMessage}</span>
         </div>
       )}
 
-      {/* Dimmed Overlay Backdrop */}
-      <div
-        onClick={handleSmoothClose}
-        className={`fixed inset-0 bg-black/60 transition-opacity duration-300 ease-out cursor-pointer ${
-          mounted && !isClosing ? 'opacity-100' : 'opacity-0'
-        }`}
-      />
+      {/* Floating Close Button Top Right */}
+      <div className="w-full max-w-[1120px] mx-auto flex justify-end px-4 sm:px-6 pb-2 pointer-events-none">
+        <button
+          type="button"
+          onClick={(e) => {
+            e.stopPropagation();
+            handleSmoothClose();
+          }}
+          className="pointer-events-auto w-9 h-9 rounded-full bg-white/20 hover:bg-white/35 active:bg-white/50 text-white flex items-center justify-center transition-colors cursor-pointer shadow-md"
+          aria-label="Tutup detail proyek"
+        >
+          <X className="w-5 h-5 stroke-[2.5]" />
+        </button>
+      </div>
 
-      {/* Fixed Close Button Top Right */}
-      <button
-        type="button"
-        onClick={handleSmoothClose}
-        className="fixed top-3 right-3 sm:top-5 sm:right-6 z-50 p-2.5 rounded-full bg-black/40 hover:bg-black/70 text-white transition-colors cursor-pointer"
-        aria-label="Tutup Detail Proyek"
-      >
-        <X className="w-5 h-5 sm:w-6 sm:h-6" />
-      </button>
-
-      {/* Smooth Bottom Sheet Container */}
+      {/* Modal Surface - Slides Up Smoothly from Bottom */}
       <div
-        ref={scrollContainerRef}
-        className={`relative z-10 w-full h-[94vh] sm:h-[92vh] overflow-y-auto overscroll-contain transform-gpu [will-change:transform,scroll-position] transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] ${
-          mounted && !isClosing ? 'translate-y-0 opacity-100' : 'translate-y-full opacity-0'
+        onClick={(e) => e.stopPropagation()}
+        className={`w-full max-w-[1120px] mx-auto bg-white rounded-t-[28px] sm:rounded-t-[36px] shadow-2xl flex flex-col h-[88vh] sm:h-[90vh] max-h-[92vh] overflow-hidden transition-transform duration-300 ease-out transform-gpu ${
+          mounted && !isClosing ? 'translate-y-0' : 'translate-y-full'
         }`}
       >
-        <div className="w-full bg-white rounded-t-[28px] sm:rounded-t-[36px] shadow-2xl min-h-full flex flex-col justify-between">
-          <div>
-            {/* 1. STICKY / FIXED PROFILE HEADER - menetap (stuck) tidak ikut scroll */}
-            <header className="sticky top-0 z-30 bg-white/95 backdrop-blur-md border-b border-[#F3F4F6] rounded-t-[28px] sm:rounded-t-[36px] shadow-xs">
-              <div className="max-w-5xl mx-auto w-full px-4 sm:px-8 py-3.5 sm:py-5 flex items-center justify-between gap-3 sm:gap-4">
-                <div className="flex items-center gap-3 sm:gap-3.5 min-w-0">
+        {/* Scrollable Container with Hardware Acceleration (Zero Lag) */}
+        <div
+          ref={scrollContainerRef}
+          className="flex-1 overflow-y-auto overscroll-contain px-5 sm:px-8 md:px-12 py-6 sm:py-8 space-y-6 sm:space-y-8 transform-gpu [will-change:scroll-position]"
+        >
+          {/* 1. Header Section: Creator Info + Action Buttons */}
+          <header className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-5 border-b border-[#F3F3F4]">
+            <div className="flex items-center gap-3.5 min-w-0">
+              <img
+                src={creator?.avatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80'}
+                alt={creatorName}
+                onClick={handleCreatorClick}
+                className="w-12 h-12 rounded-full object-cover ring-1 ring-black/5 shrink-0 cursor-pointer hover:opacity-90 transition-opacity"
+              />
+              <div className="min-w-0">
+                <h2
+                  onClick={handleCreatorClick}
+                  className="font-display font-bold text-base sm:text-lg text-[#0D0C22] hover:text-[#155DFC] cursor-pointer transition-colors truncate"
+                >
+                  {creatorName}
+                </h2>
+                <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-[#55576A] mt-0.5">
+                  <span className="inline-flex items-center gap-1 hover:text-[#0D0C22] cursor-pointer">
+                    <Globe className="w-3.5 h-3.5 text-[#6F7285]" />
+                    <span>{creatorWebsite}</span>
+                  </span>
+                  <span>&middot;</span>
+                  <span className="inline-flex items-center gap-1 hover:text-[#0D0C22] cursor-pointer">
+                    <Mail className="w-3.5 h-3.5 text-[#6F7285]" />
+                    <span>{creatorEmail}</span>
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-2.5 self-start sm:self-auto shrink-0">
+              <button
+                type="button"
+                onClick={handleShare}
+                className="w-10 h-10 rounded-full border border-[#E1E3EA] bg-white hover:bg-[#F3F3F4] active:bg-[#ECEEF2] text-[#55576A] hover:text-[#0D0C22] flex items-center justify-center transition-colors cursor-pointer"
+                aria-label="Bagikan tautan proyek"
+              >
+                <Share2 className="w-4 h-4" />
+              </button>
+              <button
+                type="button"
+                onClick={handleSendMessage}
+                className="rounded-full bg-[#0D0C22] hover:bg-black active:bg-neutral-900 text-white px-6 py-2.5 text-xs sm:text-sm font-semibold transition-all active:scale-95 cursor-pointer shadow-xs"
+              >
+                Kirim Pesan
+              </button>
+            </div>
+          </header>
+
+          {/* 2. Media Gallery Section (Hero Image + 5 Thumbnails Row) */}
+          <section aria-label="Galeri Media Proyek" className="space-y-3.5">
+            {/* Hero Main Media */}
+            <div className="aspect-[16/10] sm:aspect-[16/9] w-full rounded-2xl overflow-hidden relative bg-neutral-900 shadow-xs group/hero">
+              <img
+                src={galleryImages[activeImageIndex] || currentProject.coverImage}
+                alt={`${currentProject.title} preview`}
+                className="w-full h-full object-cover transition-opacity duration-200"
+                loading="eager"
+                decoding="async"
+              />
+              {/* Counter Badge Pill Top Right */}
+              <div className="absolute top-3.5 right-3.5 bg-black/65 backdrop-blur-xs text-white text-xs font-semibold px-3 py-1 rounded-full shadow-xs">
+                {activeImageIndex + 1} / {galleryImages.length} Foto
+              </div>
+
+              {/* Prev / Next Gallery Navigation Buttons */}
+              {galleryImages.length > 1 && (
+                <>
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handlePrevImage();
+                    }}
+                    className="absolute left-3.5 top-1/2 -translate-y-1/2 w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-black/50 hover:bg-black/80 active:scale-95 text-white flex items-center justify-center transition-all cursor-pointer backdrop-blur-xs shadow-md opacity-90 sm:opacity-0 sm:group-hover/hero:opacity-100"
+                    aria-label="Foto sebelumnya"
+                    title="Foto sebelumnya (Panah Kiri)"
+                  >
+                    <ChevronLeft className="w-5 h-5 stroke-[2.5]" />
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleNextImage();
+                    }}
+                    className="absolute right-3.5 top-1/2 -translate-y-1/2 w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-black/50 hover:bg-black/80 active:scale-95 text-white flex items-center justify-center transition-all cursor-pointer backdrop-blur-xs shadow-md opacity-90 sm:opacity-0 sm:group-hover/hero:opacity-100"
+                    aria-label="Foto berikutnya"
+                    title="Foto berikutnya (Panah Kanan)"
+                  >
+                    <ChevronRight className="w-5 h-5 stroke-[2.5]" />
+                  </button>
+                </>
+              )}
+            </div>
+
+            {/* Thumbnails Row (5 Items matching Figma) */}
+            <div className="grid grid-cols-5 gap-2.5 sm:gap-4">
+              {galleryImages.slice(0, 5).map((imgUrl, idx) => {
+                const isActive = activeImageIndex === idx;
+                const isLastWithMore = idx === 4 && galleryImages.length > 5;
+                const moreCount = galleryImages.length - 4;
+
+                return (
+                  <button
+                    type="button"
+                    key={idx}
+                    onClick={() => setActiveImageIndex(idx)}
+                    className={`aspect-[4/3] rounded-xl overflow-hidden relative cursor-pointer transition-all ${
+                      isActive
+                        ? 'ring-2 ring-[#0D0C22] ring-offset-2 opacity-100'
+                        : 'opacity-75 hover:opacity-100'
+                    }`}
+                  >
+                    <img
+                      src={imgUrl}
+                      alt={`Thumbnail ${idx + 1}`}
+                      className="w-full h-full object-cover"
+                      loading="lazy"
+                    />
+                    {isLastWithMore && (
+                      <div className="absolute inset-0 bg-black/55 text-white font-bold text-sm sm:text-base flex items-center justify-center">
+                        +{moreCount}
+                      </div>
+                    )}
+                  </button>
+                );
+              })}
+            </div>
+          </section>
+
+          {/* 3. Project Meta: Category Pill, Title, Description */}
+          <section aria-label="Detail Informasi Proyek" className="pt-2">
+            <span className="inline-block bg-[#F4F5F7] text-[#55576A] text-xs font-semibold px-3 py-1 rounded-full mb-3.5 tracking-wide">
+              {categoryLabel}
+            </span>
+            <h1 className="font-display text-2xl sm:text-3xl font-bold text-[#0D0C22] leading-tight mb-3">
+              {currentProject.title}
+            </h1>
+            <p className="text-sm sm:text-base text-[#55576A] leading-relaxed max-w-4xl">
+              {description}
+            </p>
+          </section>
+
+          {/* 4. "Proyek Serupa" Section */}
+          <section aria-label="Proyek Serupa" className="pt-6 sm:pt-8 border-t border-[#F3F3F4]">
+            <div className="flex items-center justify-between pb-4">
+              <h3 className="font-display text-lg sm:text-xl font-bold text-[#0D0C22]">
+                Proyek Serupa
+              </h3>
+              <button
+                type="button"
+                onClick={handleExploreMore}
+                className="inline-flex items-center gap-1 text-xs sm:text-sm font-semibold text-[#155DFC] hover:underline cursor-pointer"
+              >
+                <span>Lihat Proyek Lainnya</span>
+                <ArrowUpRight className="w-4 h-4" />
+              </button>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 pt-2">
+              {similarProjects.map((item) => (
+                <article
+                  key={item.id}
+                  onClick={() => handleSelectSimilar(item)}
+                  className="aspect-[3/4] rounded-2xl overflow-hidden relative group cursor-pointer shadow-xs hover:shadow-xl transition-all duration-300 border border-[#E1E3EA]/50 bg-neutral-900"
+                >
                   <img
-                    src={creator?.avatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80'}
-                    alt={creatorName}
-                    onClick={handleCreatorClick}
-                    className="w-10 h-10 sm:w-12 sm:h-12 rounded-full object-cover ring-1 ring-black/5 shrink-0 cursor-pointer hover:opacity-90 transition-opacity"
+                    src={item.mediaUrl}
+                    alt={item.title}
+                    className="w-full h-full object-cover"
+                    loading="lazy"
                   />
-                  <div className="min-w-0">
-                    <h2
-                      onClick={handleCreatorClick}
-                      className="font-display font-bold text-sm sm:text-lg text-[#0D0C22] hover:text-[#155DFC] cursor-pointer transition-colors truncate"
-                    >
-                      {creatorName}
-                    </h2>
-                    <div className="flex flex-wrap items-center gap-x-2 text-[11px] sm:text-xs text-[#55576A] mt-0.5">
-                      <span className="inline-flex items-center gap-1 hover:text-[#0D0C22] cursor-pointer">
-                        <Globe className="w-3.5 h-3.5 text-[#6F7285]" />
-                        <span>{creatorWebsite}</span>
+                  {/* Play Badge Top Right */}
+                  <div className="absolute top-3 right-3 w-7 h-7 rounded-full bg-black/50 flex items-center justify-center text-white shadow-xs">
+                    <Play className="w-3.5 h-3.5 fill-white text-white ml-0.5" />
+                  </div>
+                  {/* Dark Gradient Overlay Bottom */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/30 to-transparent flex flex-col justify-end p-4">
+                    <h4 className="text-white font-display font-semibold text-xs leading-snug line-clamp-2 drop-shadow-xs group-hover:text-blue-200 transition-colors">
+                      {item.title}
+                    </h4>
+                    <div className="flex items-center justify-between mt-2 pt-1.5 border-t border-white/15 text-white/85 text-[11px] sm:text-xs">
+                      <span className="font-medium truncate pr-2 hover:text-white transition-colors">
+                        {item.creatorHandle}
                       </span>
-                      <span className="hidden sm:inline">&middot;</span>
-                      <span className="hidden sm:inline-flex items-center gap-1 hover:text-[#0D0C22] cursor-pointer">
-                        <Mail className="w-3.5 h-3.5 text-[#6F7285]" />
-                        <span>{creatorEmail}</span>
+                      <span className="shrink-0 font-medium text-white/75">
+                        {item.viewsCount}
                       </span>
                     </div>
                   </div>
-                </div>
-
-                <div className="flex items-center gap-2 sm:gap-2.5 shrink-0">
-                  <button
-                    type="button"
-                    onClick={handleShare}
-                    className="w-9 h-9 sm:w-10 sm:h-10 rounded-full border border-[#E1E3EA] bg-white hover:bg-[#F4F5F7] text-[#0D0C22] flex items-center justify-center transition-colors cursor-pointer"
-                    aria-label="Bagikan tautan proyek"
-                  >
-                    <Share2 className="w-4 h-4" />
-                  </button>
-                  <button
-                    type="button"
-                    onClick={handleSendMessage}
-                    className="rounded-full bg-[#0D0C22] hover:bg-black active:bg-neutral-900 text-white px-4 sm:px-6 py-2 sm:py-2.5 text-xs sm:text-sm font-semibold transition-all cursor-pointer shadow-xs active:scale-98"
-                  >
-                    Kirim Pesan
-                  </button>
-                </div>
-              </div>
-            </header>
-
-            {/* 2. Main Scrollable Content */}
-            <div className="max-w-5xl mx-auto w-full px-4 sm:px-8 py-6 sm:py-8 space-y-6 sm:space-y-8">
-              {/* Media Gallery Section */}
-              <section aria-label="Galeri Media Proyek" className="space-y-3.5">
-                <div className="aspect-[16/10] sm:aspect-[16/9] w-full rounded-2xl overflow-hidden relative bg-neutral-900 shadow-xs">
-                  <img
-                    src={galleryImages[activeImageIndex] || currentProject.coverImage}
-                    alt={`${currentProject.title} preview`}
-                    className="w-full h-full object-cover transition-opacity duration-200"
-                    loading="eager"
-                    decoding="async"
-                  />
-                  <div className="absolute top-3.5 right-3.5 bg-black/65 text-white text-xs font-semibold px-3 py-1 rounded-full shadow-xs">
-                    {activeImageIndex + 1} / {galleryImages.length} Foto
-                  </div>
-                </div>
-
-                {/* Thumbnails Row */}
-                <div className="grid grid-cols-5 gap-2.5 sm:gap-4">
-                  {galleryImages.slice(0, 5).map((imgUrl, idx) => {
-                    const isActive = activeImageIndex === idx;
-                    const isLastWithMore = idx === 4 && galleryImages.length > 5;
-                    const moreCount = galleryImages.length - 4;
-
-                    return (
-                      <button
-                        type="button"
-                        key={idx}
-                        onClick={() => setActiveImageIndex(idx)}
-                        className={`aspect-[4/3] rounded-xl overflow-hidden relative cursor-pointer transition-all ${
-                          isActive
-                            ? 'ring-2 ring-[#0D0C22] ring-offset-2 opacity-100'
-                            : 'opacity-75 hover:opacity-100'
-                        }`}
-                      >
-                        <img
-                          src={imgUrl}
-                          alt={`Thumbnail ${idx + 1}`}
-                          className="w-full h-full object-cover"
-                          loading="lazy"
-                        />
-                        {isLastWithMore && (
-                          <div className="absolute inset-0 bg-black/55 text-white font-bold text-sm sm:text-base flex items-center justify-center">
-                            +{moreCount}
-                          </div>
-                        )}
-                      </button>
-                    );
-                  })}
-                </div>
-              </section>
-
-              {/* Project Meta */}
-              <section aria-label="Detail Informasi Proyek" className="pt-2">
-                <span className="inline-block bg-[#F4F5F7] text-[#55576A] text-xs font-semibold px-3 py-1 rounded-full mb-3.5 tracking-wide">
-                  {categoryLabel}
-                </span>
-                <h1 className="font-display text-2xl sm:text-3xl font-bold text-[#0D0C22] leading-tight mb-3">
-                  {currentProject.title}
-                </h1>
-                <p className="text-sm sm:text-base text-[#55576A] leading-relaxed max-w-4xl">
-                  {description}
-                </p>
-              </section>
-
-              {/* Proyek Serupa */}
-              <section aria-label="Proyek Serupa" className="pt-6 sm:pt-8 border-t border-[#F3F3F4]">
-                <div className="flex items-center justify-between pb-4">
-                  <h3 className="font-display text-lg sm:text-xl font-bold text-[#0D0C22]">
-                    Proyek Serupa
-                  </h3>
-                  <button
-                    type="button"
-                    onClick={handleExploreMore}
-                    className="inline-flex items-center gap-1 text-xs sm:text-sm font-semibold text-[#155DFC] hover:underline cursor-pointer"
-                  >
-                    <span>Lihat Proyek Lainnya</span>
-                    <ArrowUpRight className="w-4 h-4" />
-                  </button>
-                </div>
-
-                <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-4 pt-2">
-                  {similarProjects.map((item) => {
-                    const simFeedProj: FeedProject = {
-                      id: item.id,
-                      title: item.title,
-                      description: item.description || item.title,
-                      coverImage: item.mediaUrl,
-                      mediaUrl: item.mediaUrl,
-                      mediaType: (item.category.toLowerCase().includes('video') || item.category.toLowerCase().includes('ugc') || item.category.toLowerCase().includes('motion')) ? 'video' : 'image',
-                      creatorId: item.creatorId || 'creator-sim',
-                      creator: {
-                        id: item.creatorId || 'creator-sim',
-                        name: item.creatorName || item.creatorHandle.replace('@', ''),
-                        username: item.creatorHandle.replace('@', ''),
-                        avatar: item.mediaUrl,
-                        category: 'Image',
-                        roleTitle: 'Kreator Profesional',
-                        bio: `${item.creatorName || item.creatorHandle} di Creatorin`,
-                        location: 'Indonesia',
-                        startingRate: 250000,
-                        formattedRate: 'Rp250.000',
-                        careerScore: {
-                          overall: 95,
-                          deadlineAccuracy: 98,
-                          revisionRate: 1,
-                          completionRate: 100,
-                          clientRating: 4.9,
-                          completedProjects: 45,
-                          tier: 'Top Tier',
-                        },
-                        rating: 4.9,
-                        reviewCount: 38,
-                        skills: [item.category, 'Kreator Digital'],
-                        joinedDate: '2024',
-                      },
-                      category: item.category,
-                      platform: 'direct',
-                      tags: [item.category.replace(/\s+/g, '')],
-                      likesCount: 142,
-                      commentsCount: 18,
-                      viewsCount: item.viewsCount,
-                      sharesCount: 12,
-                    };
-
-                    return (
-                      <ProjectCard
-                        key={item.id}
-                        id={`similar-project-${item.id}`}
-                        project={simFeedProj}
-                        onClick={() => handleSelectSimilar(item)}
-                      />
-                    );
-                  })}
-                </div>
-              </section>
+                </article>
+              ))}
             </div>
-          </div>
+          </section>
 
-          {/* Footer at bottom */}
+          {/* Footer at the bottom of the modal */}
           <div className="border-t border-[#F3F4F6] mt-12 sm:mt-16 w-full">
             <Footer onNavigate={onNavigate} />
           </div>
