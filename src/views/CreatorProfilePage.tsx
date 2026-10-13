@@ -49,7 +49,8 @@ import {
   Instagram,
   Linkedin,
   Pencil,
-  Link as LinkIcon
+  Link as LinkIcon,
+  Loader2
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/providers/AuthProvider';
@@ -61,6 +62,7 @@ import { ProjectDetailModal } from '@/components/modals/ProjectDetailModal';
 import { ServiceDetailModal } from '@/components/modals/ServiceDetailModal';
 import { UploadProjectModal } from '@/components/modals/UploadProjectModal';
 import { UploadServiceModal } from '@/components/modals/UploadServiceModal';
+import { AuthModal } from '@/components/modals/AuthModal';
 import { creatorService } from '@/services/creatorService';
 import { chatService } from '@/services/chatService';
 import { createClient } from '@/lib/supabase/client';
@@ -131,6 +133,18 @@ export const CreatorProfilePage: React.FC<CreatorProfilePageProps> = ({
   const [isSendingInquiry, setIsSendingInquiry] = useState(false);
   const [copiedLinkSuccess, setCopiedLinkSuccess] = useState(false);
 
+  // Protected actions AuthModal state
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  const [authModalConfig, setAuthModalConfig] = useState<{
+    title: string;
+    description: string;
+    action?: (user?: NonNullable<AuthState['user']>) => void;
+  }>({
+    title: 'Masuk ke Akun Creatorin',
+    description: 'Masuk untuk melanjutkan tindakan ini dan membuka akses ke seluruh fitur kolaborasi.',
+  });
+  const [isTogglingFollow, setIsTogglingFollow] = useState(false);
+
   // In-place inline edit profile state
   const [isEditModeActive, setIsEditModeActive] = useState(false);
   const [editingSection, setEditingSection] = useState<'name' | 'bio' | 'avatar' | 'banner' | null>(null);
@@ -162,14 +176,41 @@ export const CreatorProfilePage: React.FC<CreatorProfilePageProps> = ({
   const [isDetailMuted, setIsDetailMuted] = useState(true);
   const [detailMediaIndex, setDetailMediaIndex] = useState(0);
 
-  // Handle follow toggle
-  const toggleFollow = () => {
-    if (isFollowing) {
-      setIsFollowing(false);
-      setFollowersCount(prev => Math.max(0, prev - 1));
-    } else {
-      setIsFollowing(true);
-      setFollowersCount(prev => prev + 1);
+  // Handle follow toggle with auth guard and backend persistence
+  const toggleFollow = async () => {
+    if (isTogglingFollow) return;
+
+    if (!currentUser) {
+      setAuthModalConfig({
+        title: 'Masuk untuk Mengikuti Kreator',
+        description: 'Anda harus masuk ke akun Creatorin terlebih dahulu untuk mengikuti kreator ini dan memantau pembaruan karya mereka.',
+        action: async () => {
+          try {
+            setIsTogglingFollow(true);
+            const res = await creatorService.toggleFollow(creator.id, true);
+            setIsFollowing(true);
+            setFollowersCount(res.followersCount);
+          } catch (err) {
+            console.error('Follow failed after auth:', err);
+          } finally {
+            setIsTogglingFollow(false);
+          }
+        },
+      });
+      setIsAuthModalOpen(true);
+      return;
+    }
+
+    const nextState = !isFollowing;
+    setIsTogglingFollow(true);
+    try {
+      const res = await creatorService.toggleFollow(creator.id, nextState);
+      setIsFollowing(res.isFollowing);
+      setFollowersCount(res.followersCount);
+    } catch (err: any) {
+      alert(err.message || 'Gagal memperbarui status follow.');
+    } finally {
+      setIsTogglingFollow(false);
     }
   };
 
@@ -229,9 +270,20 @@ export const CreatorProfilePage: React.FC<CreatorProfilePageProps> = ({
   const [isStartingChat, setIsStartingChat] = useState(false);
   const handleContactCreator = async () => {
     if (!currentUser) {
-      router.push('/sign-in');
+      setAuthModalConfig({
+        title: 'Masuk untuk Menghubungi Kreator',
+        description: 'Silakan masuk ke akun Creatorin Anda terlebih dahulu untuk memulai obrolan dengan kreator ini.',
+        action: async () => {
+          await executeContactCreator();
+        },
+      });
+      setIsAuthModalOpen(true);
       return;
     }
+    await executeContactCreator();
+  };
+
+  const executeContactCreator = async () => {
     setIsStartingChat(true);
     try {
       const res = await chatService.initiateChatWithProfile(
@@ -252,17 +304,8 @@ export const CreatorProfilePage: React.FC<CreatorProfilePageProps> = ({
     }
   };
 
-  // Send message handler - Connects to real conversation and message APIs
-  const handleSendInquiry = async (e: React.FormEvent) => {
-    e.preventDefault();
-    const text = inquiryMessage.trim();
-    if (!text) return;
-
-    if (!currentUser) {
-      router.push('/sign-in');
-      return;
-    }
-
+  // Internal executor for sending inquiry message
+  const executeSendInquiry = async (text: string) => {
     setIsSendingInquiry(true);
     try {
       const res = await chatService.initiateChatWithProfile(
@@ -291,6 +334,43 @@ export const CreatorProfilePage: React.FC<CreatorProfilePageProps> = ({
     } finally {
       setIsSendingInquiry(false);
     }
+  };
+
+  // Send message handler - with draft preservation and contextual auth modal
+  const handleSendInquiry = async (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
+    const text = inquiryMessage.trim();
+    if (!text) return;
+
+    if (!currentUser) {
+      setAuthModalConfig({
+        title: 'Masuk untuk Mengirim Pesan',
+        description: 'Draf pesan Anda telah tersimpan rapi. Masuk ke akun Anda terlebih dahulu untuk langsung mengirimkan pesan diskusi ke kreator ini.',
+        action: async () => {
+          await executeSendInquiry(text);
+        },
+      });
+      setIsAuthModalOpen(true);
+      return;
+    }
+
+    await executeSendInquiry(text);
+  };
+
+  // Guard for discussing or ordering service
+  const handleOpenOrderService = (srv: CreatorService) => {
+    if (!currentUser) {
+      setAuthModalConfig({
+        title: 'Masuk untuk Mendiskusikan Layanan',
+        description: 'Silakan masuk akun terlebih dahulu untuk memesan atau mendiskusikan paket layanan kolaborasi dengan kreator ini.',
+        action: () => {
+          setSelectedServiceForOrder(srv);
+        },
+      });
+      setIsAuthModalOpen(true);
+      return;
+    }
+    setSelectedServiceForOrder(srv);
   };
 
   const creatorProjects = liveProjects;
@@ -503,13 +583,15 @@ export const CreatorProfilePage: React.FC<CreatorProfilePageProps> = ({
                 <button
                   id="btn-follow-toggle"
                   onClick={toggleFollow}
-                  className={`h-10 px-5 rounded-xl border text-sm font-semibold transition-colors cursor-pointer ${
+                  disabled={isTogglingFollow}
+                  className={`h-10 px-5 rounded-xl border text-sm font-semibold transition-colors cursor-pointer inline-flex items-center justify-center gap-2 ${
                     isFollowing
                       ? 'border-[#E2E8F0] bg-white text-[#171717] hover:bg-[#F8FAFC]'
                       : 'border-[#0B1F3A] bg-[#0B1F3A] text-white hover:bg-[#123B8C]'
-                  }`}
+                  } ${isTogglingFollow ? 'opacity-70 cursor-not-allowed' : ''}`}
                 >
-                  {isFollowing ? 'Following' : 'Follow'}
+                  {isTogglingFollow && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
+                  <span>{isFollowing ? 'Following' : 'Follow'}</span>
                 </button>
 
                 {/* Public Profile: Hubungi */}
@@ -938,7 +1020,7 @@ export const CreatorProfilePage: React.FC<CreatorProfilePageProps> = ({
                         {/* Tombol Diskusikan */}
                         <button
                           type="button"
-                          onClick={() => setSelectedServiceForOrder(srv)}
+                          onClick={() => handleOpenOrderService(srv)}
                           className="rounded-full bg-[#0d0c22] px-4 py-2 text-[12px] font-bold leading-4 text-white shadow-xs transition hover:bg-neutral-800 cursor-pointer"
                         >
                           Diskusikan
@@ -1466,6 +1548,18 @@ export const CreatorProfilePage: React.FC<CreatorProfilePageProps> = ({
 
             <button
               onClick={() => {
+                if (!currentUser) {
+                  setAuthModalConfig({
+                    title: 'Masuk untuk Melanjutkan Pembayaran',
+                    description: 'Silakan masuk ke akun Creatorin Anda terlebih dahulu untuk menyelesaikan proses pembayaran aman.',
+                    action: () => {
+                      alert(`Pemesanan layanan "${selectedServiceForOrder.title}" berhasil diproses! Silakan lengkapi instruksi brief.`);
+                      setSelectedServiceForOrder(null);
+                    },
+                  });
+                  setIsAuthModalOpen(true);
+                  return;
+                }
                 alert(`Pemesanan layanan "${selectedServiceForOrder.title}" berhasil diproses! Silakan lengkapi instruksi brief.`);
                 setSelectedServiceForOrder(null);
               }}
@@ -1494,7 +1588,7 @@ export const CreatorProfilePage: React.FC<CreatorProfilePageProps> = ({
           onClose={() => setSelectedServiceForDetail(null)}
           onOrderService={(srv) => {
             setSelectedServiceForDetail(null);
-            setSelectedServiceForOrder(srv);
+            handleOpenOrderService(srv);
           }}
           onNavigate={(page) => {
             if (onNavigate) onNavigate(page);
@@ -1696,6 +1790,21 @@ export const CreatorProfilePage: React.FC<CreatorProfilePageProps> = ({
         onClose={() => setIsUploadServiceModalOpen(false)}
         creator={creator}
         onSuccess={(newSrv) => setLiveServices((services) => [newSrv, ...services])}
+      />
+
+      {/* Contextual Auth Modal for protected actions */}
+      <AuthModal
+        isOpen={isAuthModalOpen}
+        onClose={() => setIsAuthModalOpen(false)}
+        title={authModalConfig.title}
+        description={authModalConfig.description}
+        onSuccess={(loggedUser) => {
+          setIsAuthModalOpen(false);
+          refreshUser?.();
+          if (authModalConfig.action) {
+            authModalConfig.action(loggedUser);
+          }
+        }}
       />
 
     </div>

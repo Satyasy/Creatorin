@@ -14,11 +14,18 @@ import {
   Palette,
   User,
 } from 'lucide-react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { AuthBanner } from '@/components/auth/AuthBanner';
 import { useAuth } from '@/providers/AuthProvider';
 import { authService } from '@/services/authService';
 import { ActivePage, AuthState, UserRole } from '@/types';
+
+function sanitizeRedirect(url: string | null): string | null {
+  if (!url) return null;
+  if (!url.startsWith('/') || url.startsWith('//') || url.startsWith('/\\')) return null;
+  if (url.startsWith('/sign-in') || url.startsWith('/sign-up')) return null;
+  return url;
+}
 
 interface Props {
   onNavigate?: (page: ActivePage) => void;
@@ -27,6 +34,8 @@ interface Props {
 
 export const SignUpPage: React.FC<Props> = ({ onNavigate, onLoginSuccess }) => {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const redirectParam = searchParams.get('redirect');
   const { login } = useAuth();
   const [role, setRole] = useState<UserRole>('umkm');
   const [name, setName] = useState('');
@@ -67,6 +76,12 @@ export const SignUpPage: React.FC<Props> = ({ onNavigate, onLoginSuccess }) => {
 
     login(result.user);
     onLoginSuccess?.(result.user);
+
+    const safeRedirect = sanitizeRedirect(redirectParam);
+    if (safeRedirect) {
+      router.push(safeRedirect);
+      return;
+    }
 
     if (result.user.role === 'school') {
       onNavigate?.('school-dashboard');
@@ -287,7 +302,10 @@ export const SignUpPage: React.FC<Props> = ({ onNavigate, onLoginSuccess }) => {
             Sudah memiliki akun?{' '}
             <button
               type="button"
-              onClick={() => router.push('/sign-in')}
+              onClick={() => {
+                const safe = sanitizeRedirect(redirectParam);
+                router.push(safe ? `/sign-in?redirect=${encodeURIComponent(safe)}` : '/sign-in');
+              }}
               className="font-semibold text-[#155DFC] hover:underline"
             >
               Masuk sekarang

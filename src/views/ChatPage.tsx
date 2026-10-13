@@ -40,6 +40,8 @@ import { chatService } from '@/services/chatService';
 import { DEFAULT_CREATORS } from '@/data/defaultCreators';
 import { aiSummarizeService } from '@/services/aiSummarizeService';
 import { formatCoin, formatCoinWithIcon } from '@/lib/coin';
+import { AuthModal } from '@/components/modals/AuthModal';
+import { startRouteProgress } from '@/components/common/RouteProgressBar';
 
 interface ChatPageProps {
   currentUser?: AuthState['user'];
@@ -68,8 +70,12 @@ export const ChatPage: React.FC<ChatPageProps> = ({
 
   const handleCreatorClick = (creator: Creator) => {
     if (onViewCreatorProfile) onViewCreatorProfile(creator);
-    else router.push(`/creator/${creator.id}`);
+    else {
+      startRouteProgress();
+      router.push(`/creator/${creator.id}`);
+    }
   };
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [conversations, setConversations] = useState<ChatConversation[]>([]);
   const [activeChatId, setActiveChatId] = useState<string | null>(null);
   const [inputText, setInputText] = useState('');
@@ -170,6 +176,7 @@ export const ChatPage: React.FC<ChatPageProps> = ({
 
   // 1. Fetch conversations from live database with fallback & auto-select from query
   useEffect(() => {
+    if (!currentUser) return;
     const partnerNameParam = searchParams.get('name') || '';
     const partnerAvatarParam = searchParams.get('avatar') || '';
     const partnerRoleTitleParam = searchParams.get('roleTitle') || '';
@@ -178,7 +185,6 @@ export const ChatPage: React.FC<ChatPageProps> = ({
     const ensureConversationInList = (list: ChatConversation[]): { updatedList: ChatConversation[]; matchedId: string } => {
       let finalConvs = [...list];
       let matchedId = '';
-
       if (targetConvId) {
         const found = finalConvs.find(c => c.id === targetConvId);
         if (found) matchedId = found.id;
@@ -579,6 +585,36 @@ export const ChatPage: React.FC<ChatPageProps> = ({
   });
 
   const totalUnreadCount = conversations.reduce((acc, c) => acc + c.unreadCount, 0);
+
+  if (!currentUser) {
+    return (
+      <div className="flex-1 w-full min-h-[70vh] flex items-center justify-center p-6 bg-[#FDFCFB]">
+        <div className="max-w-md w-full text-center bg-white p-8 rounded-3xl border border-neutral-200/80 shadow-md space-y-5">
+          <div className="w-14 h-14 bg-blue-50 text-[#155DFC] rounded-2xl flex items-center justify-center mx-auto ring-8 ring-blue-50/50">
+            <MessageSquare className="w-7 h-7" />
+          </div>
+          <div>
+            <h1 className="text-xl font-bold text-neutral-900">Masuk untuk Memulai Pesan</h1>
+            <p className="text-sm text-neutral-500 mt-2 leading-relaxed">
+              Silakan masuk ke akun Creatorin Anda terlebih dahulu untuk mengakses pesan, konsultasi, dan ruang kolaborasi proyek.
+            </p>
+          </div>
+          <button
+            onClick={() => setIsAuthModalOpen(true)}
+            className="w-full py-3 rounded-xl bg-[#0B1F3A] hover:bg-[#123B8C] text-sm font-semibold text-white shadow-xs transition cursor-pointer"
+          >
+            Masuk ke Akun
+          </button>
+        </div>
+        <AuthModal
+          isOpen={isAuthModalOpen}
+          onClose={() => setIsAuthModalOpen(false)}
+          title="Masuk ke Pesan & Kolaborasi"
+          description="Masuk untuk membuka percakapan aktif dan ruang kolaborasi proyek Anda."
+        />
+      </div>
+    );
+  }
 
   return (
     <div className="flex-1 w-full flex flex-col min-h-0 bg-white text-[#171717] font-sans overflow-hidden h-[calc(100vh-80px)] max-h-[calc(100vh-80px)] overscroll-none selection:bg-[#0B1F3A] selection:text-white">

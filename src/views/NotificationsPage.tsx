@@ -37,14 +37,25 @@ export const NotificationsPage = ({ onNavigate }: NotificationsPageProps) => {
 
   const markAllRead = async () => {
     const success = await notificationService.markAllAsRead();
-    if (success) setNotifications((items) => items.map((item) => ({ ...item, read: true })));
-    else setError('Gagal memperbarui notifikasi.');
+    if (success) {
+      setNotifications((items) => items.map((item) => ({ ...item, read: true })));
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new CustomEvent('creatorin_notifications_updated'));
+      }
+    } else {
+      setError('Gagal memperbarui notifikasi.');
+    }
   };
 
   const open = async (item: AppNotification) => {
     if (!item.read) {
       const success = await notificationService.markAsRead(item.id);
-      if (success) setNotifications((items) => items.map((entry) => entry.id === item.id ? { ...entry, read: true } : entry));
+      if (success) {
+        setNotifications((items) => items.map((entry) => entry.id === item.id ? { ...entry, read: true } : entry));
+        if (typeof window !== 'undefined') {
+          window.dispatchEvent(new CustomEvent('creatorin_notifications_updated'));
+        }
+      }
     }
     const targetUrl = item.actionUrl ? item.actionUrl.replace('/pesan', '/chat') : '';
     if (targetUrl?.startsWith('/')) router.push(targetUrl);

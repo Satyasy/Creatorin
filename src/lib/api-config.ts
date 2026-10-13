@@ -8,12 +8,9 @@ const isLocalhost =
     ? (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
     : process.env.NODE_ENV === 'development';
 
-// In development / localhost, use relative URLs (empty string) so local Next.js API routes handle requests.
-// In production, route to the backend domain unless overridden by NEXT_PUBLIC_API_URL.
-export const API_BASE_URL = (
-  process.env.NEXT_PUBLIC_API_URL?.replace(/\/$/, '') ||
-  (isLocalhost ? '' : 'https://api.creatorin.my.id')
-).replace(/\/api$/, '');
+// Always default to same-origin relative URLs ('') so all API routes are called directly on creatorin.my.id
+// This prevents cross-domain failures and cookie blocking across subdomains.
+export const API_BASE_URL = (process.env.NEXT_PUBLIC_API_URL || '').replace(/\/$/, '').replace(/\/api$/, '');
 
 /**
  * Returns the absolute or relative URL for any API endpoint.
