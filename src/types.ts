@@ -37,6 +37,7 @@ export interface CreatorService {
   galleryImages?: string[];
   category?: string;
   toolsUsed?: string[];
+  isActive?: boolean;
 }
 
 export interface Creator {

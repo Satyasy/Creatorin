@@ -52,7 +52,7 @@ import {
   Link as LinkIcon,
   Loader2
 } from 'lucide-react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '@/providers/AuthProvider';
 import { Creator, CreatorService, PortfolioItem, AuthState, ActivePage, FeedProject } from '@/types';
 import { CareerScoreBadge } from '@/components/common/CareerScoreBadge';
@@ -72,6 +72,53 @@ import { ShaderFill } from '@/lib/custom-effect-runtime';
 import { setup as setupConcentric, render as renderConcentric, manifest as manifestConcentric } from '@/lib/custom-effects/CodeComponentId_c2b302fbdfce8a1ec92a5a80b10a5916ab506ed7_430';
 import { setup as setupWater, render as renderWater, manifest as manifestWater } from '@/lib/custom-effects/CodeComponentId_40f03f78407c1c973fc891fbca9ff3d0387485e6_435';
 import { setup as setupWave, render as renderWave, manifest as manifestWave } from '@/lib/custom-effects/CodeComponentId_cd43ef0afb2cac168a28e7f79135150678ccfd25_433';
+
+const DEFAULT_CREATOR_SERVICES: CreatorService[] = [
+  {
+    id: 'demo-srv-1',
+    title: 'Premium Figma SaaS Landing Page & Design System',
+    tag: 'Figma Template',
+    description: 'Template landing page SaaS conversion-ready dengan 30+ komponen auto-layout dan variabel token warna.',
+    deliveryDays: '2 Hari Kerja',
+    price: 1500000,
+    formattedPrice: 'Rp1.500.000',
+    coverImage: '/figma/service-figma.png',
+    isActive: true,
+  },
+  {
+    id: 'demo-srv-2',
+    title: 'Full Framer Interactive Website Build + CMS',
+    tag: 'Framer Site',
+    description: 'Pengerjaan website interaktif dengan Framer Motion, animasi responsif mobile, dan integrasi CMS dinamis.',
+    deliveryDays: '4 Hari Kerja',
+    price: 3800000,
+    formattedPrice: 'Rp3.800.000',
+    coverImage: '/figma/service-framer.png',
+    isActive: true,
+  },
+  {
+    id: 'demo-srv-3',
+    title: '3x Video TikTok UGC & Review Produk Hook Viral',
+    tag: 'TikTok UGC',
+    description: '3 video vertical 9:16 dengan angle problem-solution, hook 3 detik pertama, B-roll estetik, dan subtitle dinamis.',
+    deliveryDays: '3 Hari Kerja',
+    price: 2200000,
+    formattedPrice: 'Rp2.200.000',
+    coverImage: '/figma/service-tiktok.png',
+    isActive: true,
+  },
+  {
+    id: 'demo-srv-4',
+    title: 'Brand Visual Identity Kit & Guidelines UMKM',
+    tag: 'Branding',
+    description: 'Panduan identitas logo primer/sekunder, palet warna, tipografi, dan mockup kemasan produk untuk UMKM.',
+    deliveryDays: '5 Hari Kerja',
+    price: 1800000,
+    formattedPrice: 'Rp1.800.000',
+    coverImage: '/figma/service-branding.png',
+    isActive: false,
+  },
+];
 
 interface CreatorProfilePageProps {
   creator: Creator;
@@ -112,8 +159,22 @@ export const CreatorProfilePage: React.FC<CreatorProfilePageProps> = ({
     if (onSelectCreator) onSelectCreator(c);
     else router.push(`/creator/${c.id}`);
   };
+
+  const searchParams = useSearchParams();
+  const tabParam = searchParams?.get('tab') as ProfileTab | null;
   // Active Tab
-  const [activeTab, setActiveTab] = useState<ProfileTab>('work');
+  const [activeTab, setActiveTab] = useState<ProfileTab>(() => {
+    if (tabParam && ['work', 'services', 'reviews', 'statistics', 'liked', 'about'].includes(tabParam)) {
+      return tabParam;
+    }
+    return 'work';
+  });
+
+  useEffect(() => {
+    if (tabParam && ['work', 'services', 'reviews', 'statistics', 'liked', 'about'].includes(tabParam)) {
+      setActiveTab(tabParam);
+    }
+  }, [tabParam]);
   const [shotFilter, setShotFilter] = useState<ShotFilter>('recent');
   const [reviewFilter, setReviewFilter] = useState<'recent' | 'highest'>('recent');
   const [isFilterDropdownOpen, setIsFilterDropdownOpen] = useState(false);
@@ -259,7 +320,80 @@ export const CreatorProfilePage: React.FC<CreatorProfilePageProps> = ({
   const [activeMediaIndexes, setActiveMediaIndexes] = useState<{ [id: string]: number }>({});
   const [selectedProjectForDetail, setSelectedProjectForDetail] = useState<FeedProject | null>(null);
   const [liveProjects, setLiveProjects] = useState<FeedProject[]>([]);
-  const [liveServices, setLiveServices] = useState<CreatorService[]>(creator.services || []);
+  const [liveServices, setLiveServices] = useState<CreatorService[]>(() => {
+    if (creator.services && creator.services.length > 0) {
+      return creator.services.map((s, idx) => ({
+        ...s,
+        isActive: s.isActive !== undefined ? s.isActive : (idx === 3 ? false : true),
+        coverImage: s.coverImage || (idx === 0 ? '/figma/service-figma.png' : idx === 1 ? '/figma/service-framer.png' : idx === 2 ? '/figma/service-tiktok.png' : '/figma/service-branding.png'),
+      }));
+    }
+    return DEFAULT_CREATOR_SERVICES;
+  });
+
+  useEffect(() => {
+    if (creator.services && creator.services.length > 0) {
+      setLiveServices(creator.services.map((s, idx) => ({
+        ...s,
+        isActive: s.isActive !== undefined ? s.isActive : (idx === 3 ? false : true),
+        coverImage: s.coverImage || (idx === 0 ? '/figma/service-figma.png' : idx === 1 ? '/figma/service-framer.png' : idx === 2 ? '/figma/service-tiktok.png' : '/figma/service-branding.png'),
+      })));
+    }
+  }, [creator.services]);
+
+  const handleToggleServiceActive = async (serviceId: string) => {
+    const target = liveServices.find((s) => s.id === serviceId);
+    if (!target) return;
+    const newActive = target.isActive === false;
+    setLiveServices((prev) =>
+      prev.map((s) => (s.id === serviceId ? { ...s, isActive: newActive } : s))
+    );
+
+    if (!serviceId.startsWith('demo-') && !serviceId.startsWith('qa-') && !serviceId.startsWith('sm-')) {
+      try {
+        await fetch(`/api/services/${serviceId}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ isActive: newActive }),
+        });
+      } catch (err) {
+        console.error('Failed to toggle service status:', err);
+      }
+    }
+
+    showToast({
+      type: 'success',
+      title: newActive ? 'Layanan Diaktifkan' : 'Layanan Dinonaktifkan',
+      message: newActive ? 'Layanan berhasil diaktifkan dan tayang ke UMKM.' : 'Layanan dinonaktifkan (Draft).',
+    });
+  };
+
+  const handleDeleteService = async (serviceId: string, serviceTitle: string) => {
+    if (!window.confirm(`Yakin ingin menghapus layanan "${serviceTitle}"?`)) return;
+
+    setLiveServices((prev) => prev.filter((s) => s.id !== serviceId));
+
+    if (!serviceId.startsWith('demo-') && !serviceId.startsWith('qa-') && !serviceId.startsWith('sm-')) {
+      try {
+        await fetch(`/api/services/${serviceId}`, {
+          method: 'DELETE',
+        });
+      } catch (err) {
+        console.error('Failed to delete service:', err);
+      }
+    }
+
+    showToast({
+      type: 'info',
+      title: 'Layanan Dihapus',
+      message: `Layanan "${serviceTitle}" telah dihapus.`,
+    });
+  };
+
+  const servicesToDisplay = useMemo(() => {
+    if (isEffectiveOwner) return liveServices;
+    return liveServices.filter((s) => s.isActive !== false);
+  }, [isEffectiveOwner, liveServices]);
   useEffect(() => {
     if (!creator.id) return;
     creatorService.getFeedProjects(creator.id).then(setLiveProjects).catch(() => setLiveProjects([]));
@@ -805,7 +939,7 @@ export const CreatorProfilePage: React.FC<CreatorProfilePageProps> = ({
             >
               <span>Layanan</span>
               <span className={`rounded-full px-1.5 text-[10px] font-bold leading-[14.286px] tracking-[0.12px] ${activeTab === 'services' ? 'bg-white/20 text-white' : 'bg-[#e5e5e5] text-[#404040]'}`}>
-                {liveServices.length}
+                {servicesToDisplay.length}
               </span>
             </button>
 
@@ -985,109 +1119,197 @@ export const CreatorProfilePage: React.FC<CreatorProfilePageProps> = ({
 
         {/* ----------------- TAB 2: SERVICES ----------------- */}
         {activeTab === 'services' && (
-          <div>
-            {liveServices.length === 0 ? (
-              <div className="bg-neutral-50 rounded-3xl border border-neutral-200 p-12 text-center">
-                <Sparkles className="w-10 h-10 text-neutral-400 mx-auto mb-3" />
-                <h4 className="text-base font-bold text-[#0d0c22]">Belum Ada Paket Layanan Standar</h4>
-                <p className="text-xs text-neutral-500 max-w-md mx-auto mt-1 mb-4">
-                  Kreator ini melayani proyek kustom sesuai kebutuhan spesifik Anda.
+          <div className="py-2">
+            {/* Header: Manajemen Layanan Kreator (Figma node 5414:15483) */}
+            <div className="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+              <div className="max-w-[672px]">
+                <h2 className="text-[28px] sm:text-[30px] font-extrabold leading-[36px] tracking-[-0.012em] text-[#0d0c22]">
+                  {isEffectiveOwner ? 'Manajemen Layanan Kreator' : 'Paket Layanan Kreator'}
+                </h2>
+                <p className="mt-1 text-[14px] font-normal leading-[22.75px] tracking-[-0.011em] text-[#737373]">
+                  {isEffectiveOwner
+                    ? 'Kelola paket jasa, tarif komersial, durasi pengerjaan, dan status aktif layanan yang Anda tawarkan kepada brand & UMKM.'
+                    : 'Pesan paket layanan komersial terverifikasi dengan proteksi pembayaran rekening bersama (escrow) Creatorin.'}
                 </p>
-                <button
-                  onClick={() => isEffectiveOwner ? setIsUploadServiceModalOpen(true) : setIsBriefModalOpen(true)}
-                  className="px-5 py-2.5 rounded-full bg-[#0d0c22] text-white text-xs font-bold"
-                >
-                  {isEffectiveOwner ? 'Upload Layanan' : 'Buat Brief Proyek'}
-                </button>
               </div>
-            ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                {isEffectiveOwner && (
-                  <button
-                    id="btn-upload-service-action"
-                    data-testid="btn-upload-service-action"
-                    type="button"
-                    onClick={() => setIsUploadServiceModalOpen(true)}
-                    className="flex min-h-[468px] flex-col items-center justify-center rounded-md border border-dashed border-[#acacac] bg-white px-8 text-center transition hover:border-[#0d0c22] hover:bg-neutral-50 cursor-pointer"
-                  >
-                    <span className="text-6xl font-light leading-none text-[#acacac]">+</span>
-                    <span className="mt-6 text-[24px] font-bold leading-none text-black">Upload Layanan</span>
-                    <span className="mt-2 max-w-[256px] text-[12px] font-normal leading-[1.4] text-black">
+            </div>
+
+            {/* Grid Container matching Figma node 5414:15490 */}
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+              {/* Item 1: Upload Proyek Tile (Only visible if isEffectiveOwner) */}
+              {isEffectiveOwner && (
+                <button
+                  id="btn-upload-service-action"
+                  data-testid="btn-upload-service-action"
+                  type="button"
+                  onClick={() => setIsUploadServiceModalOpen(true)}
+                  className="group relative flex min-h-[560px] w-full flex-col items-center justify-center rounded-[6px] border border-dashed border-[#acacac] bg-white p-8 text-center transition-all hover:border-[#0d0c22] hover:bg-neutral-50/50 cursor-pointer shadow-xs hover:shadow-md"
+                >
+                  <div className="flex flex-col items-center justify-center max-w-[400px]">
+                    <div className="flex items-center justify-center transition-transform group-hover:scale-105">
+                      <svg width="64" height="53" viewBox="0 0 64 53" fill="none" xmlns="http://www.w3.org/2000/svg" className="text-[#b0b0b0] group-hover:text-[#0d0c22] transition-colors">
+                        <path d="M32.3297 0V52.9998" stroke="currentColor" strokeWidth="3.6" />
+                        <path d="M63.729 26.8841H0.000499456" stroke="currentColor" strokeWidth="3.6" />
+                      </svg>
+                    </div>
+                    <h3 className="mt-6 text-[24px] font-bold leading-tight text-black group-hover:text-[#0d0c22]">
+                      Upload Proyek
+                    </h3>
+                    <p className="mt-2 text-[12px] font-normal leading-[1.4] text-black">
                       Show off your best work. Get feedback, likes and be a part of a growing community.
-                    </span>
-                  </button>
-                )}
-                {liveServices.map((srv) => (
-                  <div
-                    key={srv.id}
-                    className="group flex min-h-[468px] flex-col justify-between rounded-[24px] border border-[rgba(229,229,229,0.9)] bg-white p-5 text-left transition-all hover:border-neutral-300 hover:shadow-lg"
-                  >
-                    <div>
-                      <div
-                        onClick={() => setSelectedServiceForDetail(srv)}
-                        className="mb-4 h-[177.5px] overflow-hidden rounded-2xl bg-[#f5f5f5] cursor-pointer"
-                        title="Lihat detail layanan"
-                      >
-                        <ShaderFill
-                          className="h-full w-full"
-                          shader={{
-                            setup: setupWave,
-                            render: renderWave,
-                            params: {
-                              transform: { x: 50, y: 50, radius: 30, angle: 0 },
-                              amplitude: 15,
-                              waveColor: { r: 1, g: 1, b: 1, a: 1 },
-                              offset: 0,
-                              zoom: 1,
-                              glowIntensity: 1,
-                            },
-                            manifest: manifestWave,
+                    </p>
+                  </div>
+                </button>
+              )}
+
+              {/* Service Cards matching Figma node 5414:15491 & variants */}
+              {servicesToDisplay.map((srv) => (
+                <div
+                  key={srv.id}
+                  className="group flex min-h-[560px] flex-col justify-between rounded-[24px] border border-[rgba(229,229,229,0.9)] bg-white p-5 text-left transition-all hover:border-neutral-300 hover:shadow-lg"
+                >
+                  <div>
+                    {/* Cover Image Container */}
+                    <div
+                      onClick={() => setSelectedServiceForDetail(srv)}
+                      className="relative h-[292.91px] w-full overflow-hidden rounded-[16px] bg-[#f5f5f5] cursor-pointer"
+                      title="Lihat detail layanan"
+                    >
+                      {srv.coverImage ? (
+                        <img
+                          src={srv.coverImage}
+                          alt={srv.title}
+                          className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.02]"
+                          onError={(e) => {
+                            (e.currentTarget as HTMLImageElement).src = '/figma/service-figma.png';
                           }}
                         />
-                      </div>
-
-                      {srv.tag && (
-                        <span className="mb-2.5 inline-block rounded-md bg-[#f5f5f5] px-2.5 py-1 text-[10px] font-bold uppercase leading-[15px] tracking-[0.62px] text-[#525252]">
-                          {srv.tag}
-                        </span>
+                      ) : (
+                        <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-neutral-100 to-neutral-200">
+                          <span className="text-sm font-semibold text-neutral-400">{srv.tag || 'Layanan'}</span>
+                        </div>
                       )}
-
-                      <h4 
-                        onClick={() => setSelectedServiceForDetail(srv)}
-                        className="mb-1.5 cursor-pointer text-[17px] font-bold leading-[23.375px] tracking-[-0.43px] text-[#0d0c22] transition-colors group-hover:text-blue-600"
-                        title="Lihat detail layanan"
-                      >
-                        {srv.title}
-                      </h4>
-
-                      <p 
-                        onClick={() => setSelectedServiceForDetail(srv)}
-                        className="mb-4 line-clamp-2 cursor-pointer text-[12px] font-normal leading-[19.5px] text-[#737373]"
-                      >
-                        {srv.description || 'Pengerjaan profesional dengan jaminan kepatuhan brief dan revisi cepat.'}
-                      </p>
-
-                      <div 
-                        onClick={() => setSelectedServiceForDetail(srv)}
-                        className="mb-6 flex cursor-pointer items-center gap-1.5 text-[12px] font-normal leading-4 text-[#737373]"
-                      >
-                        <Clock className="w-3.5 h-3.5 text-neutral-400 stroke-[1.75]" />
-                        <span>Estimasi: {srv.deliveryDays ? (srv.deliveryDays.toLowerCase().includes('hari') ? srv.deliveryDays : `${srv.deliveryDays} Hari Kerja`) : '2-3 Hari Kerja'}</span>
-                      </div>
                     </div>
 
-                    <div className="flex items-center justify-between gap-2 pt-2">
-                      <div onClick={() => setSelectedServiceForDetail(srv)} className="cursor-pointer min-w-0">
-                        <span className="mb-0.5 block text-[10px] font-bold uppercase leading-[15px] tracking-[0.62px] text-[#a1a1a1]">HARGA</span>
-                        <span className="block truncate text-[16px] font-black leading-6 tracking-[-0.31px] text-[#0d0c22]">{srv.formattedPrice}</span>
-                      </div>
+                    {/* Tag & Status Row */}
+                    <div className="flex items-center justify-between gap-2 pt-4">
+                      {/* Category Tag */}
+                      <span className="inline-block rounded-[6px] bg-[#f5f5f5] px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.0617em] text-[#525252]">
+                        {srv.tag || srv.category || 'Layanan'}
+                      </span>
 
+                      {/* Status Badge */}
+                      {srv.isActive !== false ? (
+                        <div className="flex items-center gap-1.5 rounded-full border border-[#a4f4cf] bg-[#ecfdf5] px-2.5 py-1">
+                          <span className="size-1.5 rounded-full bg-[#00bc7d] opacity-65" />
+                          <span className="text-[10px] font-bold leading-[15px] tracking-[0.0117em] text-[#007a55]">
+                            Aktif Tayang
+                          </span>
+                        </div>
+                      ) : (
+                        <div className="flex items-center gap-1.5 rounded-full border border-[#e5e5e5] bg-[#f5f5f5] px-2.5 py-1">
+                          <span className="size-1.5 rounded-full bg-[#a1a1a1]" />
+                          <span className="text-[10px] font-bold leading-[15px] tracking-[0.0117em] text-[#525252]">
+                            Draft
+                          </span>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Title */}
+                    <h4
+                      onClick={() => setSelectedServiceForDetail(srv)}
+                      className="pt-2.5 cursor-pointer text-[17px] font-bold leading-[23.38px] tracking-[-0.0254em] text-[#0d0c22] transition-colors group-hover:text-blue-600 line-clamp-2"
+                      title="Lihat detail layanan"
+                    >
+                      {srv.title}
+                    </h4>
+
+                    {/* Description */}
+                    <p
+                      onClick={() => setSelectedServiceForDetail(srv)}
+                      className="pt-1.5 line-clamp-2 cursor-pointer text-[12px] font-normal leading-[19.5px] text-[#737373]"
+                    >
+                      {srv.description || 'Pengerjaan profesional dengan jaminan kepatuhan brief dan revisi cepat.'}
+                    </p>
+
+                    {/* Duration / Estimasi */}
+                    <div
+                      onClick={() => setSelectedServiceForDetail(srv)}
+                      className="flex cursor-pointer items-center gap-1.5 pt-4 pb-6 text-[12px] font-normal leading-4 text-[#737373]"
+                    >
+                      <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg" className="shrink-0 text-[#737373]">
+                        <path d="M7 3.5V7L9.33333 8.16667" stroke="currentColor" strokeWidth="1.02" strokeLinecap="round" strokeLinejoin="round" />
+                        <path d="M6.99935 12.8337C10.221 12.8337 12.8327 10.222 12.8327 7.00033C12.8327 3.77866 10.221 1.16699 6.99935 1.16699C3.77769 1.16699 1.16602 3.77866 1.16602 7.00033C1.16602 10.222 3.77769 12.8337 6.99935 12.8337Z" stroke="currentColor" strokeWidth="1.02" strokeLinecap="round" strokeLinejoin="round" />
+                      </svg>
+                      <span>
+                        Estimasi:{' '}
+                        {srv.deliveryDays
+                          ? srv.deliveryDays.toLowerCase().includes('hari')
+                            ? srv.deliveryDays
+                            : `${srv.deliveryDays} Hari Kerja`
+                          : '2-3 Hari Kerja'}
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Footer / Bottom Row */}
+                  <div className="flex items-center justify-between gap-2 border-t border-[#f5f5f5] pt-2">
+                    {/* Price column */}
+                    <div onClick={() => setSelectedServiceForDetail(srv)} className="cursor-pointer min-w-0">
+                      <span className="block text-[10px] font-bold uppercase tracking-[0.0617em] text-[#a1a1a1]">
+                        HARGA
+                      </span>
+                      <span className="block truncate text-[16px] font-black leading-6 tracking-[-0.0195em] text-[#0d0c22]">
+                        {srv.formattedPrice || (srv.price ? `Rp${srv.price.toLocaleString('id-ID')}` : 'Rp1.500.000')}
+                      </span>
+                    </div>
+
+                    {/* Action Buttons */}
+                    {isEffectiveOwner ? (
                       <div className="flex items-center gap-1.5 shrink-0">
-                        {/* Tombol Icon Simpan */}
+                        {/* Toggle Active / Nonaktifkan */}
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleToggleServiceActive(srv.id);
+                          }}
+                          className={`rounded-full border border-[#e5e5e5] px-3 py-1.5 text-[12px] font-semibold leading-4 transition cursor-pointer ${
+                            srv.isActive !== false
+                              ? 'text-[#404040] hover:border-red-200 hover:bg-red-50 hover:text-red-600'
+                              : 'text-[#404040] hover:border-emerald-300 hover:bg-emerald-50 hover:text-emerald-700'
+                          }`}
+                        >
+                          {srv.isActive !== false ? 'Nonaktifkan' : 'Aktifkan'}
+                        </button>
+
+                        {/* Trash button */}
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleDeleteService(srv.id, srv.title);
+                          }}
+                          className="flex size-8 items-center justify-center rounded-full border border-[#e5e5e5] text-neutral-700 transition hover:border-red-200 hover:bg-red-50 hover:text-red-600 cursor-pointer"
+                          title="Hapus Layanan"
+                          aria-label="Hapus Layanan"
+                        >
+                          <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg" className="shrink-0">
+                            <path d="M5.83398 6.41699V9.91699" stroke="currentColor" strokeWidth="1.17" strokeLinecap="round" strokeLinejoin="round"/>
+                            <path d="M8.16602 6.41699V9.91699" stroke="currentColor" strokeWidth="1.17" strokeLinecap="round" strokeLinejoin="round"/>
+                            <path d="M11.0827 3.5V11.6667C11.0827 11.9761 10.9598 12.2728 10.741 12.4916C10.5222 12.7104 10.2254 12.8333 9.91602 12.8333H4.08268C3.77326 12.8333 3.47652 12.7104 3.25772 12.4916C3.03893 12.2728 2.91602 11.9761 2.91602 11.6667V3.5" stroke="currentColor" strokeWidth="1.17" strokeLinecap="round" strokeLinejoin="round"/>
+                            <path d="M1.75 3.5H12.25" stroke="currentColor" strokeWidth="1.17" strokeLinecap="round" strokeLinejoin="round"/>
+                            <path d="M4.66602 3.50033V2.33366C4.66602 2.02424 4.78893 1.72749 5.00772 1.5087C5.22652 1.28991 5.52326 1.16699 5.83268 1.16699H8.16602C8.47543 1.16699 8.77218 1.28991 8.99097 1.5087C9.20977 1.72749 9.33268 2.02424 9.33268 2.33366V3.50033" stroke="currentColor" strokeWidth="1.17" strokeLinecap="round" strokeLinejoin="round"/>
+                          </svg>
+                        </button>
+                      </div>
+                    ) : (
+                      <div className="flex items-center gap-1.5 shrink-0">
                         <button
                           type="button"
                           onClick={(e) => toggleSaveService(srv.id, e)}
-                          className={`flex size-9 items-center justify-center rounded-full border transition cursor-pointer ${
+                          className={`flex size-8 items-center justify-center rounded-full border transition cursor-pointer ${
                             savedServiceIds.has(srv.id)
                               ? 'border-amber-300 bg-amber-50 text-amber-600'
                               : 'border-neutral-200 hover:border-neutral-300 hover:bg-neutral-100 text-neutral-600'
@@ -1095,10 +1317,8 @@ export const CreatorProfilePage: React.FC<CreatorProfilePageProps> = ({
                           title={savedServiceIds.has(srv.id) ? 'Tersimpan' : 'Simpan layanan'}
                           aria-label="Simpan layanan"
                         >
-                          <Bookmark className={`w-3.5 h-3.5 sm:w-4 sm:h-4 ${savedServiceIds.has(srv.id) ? 'fill-amber-500 text-amber-500' : 'stroke-[1.75]'}`} />
+                          <Bookmark className={`w-3.5 h-3.5 ${savedServiceIds.has(srv.id) ? 'fill-amber-500 text-amber-500' : 'stroke-[1.75]'}`} />
                         </button>
-
-                        {/* Tombol Diskusikan */}
                         <button
                           type="button"
                           onClick={() => handleOpenOrderService(srv)}
@@ -1107,11 +1327,11 @@ export const CreatorProfilePage: React.FC<CreatorProfilePageProps> = ({
                           Diskusikan
                         </button>
                       </div>
-                    </div>
+                    )}
                   </div>
-                ))}
-              </div>
-            )}
+                </div>
+              ))}
+            </div>
           </div>
         )}
 
@@ -1579,7 +1799,7 @@ export const CreatorProfilePage: React.FC<CreatorProfilePageProps> = ({
               const routeMap: Record<string, string> = {
                 'home': '/',
                 'landing': '/landing',
-                'explore': '/explore',
+                'explore': '/jelajah',
                 'explore-projects': '/jelajah/proyek',
                 'explore-services': '/jelajah/layanan',
                 'chat': '/chat',
@@ -1589,7 +1809,7 @@ export const CreatorProfilePage: React.FC<CreatorProfilePageProps> = ({
                 'signin': '/sign-in',
                 'signup': '/sign-up',
               };
-              router.push(routeMap[page] || '/explore');
+              router.push(routeMap[page] || '/jelajah');
             }
           }}
           allProjects={creatorProjects}
@@ -1677,7 +1897,7 @@ export const CreatorProfilePage: React.FC<CreatorProfilePageProps> = ({
               const routeMap: Record<string, string> = {
                 'home': '/',
                 'landing': '/landing',
-                'explore': '/explore',
+                'explore': '/jelajah',
                 'explore-projects': '/jelajah/proyek',
                 'explore-services': '/jelajah/layanan',
                 'chat': '/chat',
@@ -1687,7 +1907,7 @@ export const CreatorProfilePage: React.FC<CreatorProfilePageProps> = ({
                 'signin': '/sign-in',
                 'signup': '/sign-up',
               };
-              router.push(routeMap[page] || '/explore');
+              router.push(routeMap[page] || '/jelajah');
             }
           }}
           onSelectOtherService={(newSrv) => {

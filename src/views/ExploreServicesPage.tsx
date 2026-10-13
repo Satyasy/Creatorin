@@ -72,7 +72,7 @@ export const ExploreServicesPage: React.FC<ExploreServicesPageProps> = ({
       const routeMap: Record<string, string> = {
         'home': '/',
         'landing': '/landing',
-        'explore': '/explore',
+        'explore': '/jelajah',
         'explore-projects': '/jelajah/proyek',
         'explore-services': '/jelajah/layanan',
         'chat': '/chat',

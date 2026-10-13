@@ -259,7 +259,7 @@ async function runTests() {
     // ITEM 11: Comment Edit & Delete (< 10 Minutes)
     // -------------------------------------------------------------
     console.log('\n--- ITEM 11: Comment Edit & Delete (< 10 Minutes) ---');
-    await page.goto('http://localhost:3000/explore/projects', { waitUntil: 'domcontentloaded' });
+    await page.goto('http://localhost:3000/jelajah/proyek', { waitUntil: 'domcontentloaded' });
     await page.waitForTimeout(600);
 
     // Click first project card to open ProjectDetailModal

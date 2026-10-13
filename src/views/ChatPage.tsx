@@ -1251,16 +1251,16 @@ export const ChatPage: React.FC<ChatPageProps> = ({
             {/* HEADER SIDEBAR KANAN (AI SUMMARIZE OBROLAN) */}
             <div className="px-4 py-3.5 border-b border-neutral-100 flex items-center justify-between shrink-0 bg-white">
               <div className="flex items-center gap-2">
-                <div className="w-7 h-7 rounded-[8px] bg-blue-50 text-[#155DFC] flex items-center justify-center shrink-0 border border-blue-100">
+                <div className="w-7 h-7 rounded-lg bg-neutral-50 text-primary flex items-center justify-center shrink-0 border border-neutral-100">
                   <Sparkles className="w-3.5 h-3.5 stroke-[1.8]" />
                 </div>
                 <div>
                   <h3 className="text-xs font-bold text-neutral-900 tracking-tight">
-                    AI Summarize Obrolan
+                    Ringkasan Obrolan
                   </h3>
-                  <span className="text-[9px] font-semibold text-[#155DFC] bg-blue-50 px-1 py-0.2 rounded-xs border border-blue-100">
-                    {chatSummaryData?.modelUsed || 'Transformers.js'}
-                  </span>
+                  <p className="text-[10px] text-neutral-400 font-normal">
+                    Diperbarui otomatis
+                  </p>
                 </div>
               </div>
               
@@ -1269,10 +1269,10 @@ export const ChatPage: React.FC<ChatPageProps> = ({
                   type="button"
                   onClick={handleGenerateChatSummary}
                   disabled={isChatSummarizing}
-                  className="p-1 rounded-[6px] text-neutral-500 hover:text-[#155DFC] hover:bg-neutral-100 transition-colors cursor-pointer disabled:opacity-50"
+                  className="p-1 rounded-[6px] text-neutral-500 hover:text-primary hover:bg-neutral-100 transition-colors cursor-pointer disabled:opacity-50"
                   title="Perbarui Ringkasan AI"
                 >
-                  <RefreshCw className={`w-3.5 h-3.5 ${isChatSummarizing ? 'animate-spin text-[#155DFC]' : ''}`} />
+                  <RefreshCw className={`w-3.5 h-3.5 ${isChatSummarizing ? 'animate-spin text-primary' : ''}`} />
                 </button>
                 <button
                   onClick={() => setIsRightSidebarOpenMobile(false)}
@@ -1287,34 +1287,34 @@ export const ChatPage: React.FC<ChatPageProps> = ({
             {/* DAFTAR RINGKASAN PERCAKAPAN CHAT DENGAN CREATOR */}
             <div className="flex-1 overflow-y-auto overscroll-contain p-3.5 space-y-3">
               <p className="text-[11px] text-neutral-500 leading-relaxed">
-                Ringkasan kesepakatan dan tindak lanjut obrolan dengan <strong className="text-neutral-800">{activeConversation.name}</strong> tanpa halusinasi.
+                Poin kesepakatan & langkah tindak lanjut bersama <strong className="text-neutral-800 font-medium">{activeConversation.name}</strong>.
               </p>
 
               {isChatSummarizing ? (
                 <div className="p-4 rounded-xl bg-neutral-50 border border-neutral-100 flex items-center justify-center gap-2 text-xs text-neutral-500 py-8">
-                  <div className="w-4 h-4 border-2 border-[#155DFC] border-t-transparent rounded-full animate-spin" />
+                  <div className="w-4 h-4 border-2 border-primary border-t-transparent rounded-full animate-spin" />
                   <span>Menganalisis obrolan...</span>
                 </div>
               ) : chatSummaryData ? (
                 <div className="space-y-3 text-xs">
                   {/* Executive Summary */}
-                  <div className="p-3 rounded-xl bg-blue-50/60 border border-blue-100 text-[#0D0C22] leading-relaxed text-[11px]">
-                    <span className="font-bold text-[#155DFC] block mb-1 uppercase tracking-wider text-[10px]">
-                      Ringkasan Kesepakatan
+                  <div className="p-3 rounded-xl bg-neutral-50/80 border border-neutral-100 text-neutral-700 leading-relaxed text-[11px]">
+                    <span className="font-semibold text-neutral-400 block mb-1 text-[9px] uppercase tracking-wider">
+                      Status Kesepakatan
                     </span>
                     {chatSummaryData.executiveSummary}
                   </div>
 
                   {/* Poin Kesepakatan */}
                   <div className="space-y-1.5">
-                    <span className="font-bold text-neutral-800 text-[11px] flex items-center gap-1.5">
+                    <span className="font-semibold text-neutral-800 text-[11px] flex items-center gap-1.5">
                       <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
                       Poin yang Disepakati
                     </span>
                     <ul className="space-y-1 pl-1">
                       {chatSummaryData.agreements.map((agr, idx) => (
                         <li key={idx} className="text-[11px] text-neutral-600 flex items-start gap-1.5 leading-snug">
-                          <span className="text-[#155DFC] font-bold">•</span>
+                          <span className="text-neutral-400 font-bold">•</span>
                           <span>{agr}</span>
                         </li>
                       ))}
@@ -1323,25 +1323,25 @@ export const ChatPage: React.FC<ChatPageProps> = ({
 
                   {/* Action Items */}
                   <div className="space-y-1.5">
-                    <span className="font-bold text-neutral-800 text-[11px] flex items-center gap-1.5">
-                      <ListChecks className="w-3.5 h-3.5 text-[#155DFC]" />
+                    <span className="font-semibold text-neutral-800 text-[11px] flex items-center gap-1.5">
+                      <ListChecks className="w-3.5 h-3.5 text-primary" />
                       Tindak Lanjut Terdekat
                     </span>
                     <div className="space-y-1.5">
                       {chatSummaryData.actionItems.map((item, idx) => (
                         <div
                           key={idx}
-                          className="p-2 rounded-lg bg-neutral-50 border border-neutral-100 flex items-center justify-between gap-2 text-[10px]"
+                          className="p-2.5 rounded-lg bg-neutral-50/70 border border-neutral-100 flex items-center justify-between gap-2 text-[10px]"
                         >
                           <div className="min-w-0">
                             <span className="font-medium text-neutral-800 block truncate">{item.task}</span>
                             <span className="text-neutral-400">PJ: {item.assignee}</span>
                           </div>
                           <span
-                            className={`px-1.5 py-0.5 rounded-[4px] font-bold shrink-0 ${
+                            className={`px-1.5 py-0.5 rounded text-[10px] font-semibold shrink-0 ${
                               item.status === 'in_progress'
-                                ? 'bg-amber-100 text-amber-800'
-                                : 'bg-neutral-200 text-neutral-700'
+                                ? 'bg-amber-50 text-amber-700 border border-amber-200/60'
+                                : 'bg-neutral-100 text-neutral-600 border border-neutral-200/50'
                             }`}
                           >
                             {item.status === 'in_progress' ? 'Proses' : 'Pending'}
@@ -1354,7 +1354,7 @@ export const ChatPage: React.FC<ChatPageProps> = ({
                   {/* Catatan Khusus */}
                   {chatSummaryData.lastRevisionNotes && (
                     <div className="p-2.5 rounded-lg bg-amber-50/70 border border-amber-200/60 text-[11px] text-amber-950">
-                      <span className="font-bold block text-[10px] text-amber-800 mb-0.5">Catatan Khusus:</span>
+                      <span className="font-semibold block text-[10px] text-amber-800 mb-0.5">Catatan Khusus:</span>
                       {chatSummaryData.lastRevisionNotes}
                     </div>
                   )}
@@ -1365,12 +1365,12 @@ export const ChatPage: React.FC<ChatPageProps> = ({
                     <button
                       type="button"
                       onClick={() => {
-                        const copyText = `[RINGKASAN OBROLAN CREATORIN - ${activeConversation.name}]\nModel: ${chatSummaryData.modelUsed}\n\n${chatSummaryData.executiveSummary}\n\nPoin Kesepakatan:\n${chatSummaryData.agreements.map((a, i) => `${i + 1}. ${a}`).join('\n')}\n\nTindak Lanjut:\n${chatSummaryData.actionItems.map((item, i) => `${i + 1}. [${item.status.toUpperCase()}] ${item.task} (PJ: ${item.assignee})`).join('\n')}`;
+                        const copyText = `[RINGKASAN OBROLAN CREATORIN - ${activeConversation.name}]\n\n${chatSummaryData.executiveSummary}\n\nPoin Kesepakatan:\n${chatSummaryData.agreements.map((a, i) => `${i + 1}. ${a}`).join('\n')}\n\nTindak Lanjut:\n${chatSummaryData.actionItems.map((item, i) => `${i + 1}. [${item.status.toUpperCase()}] ${item.task} (PJ: ${item.assignee})`).join('\n')}`;
                         navigator.clipboard.writeText(copyText);
                         setIsChatSummaryCopied(true);
                         setTimeout(() => setIsChatSummaryCopied(false), 2000);
                       }}
-                      className="inline-flex items-center gap-1 text-[#155DFC] hover:underline font-bold cursor-pointer"
+                      className="inline-flex items-center gap-1 text-primary hover:underline font-semibold cursor-pointer"
                     >
                       {isChatSummaryCopied ? (
                         <>

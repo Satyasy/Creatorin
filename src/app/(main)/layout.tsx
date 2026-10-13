@@ -20,7 +20,6 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
   // Dedicated locked workspace only for /chat (which has 3-column independent inner scroll)
   const isChat = pathname?.startsWith('/chat');
   const isDashboard = pathname?.startsWith('/dashboard');
-  const isStandaloneExplore = pathname === '/explore';
   const isPublicSchoolDashboard = pathname === '/school/dashboard';
   const isPublicSchoolProfile = pathname?.startsWith('/school/') && !isPublicSchoolDashboard;
   const isCreatorShell = user?.role === 'creator';
@@ -50,8 +49,8 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
           {children}
         </main>
       </div>
-      {!hideFooter && !isCreatorShell && !isSchoolShell && !isStandaloneExplore && <Footer />}
-      {!isCreatorShell && !isSchoolShell && !isStandaloneExplore && <CreatorinChatbot />}
+      {!hideFooter && !isCreatorShell && !isSchoolShell && <Footer />}
+      {!isCreatorShell && !isSchoolShell && <CreatorinChatbot />}
     </div>
   );
 }

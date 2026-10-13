@@ -87,7 +87,7 @@ export const ProjectBriefsPage: React.FC<ProjectBriefsPageProps> = ({
       const routeMap: Record<string, string> = {
         'home': '/',
         'landing': '/landing',
-        'explore': '/explore',
+        'explore': '/jelajah',
         'explore-projects': '/jelajah/proyek',
         'explore-services': '/jelajah/layanan',
         'chat': '/chat',
@@ -97,7 +97,7 @@ export const ProjectBriefsPage: React.FC<ProjectBriefsPageProps> = ({
         'signin': '/sign-in',
         'signup': '/sign-up',
       };
-      router.push(routeMap[page] || '/explore');
+      router.push(routeMap[page] || '/jelajah');
     }
   };
 

@@ -112,9 +112,9 @@ async function runAudit() {
 
     const frontendPages = [
       { path: '/', name: 'Homepage' },
-      { path: '/explore', name: 'Explore Hub' },
-      { path: '/explore/projects', name: 'Explore Projects Gallery' },
-      { path: '/explore/services', name: 'Explore Services Catalog' },
+      { path: '/jelajah', name: 'Jelajah Hub' },
+      { path: '/jelajah/proyek', name: 'Jelajah Projects Gallery' },
+      { path: '/jelajah/layanan', name: 'Jelajah Services Catalog' },
       { path: '/briefs', name: 'Project Briefs List' },
       { path: '/chat', name: 'Chat & Collaboration Workspace' },
       { path: '/settings', name: 'Account Settings' },
@@ -291,7 +291,7 @@ async function runAudit() {
     console.log('🛍️ 6. Services & Marketplace Catalog');
     console.log('----------------------------------------------------------------------');
 
-    await page.goto(`${BASE_FRONTEND}/explore/services`, { waitUntil: 'domcontentloaded' });
+    await page.goto(`${BASE_FRONTEND}/jelajah/layanan`, { waitUntil: 'domcontentloaded' });
     await page.waitForTimeout(800);
 
     const servicesCount = await page.evaluate(() => {

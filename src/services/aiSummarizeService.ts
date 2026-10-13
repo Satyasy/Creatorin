@@ -32,26 +32,25 @@ export const aiSummarizeService = {
     // Client fallback reading real messages
     const msgs = params.messages || [];
     const hasMessages = msgs.length > 0;
-    const lastMsg = hasMessages ? msgs[msgs.length - 1].text : '';
     
     return {
       executiveSummary: hasMessages
-        ? `Obrolan proyek "${params.projectTitle}" antara ${params.businessBrand} dan ${params.creatorName} sedang aktif (${msgs.length} pesan tercatat). Diskusi kesepakatan berjalan secara langsung.`
-        : `Belum ada pesan obrolan antara ${params.businessBrand} dan ${params.creatorName}. Silakan mulai obrolan untuk menentukan kesepakatan proyek.`,
+        ? `Diskusi proyek "${params.projectTitle}" sedang berlangsung. Sampaikan rincian kebutuhan kerja dan kesepakatan di obrolan.`
+        : `Ruang diskusi baru dibuka. Silakan mulai percakapan untuk membahas kebutuhan proyek.`,
       agreements: hasMessages
         ? [
-            `Proyek: ${params.projectTitle}`,
-            lastMsg ? `Pesan terbaru: "${lastMsg.slice(0, 60)}${lastMsg.length > 60 ? '...' : ''}"` : 'Sedang mendiskusikan rincian pekerjaan.'
+            `Fokus proyek: ${params.projectTitle}`,
+            'Menunggu konfirmasi detail teknis & kesepakatan biaya.'
           ]
         : ['Belum ada poin kesepakatan yang dicatat.'],
       actionItems: [
         {
-          task: hasMessages ? 'Lanjutkan diskusi dan ajukan invoice kesepakatan DP' : 'Mulai percakapan untuk membahas lingkup proyek',
-          assignee: params.businessBrand,
+          task: hasMessages ? 'Sepakati deliverable dan buat invoice DP' : 'Mulai percakapan untuk membahas lingkup proyek',
+          assignee: `${params.creatorName} & ${params.businessBrand}`,
           status: 'pending',
         }
       ],
-      modelUsed: 'CreatorIn Context Reader',
+      modelUsed: 'Ringkasan AI',
       generatedAt: new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) + ' WIB',
     };
   }

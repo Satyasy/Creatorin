@@ -68,7 +68,7 @@ export function CreatorProfileClient({ id, initialCreator }: CreatorProfileClien
               <span>Coba Lagi</span>
             </button>
             <Link
-              href="/explore"
+              href="/jelajah"
               className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-[#155DFC] hover:bg-[#0E4CD1] text-sm font-semibold text-white transition shadow-sm"
             >
               <ArrowLeft className="w-4 h-4" />

@@ -23,19 +23,19 @@ function extractDynamicSummary(
 
   if (!messages || messages.length === 0) {
     return {
-      executiveSummary: `Belum ada pesan obrolan antara ${businessBrand} dan ${creatorName}. Silakan diskusikan kebutuhan proyek "${projectTitle}".`,
+      executiveSummary: `Percakapan baru dimulai. Belum ada rincian kesepakatan atau biaya yang dibahas.`,
       agreements: [
-        'Percakapan baru diinisialisasi.',
-        'Poin kesepakatan akan dirangkum otomatis saat detail proyek dibahas di obrolan.'
+        `Proyek: ${projectTitle}`,
+        'Detail kesepakatan akan tercatat otomatis saat dibahas di ruang obrolan.'
       ],
       actionItems: [
         {
-          task: `Diskusikan detail lingkup kerja dan target untuk "${projectTitle}"`,
-          assignee: businessBrand,
+          task: `Diskusikan lingkup kerja dan rincian kebutuhan proyek`,
+          assignee: `${creatorName} & ${businessBrand}`,
           status: 'pending'
         }
       ],
-      modelUsed: 'CreatorIn Dynamic NLP (Zero Hallucination)',
+      modelUsed: 'Ringkasan AI',
       generatedAt: currentTime
     };
   }
@@ -49,19 +49,19 @@ function extractDynamicSummary(
   const priceMatches = allText.match(/(?:Rp\s*[\d\.,]+|\b\d+(?:[\.,]\d+)?\s*(?:juta|jt|ribu|k)\b)/gi);
   if (priceMatches && priceMatches.length > 0) {
     const uniquePrices = Array.from(new Set(priceMatches.map(p => p.trim())));
-    agreements.push(`Kesepakatan biaya / penawaran yang dibahas: ${uniquePrices.slice(-2).join(' / ')}.`);
+    agreements.push(`Estimasi biaya yang dibahas: ${uniquePrices.slice(-2).join(' / ')}`);
   }
 
   // 2. Ekstraksi Format Deliverable
   const deliverableKeywords = [
-    { key: 'reels', label: 'Video Instagram Reels vertikal' },
-    { key: 'tiktok', label: 'Video konten TikTok kreatif' },
+    { key: 'reels', label: 'Video Instagram Reels' },
+    { key: 'tiktok', label: 'Video TikTok' },
     { key: 'logo', label: 'Desain Logo & Identitas Brand' },
-    { key: 'feed', label: 'Desain Feed / Carousel Instagram' },
-    { key: 'foto produk', label: 'Sesi Foto Produk Komersial' },
-    { key: 'packaging', label: 'Desain Kemasan / Packaging Produk' },
-    { key: 'banner', label: 'Desain Banner & Poster Promosi' },
-    { key: 'ui/ux', label: 'Desain Antarmuka UI/UX Figma' },
+    { key: 'feed', label: 'Desain Feed / Carousel' },
+    { key: 'foto produk', label: 'Foto Produk Komersial' },
+    { key: 'packaging', label: 'Desain Kemasan' },
+    { key: 'banner', label: 'Desain Banner & Poster' },
+    { key: 'ui/ux', label: 'Desain UI/UX Figma' },
     { key: 'storyboard', label: 'Naskah Script & Storyboard' },
   ];
 
@@ -70,15 +70,15 @@ function extractDynamicSummary(
     .map(d => d.label);
 
   if (detectedDeliverables.length > 0) {
-    agreements.push(`Format output deliverable: ${detectedDeliverables.join(', ')}.`);
+    agreements.push(`Format deliverable: ${detectedDeliverables.join(', ')}`);
   } else if (projectTitle) {
-    agreements.push(`Fokus pengerjaan proyek: ${projectTitle}.`);
+    agreements.push(`Fokus proyek: ${projectTitle}`);
   }
 
   // 3. Ekstraksi Deadline / Waktu
   const deadlineMatch = allText.match(/(?:deadline|tenggat|target|estimasi|selesai)\s*(?:dalam|pada|tanggal|hari)?\s*([^\.,\n]{3,35})/i);
   if (deadlineMatch && deadlineMatch[1]) {
-    agreements.push(`Estimasi tenggat waktu: ${deadlineMatch[1].trim()}.`);
+    agreements.push(`Target penyelesaian: ${deadlineMatch[1].trim()}`);
   }
 
   // 4. Deteksi Catatan Revisi & Feedback Aktual
@@ -86,65 +86,76 @@ function extractDynamicSummary(
   if (revisionMessages.length > 0) {
     const lastRev = revisionMessages[revisionMessages.length - 1];
     lastRevisionNotes = `"${lastRev.text.trim()}" (${lastRev.sender})`;
-    agreements.push(`Catatan penyesuaian aktif dari ${lastRev.sender}.`);
+    agreements.push(`Catatan penyesuaian dari ${lastRev.sender}`);
   }
 
-  // 5. Ekstraksi Action Items Nyata
+  // 5. Action Items
   if (lastRevisionNotes) {
     actionItems.push({
-      task: `Lakukan penyesuaian sesuai catatan dari ${businessBrand}`,
+      task: `Lakukan penyesuaian deliverable`,
       assignee: creatorName,
       status: 'in_progress'
     });
     actionItems.push({
-      task: `Tinjau hasil revisi setelah diunggah ke ruang kerja`,
+      task: `Tinjau hasil revisi di ruang obrolan`,
       assignee: businessBrand,
       status: 'pending'
     });
   } else {
-    // Cek apakah invoice sudah pernah diajukan
     const hasInvoiceMention = /invoice|dp|pembayaran|escrow|tagihan/i.test(allText);
     if (hasInvoiceMention) {
       actionItems.push({
-        task: 'Konfirmasi rincian invoice & pengamanan dana di Escrow',
+        task: 'Konfirmasi rincian pembayaran di Escrow',
         assignee: businessBrand,
         status: 'in_progress'
       });
       actionItems.push({
-        task: 'Mulai pengerjaan tahap produksi setelah DP terkonfirmasi',
+        task: 'Mulai pengerjaan setelah pembayaran dikonfirmasi',
         assignee: creatorName,
         status: 'pending'
       });
     } else {
       actionItems.push({
-        task: 'Sepakati rincian teknis deliverable & buat Invoice DP',
+        task: 'Sepakati rincian teknis deliverable & biaya',
         assignee: `${creatorName} & ${businessBrand}`,
         status: 'pending'
       });
     }
   }
 
-  // Jika agreements masih sedikit, masukkan rangkuman pesan terakhir
-  if (agreements.length < 2 && messages.length > 0) {
-    const lastMsg = messages[messages.length - 1];
-    agreements.push(`Update terbaru: "${lastMsg.text.slice(0, 80)}${lastMsg.text.length > 80 ? '...' : ''}"`);
+  // Jika pesan baru 1-2 (misal salam pembuka saja), buat ringkasan yang wajar dan bersih
+  const isEarlyStage = messages.length <= 2 && !priceMatches && detectedDeliverables.length === 0;
+
+  if (isEarlyStage) {
+    return {
+      executiveSummary: `Diskusi proyek baru dimulai. Sampaikan kebutuhan teknis dan rincian kerja untuk mencapai kesepakatan.`,
+      agreements: [
+        `Fokus proyek: ${projectTitle || 'Diskusi Kolaborasi'}`,
+        'Menunggu pembahasan detail deliverable dan biaya.'
+      ],
+      actionItems: [
+        {
+          task: 'Sepakati rincian deliverable & anggaran proyek',
+          assignee: `${creatorName} & ${businessBrand}`,
+          status: 'pending'
+        }
+      ],
+      modelUsed: 'Ringkasan AI',
+      generatedAt: currentTime
+    };
   }
 
-  // Buat Ringkasan Eksekutif yang mengalir dan akurat
-  const totalMsgs = messages.length;
-  const lastActiveSender = messages[messages.length - 1].sender;
-  const executiveSummary = `Diskusi proyek "${projectTitle}" antara ${businessBrand} dan ${creatorName} mencatat ${totalMsgs} pesan interaksi. ${
-    lastRevisionNotes 
-      ? `Saat ini terdapat catatan tindak lanjut aktif: ${lastRevisionNotes.slice(0, 100)}.`
-      : `Pihak ${lastActiveSender} baru saja mengirimkan pembaruan. Kesepakatan teknis pengerjaan sedang berjalan dengan lancar.`
-  }`;
+  // Ringkasan Eksekutif yang ringkas dan alami
+  const executiveSummary = lastRevisionNotes
+    ? `Terdapat catatan penyesuaian yang sedang ditindaklanjuti oleh ${creatorName}.`
+    : `Diskusi proyek "${projectTitle}" sedang berlangsung antara ${businessBrand} dan ${creatorName}.`;
 
   return {
     executiveSummary,
-    agreements,
-    actionItems,
+    agreements: agreements.slice(0, 3),
+    actionItems: actionItems.slice(0, 2),
     lastRevisionNotes,
-    modelUsed: 'CreatorIn Dynamic NLP (Zero Hallucination)',
+    modelUsed: 'Ringkasan AI',
     generatedAt: currentTime
   };
 }

@@ -140,7 +140,7 @@ const primaryLinks: CreatorNavLink[] = [
   { label: 'Home', href: '/', icon: HomeIcon },
   { label: 'Messages', href: '/chat', icon: MessagesIcon },
   { label: 'Contracts', href: '/contracts', icon: ContractsIcon },
-  { label: 'Layanan', href: '/jelajah/layanan', icon: LayananIcon },
+  { label: 'Layanan', href: '/dashboard/layanan', icon: LayananIcon },
   { label: 'Proyek', href: '/proyek', icon: ProyekIcon },
   { label: 'Finances', href: '/wallet', icon: FinancesIcon },
 ];
@@ -153,6 +153,15 @@ export function CreatorSidebar() {
   const isActive = (href: string) => {
     if (href === '/') {
       return pathname === '/' || pathname === '/dashboard';
+    }
+    if (href === '/dashboard/layanan' || href === '/profile?tab=services') {
+      return (
+        pathname === '/dashboard/layanan' ||
+        pathname === '/layanan' ||
+        pathname?.startsWith('/dashboard/layanan') ||
+        pathname?.startsWith('/layanan') ||
+        pathname?.startsWith('/jelajah/layanan')
+      );
     }
     if (href === '/proyek') {
       return pathname?.startsWith('/proyek') || pathname?.startsWith('/jelajah/proyek') || pathname?.startsWith('/briefs');
