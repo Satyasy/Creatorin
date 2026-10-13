@@ -12,11 +12,14 @@ import {
   Bookmark, 
   UserCheck, 
   Clock, 
-  Sparkles 
+  Sparkles,
+  Loader2
 } from 'lucide-react';
 import { ScrollReveal } from '@/components/common/ScrollReveal';
 import { ProjectBriefModal } from '@/components/modals/ProjectBriefModal';
 import { ServiceDetailModal } from '@/components/modals/ServiceDetailModal';
+import { AuthModal } from '@/components/modals/AuthModal';
+import { startRouteProgress } from '@/components/common/RouteProgressBar';
 import { creatorService } from '@/services/creatorService';
 import { DEFAULT_CREATORS } from '@/data/defaultCreators';
 import type { Creator, CreatorService, ActivePage, AuthState } from '@/types';
@@ -73,6 +76,7 @@ export const JelajahKreatorPage: React.FC<JelajahKreatorPageProps> = ({
   const [selectedSort, setSelectedSort] = useState<'score' | 'rating' | 'projects' | 'rate-asc'>('score');
   const [openDropdown, setOpenDropdown] = useState<'kategori' | 'budget' | 'lokasi' | 'sort' | null>(null);
   const [bookmarkedIds, setBookmarkedIds] = useState<string[]>([]);
+  const [loadingCreatorId, setLoadingCreatorId] = useState<string | null>(null);
 
   // Modals
   const [isBriefModalOpen, setIsBriefModalOpen] = useState(false);
@@ -81,6 +85,17 @@ export const JelajahKreatorPage: React.FC<JelajahKreatorPageProps> = ({
     service: CreatorService;
     creator: Creator;
   } | null>(null);
+
+  // AuthModal state for protected actions
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  const [authModalConfig, setAuthModalConfig] = useState<{
+    title: string;
+    description: string;
+    action?: (user?: NonNullable<AuthState['user']>) => void;
+  }>({
+    title: 'Masuk ke Akun Creatorin',
+    description: 'Masuk untuk melanjutkan tindakan ini dan membuka akses ke seluruh fitur kolaborasi.',
+  });
 
   useEffect(() => {
     creatorService
@@ -111,12 +126,26 @@ export const JelajahKreatorPage: React.FC<JelajahKreatorPageProps> = ({
     if (onViewCreatorProfile) {
       onViewCreatorProfile(creator);
     } else {
+      setLoadingCreatorId(creator.id);
+      startRouteProgress();
       router.push(`/creator/${creator.id}`);
     }
   };
 
   const handleOpenBrief = (creator: Creator, e: React.MouseEvent) => {
     e.stopPropagation();
+    if (!currentUser) {
+      setAuthModalConfig({
+        title: 'Masuk untuk Mengirim Brief Proyek',
+        description: 'Anda harus masuk ke akun Creatorin Anda terlebih dahulu untuk mengirimkan brief proyek kolaborasi ke kreator ini.',
+        action: () => {
+          setTargetCreatorForBrief(creator);
+          setIsBriefModalOpen(true);
+        },
+      });
+      setIsAuthModalOpen(true);
+      return;
+    }
     setTargetCreatorForBrief(creator);
     setIsBriefModalOpen(true);
   };
@@ -470,7 +499,13 @@ export const JelajahKreatorPage: React.FC<JelajahKreatorPageProps> = ({
                     onClick={() => {
                       handleCreatorClick(creator);
                     }}
-                    className="group bg-white rounded-2xl sm:rounded-3xl border border-neutral-200/80 hover:border-neutral-300 p-6 sm:p-8 transition-all shadow-xs hover:shadow-md cursor-pointer text-left"
+                    onMouseEnter={() => router.prefetch(`/creator/${creator.id}`)}
+                    className={`group bg-white rounded-2xl sm:rounded-3xl border ${
+                      loadingCreatorId === creator.id
+                        ? 'border-[#155DFC] ring-2 ring-[#155DFC]/20 shadow-md'
+                        : 'border-neutral-200/80 hover:border-neutral-300 shadow-xs hover:shadow-md'
+                    } p-6 sm:p-8 transition-all cursor-pointer text-left relative`}
+                    aria-busy={loadingCreatorId === creator.id}
                   >
                   
                   {/* BARIS 1: Header Profil Kreator, Badges, & Action Buttons */}
@@ -486,6 +521,11 @@ export const JelajahKreatorPage: React.FC<JelajahKreatorPageProps> = ({
                           alt={creator.name}
                           className="w-14 h-14 sm:w-16 sm:h-16 rounded-full object-cover ring-2 ring-neutral-100"
                         />
+                        {loadingCreatorId === creator.id && (
+                          <div className="absolute inset-0 bg-neutral-900/40 rounded-full flex items-center justify-center text-white backdrop-blur-[1px]">
+                            <Loader2 className="w-5 h-5 animate-spin" />
+                          </div>
+                        )}
                       </div>
 
                       {/* Detail Nama & Status Promoted */}
@@ -494,6 +534,13 @@ export const JelajahKreatorPage: React.FC<JelajahKreatorPageProps> = ({
                           <h3 className="text-lg sm:text-xl font-bold tracking-tight text-[#0d0c22]">
                             {creator.name}
                           </h3>
+
+                          {loadingCreatorId === creator.id && (
+                            <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-blue-50 text-[#155DFC] animate-pulse">
+                              <Loader2 className="w-3 h-3 animate-spin" />
+                              <span>Membuka profil...</span>
+                            </span>
+                          )}
 
                           <div className="flex items-center gap-1 text-xs font-bold text-neutral-800">
                             <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
@@ -723,6 +770,17 @@ export const JelajahKreatorPage: React.FC<JelajahKreatorPageProps> = ({
           onClose={() => setSelectedServiceForDetail(null)}
           onOrderService={(srv, cr) => {
             setSelectedServiceForDetail(null);
+            if (!currentUser) {
+              setAuthModalConfig({
+                title: 'Masuk untuk Memesan Layanan',
+                description: 'Anda harus masuk ke akun Creatorin Anda terlebih dahulu untuk memulai pesanan dan diskusi proyek.',
+                action: () => {
+                  router.push(`/chat?creatorId=${cr.id}`);
+                },
+              });
+              setIsAuthModalOpen(true);
+              return;
+            }
             router.push(`/chat?creatorId=${cr.id}`);
           }}
           onViewCreatorProfile={(cr) => {
@@ -730,6 +788,8 @@ export const JelajahKreatorPage: React.FC<JelajahKreatorPageProps> = ({
             if (onViewCreatorProfile) {
               onViewCreatorProfile(cr);
             } else {
+              setLoadingCreatorId(cr.id);
+              startRouteProgress();
               router.push(`/creator/${cr.id}`);
             }
           }}
@@ -739,6 +799,20 @@ export const JelajahKreatorPage: React.FC<JelajahKreatorPageProps> = ({
           }}
         />
       )}
+
+      {/* Contextual Auth Modal */}
+      <AuthModal
+        isOpen={isAuthModalOpen}
+        onClose={() => setIsAuthModalOpen(false)}
+        title={authModalConfig.title}
+        description={authModalConfig.description}
+        onSuccess={(loggedUser) => {
+          setIsAuthModalOpen(false);
+          if (authModalConfig.action) {
+            authModalConfig.action(loggedUser);
+          }
+        }}
+      />
     </div>
   );
 };

@@ -15,6 +15,9 @@ import {
 } from 'lucide-react';
 import { CreatorService, Creator, ActivePage } from '@/types';
 import { Footer } from '@/components/layout/Footer';
+import { useAuth } from '@/providers/AuthProvider';
+import { AuthModal } from '@/components/modals/AuthModal';
+import { startRouteProgress } from '@/components/common/RouteProgressBar';
 
 export interface ServiceDetailModalProps {
   service: CreatorService;
@@ -118,6 +121,17 @@ export const ServiceDetailModal: React.FC<ServiceDetailModalProps> = ({
   const [mounted, setMounted] = useState(false);
   const [isClosing, setIsClosing] = useState(false);
 
+  const { user } = useAuth();
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  const [authModalConfig, setAuthModalConfig] = useState<{
+    title: string;
+    description: string;
+    action?: () => void;
+  }>({
+    title: 'Masuk ke Akun Creatorin',
+    description: 'Masuk untuk melanjutkan tindakan ini dan membuka akses ke seluruh fitur kolaborasi.',
+  });
+
   const scrollContainerRef = useRef<HTMLDivElement | null>(null);
 
   // Sync state if initialService changes
@@ -188,6 +202,22 @@ export const ServiceDetailModal: React.FC<ServiceDetailModalProps> = ({
   };
 
   const handleGoToChat = () => {
+    if (!user) {
+      setAuthModalConfig({
+        title: 'Masuk untuk Menghubungi Kreator',
+        description: 'Anda harus masuk akun terlebih dahulu untuk memulai obrolan langsung dan mendiskusikan kebutuhan kolaborasi.',
+        action: () => {
+          handleSmoothClose();
+          if (creator?.id) {
+            router.push(`/chat?creatorId=${creator.id}`);
+          } else {
+            router.push('/chat');
+          }
+        },
+      });
+      setIsAuthModalOpen(true);
+      return;
+    }
     handleSmoothClose();
     if (creator?.id) {
       router.push(`/chat?creatorId=${creator.id}`);
@@ -200,8 +230,30 @@ export const ServiceDetailModal: React.FC<ServiceDetailModalProps> = ({
     if (onOrderService && creator) {
       onOrderService(srvToOrder, creator);
     } else if (creator?.id) {
+      if (!user) {
+        setAuthModalConfig({
+          title: 'Masuk untuk Memesan Layanan',
+          description: 'Anda harus masuk akun terlebih dahulu untuk memesan paket layanan dan memulai diskusi proyek.',
+          action: () => {
+            router.push(`/chat?creatorId=${creator.id}`);
+          },
+        });
+        setIsAuthModalOpen(true);
+        return;
+      }
       router.push(`/chat?creatorId=${creator.id}`);
     } else {
+      if (!user) {
+        setAuthModalConfig({
+          title: 'Masuk untuk Memesan Layanan',
+          description: 'Anda harus masuk akun terlebih dahulu untuk mengakses fitur pemesanan layanan & chat.',
+          action: () => {
+            router.push('/chat');
+          },
+        });
+        setIsAuthModalOpen(true);
+        return;
+      }
       router.push('/chat');
     }
   };
@@ -323,6 +375,7 @@ export const ServiceDetailModal: React.FC<ServiceDetailModalProps> = ({
                         onViewCreatorProfile(creator);
                       } else if (creator?.id) {
                         handleSmoothClose();
+                        startRouteProgress();
                         router.push(`/creator/${creator.id}`);
                       }
                     }}
@@ -565,6 +618,20 @@ export const ServiceDetailModal: React.FC<ServiceDetailModalProps> = ({
           </div>
         </div>
       </div>
+
+      {/* Contextual Auth Modal */}
+      <AuthModal
+        isOpen={isAuthModalOpen}
+        onClose={() => setIsAuthModalOpen(false)}
+        title={authModalConfig.title}
+        description={authModalConfig.description}
+        onSuccess={() => {
+          setIsAuthModalOpen(false);
+          if (authModalConfig.action) {
+            authModalConfig.action();
+          }
+        }}
+      />
     </div>
   );
 };

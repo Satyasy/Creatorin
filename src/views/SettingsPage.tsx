@@ -25,11 +25,21 @@ export const SettingsPage: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'profile' | 'preferences' | 'security'>('profile');
 
   // Form states
-  const [fullName, setFullName] = useState('');
-  const [email, setEmail] = useState('');
-  const [location, setLocation] = useState('');
-  const [phone, setPhone] = useState('');
-  const [bio, setBio] = useState('');
+  const [fullName, setFullName] = useState(user?.name || '');
+  const [email, setEmail] = useState(user?.email || '');
+  const [location, setLocation] = useState(user?.location || '');
+  const [phone, setPhone] = useState(user?.phone || '');
+  const [bio, setBio] = useState(user?.bio || '');
+  const [prevUserId, setPrevUserId] = useState<string | undefined>(user?.id);
+
+  if (user?.id !== prevUserId) {
+    setPrevUserId(user?.id);
+    setFullName(user?.name || '');
+    setEmail(user?.email || '');
+    setLocation(user?.location || '');
+    setPhone(user?.phone || '');
+    setBio(user?.bio || '');
+  }
   
   // Notification states
   const [notifyPush, setNotifyPush] = useState(true);
@@ -44,14 +54,6 @@ export const SettingsPage: React.FC = () => {
   const [isSavedToast, setIsSavedToast] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [saveError, setSaveError] = useState('');
-
-  useEffect(() => {
-    setFullName(user?.name || '');
-    setEmail(user?.email || '');
-    setLocation(user?.location || '');
-    setPhone(user?.phone || '');
-    setBio(user?.bio || '');
-  }, [user]);
 
   useEffect(() => {
     if (!user) return;

@@ -1193,7 +1193,7 @@ export const UmkmProfilePage: React.FC<UmkmProfilePageProps> = ({
 
                     {/* Isi Testimoni Klien */}
                     <p className="mt-2 text-sm text-neutral-700 leading-relaxed font-normal">
-                      "{rev.comment}"
+                      &ldquo;{rev.comment}&rdquo;
                     </p>
 
                     {/* Tags Tagar Proyek */}
@@ -2012,7 +2012,7 @@ export const UmkmProfilePage: React.FC<UmkmProfilePageProps> = ({
 
               {selectedCollabDetail.reviewComment && (
                 <div className="p-4 rounded-2xl bg-[#fafafa] border border-neutral-100 text-xs text-neutral-600 italic leading-relaxed">
-                  "{selectedCollabDetail.reviewComment}"
+                  &ldquo;{selectedCollabDetail.reviewComment}&rdquo;
                 </div>
               )}
 
