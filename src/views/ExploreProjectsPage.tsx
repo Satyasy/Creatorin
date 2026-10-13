@@ -63,18 +63,6 @@ const PLATFORM_FILTERS = [
   { id: 'direct', label: 'Creatorin Upload' }
 ];
 
-const POPULAR_PROJECT_TAGS = [
-  '#ReelsInstagram',
-  '#TikTokViral',
-  '#UIUXDesign',
-  '#FotoProduk',
-  '#DesignSystems',
-  '#CinematicBRoll',
-  '#FigmaCommunity',
-  '#PackagingDesign',
-  '#ASMRCoffee'
-];
-
 const MOCK_FEED_PROJECTS: FeedProject[] = [
   {
     id: 'proj-1',

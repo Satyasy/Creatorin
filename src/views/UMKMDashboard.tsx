@@ -22,6 +22,7 @@ import { creatorService } from '@/services/creatorService';
 import { useAuth } from '@/providers/AuthProvider';
 import { FeedProject, CreatorService, Creator, AuthState } from '@/types';
 import { HomeHeroSection } from '@/components/home/HomeHeroSection';
+import { ProjectCard } from '@/components/common/ProjectCard';
 import { startRouteProgress } from '@/components/common/RouteProgressBar';
 import { AuthModal } from '@/components/modals/AuthModal';
 
@@ -660,6 +661,7 @@ export const UMKMDashboard = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [savedCreators, setSavedCreators] = useState<Record<string, boolean>>({});
   const [savedServices, setSavedServices] = useState<Record<string, boolean>>({});
+  const [savedProjects, setSavedProjects] = useState<Record<string, boolean>>({});
   const [visibleCount, setVisibleCount] = useState(5);
   const [visibleServicesCount, setVisibleServicesCount] = useState(8);
   const [visibleProjectsCount, setVisibleProjectsCount] = useState(8);
@@ -793,6 +795,14 @@ export const UMKMDashboard = () => {
     setSavedServices((prev) => ({
       ...prev,
       [serviceId]: !prev[serviceId],
+    }));
+  };
+
+  const toggleBookmarkProject = (projectId: string, e?: React.MouseEvent) => {
+    if (e) e.stopPropagation();
+    setSavedProjects((prev) => ({
+      ...prev,
+      [projectId]: !prev[projectId],
     }));
   };
 
@@ -934,23 +944,35 @@ export const UMKMDashboard = () => {
     setSelectedService({ service: creatorServiceMock, creator: creatorMock });
   };
 
-  const handleProjectCardClick = (project: HomeProjectItem) => {
+  const handleProjectCardClick = (project: HomeProjectItem | FeedProject) => {
+    const existing = allFeedProjects.find((p) => p.id === project.id);
+    if (existing) {
+      setSelectedProject(existing);
+      return;
+    }
+    const isVideo =
+      (project.category?.toLowerCase().includes('video') ||
+       project.category?.toLowerCase().includes('ugc') ||
+       project.category?.toLowerCase().includes('tiktok') ||
+       project.category?.toLowerCase().includes('motion') ||
+       project.category?.toLowerCase().includes('reels'));
+
     const feedProjectMock: FeedProject = {
       id: project.id,
       title: project.title,
-      description: project.description || `${project.title} oleh ${project.creatorName}`,
-      coverImage: project.mediaUrl,
-      mediaUrl: project.mediaUrl,
-      mediaType: 'image',
-      creatorId: project.creatorId,
+      description: project.description || `${project.title}`,
+      coverImage: 'mediaUrl' in project ? project.mediaUrl : (project as any).coverImage,
+      mediaUrl: 'mediaUrl' in project ? project.mediaUrl : (project as any).coverImage,
+      mediaType: isVideo ? 'video' : 'image',
+      creatorId: project.creatorId || 'creator',
       creator: {
-        id: project.creatorId,
-        name: project.creatorName,
-        username: project.creatorHandle.replace('@', ''),
-        avatar: project.creatorAvatar,
-        category: (project.category.toLowerCase().includes('video') || project.category.toLowerCase().includes('tiktok') || project.category.toLowerCase().includes('motion')) ? 'Video' : 'Image',
+        id: project.creatorId || 'creator',
+        name: (project as any).creatorName || (project as any).creator?.name || 'Kreator',
+        username: ((project as any).creatorHandle?.replace('@', '') || (project as any).creator?.username || 'kreator'),
+        avatar: (project as any).creatorAvatar || (project as any).creator?.avatar || '',
+        category: isVideo ? 'Video' : 'Image',
         roleTitle: 'Kreator Profesional',
-        bio: `${project.creatorName} di Creatorin`,
+        bio: `${(project as any).creatorName || 'Kreator'} di Creatorin`,
         location: 'Indonesia',
         startingRate: 250000,
         formattedRate: 'Rp250.000',
@@ -965,62 +987,71 @@ export const UMKMDashboard = () => {
         },
         rating: 4.9,
         reviewCount: 38,
-        skills: [project.category, 'Kreator Digital', 'Portofolio'],
+        skills: [project.category || 'Kreator Digital', 'Portofolio'],
         joinedDate: '2024',
       },
-      category: project.category,
+      category: project.category || 'Proyek',
       platform: 'direct',
-      tags: [project.category.replace(/\s+/g, '')],
+      tags: [(project.category || 'Karya').replace(/\s+/g, '')],
       likesCount: 142,
       commentsCount: 18,
-      viewsCount: project.viewsCount,
+      viewsCount: (project as any).viewsCount || '500K',
       sharesCount: 12,
     };
     setSelectedProject(feedProjectMock);
   };
 
   const allFeedProjects = useMemo<FeedProject[]>(() => {
-    return showcaseProjects.map((p) => ({
-      id: p.id,
-      title: p.title,
-      description: p.description,
-      coverImage: p.mediaUrl,
-      mediaUrl: p.mediaUrl,
-      mediaType: 'image',
-      creatorId: p.creatorId,
-      creator: {
-        id: p.creatorId,
-        name: p.creatorName,
-        username: p.creatorHandle.replace('@', ''),
-        avatar: p.creatorAvatar,
-        category: 'Image',
-        roleTitle: 'Kreator Profesional',
-        bio: `${p.creatorName} di Creatorin`,
-        location: 'Indonesia',
-        startingRate: 250000,
-        formattedRate: 'Rp250.000',
-        careerScore: {
-          overall: 95,
-          deadlineAccuracy: 98,
-          revisionRate: 1,
-          completionRate: 100,
-          clientRating: 4.9,
-          completedProjects: 45,
-          tier: 'Top Tier',
+    return showcaseProjects.map((p) => {
+      const isVideo =
+        p.category.toLowerCase().includes('video') ||
+        p.category.toLowerCase().includes('ugc') ||
+        p.category.toLowerCase().includes('tiktok') ||
+        p.category.toLowerCase().includes('motion') ||
+        p.category.toLowerCase().includes('reels');
+
+      return {
+        id: p.id,
+        title: p.title,
+        description: p.description,
+        coverImage: p.mediaUrl,
+        mediaUrl: p.mediaUrl,
+        mediaType: isVideo ? 'video' : 'image',
+        creatorId: p.creatorId,
+        creator: {
+          id: p.creatorId,
+          name: p.creatorName,
+          username: p.creatorHandle.replace('@', ''),
+          avatar: p.creatorAvatar,
+          category: isVideo ? 'Video' : 'Image',
+          roleTitle: 'Kreator Profesional',
+          bio: `${p.creatorName} di Creatorin`,
+          location: 'Indonesia',
+          startingRate: 250000,
+          formattedRate: 'Rp250.000',
+          careerScore: {
+            overall: 95,
+            deadlineAccuracy: 98,
+            revisionRate: 1,
+            completionRate: 100,
+            clientRating: 4.9,
+            completedProjects: 45,
+            tier: 'Top Tier',
+          },
+          rating: 4.9,
+          reviewCount: 38,
+          skills: [p.category, 'Kreator Digital'],
+          joinedDate: '2024',
         },
-        rating: 4.9,
-        reviewCount: 38,
-        skills: [p.category, 'Kreator Digital'],
-        joinedDate: '2024',
-      },
-      category: p.category,
-      platform: 'direct',
-      tags: [p.category.replace(/\s+/g, '')],
-      likesCount: 142,
-      commentsCount: 18,
-      viewsCount: p.viewsCount,
-      sharesCount: 12,
-    }));
+        category: p.category,
+        platform: 'direct',
+        tags: [p.category.replace(/\s+/g, '')],
+        likesCount: 142,
+        commentsCount: 18,
+        viewsCount: p.viewsCount,
+        sharesCount: 12,
+      };
+    });
   }, [showcaseProjects]);
 
   return (
@@ -1361,19 +1392,6 @@ export const UMKMDashboard = () => {
                       <div className="flex items-center gap-2 shrink-0">
                         <button
                           type="button"
-                          onClick={() => toggleBookmarkService(service.id)}
-                          className="w-8 h-8 rounded-full border border-[#E1E3EA] bg-white hover:bg-[#F3F3F4] text-[#55576A] hover:text-[#0D0C22] flex items-center justify-center transition-colors cursor-pointer"
-                          aria-label={`Simpan layanan ${service.title}`}
-                        >
-                          <Bookmark
-                            className={`w-3.5 h-3.5 ${
-                              savedServices[service.id] ? 'fill-[#0D0C22] text-[#0D0C22]' : ''
-                            }`}
-                          />
-                        </button>
-
-                        <button
-                          type="button"
                           onClick={() => handleOpenChatWithCreator(service.creatorId)}
                           className="rounded-full bg-[#0D0C22] hover:bg-black active:bg-neutral-900 text-white px-3.5 sm:px-4 py-1.5 text-xs font-semibold transition-all cursor-pointer shadow-xs active:scale-95"
                         >
@@ -1403,43 +1421,61 @@ export const UMKMDashboard = () => {
                 </button>
               </div>
             ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                {filteredProjects.slice(0, visibleProjectsCount).map((project) => (
-                  <article
-                    key={project.id}
-                    onClick={() => handleProjectCardClick(project)}
-                    className="aspect-[3/4] rounded-2xl overflow-hidden relative group cursor-pointer shadow-xs hover:shadow-xl transition-all duration-300 border border-[#E1E3EA]/50 bg-neutral-900"
-                  >
-                    {/* Media Thumbnail */}
-                    <img
-                      src={project.mediaUrl}
-                      alt={project.title}
-                      className="w-full h-full object-cover"
-                      loading="lazy"
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2">
+                {filteredProjects.slice(0, visibleProjectsCount).map((project) => {
+                  const feedProj = allFeedProjects.find((p) => p.id === project.id) || {
+                    id: project.id,
+                    title: project.title,
+                    description: project.description,
+                    coverImage: project.mediaUrl,
+                    mediaUrl: project.mediaUrl,
+                    mediaType: (project.category.toLowerCase().includes('video') || project.category.toLowerCase().includes('ugc') || project.category.toLowerCase().includes('motion')) ? 'video' : 'image',
+                    creatorId: project.creatorId,
+                    creator: {
+                      id: project.creatorId,
+                      name: project.creatorName,
+                      username: project.creatorHandle.replace('@', ''),
+                      avatar: project.creatorAvatar,
+                      category: 'Image',
+                      roleTitle: 'Kreator Profesional',
+                      bio: `${project.creatorName} di Creatorin`,
+                      location: 'Indonesia',
+                      startingRate: 250000,
+                      formattedRate: 'Rp250.000',
+                      careerScore: {
+                        overall: 95,
+                        deadlineAccuracy: 98,
+                        revisionRate: 1,
+                        completionRate: 100,
+                        clientRating: 4.9,
+                        completedProjects: 45,
+                        tier: 'Top Tier',
+                      },
+                      rating: 4.9,
+                      reviewCount: 38,
+                      skills: [project.category, 'Kreator Digital'],
+                      joinedDate: '2024',
+                    },
+                    category: project.category,
+                    platform: 'direct',
+                    tags: [project.category.replace(/\s+/g, '')],
+                    likesCount: 142,
+                    commentsCount: 18,
+                    viewsCount: project.viewsCount,
+                    sharesCount: 12,
+                  };
+
+                  return (
+                    <ProjectCard
+                      key={project.id}
+                      id={`feed-card-${project.id}`}
+                      project={feedProj}
+                      isSaved={Boolean(savedProjects[project.id])}
+                      onToggleSave={(id, e) => toggleBookmarkProject(id, e)}
+                      onClick={() => handleProjectCardClick(project)}
                     />
-
-                    {/* Top Right Video Play Badge */}
-                    <div className="absolute top-3 right-3 w-7 h-7 rounded-full bg-black/50 backdrop-blur-xs flex items-center justify-center text-white shadow-xs">
-                      <Play className="w-3.5 h-3.5 fill-white text-white ml-0.5" />
-                    </div>
-
-                    {/* Dark Gradient Overlay with Title and Meta */}
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/30 to-transparent flex flex-col justify-end p-4">
-                      <h3 className="text-white font-display font-semibold text-xs sm:text-sm leading-snug line-clamp-2 drop-shadow-xs group-hover:text-blue-200 transition-colors">
-                        {project.title}
-                      </h3>
-
-                      <div className="flex items-center justify-between mt-2 pt-1.5 border-t border-white/15 text-white/85 text-xs">
-                        <span className="font-medium truncate pr-2 hover:text-white transition-colors">
-                          {project.creatorHandle}
-                        </span>
-                        <span className="shrink-0 font-medium text-white/75">
-                          {project.viewsCount}
-                        </span>
-                      </div>
-                    </div>
-                  </article>
-                ))}
+                  );
+                })}
               </div>
             )}
           </section>

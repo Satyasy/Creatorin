@@ -29,13 +29,15 @@ import {
   Download,
   ArrowRight,
   Plus,
-  FileCheck2
+  FileCheck2,
+  ShoppingBag
 } from 'lucide-react';
 import { InvoiceDetailPage } from './InvoiceDetailPage';
 import { CollaborationRoomView } from '@/components/collaboration/CollaborationRoomView';
 import { ActivePage, AuthState, ChatConversation, ChatInvoice, ChatMessage, Creator, CreatorService } from '@/types';
 import { toCreator } from '@/services/creatorService';
 import { chatService } from '@/services/chatService';
+import { DEFAULT_CREATORS } from '@/data/defaultCreators';
 import { aiSummarizeService } from '@/services/aiSummarizeService';
 import { formatCoin, formatCoinWithIcon } from '@/lib/coin';
 import { AuthModal } from '@/components/modals/AuthModal';
@@ -57,6 +59,7 @@ export const ChatPage: React.FC<ChatPageProps> = ({
   const router = useRouter();
   const searchParams = useSearchParams();
   const targetConvId = searchParams.get('conversationId');
+  const targetCreatorId = searchParams.get('creatorId');
   const { user: authUser } = useAuth();
   const currentUser = propUser !== undefined ? propUser : authUser;
 
@@ -174,33 +177,102 @@ export const ChatPage: React.FC<ChatPageProps> = ({
   // 1. Fetch conversations from live database with fallback & auto-select from query
   useEffect(() => {
     if (!currentUser) return;
-    chatService.getConversations(currentUser).then((loadedConvs) => {
-      setConversations(loadedConvs);
+    const partnerNameParam = searchParams.get('name') || '';
+    const partnerAvatarParam = searchParams.get('avatar') || '';
+    const partnerRoleTitleParam = searchParams.get('roleTitle') || '';
+    const partnerRoleParam = searchParams.get('role') || '';
+
+    const ensureConversationInList = (list: ChatConversation[]): { updatedList: ChatConversation[]; matchedId: string } => {
+      let finalConvs = [...list];
+      let matchedId = '';
       if (targetConvId) {
-        const found = loadedConvs.find(c => c.id === targetConvId);
-        if (found) {
-          setActiveChatId(targetConvId);
-          setIsMobileChatOpen(true);
-        } else if (targetConvId.length > 20) {
-          setActiveChatId(targetConvId);
-          setIsMobileChatOpen(true);
+        const found = finalConvs.find(c => c.id === targetConvId);
+        if (found) matchedId = found.id;
+        else matchedId = targetConvId;
+      }
+
+      if (!matchedId && targetCreatorId) {
+        const found = finalConvs.find(c => c.creatorId === targetCreatorId || c.partnerId === targetCreatorId || c.id === `conv-${targetCreatorId}`);
+        if (found) matchedId = found.id;
+        else matchedId = `conv-${targetCreatorId}`;
+      }
+
+      // Pastikan matchedId benar-benar ada di dalam array finalConvs agar activeConversation ter-render sempurna
+      if (matchedId && !finalConvs.some(c => c.id === matchedId)) {
+        const localMatch = chatService.getLocalConversations().find(
+          c => c.id === matchedId || c.creatorId === targetCreatorId || c.partnerId === targetCreatorId
+        );
+        if (localMatch) {
+          finalConvs = [localMatch, ...finalConvs];
+        } else {
+          const defaultCreator = targetCreatorId ? DEFAULT_CREATORS.find(c => c.id === targetCreatorId) : null;
+          const pName = partnerNameParam || defaultCreator?.name || 'Mitra Kolaborasi';
+          const pAvatar = partnerAvatarParam || defaultCreator?.avatar || '';
+          const pRole = partnerRoleParam || (currentUser?.role === 'creator' ? 'umkm' : 'creator');
+          const pRoleTitle = partnerRoleTitleParam || defaultCreator?.roleTitle || (pRole === 'umkm' ? 'UMKM Brand' : 'Kreator');
+
+          const fallbackConv: ChatConversation = {
+            id: matchedId,
+            creatorId: targetCreatorId || matchedId.replace('conv-', ''),
+            partnerId: targetCreatorId || matchedId.replace('conv-', ''),
+            partnerRole: pRole,
+            myRole: currentUser?.role === 'creator' ? 'creator' : 'umkm',
+            name: pName,
+            roleTitle: pRoleTitle,
+            avatar: pAvatar,
+            online: true,
+            lastMessage: 'Ruang obrolan telah dibuka. Silakan sampaikan pesan Anda.',
+            lastMessageTime: 'Baru saja',
+            unreadCount: 0,
+            messages: [
+              {
+                id: `msg-welcome-${Date.now()}`,
+                senderId: targetCreatorId || 'partner',
+                text: `Halo! Ruang obrolan telah dibuka. Silakan sampaikan pesan atau kebutuhan proyek Anda di sini.`,
+                timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+                isSelf: false,
+                status: 'delivered',
+              }
+            ],
+          };
+          finalConvs = [fallbackConv, ...finalConvs];
         }
       }
-    }).catch(() => setConversations([]));
-  }, [targetConvId, currentUser]);
 
-  // 2. Realtime listener for active database conversation
+      return { updatedList: finalConvs, matchedId };
+    };
+
+    chatService.getConversations(currentUser).then((loadedConvs) => {
+      const { updatedList, matchedId } = ensureConversationInList(loadedConvs);
+      setConversations(updatedList);
+      if (matchedId) {
+        setActiveChatId(matchedId);
+        setIsMobileChatOpen(true);
+      }
+    }).catch(() => {
+      const localConvs = chatService.getLocalConversations();
+      const { updatedList, matchedId } = ensureConversationInList(localConvs);
+      setConversations(updatedList);
+      if (matchedId) {
+        setActiveChatId(matchedId);
+        setIsMobileChatOpen(true);
+      }
+    });
+  }, [targetConvId, targetCreatorId, currentUser, searchParams]);
+
+  // 2. Realtime listener for active database conversation and message loader
   useEffect(() => {
     if (!activeChatId) return;
-    const isDbConversation = activeChatId.length > 20 && !activeChatId.startsWith('conv-');
-    if (!isDbConversation) return;
 
-    // Load initial messages for DB conversation
+    // Load initial messages (supports both DB and local storage conversations)
     chatService.getMessages(activeChatId, currentUser?.id).then((msgs) => {
       if (msgs && msgs.length > 0) {
         setConversations(prev => prev.map(c => c.id === activeChatId ? { ...c, messages: msgs } : c));
       }
     });
+
+    const isDbConversation = activeChatId.length > 20 && !activeChatId.startsWith('conv-');
+    if (!isDbConversation) return;
 
     const unsubscribe = chatService.subscribeToMessages(activeChatId, (newMsg) => {
       const meta = newMsg.metadata || {};
@@ -213,6 +285,7 @@ export const ChatPage: React.FC<ChatPageProps> = ({
         status: 'delivered',
         attachment: meta.attachment || (newMsg.attachment_url ? { type: 'file', url: newMsg.attachment_url, name: 'Lampiran' } : undefined),
         invoice: meta.invoice || undefined,
+        serviceInquiry: meta.serviceInquiry || undefined,
         metadata: meta,
       };
       setConversations(prev => prev.map(c => {
@@ -848,38 +921,67 @@ export const ChatPage: React.FC<ChatPageProps> = ({
                       : 'bg-neutral-100 text-[#171717] rounded-tl-xs'
                   }`}>
                     
-                    {/* Kartu Referensi Layanan Ringkas di Dalam Bubble */}
+                    {/* Kartu Referensi & Preview Layanan yang Ditanyakan */}
                     {msg.serviceInquiry && (
-                      <div className="mb-2.5 p-2.5 rounded-xl bg-white text-neutral-900 border border-neutral-200/80 flex items-center justify-between gap-3">
-                        <div className="flex items-center gap-2.5 min-w-0">
+                      <div className="mb-2.5 p-3 rounded-xl bg-white text-neutral-900 border border-neutral-200/90 shadow-2xs">
+                        {/* Header: Indikator Layanan yang Ditanyakan */}
+                        <div className="flex items-center justify-between gap-2 mb-2 pb-2 border-b border-neutral-100">
+                          <div className="flex items-center gap-1.5 text-[11px] font-bold text-blue-600">
+                            <ShoppingBag className="w-3.5 h-3.5 text-blue-600 shrink-0" />
+                            <span>Menanyakan Layanan</span>
+                          </div>
+                          {msg.serviceInquiry.tag && (
+                            <span className="text-[10px] font-semibold text-neutral-600 bg-neutral-100 px-2 py-0.5 rounded-full truncate max-w-[140px]">
+                              {msg.serviceInquiry.tag}
+                            </span>
+                          )}
+                        </div>
+
+                        {/* Konten Pratinjau Layanan */}
+                        <div
+                          onClick={() => setSelectedServiceDetail(msg.serviceInquiry!)}
+                          className="flex items-center gap-3 cursor-pointer group"
+                        >
                           {msg.serviceInquiry.coverImage && (
                             <img
                               src={msg.serviceInquiry.coverImage}
                               alt={msg.serviceInquiry.title}
-                              className="w-10 h-10 rounded-md object-cover shrink-0"
+                              className="w-12 h-12 rounded-lg object-cover shrink-0 ring-1 ring-neutral-200/80 group-hover:opacity-90 transition"
                             />
                           )}
-                          <div className="min-w-0">
-                            <p className="text-xs font-semibold text-neutral-900 truncate">
+                          <div className="min-w-0 flex-1">
+                            <p className="text-xs font-bold text-neutral-900 line-clamp-1 group-hover:text-blue-600 transition-colors">
                               {msg.serviceInquiry.title}
                             </p>
-                            <p className="text-xs font-medium text-blue-600">
-                              {msg.serviceInquiry.formattedPrice}
+                            <div className="flex items-center gap-1.5 mt-0.5">
+                              <span className="text-xs font-bold text-blue-600">
+                                {msg.serviceInquiry.formattedPrice}
+                              </span>
                               {msg.serviceInquiry.deliveryDays && (
-                                <span className="text-neutral-400 font-normal text-[11px] ml-1.5">
-                                  • {msg.serviceInquiry.deliveryDays}
-                                </span>
+                                <>
+                                  <span className="text-neutral-300 text-xs">•</span>
+                                  <span className="text-neutral-500 font-medium text-[11px] flex items-center gap-1">
+                                    <Clock className="w-3 h-3 text-neutral-400 shrink-0" />
+                                    <span>{msg.serviceInquiry.deliveryDays}</span>
+                                  </span>
+                                </>
                               )}
-                            </p>
+                            </div>
                           </div>
-                        </div>
 
-                        <button
-                          onClick={() => setSelectedServiceDetail(msg.serviceInquiry!)}
-                          className="px-2.5 py-1 text-[11px] font-medium text-neutral-700 hover:text-neutral-900 bg-neutral-100 hover:bg-neutral-200/80 rounded-md transition-colors shrink-0 cursor-pointer"
-                        >
-                          Detail
-                        </button>
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setSelectedServiceDetail(msg.serviceInquiry!);
+                            }}
+                            className="px-2.5 py-1.5 text-[11px] font-semibold text-neutral-700 hover:text-neutral-900 bg-neutral-100 hover:bg-neutral-200/80 rounded-lg transition-colors shrink-0 cursor-pointer flex items-center gap-1"
+                            title="Buka rincian lengkap layanan"
+                          >
+                            <span>Detail</span>
+                            <ExternalLink className="w-3 h-3 text-neutral-500" />
+                          </button>
+                        </div>
                       </div>
                     )}
 

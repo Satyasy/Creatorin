@@ -35,6 +35,7 @@ import { ServiceDetailModal } from '@/components/modals/ServiceDetailModal';
 import { ServiceFilterModal, FilterState } from '@/components/modals/ServiceFilterModal';
 import { ScrollReveal } from '@/components/common/ScrollReveal';
 import { toCreator } from '@/services/creatorService';
+import { chatService } from '@/services/chatService';
 import { ActivePage, AuthState, Creator, CreatorService } from '@/types';
 
 interface ExploreServicesPageProps {
@@ -47,18 +48,6 @@ interface ExploreServicesPageProps {
 interface ServiceWithCreator extends CreatorService {
   creator: Creator;
 }
-
-const POPULAR_SERVICES_TAGS = [
-  '#Kuliner',
-  '#TikTokViral',
-  '#InstagramReels',
-  '#ReviewProduk',
-  '#DesainPoster',
-  '#FotoProduk',
-  '#FeedInstagram',
-  '#LogoUMKM',
-  '#BannerPromo'
-];
 
 export const ExploreServicesPage: React.FC<ExploreServicesPageProps> = ({
   currentUser: propUser,
@@ -121,7 +110,7 @@ export const ExploreServicesPage: React.FC<ExploreServicesPageProps> = ({
 
   const [orderModalService, setOrderModalService] = useState<ServiceWithCreator | null>(null);
   const [selectedServiceForDetail, setSelectedServiceForDetail] = useState<ServiceWithCreator | null>(null);
-  const [orderPlaced, setOrderPlaced] = useState(false);
+  const [isSendingInquiry, setIsSendingInquiry] = useState(false);
   const [orderBriefNotes, setOrderBriefNotes] = useState('');
   const [savedServiceIds, setSavedServiceIds] = useState<string[]>([]);
 
@@ -764,12 +753,52 @@ const DEFAULT_SERVICES: ServiceWithCreator[] = [
     }
     setOrderModalService(item);
     setOrderBriefNotes('');
-    setOrderPlaced(false);
+    setIsSendingInquiry(false);
   };
 
-  const handleOrderSubmit = (e: React.FormEvent) => {
+  const handleOrderSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setOrderPlaced(true);
+    if (!orderModalService) return;
+    const text = orderBriefNotes.trim();
+    if (!text) return;
+
+    setIsSendingInquiry(true);
+    try {
+      const res = await chatService.sendServiceInquiry({
+        creator: {
+          id: orderModalService.creator.id,
+          name: orderModalService.creator.name,
+          username: orderModalService.creator.username,
+          avatar: orderModalService.creator.avatar,
+          roleTitle: orderModalService.creator.roleTitle,
+        },
+        service: {
+          id: orderModalService.id,
+          title: orderModalService.title,
+          price: orderModalService.price,
+          formattedPrice: orderModalService.formattedPrice,
+          deliveryDays: orderModalService.deliveryDays,
+          coverImage: orderModalService.coverImage,
+          tag: orderModalService.tag,
+          description: orderModalService.description,
+        },
+        message: text,
+        currentUser,
+      });
+
+      const targetCreatorId = orderModalService.creator.id;
+      const targetConvId = res.conversationId;
+
+      setOrderModalService(null);
+      setOrderBriefNotes('');
+
+      // Arahkan otomatis ke ruang chat
+      navigateTo('chat', `/chat?conversationId=${targetConvId}&creatorId=${targetCreatorId}`);
+    } catch (err: any) {
+      alert(err.message || 'Gagal mengirim pesan ke kreator.');
+    } finally {
+      setIsSendingInquiry(false);
+    }
   };
 
   return (
@@ -1122,24 +1151,6 @@ const DEFAULT_SERVICES: ServiceWithCreator[] = [
                       </div>
 
                       <div className="flex items-center gap-1.5 shrink-0">
-                        {/* Tombol Icon Simpan */}
-                        <button
-                          type="button"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            toggleSaveService(item.id);
-                          }}
-                          className={`w-8 h-8 rounded-full border transition cursor-pointer flex items-center justify-center ${
-                            savedServiceIds.includes(item.id)
-                              ? 'border-amber-300 bg-amber-50 text-amber-600'
-                              : 'border-neutral-200 hover:border-neutral-300 hover:bg-neutral-50 text-neutral-600'
-                          }`}
-                          title={savedServiceIds.includes(item.id) ? "Tersimpan" : "Simpan layanan"}
-                          aria-label="Simpan layanan"
-                        >
-                          <Bookmark className={`w-3.5 h-3.5 ${savedServiceIds.includes(item.id) ? 'fill-amber-500 text-amber-500' : 'stroke-[1.75]'}`} />
-                        </button>
-
                         {/* Tombol Diskusikan (CTA rounded-full matching Figma) */}
                         <button
                           type="button"
@@ -1189,84 +1200,59 @@ const DEFAULT_SERVICES: ServiceWithCreator[] = [
             </div>
 
             {/* Body */}
-            {orderPlaced ? (
-              <div className="p-8 text-center space-y-4">
-                <div className="w-16 h-16 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center mx-auto">
-                  <CheckCircle2 className="w-8 h-8" />
+            <form onSubmit={handleOrderSubmit} className="p-6 space-y-4 overflow-y-auto">
+              {/* Price summary */}
+              <div className="bg-neutral-50 p-4 rounded-2xl border border-neutral-100 flex items-center justify-between">
+                <div>
+                  <span className="text-xs text-neutral-400 font-bold uppercase">Total Biaya Layanan</span>
+                  <p className="text-xl font-black text-[#0d0c22]">{orderModalService.formattedPrice}</p>
                 </div>
-                <h4 className="text-xl font-bold text-[#0d0c22]">
-                  Pesanan Layanan Berhasil Dibuat!
-                </h4>
-                <p className="text-sm text-neutral-600 max-w-md mx-auto leading-relaxed">
-                  Permintaan pesanan telah diteruskan ke <strong>{orderModalService.creator.name}</strong>. Pembayaran Anda sebesar <strong>{orderModalService.formattedPrice}</strong> akan diamankan di sistem escrow Creatorin hingga hasil akhir disetujui.
-                </p>
-                <div className="pt-4 flex justify-center gap-3">
-                  <button
-                    onClick={() => setOrderModalService(null)}
-                    className="px-6 py-2.5 rounded-full bg-[#0d0c22] text-white text-xs font-bold hover:bg-neutral-800 transition cursor-pointer"
-                  >
-                    Kembali ke Katalog
-                  </button>
+                <div className="text-right">
+                  <span className="text-xs text-neutral-400 font-bold uppercase">Estimasi Pengerjaan</span>
+                  <p className="text-sm font-bold text-neutral-800">{orderModalService.deliveryDays || '3 Hari Kerja'}</p>
                 </div>
               </div>
-            ) : (
-              <form onSubmit={handleOrderSubmit} className="p-6 space-y-4 overflow-y-auto">
-                
-                {/* Price summary */}
-                <div className="bg-neutral-50 p-4 rounded-2xl border border-neutral-100 flex items-center justify-between">
-                  <div>
-                    <span className="text-xs text-neutral-400 font-bold uppercase">Total Biaya Layanan</span>
-                    <p className="text-xl font-black text-[#0d0c22]">{orderModalService.formattedPrice}</p>
-                  </div>
-                  <div className="text-right">
-                    <span className="text-xs text-neutral-400 font-bold uppercase">Garansi Pengerjaan</span>
-                    <p className="text-sm font-bold text-neutral-800">{orderModalService.deliveryDays || '3 Hari Kerja'}</p>
-                  </div>
-                </div>
 
-                {/* Brief details input */}
-                <div>
-                  <label className="block text-xs font-bold text-[#0d0c22] mb-1">
-                    Catatan Kebutuhan / Link Referensi
-                  </label>
-                  <textarea
-                    rows={4}
-                    required
-                    value={orderBriefNotes}
-                    onChange={(e) => setOrderBriefNotes(e.target.value)}
-                    placeholder="Sebutkan detail brand Anda, produk yang ingin dibuatkan konten, atau lampirkan link Google Drive materi..."
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-neutral-300 text-sm focus:outline-hidden focus:ring-2 focus:ring-blue-600 resize-none"
-                  />
-                </div>
+              {/* Input Kirim Pesan untuk Kreator */}
+              <div>
+                <label className="block text-xs font-bold text-[#0d0c22] mb-1.5">
+                  Kirim pesan untuk kreator
+                </label>
+                <textarea
+                  rows={4}
+                  required
+                  value={orderBriefNotes}
+                  onChange={(e) => setOrderBriefNotes(e.target.value)}
+                  placeholder="Tulis pesan atau pertanyaan Anda terkait layanan ini ke kreator..."
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-neutral-300 text-sm focus:outline-hidden focus:ring-2 focus:ring-[#0d0c22] resize-none"
+                />
+              </div>
 
-                {/* Escrow note */}
-                <div className="p-3 bg-emerald-50/80 rounded-xl border border-emerald-100 flex items-start gap-2.5 text-xs text-emerald-900">
-                  <ShieldCheck className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
-                  <span>
-                    <strong>Garansi Escrow Creatorin</strong>: Dana Anda tidak akan diteruskan ke kreator sebelum hasil akhir diserahkan dan sesuai kesepakatan revisi.
-                  </span>
-                </div>
-
-                {/* Footer buttons */}
-                <div className="pt-2 flex items-center justify-end gap-3">
-                  <button
-                    type="button"
-                    onClick={() => setOrderModalService(null)}
-                    className="px-5 py-2.5 rounded-full border border-neutral-300 text-xs font-bold text-neutral-700 hover:bg-neutral-100 transition cursor-pointer"
-                  >
-                    Batal
-                  </button>
-                  <button
-                    type="submit"
-                    className="px-6 py-2.5 rounded-full bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold shadow-sm transition cursor-pointer flex items-center gap-2"
-                  >
-                    <Zap className="w-3.5 h-3.5 fill-white" />
-                    <span>Lanjutkan & Amankan Dana di Escrow</span>
-                  </button>
-                </div>
-              </form>
-            )}
-
+              {/* Footer buttons */}
+              <div className="pt-2 flex items-center justify-end gap-3">
+                <button
+                  type="button"
+                  onClick={() => setOrderModalService(null)}
+                  className="px-5 py-2.5 rounded-full border border-neutral-300 text-xs font-bold text-neutral-700 hover:bg-neutral-100 transition cursor-pointer"
+                >
+                  Batal
+                </button>
+                <button
+                  type="submit"
+                  disabled={isSendingInquiry}
+                  className="px-6 py-2.5 rounded-full bg-[#0D0C22] hover:bg-[#1a1936] text-white text-xs sm:text-sm font-bold shadow-sm transition cursor-pointer flex items-center gap-2 disabled:opacity-60"
+                >
+                  {isSendingInquiry ? (
+                    <span>Mengirim...</span>
+                  ) : (
+                    <>
+                      <Send className="w-3.5 h-3.5" />
+                      <span>Kirim Pesan</span>
+                    </>
+                  )}
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}

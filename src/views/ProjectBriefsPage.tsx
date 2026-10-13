@@ -67,18 +67,6 @@ const CATEGORY_TABS = [
   'Banner & Poster'
 ];
 
-const POPULAR_BRIEF_TAGS = [
-  '#ReelsInstagram',
-  '#TikTokViral',
-  '#UIUXDesign',
-  '#FotoProduk',
-  '#DesignSystems',
-  '#CinematicBRoll',
-  '#FigmaCommunity',
-  '#PackagingDesign',
-  '#ASMRCoffee'
-];
-
 export const ProjectBriefsPage: React.FC<ProjectBriefsPageProps> = ({
   currentUser: propUser,
   onSignOut,
@@ -406,37 +394,6 @@ export const ProjectBriefsPage: React.FC<ProjectBriefsPageProps> = ({
                   <span>Pasang Brief Baru</span>
                 </button>
               </div>
-            )}
-          </div>
-
-          {/* Popular Tag Pills */}
-          <div className="pt-2 flex flex-wrap items-center gap-1.5">
-            <span className="text-xs font-semibold text-[#64748B] mr-1 flex items-center gap-1">
-              <span>Tagar Populer:</span>
-            </span>
-            {POPULAR_BRIEF_TAGS.map((tag) => {
-              const isSelected = selectedTag === tag;
-              return (
-                <button
-                  key={tag}
-                  onClick={() => setSelectedTag(isSelected ? null : tag)}
-                  className={`px-3 py-1 rounded-full text-xs font-medium border transition-all cursor-pointer ${
-                    isSelected
-                      ? 'bg-[#0B1F3A] text-white border-[#0B1F3A] shadow-2xs font-semibold'
-                      : 'bg-white text-[#64748B] border-[#E2E8F0] hover:border-[#64748B] hover:text-[#0F172A] hover:bg-[#F8FAFC]'
-                  }`}
-                >
-                  {tag}
-                </button>
-              );
-            })}
-            {selectedTag && (
-              <button
-                onClick={() => setSelectedTag(null)}
-                className="text-xs text-[#1D4ED8] font-semibold hover:underline ml-1.5 cursor-pointer"
-              >
-                Reset Tagar
-              </button>
             )}
           </div>
         </div>
