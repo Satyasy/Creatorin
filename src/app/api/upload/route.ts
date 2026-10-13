@@ -54,9 +54,13 @@ export async function POST(req: NextRequest) {
     const sanitizedExt = extension.toLowerCase();
     const uniqueFileName = `${Date.now()}-${crypto.randomBytes(6).toString("hex")}.${sanitizedExt}`;
 
-    // Target directory: public/uploads/<folderType>/
-    const sanitizedFolder = folderType === "avatars" ? "avatars" : "chat";
-    const uploadDir = path.join(process.cwd(), "public", "uploads", sanitizedFolder);
+    // Target directory: persistent shared/uploads or public/uploads/<folderType>/
+    const sanitizedFolder = ["avatars", "projects", "chat"].includes(folderType) ? folderType : "chat";
+    const sharedUploadsDir = "/var/www/creatorin/shared/uploads";
+    const uploadBaseDir = fs.existsSync(sharedUploadsDir)
+      ? sharedUploadsDir
+      : path.join(process.cwd(), "public", "uploads");
+    const uploadDir = path.join(uploadBaseDir, sanitizedFolder);
     if (!fs.existsSync(uploadDir)) {
       fs.mkdirSync(uploadDir, { recursive: true });
     }

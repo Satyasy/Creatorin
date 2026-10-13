@@ -166,6 +166,92 @@ export const CreatorProfilePage: React.FC<CreatorProfilePageProps> = ({
   const [tempAvatar, setTempAvatar] = useState(creator.avatar);
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
 
+  // Finish edit confirmation & animated success modal state
+  const [isConfirmFinishOpen, setIsConfirmFinishOpen] = useState(false);
+  const [isSuccessFinishOpen, setIsSuccessFinishOpen] = useState(false);
+  const [isSavingProfile, setIsSavingProfile] = useState(false);
+
+  useEffect(() => {
+    if (isSuccessFinishOpen) {
+      const timer = setTimeout(() => {
+        setIsSuccessFinishOpen(false);
+        setIsEditModeActive(false);
+      }, 1800);
+      return () => clearTimeout(timer);
+    }
+  }, [isSuccessFinishOpen]);
+
+  const handleConfirmFinish = async () => {
+    setIsSavingProfile(true);
+    try {
+      let avatarUrl = creatorAvatar;
+      if (avatarFile) {
+        if (!['image/jpeg', 'image/png', 'image/webp'].includes(avatarFile.type) || avatarFile.size > 10 * 1024 * 1024) {
+          throw new Error('Gunakan JPG, PNG, atau WebP maksimal 10 MB.');
+        }
+        const formData = new FormData();
+        formData.append('file', avatarFile);
+        formData.append('folder', 'avatars');
+        const uploadRes = await fetch('/api/upload', {
+          method: 'POST',
+          body: formData,
+        });
+        const uploadData = await uploadRes.json();
+        if (!uploadRes.ok) {
+          throw new Error(uploadData.error || 'Gagal mengunggah foto profil.');
+        }
+        avatarUrl = uploadData.url;
+        setCreatorAvatar(avatarUrl);
+        setAvatarFile(null);
+        creator.avatar = avatarUrl;
+        updateUser({ avatar: avatarUrl });
+      }
+
+      const payload: { fullName?: string; headline?: string; bio?: string; avatarUrl?: string } = {};
+      if (tempName && tempName !== creator.name) payload.fullName = tempName;
+      if (tempRoleTitle && tempRoleTitle !== creator.roleTitle) payload.headline = tempRoleTitle;
+      if (tempBio && tempBio !== creator.bio) payload.bio = tempBio;
+      if (avatarUrl && avatarUrl !== creator.avatar) payload.avatarUrl = avatarUrl;
+
+      if (Object.keys(payload).length > 0) {
+        const response = await fetch('/api/profile', {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        });
+        if (!response.ok) {
+          throw new Error((await response.json()).error || 'Gagal menyimpan profil.');
+        }
+        if (payload.fullName) {
+          setCreatorName(tempName);
+          creator.name = tempName;
+        }
+        if (payload.headline) {
+          setCreatorRoleTitle(tempRoleTitle);
+          creator.roleTitle = tempRoleTitle;
+        }
+        if (payload.bio) {
+          setCreatorBio(tempBio);
+          creator.bio = tempBio;
+        }
+        updateUser({
+          ...(payload.fullName ? { name: tempName } : {}),
+          ...(payload.headline ? { roleTitle: tempRoleTitle } : {}),
+          ...(payload.bio ? { bio: tempBio } : {}),
+          ...(payload.avatarUrl ? { avatar: avatarUrl } : {}),
+        });
+        await refreshUser();
+      }
+
+      setIsConfirmFinishOpen(false);
+      setIsSuccessFinishOpen(true);
+    } catch (error) {
+      alert(error instanceof Error ? error.message : 'Gagal menyimpan profil.');
+    } finally {
+      setIsSavingProfile(false);
+    }
+  };
+
   // Saved shots / projects in profile
   const [likedShots, setLikedShots] = useState<Set<string>>(new Set());
   const [savedProjectIds, setSavedProjectIds] = useState<Set<string>>(new Set());
@@ -557,9 +643,10 @@ export const CreatorProfilePage: React.FC<CreatorProfilePageProps> = ({
                       setIsEditModeActive(true);
                       setTempName(creatorName);
                       setTempRoleTitle(creatorRoleTitle);
-                      setEditingSection('name');
+                      setTempBio(creatorBio);
+                      setTempAvatar(creatorAvatar);
                     } else {
-                      setIsEditModeActive(false);
+                      setIsConfirmFinishOpen(true);
                     }
                   }}
                   className={`flex items-center gap-2 h-10 px-5 rounded-xl text-sm font-semibold transition-colors cursor-pointer shadow-xs ${
@@ -1724,6 +1811,7 @@ export const CreatorProfilePage: React.FC<CreatorProfilePageProps> = ({
                       }
                       const formData = new FormData();
                       formData.append('file', avatarFile);
+                      formData.append('folder', 'avatars');
                       const uploadRes = await fetch('/api/upload', {
                         method: 'POST',
                         body: formData,
@@ -1800,6 +1888,174 @@ export const CreatorProfilePage: React.FC<CreatorProfilePageProps> = ({
           }
         }}
       />
+
+      {/* ==================================================================== */}
+      {/* CUSTOM CONFIRMATION POPUP (SELESAI EDIT VERIFICATION)               */}
+      {/* ==================================================================== */}
+      {isConfirmFinishOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-in fade-in duration-200">
+          <div className="relative overflow-hidden bg-white w-full max-w-md rounded-3xl shadow-2xl border border-blue-100/60 p-6 sm:p-7 text-center">
+            {/* Top brand gradient bar */}
+            <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-[#155DFC] via-[#03ACFD] to-[#155DFC]" />
+
+            {/* Scattered ambient glow silhouettes across background */}
+            <div className="absolute -top-12 -right-12 w-48 h-48 rounded-full bg-gradient-to-br from-[#155DFC]/20 via-[#03ACFD]/15 to-transparent blur-2xl pointer-events-none" />
+            <div className="absolute -bottom-16 -left-16 w-52 h-52 rounded-full bg-gradient-to-tr from-[#03ACFD]/20 via-[#155DFC]/10 to-transparent blur-3xl pointer-events-none" />
+            <div className="absolute top-1/2 -left-8 w-28 h-28 rounded-full bg-blue-400/15 blur-xl pointer-events-none" />
+            <div className="absolute bottom-1/3 -right-8 w-32 h-32 rounded-full bg-indigo-500/10 blur-xl pointer-events-none" />
+
+            {/* Subtle SVG silhouette gradient curves */}
+            <svg className="absolute inset-0 w-full h-full opacity-10 pointer-events-none" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none" viewBox="0 0 400 300">
+              <defs>
+                <linearGradient id="confirmGradSilhouette" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stopColor="#155DFC" stopOpacity="0.8" />
+                  <stop offset="50%" stopColor="#03ACFD" stopOpacity="0.4" />
+                  <stop offset="100%" stopColor="#0D0C22" stopOpacity="0.1" />
+                </linearGradient>
+              </defs>
+              <path d="M-20,70 Q90,10 190,100 T390,80 Q430,160 430,260 L-20,320 Z" fill="url(#confirmGradSilhouette)" />
+              <circle cx="340" cy="40" r="65" fill="url(#confirmGradSilhouette)" />
+              <circle cx="45" cy="250" r="75" fill="url(#confirmGradSilhouette)" />
+            </svg>
+
+            {/* Center Header Icon */}
+            <div className="relative w-14 h-14 mx-auto mb-4 rounded-2xl bg-gradient-to-br from-blue-50 to-indigo-50 border border-blue-200/60 flex items-center justify-center shadow-xs text-[#155DFC]">
+              <Sparkles className="w-7 h-7 text-[#155DFC]" />
+            </div>
+
+            <h3 className="relative text-lg font-bold text-[#0D0C22] mb-2 tracking-tight">
+              {t('profile.confirmFinishTitle', 'Selesaikan & Simpan Edit?')}
+            </h3>
+            <p className="relative text-xs sm:text-sm text-neutral-500 mb-6 leading-relaxed max-w-sm mx-auto">
+              {t('profile.confirmFinishDesc', 'Apakah kamu yakin ingin menyelesaikan pengeditan profil? Seluruh perubahan informasi terbaru akan tersimpan.')}
+            </p>
+
+            <div className="relative flex items-center justify-center gap-3">
+              <button
+                type="button"
+                onClick={() => setIsConfirmFinishOpen(false)}
+                disabled={isSavingProfile}
+                className="flex-1 py-2.5 px-4 rounded-xl border border-neutral-200 text-xs sm:text-sm font-semibold text-neutral-600 hover:bg-neutral-50 transition cursor-pointer disabled:opacity-50"
+              >
+                {t('action.cancel', 'Batal')}
+              </button>
+              <button
+                type="button"
+                onClick={handleConfirmFinish}
+                disabled={isSavingProfile}
+                className="flex-1 py-2.5 px-4 rounded-xl bg-gradient-to-r from-[#155DFC] to-[#03ACFD] hover:from-[#124bcf] hover:to-[#0295db] text-white text-xs sm:text-sm font-bold shadow-md shadow-blue-500/20 transition cursor-pointer flex items-center justify-center gap-2 disabled:opacity-50"
+              >
+                {isSavingProfile ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    <span>{t('action.saving', 'Menyimpan...')}</span>
+                  </>
+                ) : (
+                  <span>{t('profile.confirmFinishButton', 'Yakin, Simpan')}</span>
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ==================================================================== */}
+      {/* CUSTOM SUCCESS ANIMATED POPUP (CENTER CHECKMARK ANIMATION)          */}
+      {/* ==================================================================== */}
+      {isSuccessFinishOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-in fade-in duration-200">
+          <div className="relative overflow-hidden bg-white w-full max-w-sm rounded-3xl shadow-2xl border border-blue-100/60 p-7 sm:p-8 text-center animate-in zoom-in-95 duration-200">
+            {/* Top brand gradient bar */}
+            <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-[#155DFC] via-[#03ACFD] to-[#155DFC]" />
+
+            {/* Scattered ambient glow silhouettes across background */}
+            <div className="absolute -top-10 -right-10 w-44 h-44 rounded-full bg-gradient-to-br from-[#155DFC]/25 via-[#03ACFD]/20 to-transparent blur-2xl pointer-events-none" />
+            <div className="absolute -bottom-14 -left-14 w-48 h-48 rounded-full bg-gradient-to-tr from-[#03ACFD]/25 via-[#155DFC]/15 to-transparent blur-3xl pointer-events-none" />
+            <div className="absolute top-1/2 -right-6 w-24 h-24 rounded-full bg-blue-400/20 blur-xl pointer-events-none" />
+
+            {/* Subtle SVG silhouette gradient curves */}
+            <svg className="absolute inset-0 w-full h-full opacity-10 pointer-events-none" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none" viewBox="0 0 350 300">
+              <defs>
+                <linearGradient id="successGradSilhouette" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stopColor="#155DFC" stopOpacity="0.8" />
+                  <stop offset="50%" stopColor="#03ACFD" stopOpacity="0.5" />
+                  <stop offset="100%" stopColor="#0D0C22" stopOpacity="0.1" />
+                </linearGradient>
+              </defs>
+              <path d="M-20,60 Q80,10 180,90 T360,70 Q400,140 400,240 L-20,300 Z" fill="url(#successGradSilhouette)" />
+              <circle cx="300" cy="40" r="50" fill="url(#successGradSilhouette)" />
+              <circle cx="40" cy="230" r="60" fill="url(#successGradSilhouette)" />
+            </svg>
+
+            {/* Centered Smooth Animated Checkmark */}
+            <div className="relative w-20 h-20 mx-auto mb-4 flex items-center justify-center">
+              <div className="absolute inset-0 rounded-full bg-gradient-to-tr from-[#155DFC] to-[#03ACFD] opacity-25 blur-md animate-ping" style={{ animationDuration: '2.5s' }} />
+              <div className="relative w-20 h-20 rounded-full bg-gradient-to-tr from-blue-50/80 to-sky-50/80 border-2 border-[#155DFC]/30 flex items-center justify-center shadow-inner">
+                <svg className="w-12 h-12 text-[#155DFC]" viewBox="0 0 52 52">
+                  <circle
+                    cx="26"
+                    cy="26"
+                    r="23"
+                    fill="none"
+                    stroke="#155DFC"
+                    strokeWidth="3.5"
+                    strokeDasharray="145"
+                    strokeDashoffset="145"
+                    style={{
+                      animation: 'successCircleDraw 0.55s cubic-bezier(0.65, 0, 0.45, 1) forwards',
+                    }}
+                  />
+                  <path
+                    fill="none"
+                    stroke="#155DFC"
+                    strokeWidth="4"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M14.5 27.2l7.1 7.2 16.7-16.8"
+                    strokeDasharray="36"
+                    strokeDashoffset="36"
+                    style={{
+                      animation: 'successCheckDraw 0.4s 0.35s cubic-bezier(0.65, 0, 0.45, 1) forwards',
+                    }}
+                  />
+                </svg>
+              </div>
+            </div>
+
+            <h3 className="relative text-lg font-bold text-[#0D0C22] mb-1.5 tracking-tight">
+              {t('profile.successFinishTitle', 'Profil Berhasil Diperbarui!')}
+            </h3>
+            <p className="relative text-xs sm:text-sm text-neutral-500 mb-5 leading-relaxed">
+              {t('profile.successFinishDesc', 'Perubahan informasi profil Anda telah berhasil disimpan.')}
+            </p>
+
+            <button
+              type="button"
+              onClick={() => {
+                setIsSuccessFinishOpen(false);
+                setIsEditModeActive(false);
+              }}
+              className="relative w-full py-2.5 px-4 rounded-xl bg-gradient-to-r from-[#155DFC] to-[#03ACFD] hover:from-[#124bcf] hover:to-[#0295db] text-white text-xs sm:text-sm font-bold shadow-md shadow-blue-500/20 transition cursor-pointer"
+            >
+              {t('action.close', 'Tutup')}
+            </button>
+
+            {/* Embedded Keyframes for SVG stroke drawing */}
+            <style dangerouslySetInnerHTML={{
+              __html: `
+                @keyframes successCircleDraw {
+                  0% { stroke-dashoffset: 145; }
+                  100% { stroke-dashoffset: 0; }
+                }
+                @keyframes successCheckDraw {
+                  0% { stroke-dashoffset: 36; }
+                  100% { stroke-dashoffset: 0; }
+                }
+              `
+            }} />
+          </div>
+        </div>
+      )}
 
     </div>
   );

@@ -120,6 +120,13 @@ const DICTIONARY: Record<Language, Translations> = {
     'auth.invalidCredentials': 'Email atau kata sandi tidak valid.',
     'auth.networkError': 'Terjadi kendala jaringan.',
 
+    // Profile Edit Confirmation & Success
+    'profile.confirmFinishTitle': 'Selesaikan & Simpan Edit?',
+    'profile.confirmFinishDesc': 'Apakah kamu yakin ingin menyelesaikan pengeditan profil? Seluruh perubahan informasi terbaru akan tersimpan.',
+    'profile.confirmFinishButton': 'Yakin, Simpan',
+    'profile.successFinishTitle': 'Profil Berhasil Diperbarui!',
+    'profile.successFinishDesc': 'Perubahan informasi profil Anda telah berhasil disimpan.',
+
     // Toasts & Alerts
     'toast.authRequired': 'Perlu Masuk Akun',
     'toast.followAuth': 'Anda harus masuk ke akun Creatorin terlebih dahulu untuk mengikuti kreator ini.',
@@ -283,6 +290,13 @@ const DICTIONARY: Record<Language, Translations> = {
     'auth.emptyCredentials': 'Please enter both email and password.',
     'auth.invalidCredentials': 'Invalid email or password.',
     'auth.networkError': 'Network connection error.',
+
+    // Profile Edit Confirmation & Success
+    'profile.confirmFinishTitle': 'Finish & Save Changes?',
+    'profile.confirmFinishDesc': 'Are you sure you want to finish editing your profile? All recent changes will be saved.',
+    'profile.confirmFinishButton': 'Yes, Save',
+    'profile.successFinishTitle': 'Profile Successfully Updated!',
+    'profile.successFinishDesc': 'Your profile details have been successfully saved.',
 
     // Toasts & Alerts
     'toast.authRequired': 'Sign In Required',
