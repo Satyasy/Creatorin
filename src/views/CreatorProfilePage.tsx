@@ -66,6 +66,7 @@ import { AuthModal } from '@/components/modals/AuthModal';
 import { creatorService } from '@/services/creatorService';
 import { useToast } from '@/providers/ToastProvider';
 import { useLanguage } from '@/providers/LanguageProvider';
+import { useAuthModal } from '@/providers/AuthModalProvider';
 import { createClient } from '@/lib/supabase/client';
 import { ShaderFill } from '@/lib/custom-effect-runtime';
 import { setup as setupConcentric, render as renderConcentric, manifest as manifestConcentric } from '@/lib/custom-effects/CodeComponentId_c2b302fbdfce8a1ec92a5a80b10a5916ab506ed7_430';
@@ -95,6 +96,7 @@ export const CreatorProfilePage: React.FC<CreatorProfilePageProps> = ({
 }) => {
   const router = useRouter();
   const { user: authUser, updateUser, refreshUser } = useAuth();
+  const { openAuthModal } = useAuthModal();
   const { showToast } = useToast();
   const { t } = useLanguage();
   const currentUser = propUser !== undefined ? propUser : authUser;
@@ -228,6 +230,13 @@ export const CreatorProfilePage: React.FC<CreatorProfilePageProps> = ({
   // Toggle bookmark on project
   const toggleSaveProject = (id: string, e: React.MouseEvent) => {
     e.stopPropagation();
+    if (!currentUser) {
+      openAuthModal({
+        title: t('auth.loginRequired', 'Masuk ke Akun Creatorin'),
+        description: t('auth.bookmarkRequired', 'Silakan masuk ke akun Creatorin Anda terlebih dahulu untuk menyimpan ke koleksi favorit.'),
+      });
+      return;
+    }
     setSavedProjectIds(prev => {
       const next = new Set(prev);
       if (next.has(id)) {
@@ -243,14 +252,9 @@ export const CreatorProfilePage: React.FC<CreatorProfilePageProps> = ({
   const toggleSaveService = (id: string, e: React.MouseEvent) => {
     e.stopPropagation();
     if (!currentUser) {
-      showToast({
-        type: 'warning',
-        title: t('toast.authRequired', 'Perlu Masuk Akun'),
-        message: t('toast.saveServiceAuth', 'Anda harus masuk ke akun Creatorin terlebih dahulu untuk menyimpan layanan favorit.'),
-        action: {
-          label: t('action.signIn', 'Masuk ke Akun'),
-          onClick: () => router.push('/sign-in'),
-        },
+      openAuthModal({
+        title: t('auth.loginRequired', 'Masuk ke Akun Creatorin'),
+        description: t('toast.saveServiceAuth', 'Anda harus masuk ke akun Creatorin terlebih dahulu untuk menyimpan layanan favorit.'),
       });
       return;
     }

@@ -37,6 +37,7 @@ import { ScrollReveal } from '@/components/common/ScrollReveal';
 import { toCreator } from '@/services/creatorService';
 import { chatService } from '@/services/chatService';
 import { ActivePage, AuthState, Creator, CreatorService } from '@/types';
+import { useAuthModal } from '@/providers/AuthModalProvider';
 
 interface ExploreServicesPageProps {
   currentUser?: AuthState['user'];
@@ -57,6 +58,7 @@ export const ExploreServicesPage: React.FC<ExploreServicesPageProps> = ({
 }) => {
   const router = useRouter();
   const { user: authUser } = useAuth();
+  const { openAuthModal } = useAuthModal();
   const { showToast } = useToast();
   const { t } = useLanguage();
   const currentUser = propUser !== undefined ? propUser : authUser;
@@ -116,14 +118,9 @@ export const ExploreServicesPage: React.FC<ExploreServicesPageProps> = ({
 
   const toggleSaveService = (serviceId: string) => {
     if (!currentUser) {
-      showToast({
-        type: 'warning',
-        title: t('toast.authRequired', 'Perlu Masuk Akun'),
-        message: t('toast.saveServiceAuth', 'Anda harus masuk ke akun Creatorin terlebih dahulu untuk menyimpan layanan favorit.'),
-        action: {
-          label: t('action.signIn', 'Masuk ke Akun'),
-          onClick: () => router.push('/sign-in'),
-        },
+      openAuthModal({
+        title: t('auth.loginRequired', 'Masuk ke Akun Creatorin'),
+        description: t('toast.saveServiceAuth', 'Anda harus masuk ke akun Creatorin terlebih dahulu untuk menyimpan layanan favorit.'),
       });
       return;
     }

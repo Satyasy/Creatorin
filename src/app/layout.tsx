@@ -3,6 +3,7 @@ import "../index.css";
 import { Suspense } from "react";
 import { AuthProvider } from "@/providers/AuthProvider";
 import { LanguageProvider } from "@/providers/LanguageProvider";
+import { AuthModalProvider } from "@/providers/AuthModalProvider";
 import { ToastProvider } from "@/providers/ToastProvider";
 import { RouteProgressBar } from "@/components/common/RouteProgressBar";
 
@@ -125,12 +126,14 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
       <body className="antialiased font-sans overflow-x-clip text-base leading-6" suppressHydrationWarning>
         <AuthProvider>
           <LanguageProvider>
-            <ToastProvider>
-              <Suspense fallback={null}>
-                <RouteProgressBar />
-              </Suspense>
-              {children}
-            </ToastProvider>
+            <AuthModalProvider>
+              <ToastProvider>
+                <Suspense fallback={null}>
+                  <RouteProgressBar />
+                </Suspense>
+                {children}
+              </ToastProvider>
+            </AuthModalProvider>
           </LanguageProvider>
         </AuthProvider>
       </body>

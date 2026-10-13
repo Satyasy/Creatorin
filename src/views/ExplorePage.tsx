@@ -5,14 +5,15 @@ import { useEffect, useMemo, useState } from 'react';
 import { ArrowUpRight, Check, MapPin, Search, Star, Video, X } from 'lucide-react';
 import { businessService } from '@/services/businessService';
 import { creatorService } from '@/services/creatorService';
+import { useLanguage } from '@/providers/LanguageProvider';
 import type { Creator, UMKMProfile } from '@/types';
 
 import { DEFAULT_CREATORS } from '@/data/defaultCreators';
 
 type ExploreTab = 'video' | 'umkm' | 'creator';
 
-
 export function ExplorePage() {
+  const { t, language } = useLanguage();
   const [activeTab, setActiveTab] = useState<ExploreTab>('video');
   const [query, setQuery] = useState('');
   const [businesses, setBusinesses] = useState<UMKMProfile[]>([]);
@@ -136,34 +137,52 @@ export function ExplorePage() {
           <div className="mx-auto max-w-[1440px] px-4 py-10 sm:px-6 sm:py-14 lg:px-10 lg:py-16">
             <nav aria-label="Konten jelajah" className="mb-9 flex h-12 items-center gap-1 border-b border-[#DFE0DA] sm:mb-12">
               <TabButton active={activeTab === 'video'} onClick={() => switchTab('video')}>
-                Video
+                {language === 'en' ? 'Video' : 'Video'}
               </TabButton>
               <TabButton active={activeTab === 'umkm'} onClick={() => switchTab('umkm')}>
-                UMKM
+                {language === 'en' ? 'SMEs & Businesses' : 'UMKM'}
               </TabButton>
               <TabButton active={activeTab === 'creator'} onClick={() => switchTab('creator')}>
-                Profil Kreator
+                {language === 'en' ? 'Creator Profiles' : 'Profil Kreator'}
               </TabButton>
             </nav>
 
             <div className="grid items-end gap-8 lg:grid-cols-[minmax(0,1fr)_420px]">
               <div className="max-w-3xl">
                 <p className="mb-3 text-sm font-medium text-[#155DFC]">
-                  {activeTab === 'video'
+                  {language === 'en'
+                    ? activeTab === 'video'
+                      ? 'Latest community showcase'
+                      : activeTab === 'umkm'
+                      ? 'Local business directory'
+                      : 'Verified creative talent'
+                    : activeTab === 'video'
                     ? 'Karya terbaru komunitas'
                     : activeTab === 'umkm'
                     ? 'Direktori usaha lokal'
                     : 'Talenta kreatif terdaftar'}
                 </p>
                 <h1 className="text-[34px] font-semibold leading-[1.08] tracking-[-0.045em] sm:text-5xl lg:text-[58px]">
-                  {activeTab === 'video'
+                  {language === 'en'
+                    ? activeTab === 'video'
+                      ? 'See how creators tell authentic stories through video.'
+                      : activeTab === 'umkm'
+                      ? 'Discover businesses ready for creative collaboration.'
+                      : 'Find top creative profiles for your next project.'
+                    : activeTab === 'video'
                     ? 'Lihat cara kreator lain bercerita lewat video.'
                     : activeTab === 'umkm'
                     ? 'Temukan UMKM yang siap berkolaborasi.'
                     : 'Temukan profil kreator terbaik untuk proyekmu.'}
                 </h1>
                 <p className="mt-5 max-w-2xl text-base leading-7 text-[#62635E] sm:text-lg">
-                  {activeTab === 'video'
+                  {language === 'en'
+                    ? activeTab === 'video'
+                      ? 'Browse UGC, culinary, beauty, and short-form video references from Creatorin creator portfolios.'
+                      : activeTab === 'umkm'
+                      ? 'Learn about brands, business categories, locations, and past project track records.'
+                      : 'Explore portfolios, ratings, and skills of Creatorin creators for your business creative needs.'
+                    : activeTab === 'video'
                     ? 'Jelajahi referensi UGC, kuliner, beauty, dan konten pendek dari portofolio kreator Creatorin.'
                     : activeTab === 'umkm'
                     ? 'Kenali brand, bidang usaha, lokasi, dan rekam jejak proyeknya sebelum mengirim ide.'
@@ -174,13 +193,21 @@ export function ExplorePage() {
               <label className="flex h-13 items-center gap-3 border-b-2 border-[#171714] bg-white focus-within:border-[#155DFC]">
                 <Search aria-hidden="true" className="h-5 w-5 shrink-0 text-[#62635E]" strokeWidth={1.6} />
                 <span className="sr-only">
-                  Cari {activeTab === 'video' ? 'video kreator' : activeTab === 'umkm' ? 'UMKM' : 'profil kreator'}
+                  {language === 'en'
+                    ? `Search ${activeTab === 'video' ? 'creator videos' : activeTab === 'umkm' ? 'businesses' : 'creator profiles'}`
+                    : `Cari ${activeTab === 'video' ? 'video kreator' : activeTab === 'umkm' ? 'UMKM' : 'profil kreator'}`}
                 </span>
                 <input
                   value={query}
                   onChange={(event) => setQuery(event.target.value)}
                   placeholder={
-                    activeTab === 'video'
+                    language === 'en'
+                      ? activeTab === 'video'
+                        ? 'Search videos, categories, or creators'
+                        : activeTab === 'umkm'
+                        ? 'Search business name, industry, or city'
+                        : 'Search creator name, handle, skills, or city'
+                      : activeTab === 'video'
                       ? 'Cari video, kategori, atau kreator'
                       : activeTab === 'umkm'
                       ? 'Cari nama, industri, atau kota'

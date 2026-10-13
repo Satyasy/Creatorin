@@ -4,6 +4,8 @@ import React, { useState, useMemo, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/providers/AuthProvider';
+import { useAuthModal } from '@/providers/AuthModalProvider';
+import { useLanguage } from '@/providers/LanguageProvider';
 import { creatorService } from '@/services/creatorService';
 import { Creator, CreatorCategory, CreatorService, AuthState, ActivePage } from '@/types';
 import { ProfileModal } from '@/components/modals/ProfileModal';
@@ -55,6 +57,8 @@ const POPULAR_TAGS = [
 export const LandingPage: React.FC<LandingPageProps> = ({ currentUser: propUser, onSignOut, onNavigate, onViewCreatorProfile }) => {
   const router = useRouter();
   const { user: authUser } = useAuth();
+  const { openAuthModal } = useAuthModal();
+  const { t } = useLanguage();
   const currentUser = propUser !== undefined ? propUser : authUser;
 
   const navigateTo = (page: ActivePage, path: string) => {
@@ -91,9 +95,16 @@ export const LandingPage: React.FC<LandingPageProps> = ({ currentUser: propUser,
     creator: Creator;
   } | null>(null);
 
-  // Toggle Save Creator
+  // Toggle Save Creator (Guarded with Auth Modal)
   const toggleSave = (id: string, e: React.MouseEvent) => {
     e.stopPropagation();
+    if (!currentUser) {
+      openAuthModal({
+        title: t('auth.loginRequired', 'Masuk ke Akun Creatorin'),
+        description: t('auth.bookmarkRequired', 'Silakan masuk ke akun Creatorin Anda terlebih dahulu untuk menyimpan ke koleksi favorit.'),
+      });
+      return;
+    }
     setSavedCreators(prev => {
       const next = new Set(prev);
       if (next.has(id)) {
@@ -230,7 +241,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ currentUser: propUser,
             className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-xs sm:text-sm font-semibold transition-all bg-[#F4F5F7] text-[#0D0C22] shadow-xs ring-1 ring-black/5 font-bold"
           >
             <User className="w-4 h-4 text-inherit" />
-            <span>Creator</span>
+            <span>{t('tabs.creators', 'Creator')}</span>
           </Link>
 
           <Link
@@ -238,7 +249,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ currentUser: propUser,
             className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-xs sm:text-sm font-semibold transition-all text-[#55576A] hover:text-[#0D0C22] hover:bg-[#F8F9FC]"
           >
             <Package className="w-4 h-4 text-inherit" />
-            <span>Layanan</span>
+            <span>{t('tabs.services', 'Layanan')}</span>
           </Link>
 
           <Link
@@ -246,7 +257,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ currentUser: propUser,
             className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-xs sm:text-sm font-semibold transition-all text-[#55576A] hover:text-[#0D0C22] hover:bg-[#F8F9FC]"
           >
             <Layers className="w-4 h-4 text-inherit" />
-            <span>Proyek</span>
+            <span>{t('tabs.projects', 'Proyek')}</span>
           </Link>
         </div>
 
@@ -255,7 +266,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ currentUser: propUser,
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
             
             <h2 className="text-base sm:text-lg font-semibold text-[#0F172A]">
-              Cari Talenta berdasarkan Kategori
+              {t('explore.heading', 'Cari Talenta berdasarkan Kategori')}
             </h2>
 
             {/* Filter Buttons Group (Dribbble Toolbar) */}
@@ -272,7 +283,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ currentUser: propUser,
                   setSearchQuery('');
                 }}
                 className="p-2 rounded-xl border border-neutral-200 bg-white hover:bg-neutral-50 text-neutral-600 transition cursor-pointer"
-                title="Reset Semua Filter"
+                title={t('filter.reset', 'Reset Semua Filter')}
               >
                 <SlidersHorizontal className="w-4 h-4" />
               </button>
@@ -285,7 +296,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ currentUser: propUser,
                     selectedCategory !== 'Semua' ? 'border-[#0B1F3A] text-[#0B1F3A] bg-neutral-50' : 'border-neutral-200 text-neutral-700 hover:border-neutral-300'
                   }`}
                 >
-                  <span>{selectedCategory === 'Semua' ? 'Kategori' : selectedCategory}</span>
+                  <span>{selectedCategory === 'Semua' ? t('filter.category', 'Kategori') : selectedCategory}</span>
                   <ChevronDown className="w-3.5 h-3.5 text-neutral-400" />
                 </button>
 
@@ -312,7 +323,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ currentUser: propUser,
                           selectedCategory === cat ? 'font-bold text-[#0B1F3A]' : 'text-neutral-600'
                         }`}
                       >
-                        <span>{cat}</span>
+                        <span>{cat === 'Semua' ? t('filter.all', 'Semua') : cat}</span>
                         {selectedCategory === cat && <Check className="w-3.5 h-3.5 text-[#0B1F3A]" />}
                       </button>
                     ))}
@@ -329,7 +340,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ currentUser: propUser,
                   }`}
                 >
                   <span>
-                    {selectedBudget === 'Semua' ? 'Budget' : selectedBudget === 'under500' ? '< Rp500rb' : selectedBudget === 'mid' ? 'Rp500rb - Rp1.5jt' : '> Rp1.5jt'}
+                    {selectedBudget === 'Semua' ? t('filter.budget', 'Budget') : selectedBudget === 'under500' ? '< Rp500rb' : selectedBudget === 'mid' ? 'Rp500rb - Rp1.5jt' : '> Rp1.5jt'}
                   </span>
                   <ChevronDown className="w-3.5 h-3.5 text-neutral-400" />
                 </button>
@@ -337,10 +348,10 @@ export const LandingPage: React.FC<LandingPageProps> = ({ currentUser: propUser,
                 {openDropdown === 'budget' && (
                   <div className="absolute left-0 mt-1.5 w-52 bg-white rounded-2xl border border-neutral-200 shadow-xl py-2 z-30 animate-in fade-in">
                     {[
-                      { label: 'Semua Budget', val: 'Semua' },
-                      { label: 'Di bawah Rp500.000', val: 'under500' },
-                      { label: 'Rp500.000 - Rp1.500.000', val: 'mid' },
-                      { label: 'Di atas Rp1.500.000', val: 'high' }
+                      { label: t('filter.allBudget', 'Semua Budget'), val: 'Semua' },
+                      { label: t('filter.under500k', 'Di bawah Rp500.000'), val: 'under500' },
+                      { label: t('filter.midBudget', 'Rp500.000 - Rp1.500.000'), val: 'mid' },
+                      { label: t('filter.highBudget', 'Di atas Rp1.500.000'), val: 'high' }
                     ].map((b) => (
                       <button
                         key={b.val}
@@ -368,7 +379,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ currentUser: propUser,
                     selectedLocation !== 'Semua' ? 'border-[#0B1F3A] text-[#0B1F3A] bg-neutral-50' : 'border-neutral-200 text-neutral-700 hover:border-neutral-300'
                   }`}
                 >
-                  <span>{selectedLocation === 'Semua' ? 'Lokasi' : selectedLocation}</span>
+                  <span>{selectedLocation === 'Semua' ? t('filter.location', 'Lokasi') : selectedLocation}</span>
                   <ChevronDown className="w-3.5 h-3.5 text-neutral-400" />
                 </button>
 
@@ -385,7 +396,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ currentUser: propUser,
                           selectedLocation === loc ? 'font-bold text-[#0B1F3A]' : 'text-neutral-600'
                         }`}
                       >
-                        <span>{loc}</span>
+                        <span>{loc === 'Semua' ? t('filter.all', 'Semua') : loc}</span>
                         {selectedLocation === loc && <Check className="w-3.5 h-3.5 text-[#0B1F3A]" />}
                       </button>
                     ))}
@@ -401,16 +412,16 @@ export const LandingPage: React.FC<LandingPageProps> = ({ currentUser: propUser,
                     selectedScore !== 'Semua' ? 'border-[#0B1F3A] text-[#0B1F3A] bg-neutral-50' : 'border-neutral-200 text-neutral-700 hover:border-neutral-300'
                   }`}
                 >
-                  <span>{selectedScore === 'Semua' ? 'Rating / Score' : `Score ${selectedScore}`}</span>
+                  <span>{selectedScore === 'Semua' ? t('filter.rating', 'Rating / Score') : `Score ${selectedScore}`}</span>
                   <ChevronDown className="w-3.5 h-3.5 text-neutral-400" />
                 </button>
 
                 {openDropdown === 'rating' && (
                   <div className="absolute right-0 mt-1.5 w-48 bg-white rounded-2xl border border-neutral-200 shadow-xl py-2 z-30 animate-in fade-in">
                     {[
-                      { label: 'Semua Skor', val: 'Semua' },
-                      { label: 'Score 95+ (Top Tier)', val: '95+' },
-                      { label: 'Score 90+ (Rising Star)', val: '90+' }
+                      { label: t('filter.allScores', 'Semua Skor'), val: 'Semua' },
+                      { label: t('filter.topTier', 'Score 95+ (Top Tier)'), val: '95+' },
+                      { label: t('filter.risingStar', 'Score 90+ (Rising Star)'), val: '90+' }
                     ].map((s) => (
                       <button
                         key={s.val}
@@ -437,7 +448,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ currentUser: propUser,
 
         {/* Results Counter & Notification */}
         <div className="text-xs font-medium text-neutral-400 mb-6 flex items-center justify-between">
-          <span>Menampilkan <strong>{filteredCreators.length}</strong> kreator terverifikasi</span>
+          <span>{t('filter.showingCreators', 'Menampilkan {count} kreator terverifikasi').replace('{count}', String(filteredCreators.length))}</span>
           {(selectedCategory !== 'Semua' || selectedBudget !== 'Semua' || selectedLocation !== 'Semua' || selectedScore !== 'Semua' || selectedTag || searchQuery) && (
             <button
               onClick={() => {
@@ -450,7 +461,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ currentUser: propUser,
               }}
               className="text-xs text-blue-600 font-semibold hover:underline cursor-pointer"
             >
-              Hapus semua filter
+              {t('filter.clearAll', 'Hapus semua filter')}
             </button>
           )}
         </div>
@@ -460,9 +471,9 @@ export const LandingPage: React.FC<LandingPageProps> = ({ currentUser: propUser,
           {filteredCreators.length === 0 ? (
             <div className="text-center py-16 bg-white rounded-3xl border border-neutral-200">
               <Sparkles className="w-10 h-10 text-neutral-300 mx-auto mb-3" />
-              <h3 className="text-lg font-bold text-[#0d0c22]">Tidak Ada Kreator yang Sesuai</h3>
+              <h3 className="text-lg font-bold text-[#0d0c22]">{t('empty.creatorsTitle', 'Tidak Ada Kreator yang Sesuai')}</h3>
               <p className="text-xs text-neutral-500 max-w-sm mx-auto mt-1">
-                Coba sesuaikan kata kunci pencarian atau reset filter untuk melihat kreator berbakat lainnya.
+                {t('empty.creatorsDesc', 'Coba sesuaikan kata kunci pencarian atau reset filter untuk melihat kreator berbakat lainnya.')}
               </p>
             </div>
           ) : (
@@ -527,7 +538,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ currentUser: propUser,
                         {/* Sub-info Row (Harga, Lokasi, Respon, Layanan) */}
                         <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-neutral-500 mt-2">
                           <span className="font-semibold text-neutral-800">
-                            Mulai {creator.formattedRate}
+                            {t('card.startingFrom', 'Mulai')} {creator.formattedRate}
                           </span>
                           <span>•</span>
                           <span className="flex items-center gap-1">
@@ -537,10 +548,10 @@ export const LandingPage: React.FC<LandingPageProps> = ({ currentUser: propUser,
                           <span>•</span>
                           <span className="flex items-center gap-1">
                             <Clock className="w-3 h-3 text-neutral-400" />
-                            {creator.responseTime || 'Merespons cepat'}
+                            {creator.responseTime || t('card.fastResponse', 'Merespons cepat')}
                           </span>
                           <span>•</span>
-                          <span>{creator.servicesAvailableCount || 8} Layanan tersedia</span>
+                          <span>{creator.servicesAvailableCount || 8} {t('card.servicesAvailable', 'Layanan tersedia')}</span>
                         </div>
 
                       </div>
@@ -558,7 +569,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ currentUser: propUser,
                             ? 'bg-blue-50 border-blue-200 text-blue-600' 
                             : 'border-neutral-200 text-neutral-600 hover:bg-neutral-50 hover:border-neutral-300'
                         }`}
-                        title="Simpan Kreator"
+                        title={isSaved ? t('card.removeSave', 'Hapus Simpan') : t('card.saveCreator', 'Simpan Kreator')}
                       >
                         <Bookmark className={`w-4 h-4 ${isSaved ? 'fill-blue-600' : ''}`} />
                       </button>
@@ -568,7 +579,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ currentUser: propUser,
                         onClick={(e) => handleOpenBrief(creator, e)}
                         className="h-10 px-5 sm:px-6 rounded-xl bg-[#0B1F3A] hover:bg-[#123B8C] text-white text-xs sm:text-sm font-semibold transition-all shadow-2xs hover:shadow-xs cursor-pointer flex items-center gap-2"
                       >
-                        <span>Hubungi</span>
+                        <span>{t('card.contact', 'Hubungi')}</span>
                       </button>
 
                     </div>

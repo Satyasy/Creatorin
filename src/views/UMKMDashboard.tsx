@@ -785,6 +785,20 @@ export const UMKMDashboard = () => {
   }, []);
 
   const toggleBookmark = (creatorId: string) => {
+    if (!user) {
+      setAuthModalConfig({
+        title: 'Masuk ke Akun Creatorin',
+        description: 'Silakan masuk ke akun Creatorin Anda terlebih dahulu untuk menyimpan ke koleksi favorit.',
+        action: () => {
+          setSavedCreators((prev) => ({
+            ...prev,
+            [creatorId]: !prev[creatorId],
+          }));
+        },
+      });
+      setIsAuthModalOpen(true);
+      return;
+    }
     setSavedCreators((prev) => ({
       ...prev,
       [creatorId]: !prev[creatorId],
@@ -792,6 +806,20 @@ export const UMKMDashboard = () => {
   };
 
   const toggleBookmarkService = (serviceId: string) => {
+    if (!user) {
+      setAuthModalConfig({
+        title: 'Masuk ke Akun Creatorin',
+        description: 'Silakan masuk ke akun Creatorin Anda terlebih dahulu untuk menyimpan ke koleksi favorit.',
+        action: () => {
+          setSavedServices((prev) => ({
+            ...prev,
+            [serviceId]: !prev[serviceId],
+          }));
+        },
+      });
+      setIsAuthModalOpen(true);
+      return;
+    }
     setSavedServices((prev) => ({
       ...prev,
       [serviceId]: !prev[serviceId],
@@ -800,6 +828,20 @@ export const UMKMDashboard = () => {
 
   const toggleBookmarkProject = (projectId: string, e?: React.MouseEvent) => {
     if (e) e.stopPropagation();
+    if (!user) {
+      setAuthModalConfig({
+        title: 'Masuk ke Akun Creatorin',
+        description: 'Silakan masuk ke akun Creatorin Anda terlebih dahulu untuk menyimpan ke koleksi favorit.',
+        action: () => {
+          setSavedProjects((prev) => ({
+            ...prev,
+            [projectId]: !prev[projectId],
+          }));
+        },
+      });
+      setIsAuthModalOpen(true);
+      return;
+    }
     setSavedProjects((prev) => ({
       ...prev,
       [projectId]: !prev[projectId],
