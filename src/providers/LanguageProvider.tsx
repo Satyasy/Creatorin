@@ -12,9 +12,7 @@ const DICTIONARY: Record<Language, Translations> = {
   id: {
     // Navigation
     'nav.home': 'Beranda',
-    'nav.explore': 'Explore',
     'nav.browse': 'Jelajah',
-    'nav.allCategories': 'Semua (Explore Hub)',
     'nav.creators': 'Kreator',
     'nav.services': 'Layanan',
     'nav.projects': 'Proyek',
@@ -183,9 +181,7 @@ const DICTIONARY: Record<Language, Translations> = {
   en: {
     // Navigation
     'nav.home': 'Home',
-    'nav.explore': 'Explore',
     'nav.browse': 'Browse',
-    'nav.allCategories': 'All Categories (Explore Hub)',
     'nav.creators': 'Creators',
     'nav.services': 'Services',
     'nav.projects': 'Projects',
