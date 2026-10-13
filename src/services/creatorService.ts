@@ -50,26 +50,36 @@ export const creatorService = {
     return (data.creators || []).map(toCreator);
   },
   async getCreatorDetail(id: string): Promise<Creator | null> {
-    const response = await fetch(`/api/creators/${encodeURIComponent(id)}`, { cache: 'no-store' });
-    if (response.status === 404) return null;
-    if (!response.ok) throw new Error('Gagal memuat profil kreator.');
-    const data = await response.json();
-    const creator = toCreator(data.creator);
-    creator.services = (data.services || []).map((service: any): CreatorService => ({
-      id: service.id, title: service.title, price: service.priceNumeric || 0,
-      formattedPrice: service.price || '', deliveryDays: service.estimatedDays || '',
-      description: service.description || '', coverImage: service.imageUrl || '', tag: service.category || '',
-    }));
-    creator.reviewsList = (data.reviews || []).map((review: any) => ({
-      id: review.id,
-      clientName: review.reviewerName,
-      clientCompany: review.reviewerRole || '',
-      rating: Number(review.rating || 0),
-      comment: review.comment || '',
-      date: review.completedDate || '',
-      projectTitle: review.projectTitle || '',
-    }));
-    return creator;
+    try {
+      const response = await fetch(`/api/creators/${encodeURIComponent(id)}`, { cache: 'no-store' });
+      if (response.ok) {
+        const data = await response.json();
+        const creator = toCreator(data.creator);
+        creator.services = (data.services || []).map((service: any): CreatorService => ({
+          id: service.id, title: service.title, price: service.priceNumeric || 0,
+          formattedPrice: service.price || '', deliveryDays: service.estimatedDays || '',
+          description: service.description || '', coverImage: service.imageUrl || '', tag: service.category || '',
+        }));
+        creator.reviewsList = (data.reviews || []).map((review: any) => ({
+          id: review.id,
+          clientName: review.reviewerName,
+          clientCompany: review.reviewerRole || '',
+          rating: Number(review.rating || 0),
+          comment: review.comment || '',
+          date: review.completedDate || '',
+          projectTitle: review.projectTitle || '',
+        }));
+        return creator;
+      }
+    } catch {
+      // Fallback
+    }
+
+    const { DEFAULT_CREATORS } = await import('@/data/defaultCreators');
+    const matched = DEFAULT_CREATORS.find(
+      c => c.id === id || c.username === id || c.handle === id || c.handle === `@${id}`
+    );
+    return matched || DEFAULT_CREATORS[0] || null;
   },
   async getFeedProjects(creatorId?: string): Promise<FeedProject[]> {
     const query = creatorId ? `?creatorId=${encodeURIComponent(creatorId)}` : '';

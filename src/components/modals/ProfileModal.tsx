@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { Creator, PortfolioItem } from '@/types';
 import { CareerScoreBadge } from '@/components/common/CareerScoreBadge';
+import { chatService } from '@/services/chatService';
 import { 
   X, 
   ShieldCheck, 
@@ -26,16 +28,44 @@ interface ProfileModalProps {
 }
 
 export const ProfileModal: React.FC<ProfileModalProps> = ({ creator, isOpen = true, onClose, onInitiateProject, onOpenBrief }) => {
+  const router = useRouter();
   const [selectedPortfolio, setSelectedPortfolio] = useState<PortfolioItem | null>(null);
   const [isSaved, setIsSaved] = useState(false);
+  const [isStartingChat, setIsStartingChat] = useState(false);
 
   if (!isOpen || !creator) return null;
+
+  const handleContactCreator = async () => {
+    if (onInitiateProject) {
+      onInitiateProject(creator);
+      return;
+    }
+    setIsStartingChat(true);
+    try {
+      const res = await chatService.initiateChatWithProfile({
+        id: creator.id,
+        name: creator.name,
+        avatar: creator.avatar,
+        roleTitle: creator.roleTitle || 'Kreator',
+        role: 'creator',
+      });
+      onClose();
+      router.push(`/chat?conversationId=${res.conversationId}&creatorId=${creator.id}`);
+    } catch {
+      onClose();
+      router.push(`/chat?creatorId=${creator.id}`);
+    } finally {
+      setIsStartingChat(false);
+    }
+  };
 
   const initiateProject = () => {
     if (onInitiateProject) {
       onInitiateProject(creator);
     } else if (onOpenBrief) {
       onOpenBrief();
+    } else {
+      handleContactCreator();
     }
   };
 
@@ -291,14 +321,12 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({ creator, isOpen = tr
               Tutup
             </button>
             <button
-              onClick={() => {
-                onClose();
-                initiateProject();
-              }}
-              className="px-6 py-2.5 rounded-xl bg-[#0B1F3A] hover:bg-[#123B8C] text-white text-xs font-semibold flex items-center gap-2 shadow-xs transition cursor-pointer"
+              onClick={handleContactCreator}
+              disabled={isStartingChat}
+              className="px-6 py-2.5 rounded-xl bg-[#0B1F3A] hover:bg-[#123B8C] text-white text-xs font-semibold flex items-center gap-2 shadow-xs transition cursor-pointer disabled:opacity-75"
             >
-              <span>Hubungi Kreator</span>
-              <Send className="w-3.5 h-3.5" />
+              <span>{isStartingChat ? 'Menghubungkan...' : 'Hubungi Kreator'}</span>
+              <Send className={`w-3.5 h-3.5 ${isStartingChat ? 'animate-spin' : ''}`} />
             </button>
           </div>
         </div>

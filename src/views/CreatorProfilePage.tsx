@@ -62,6 +62,7 @@ import { ServiceDetailModal } from '@/components/modals/ServiceDetailModal';
 import { UploadProjectModal } from '@/components/modals/UploadProjectModal';
 import { UploadServiceModal } from '@/components/modals/UploadServiceModal';
 import { creatorService } from '@/services/creatorService';
+import { chatService } from '@/services/chatService';
 import { createClient } from '@/lib/supabase/client';
 import { ShaderFill } from '@/lib/custom-effect-runtime';
 import { setup as setupConcentric, render as renderConcentric, manifest as manifestConcentric } from '@/lib/custom-effects/CodeComponentId_c2b302fbdfce8a1ec92a5a80b10a5916ab506ed7_430';
@@ -224,6 +225,33 @@ export const CreatorProfilePage: React.FC<CreatorProfilePageProps> = ({
     setTimeout(() => setCopiedLinkSuccess(false), 3000);
   };
 
+  // Contact creator directly - creates/finds conversation room and redirects to chat
+  const [isStartingChat, setIsStartingChat] = useState(false);
+  const handleContactCreator = async () => {
+    if (!currentUser) {
+      router.push('/sign-in');
+      return;
+    }
+    setIsStartingChat(true);
+    try {
+      const res = await chatService.initiateChatWithProfile(
+        {
+          id: creator.id,
+          name: creatorName || creator.name,
+          avatar: creatorAvatar || creator.avatar,
+          roleTitle: creatorRoleTitle || creator.roleTitle || 'Kreator',
+          role: 'creator',
+        },
+        currentUser
+      );
+      router.push(`/chat?conversationId=${res.conversationId}&creatorId=${creator.id}`);
+    } catch {
+      router.push(`/chat?creatorId=${creator.id}`);
+    } finally {
+      setIsStartingChat(false);
+    }
+  };
+
   // Send message handler - Connects to real conversation and message APIs
   const handleSendInquiry = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -237,34 +265,26 @@ export const CreatorProfilePage: React.FC<CreatorProfilePageProps> = ({
 
     setIsSendingInquiry(true);
     try {
-      // 1. Inisiasi atau cari percakapan yang sudah ada dengan kreator ini
-      const convRes = await fetch('/api/conversations', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ recipientId: creator.id }),
-      });
-      const convData = await convRes.json();
-      if (!convRes.ok) throw new Error(convData.error || 'Gagal memulai percakapan');
+      const res = await chatService.initiateChatWithProfile(
+        {
+          id: creator.id,
+          name: creatorName || creator.name,
+          avatar: creatorAvatar || creator.avatar,
+          roleTitle: creatorRoleTitle || creator.roleTitle || 'Kreator',
+          role: 'creator',
+        },
+        currentUser
+      );
 
-      const conversationId = convData.conversation?.id;
-      if (conversationId) {
-        // 2. Kirim pesan pengantar awal
-        await fetch('/api/messages', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            conversationId,
-            content: text,
-          }),
-        });
-      }
+      const conversationId = res.conversationId;
+      await chatService.sendMessage(conversationId, text);
 
       setInquirySentSuccess(true);
       setTimeout(() => {
         setInquirySentSuccess(false);
         setIsGetInTouchOpen(false);
         setInquiryMessage('');
-        router.push(conversationId ? `/chat?conversationId=${conversationId}` : '/chat');
+        router.push(`/chat?conversationId=${conversationId}&creatorId=${creator.id}`);
       }, 900);
     } catch (err: any) {
       alert(err.message || 'Gagal mengirim pesan penawaran ke kreator.');
@@ -430,7 +450,7 @@ export const CreatorProfilePage: React.FC<CreatorProfilePageProps> = ({
                   <button
                     onClick={() => {
                       setIsMoreMenuOpen(false);
-                      setIsGetInTouchOpen(true);
+                      handleContactCreator();
                     }}
                     className="w-full px-4 py-2.5 text-xs font-semibold text-neutral-700 hover:bg-neutral-50 flex items-center gap-2.5 cursor-pointer"
                   >
@@ -492,14 +512,15 @@ export const CreatorProfilePage: React.FC<CreatorProfilePageProps> = ({
                   {isFollowing ? 'Following' : 'Follow'}
                 </button>
 
-                {/* Public Profile: Kirim Pesan */}
+                {/* Public Profile: Hubungi */}
                 <button
                   id="btn-send-message-primary"
-                  onClick={() => setIsGetInTouchOpen(true)}
-                  className="flex items-center gap-2 h-10 px-5 rounded-xl bg-[#0B1F3A] hover:bg-[#123B8C] text-sm font-semibold text-white shadow-xs transition-colors cursor-pointer"
+                  onClick={handleContactCreator}
+                  disabled={isStartingChat}
+                  className="flex items-center gap-2 h-10 px-5 rounded-xl bg-[#0B1F3A] hover:bg-[#123B8C] text-sm font-semibold text-white shadow-xs transition-colors cursor-pointer disabled:opacity-75"
                 >
-                  <Mail className="w-3.5 h-3.5" />
-                  <span>Kirim Pesan</span>
+                  <Mail className={`w-3.5 h-3.5 ${isStartingChat ? 'animate-spin' : ''}`} />
+                  <span>{isStartingChat ? 'Menghubungkan...' : 'Hubungi'}</span>
                 </button>
               </>
             )}

@@ -48,6 +48,7 @@ import {
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/providers/AuthProvider';
 import { creatorService } from '@/services/creatorService';
+import { chatService } from '@/services/chatService';
 import { UMKMProfile, AuthState, ActivePage, ProjectListing, UMKMCompletedCollab, UMKMCreatorReview, Creator } from '@/types';
 import { BriefDetailPage } from '@/views/BriefDetailPage';
 
@@ -237,6 +238,33 @@ export const UmkmProfilePage: React.FC<UmkmProfilePageProps> = ({
       navigator.clipboard.writeText(window.location.href);
     }
     showToast('Tautan profil UMKM berhasil disalin ke clipboard!');
+  };
+
+  // Contact UMKM Brand - creates/finds conversation room and redirects to chat
+  const [isStartingChat, setIsStartingChat] = useState(false);
+  const handleContactBrand = async () => {
+    if (!currentUser) {
+      router.push('/sign-in');
+      return;
+    }
+    setIsStartingChat(true);
+    try {
+      const res = await chatService.initiateChatWithProfile(
+        {
+          id: profile.id,
+          name: profile.brandName || profile.name,
+          avatar: profile.logo || '',
+          roleTitle: profile.category || profile.industry || 'UMKM Brand',
+          role: 'umkm',
+        },
+        currentUser
+      );
+      router.push(`/chat?conversationId=${res.conversationId}&creatorId=${profile.id}&role=umkm&name=${encodeURIComponent(profile.brandName || profile.name)}`);
+    } catch {
+      router.push(`/chat?creatorId=${profile.id}&role=umkm&name=${encodeURIComponent(profile.brandName || profile.name)}`);
+    } finally {
+      setIsStartingChat(false);
+    }
   };
 
   const toggleFollow = () => {
@@ -585,6 +613,18 @@ export const UmkmProfilePage: React.FC<UmkmProfilePageProps> = ({
                     <Copy className="w-4 h-4 text-neutral-400" />
                     <span>Salin Tautan Profil</span>
                   </button>
+                  {!isUmkmOwner && (
+                    <button
+                      onClick={() => {
+                        setIsMoreMenuOpen(false);
+                        handleContactBrand();
+                      }}
+                      className="w-full px-4 py-2.5 text-xs font-semibold text-neutral-700 hover:bg-neutral-50 flex items-center gap-2.5 cursor-pointer"
+                    >
+                      <MessageSquare className="w-4 h-4 text-indigo-500" />
+                      <span>Hubungi Brand</span>
+                    </button>
+                  )}
                   {isUmkmOwner && (
                     <button
                       onClick={() => {
@@ -618,11 +658,12 @@ export const UmkmProfilePage: React.FC<UmkmProfilePageProps> = ({
             ) : (
               <button
                 id="btn-contact-brand"
-                onClick={() => navigateTo('chat', '/chat')}
-                className="px-5 py-2 sm:py-2.5 rounded-xl border border-neutral-300 bg-white hover:bg-neutral-50 text-neutral-900 text-xs sm:text-sm font-semibold transition cursor-pointer flex items-center gap-2"
+                onClick={handleContactBrand}
+                disabled={isStartingChat}
+                className="px-5 py-2 sm:py-2.5 rounded-xl bg-[#0B1F3A] hover:bg-[#123B8C] text-white text-xs sm:text-sm font-semibold transition cursor-pointer flex items-center gap-2 shadow-xs disabled:opacity-75"
               >
-                <MessageSquare className="w-3.5 h-3.5" />
-                <span>Kirim Pesan</span>
+                <MessageSquare className={`w-3.5 h-3.5 ${isStartingChat ? 'animate-spin' : ''}`} />
+                <span>{isStartingChat ? 'Menghubungkan...' : 'Hubungi'}</span>
               </button>
             )}
 
