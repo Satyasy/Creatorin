@@ -14,7 +14,7 @@ type CreatorLink = {
 };
 
 const primaryLinks = [
-  { label: 'Search', href: '/explore', icon: Search },
+  { label: 'Jelajah', href: '/jelajah', icon: Search },
   { label: 'Home', href: '/', icon: House },
   { label: 'Messages', href: '/chat', icon: MessageSquareText },
   { label: 'Contracts', href: '/contracts', icon: BriefcaseBusiness },

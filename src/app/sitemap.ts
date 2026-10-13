@@ -13,7 +13,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: number;
   }> = [
     { path: '/', changeFrequency: 'daily', priority: 1.0 },
-    { path: '/explore', changeFrequency: 'daily', priority: 0.9 },
+    { path: '/jelajah', changeFrequency: 'daily', priority: 0.9 },
     { path: '/jelajah/layanan', changeFrequency: 'daily', priority: 0.9 },
     { path: '/jelajah/proyek', changeFrequency: 'daily', priority: 0.9 },
     { path: '/jelajah/kreator', changeFrequency: 'daily', priority: 0.9 },

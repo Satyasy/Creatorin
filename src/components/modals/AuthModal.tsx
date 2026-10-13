@@ -92,7 +92,7 @@ export function AuthModal({
     }
   };
 
-  const currentRedirect = redirectUrl || (typeof window !== 'undefined' ? window.location.pathname + window.location.search : '/explore');
+  const currentRedirect = redirectUrl || (typeof window !== 'undefined' ? window.location.pathname + window.location.search : '/jelajah');
   const fullSignInUrl = `/sign-in?redirect=${encodeURIComponent(currentRedirect)}`;
   const fullSignUpUrl = `/sign-up?redirect=${encodeURIComponent(currentRedirect)}`;
 

@@ -22,11 +22,11 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, onOpenBrief }) => {
   };
 
   return (
-    <footer className="w-full relative overflow-hidden bg-white border-t border-neutral-200/80 pt-8 sm:pt-10 pb-8 sm:pb-10 font-sans text-[#0d0c22]">
+    <footer className="w-full relative overflow-hidden bg-white border-t border-neutral-100 pt-8 sm:pt-12 pb-8 sm:pb-10 font-sans text-[#0d0c22]">
       <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 relative">
         
-        {/* Top Bar: Brand Logo di Kiri & Social Media di Kanan */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-neutral-200/80">
+        {/* Top Bar: Brand Logo di Kiri & Social Media di Kanan (Tanpa garis pemisah tebal) */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-8 sm:pb-10">
           <div
             className="inline-flex items-center gap-1.5 cursor-pointer select-none group w-fit"
             onClick={() => navigateTo('home', '/')}
@@ -39,14 +39,14 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, onOpenBrief }) => {
 
           {/* Social Media (Icon X, Instagram, LinkedIn) */}
           <div className="flex items-center gap-3 sm:gap-4">
-            <span className="text-xs sm:text-sm font-medium text-neutral-500">Social Media</span>
+            <span className="text-xs sm:text-sm font-medium text-neutral-400">Social Media</span>
             <div className="flex items-center gap-2">
               <a
                 href="https://x.com"
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="X / Twitter"
-                className="w-9 h-9 rounded-xl border border-neutral-200 bg-[#f8f8f9] hover:bg-neutral-100 hover:border-neutral-300 text-neutral-600 hover:text-[#0d0c22] flex items-center justify-center transition cursor-pointer"
+                className="w-9 h-9 rounded-xl border border-neutral-200/60 bg-[#f8f8f9] hover:bg-neutral-100 hover:border-neutral-300 text-neutral-600 hover:text-[#0d0c22] flex items-center justify-center transition cursor-pointer"
               >
                 <Twitter className="w-4 h-4" />
               </a>
@@ -55,7 +55,7 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, onOpenBrief }) => {
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="Instagram"
-                className="w-9 h-9 rounded-xl border border-neutral-200 bg-[#f8f8f9] hover:bg-neutral-100 hover:border-neutral-300 text-neutral-600 hover:text-[#0d0c22] flex items-center justify-center transition cursor-pointer"
+                className="w-9 h-9 rounded-xl border border-neutral-200/60 bg-[#f8f8f9] hover:bg-neutral-100 hover:border-neutral-300 text-neutral-600 hover:text-[#0d0c22] flex items-center justify-center transition cursor-pointer"
               >
                 <Instagram className="w-4 h-4" />
               </a>
@@ -64,7 +64,7 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, onOpenBrief }) => {
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="LinkedIn"
-                className="w-9 h-9 rounded-xl border border-neutral-200 bg-[#f8f8f9] hover:bg-neutral-100 hover:border-neutral-300 text-neutral-600 hover:text-[#0d0c22] flex items-center justify-center transition cursor-pointer"
+                className="w-9 h-9 rounded-xl border border-neutral-200/60 bg-[#f8f8f9] hover:bg-neutral-100 hover:border-neutral-300 text-neutral-600 hover:text-[#0d0c22] flex items-center justify-center transition cursor-pointer"
               >
                 <Linkedin className="w-4 h-4" />
               </a>
@@ -73,11 +73,11 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, onOpenBrief }) => {
         </div>
 
         {/* Middle Section: Area Brand & Deskripsi di Kiri, 4 Kolom Navigasi di Kanan */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 mt-6 sm:mt-8 relative">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 relative">
           
-          {/* Siluet Logo Creatorin di Sisi Kiri Footer (Di Belakang Kolom Tentang Platform) */}
+          {/* Siluet Logo Creatorin di Sisi Kiri Footer (Halus & Bersih) */}
           <div 
-            className="absolute -left-14 sm:-left-10 -bottom-8 sm:-bottom-6 lg:-left-6 lg:top-2 w-[260px] h-[245px] sm:w-[320px] sm:h-[302px] lg:w-[360px] lg:h-[340px] pointer-events-none select-none z-0 opacity-18 hover:opacity-24 transition-all duration-700 ease-in-out"
+            className="absolute -left-14 sm:-left-10 -bottom-8 sm:-bottom-6 lg:-left-6 lg:top-2 w-[240px] h-[225px] sm:w-[280px] sm:h-[265px] lg:w-[320px] lg:h-[300px] pointer-events-none select-none z-0 opacity-[0.06] transition-all duration-700 ease-in-out"
             aria-hidden="true"
           >
             {/* Ambient soft glow */}
@@ -232,10 +232,10 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, onOpenBrief }) => {
                 <li>
                   <button
                     type="button"
-                    onClick={() => navigateTo('explore', '/explore')}
+                    onClick={() => navigateTo('explore', '/jelajah')}
                     className="hover:text-[#0d0c22] transition cursor-pointer text-left"
                   >
-                    Explore Komunitas
+                    Jelajah
                   </button>
                 </li>
                 <li>
@@ -315,8 +315,8 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, onOpenBrief }) => {
 
         </div>
 
-        {/* Official Ecosystem & Partner Endorsement Strip */}
-        <div className="mt-8 pt-6 pb-2 border-t border-neutral-200/80 text-center">
+        {/* Official Ecosystem & Partner Endorsement Strip (Tanpa garis pemisah, ruang nafas lega) */}
+        <div className="mt-12 sm:mt-14 mb-8 text-center">
           <p className="text-[11px] font-bold text-neutral-400 uppercase tracking-widest mb-4">
             Didukung & Berkolaborasi Bersama Ekosistem Industri Digital Nasional
           </p>
@@ -324,14 +324,14 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, onOpenBrief }) => {
             <img 
               src="/creatorin/partners.png" 
               alt="Didukung & Berkolaborasi Bersama: Jagoan Hosting, Komdigi, Maspion IT, Garuda Spark"
-              className="max-h-10 sm:max-h-12 w-auto object-contain filter grayscale hover:grayscale-0 transition-all opacity-85 hover:opacity-100 duration-300"
+              className="max-h-9 sm:max-h-11 w-auto object-contain filter grayscale hover:grayscale-0 transition-all opacity-80 hover:opacity-100 duration-300"
             />
           </div>
         </div>
 
-        {/* Bagian Bawah: Copyright & Informasi Tambahan */}
-        <div className="pt-6 border-t border-neutral-200/80 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-neutral-500">
-          <p className="text-neutral-700 font-medium text-center sm:text-left">
+        {/* Bagian Bawah: Copyright & Informasi Tambahan (Garis tipis halus tunggal) */}
+        <div className="pt-6 border-t border-neutral-100 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-neutral-500">
+          <p className="text-neutral-600 font-medium text-center sm:text-left">
             © 2026 Creatorin. All rights reserved.
           </p>
 
