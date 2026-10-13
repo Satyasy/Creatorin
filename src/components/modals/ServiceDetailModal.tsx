@@ -16,6 +16,8 @@ import {
 import { CreatorService, Creator, ActivePage } from '@/types';
 import { Footer } from '@/components/layout/Footer';
 import { useAuth } from '@/providers/AuthProvider';
+import { useToast } from '@/providers/ToastProvider';
+import { useLanguage } from '@/providers/LanguageProvider';
 import { AuthModal } from '@/components/modals/AuthModal';
 import { startRouteProgress } from '@/components/common/RouteProgressBar';
 
@@ -122,6 +124,8 @@ export const ServiceDetailModal: React.FC<ServiceDetailModalProps> = ({
   const [isClosing, setIsClosing] = useState(false);
 
   const { user } = useAuth();
+  const { showToast } = useToast();
+  const { t } = useLanguage();
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [authModalConfig, setAuthModalConfig] = useState<{
     title: string;
@@ -194,28 +198,32 @@ export const ServiceDetailModal: React.FC<ServiceDetailModalProps> = ({
   const activeImage = galleryImages[activeImageIndex] || galleryImages[0];
 
   const handleShare = () => {
+    const canonicalUrl = `${window.location.origin}/jelajah/layanan?serviceId=${currentService.id}`;
     if (navigator.clipboard) {
-      navigator.clipboard.writeText(window.location.href);
-      setToastMessage('Tautan berhasil disalin ke clipboard');
+      navigator.clipboard.writeText(canonicalUrl);
+      showToast({
+        type: 'success',
+        message: t('toast.serviceCopied', 'Tautan layanan berhasil disalin!'),
+      });
+      setToastMessage(t('toast.serviceCopied', 'Tautan layanan berhasil disalin!'));
       setTimeout(() => setToastMessage(null), 2500);
     }
   };
 
   const handleGoToChat = () => {
     if (!user) {
-      setAuthModalConfig({
-        title: 'Masuk untuk Menghubungi Kreator',
-        description: 'Anda harus masuk akun terlebih dahulu untuk memulai obrolan langsung dan mendiskusikan kebutuhan kolaborasi.',
-        action: () => {
-          handleSmoothClose();
-          if (creator?.id) {
-            router.push(`/chat?creatorId=${creator.id}`);
-          } else {
-            router.push('/chat');
-          }
+      showToast({
+        type: 'warning',
+        title: t('toast.authRequired', 'Perlu Masuk Akun'),
+        message: t('toast.chatAuth', 'Anda harus masuk akun terlebih dahulu untuk menghubungi kreator ini.'),
+        action: {
+          label: t('action.signIn', 'Masuk ke Akun'),
+          onClick: () => {
+            handleSmoothClose();
+            router.push('/sign-in');
+          },
         },
       });
-      setIsAuthModalOpen(true);
       return;
     }
     handleSmoothClose();
@@ -227,33 +235,27 @@ export const ServiceDetailModal: React.FC<ServiceDetailModalProps> = ({
   };
 
   const handleOrder = (srvToOrder = currentService) => {
+    if (!user) {
+      showToast({
+        type: 'warning',
+        title: t('toast.authRequired', 'Perlu Masuk Akun'),
+        message: t('toast.orderServiceAuth', 'Silakan masuk ke akun Creatorin terlebih dahulu untuk memesan paket layanan ini.'),
+        action: {
+          label: t('action.signIn', 'Masuk ke Akun'),
+          onClick: () => {
+            handleSmoothClose();
+            router.push('/sign-in');
+          },
+        },
+      });
+      return;
+    }
+
     if (onOrderService && creator) {
       onOrderService(srvToOrder, creator);
     } else if (creator?.id) {
-      if (!user) {
-        setAuthModalConfig({
-          title: 'Masuk untuk Memesan Layanan',
-          description: 'Anda harus masuk akun terlebih dahulu untuk memesan paket layanan dan memulai diskusi proyek.',
-          action: () => {
-            router.push(`/chat?creatorId=${creator.id}`);
-          },
-        });
-        setIsAuthModalOpen(true);
-        return;
-      }
       router.push(`/chat?creatorId=${creator.id}`);
     } else {
-      if (!user) {
-        setAuthModalConfig({
-          title: 'Masuk untuk Memesan Layanan',
-          description: 'Anda harus masuk akun terlebih dahulu untuk mengakses fitur pemesanan layanan & chat.',
-          action: () => {
-            router.push('/chat');
-          },
-        });
-        setIsAuthModalOpen(true);
-        return;
-      }
       router.push('/chat');
     }
   };

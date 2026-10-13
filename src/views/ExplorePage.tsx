@@ -26,7 +26,7 @@ export function ExplorePage() {
       creator: { id: string; name: string; avatar: string; roleTitle: string };
     }>
   >([]);
-  const [creators, setCreators] = useState<Creator[]>(DEFAULT_CREATORS);
+  const [creators, setCreators] = useState<Creator[]>([]);
 
   useEffect(() => {
     // Check initial tab from URL search params if present

@@ -10,10 +10,14 @@ import {
   Play,
   ArrowUpRight,
   Check,
+  ChevronLeft,
+  ChevronRight,
 } from 'lucide-react';
 import { FeedProject, Creator, ActivePage } from '@/types';
 import { Footer } from '@/components/layout/Footer';
 import { useAuth } from '@/providers/AuthProvider';
+import { useToast } from '@/providers/ToastProvider';
+import { useLanguage } from '@/providers/LanguageProvider';
 import { AuthModal } from '@/components/modals/AuthModal';
 import { startRouteProgress } from '@/components/common/RouteProgressBar';
 
@@ -92,6 +96,8 @@ export const ProjectDetailModal: React.FC<ProjectDetailModalProps> = ({
   const [isClosing, setIsClosing] = useState(false);
 
   const { user } = useAuth();
+  const { showToast } = useToast();
+  const { t } = useLanguage();
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [authModalConfig, setAuthModalConfig] = useState<{
     title: string;
@@ -125,16 +131,6 @@ export const ProjectDetailModal: React.FC<ProjectDetailModalProps> = ({
       onClose();
     }, 240);
   }, [onClose]);
-
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
-        handleSmoothClose();
-      }
-    };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [handleSmoothClose]);
 
   // Derive creator and metadata
   const creator = currentProject.creator;
@@ -186,6 +182,28 @@ export const ProjectDetailModal: React.FC<ProjectDetailModalProps> = ({
     return list;
   }, [currentProject]);
 
+  const handlePrevImage = useCallback(() => {
+    setActiveImageIndex((prev) => (prev > 0 ? prev - 1 : galleryImages.length - 1));
+  }, [galleryImages.length]);
+
+  const handleNextImage = useCallback(() => {
+    setActiveImageIndex((prev) => (prev < galleryImages.length - 1 ? prev + 1 : 0));
+  }, [galleryImages.length]);
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        handleSmoothClose();
+      } else if (e.key === 'ArrowLeft') {
+        handlePrevImage();
+      } else if (e.key === 'ArrowRight') {
+        handleNextImage();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [handleSmoothClose, handlePrevImage, handleNextImage]);
+
   // Related projects list
   const similarProjects: SimilarProjectItem[] = useMemo(() => {
     const list: SimilarProjectItem[] = [];
@@ -220,9 +238,14 @@ export const ProjectDetailModal: React.FC<ProjectDetailModalProps> = ({
   }, [allProjects, currentProject.id]);
 
   const handleShare = () => {
+    const canonicalUrl = `${window.location.origin}/jelajah/proyek?projectId=${currentProject.id}`;
     if (typeof window !== 'undefined' && navigator.clipboard) {
-      navigator.clipboard.writeText(window.location.href);
-      setToastMessage('Tautan proyek berhasil disalin!');
+      navigator.clipboard.writeText(canonicalUrl);
+      showToast({
+        type: 'success',
+        message: t('toast.projectCopied', 'Tautan proyek berhasil disalin!'),
+      });
+      setToastMessage(t('toast.projectCopied', 'Tautan proyek berhasil disalin!'));
       setTimeout(() => setToastMessage(null), 2500);
     }
   };
@@ -422,7 +445,7 @@ export const ProjectDetailModal: React.FC<ProjectDetailModalProps> = ({
           {/* 2. Media Gallery Section (Hero Image + 5 Thumbnails Row) */}
           <section aria-label="Galeri Media Proyek" className="space-y-3.5">
             {/* Hero Main Media */}
-            <div className="aspect-[16/10] sm:aspect-[16/9] w-full rounded-2xl overflow-hidden relative bg-neutral-900 shadow-xs">
+            <div className="aspect-[16/10] sm:aspect-[16/9] w-full rounded-2xl overflow-hidden relative bg-neutral-900 shadow-xs group/hero">
               <img
                 src={galleryImages[activeImageIndex] || currentProject.coverImage}
                 alt={`${currentProject.title} preview`}
@@ -431,9 +454,40 @@ export const ProjectDetailModal: React.FC<ProjectDetailModalProps> = ({
                 decoding="async"
               />
               {/* Counter Badge Pill Top Right */}
-              <div className="absolute top-3.5 right-3.5 bg-black/65 text-white text-xs font-semibold px-3 py-1 rounded-full shadow-xs">
+              <div className="absolute top-3.5 right-3.5 bg-black/65 backdrop-blur-xs text-white text-xs font-semibold px-3 py-1 rounded-full shadow-xs">
                 {activeImageIndex + 1} / {galleryImages.length} Foto
               </div>
+
+              {/* Prev / Next Gallery Navigation Buttons */}
+              {galleryImages.length > 1 && (
+                <>
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handlePrevImage();
+                    }}
+                    className="absolute left-3.5 top-1/2 -translate-y-1/2 w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-black/50 hover:bg-black/80 active:scale-95 text-white flex items-center justify-center transition-all cursor-pointer backdrop-blur-xs shadow-md opacity-90 sm:opacity-0 sm:group-hover/hero:opacity-100"
+                    aria-label="Foto sebelumnya"
+                    title="Foto sebelumnya (Panah Kiri)"
+                  >
+                    <ChevronLeft className="w-5 h-5 stroke-[2.5]" />
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleNextImage();
+                    }}
+                    className="absolute right-3.5 top-1/2 -translate-y-1/2 w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-black/50 hover:bg-black/80 active:scale-95 text-white flex items-center justify-center transition-all cursor-pointer backdrop-blur-xs shadow-md opacity-90 sm:opacity-0 sm:group-hover/hero:opacity-100"
+                    aria-label="Foto berikutnya"
+                    title="Foto berikutnya (Panah Kanan)"
+                  >
+                    <ChevronRight className="w-5 h-5 stroke-[2.5]" />
+                  </button>
+                </>
+              )}
             </div>
 
             {/* Thumbnails Row (5 Items matching Figma) */}

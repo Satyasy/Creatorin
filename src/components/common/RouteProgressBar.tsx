@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState, useTransition } from 'react';
+import React, { useEffect, useState, useCallback, useRef } from 'react';
 import { usePathname, useSearchParams } from 'next/navigation';
 
 export function RouteProgressBar() {
@@ -21,18 +21,43 @@ export function RouteProgressBar() {
     }
   }, [pathname, searchParams]);
 
-  // Listen to global link clicks to immediately trigger the progress bar
   useEffect(() => {
     let progressInterval: NodeJS.Timeout;
+    let safetyTimeout: NodeJS.Timeout;
 
-    const handleAnchorClick = (event: MouseEvent) => {
-      const target = event.currentTarget as HTMLAnchorElement | null;
+    const startProgress = () => {
+      setIsNavigating(true);
+      setProgress(25);
+
+      clearInterval(progressInterval);
+      clearTimeout(safetyTimeout);
+
+      progressInterval = setInterval(() => {
+        setProgress((prev) => {
+          if (prev >= 85) {
+            clearInterval(progressInterval);
+            return prev;
+          }
+          return prev + (prev < 50 ? 20 : 8);
+        });
+      }, 150);
+
+      // Safety watchdog: never stay stuck for more than 3.5s
+      safetyTimeout = setTimeout(() => {
+        clearInterval(progressInterval);
+        setIsNavigating(false);
+        setProgress(0);
+      }, 3500);
+    };
+
+    const handleDocumentClick = (event: MouseEvent) => {
+      const target = (event.target as HTMLElement | null)?.closest?.('a');
       if (!target) return;
 
       const href = target.getAttribute('href');
       if (!href) return;
 
-      // Ignore external links, downloads, new tabs, hashes, and same URL
+      // Ignore external links, downloads, new tabs, hashes, and modifiers
       if (
         target.target === '_blank' ||
         target.hasAttribute('download') ||
@@ -50,76 +75,41 @@ export function RouteProgressBar() {
       }
 
       const currentPath = window.location.pathname + window.location.search;
-      // If clicking same page anchor or same route, don't show navigation bar
       if (href === currentPath || href === window.location.pathname) {
         return;
       }
 
-      setIsNavigating(true);
-      setProgress(25);
-
-      clearInterval(progressInterval);
-      progressInterval = setInterval(() => {
-        setProgress((prev) => {
-          if (prev >= 85) {
-            clearInterval(progressInterval);
-            return prev;
-          }
-          return prev + (prev < 50 ? 20 : 8);
-        });
-      }, 150);
+      startProgress();
     };
-
-    const attachLinkListeners = () => {
-      const anchors = document.querySelectorAll('a[href^="/"]');
-      anchors.forEach((a) => {
-        a.addEventListener('click', handleAnchorClick as EventListener);
-      });
-    };
-
-    // Initial attach
-    attachLinkListeners();
-
-    // Observe DOM mutations to attach to dynamically rendered links
-    const observer = new MutationObserver(() => {
-      attachLinkListeners();
-    });
-
-    observer.observe(document.body, { childList: true, subtree: true });
 
     const handlePopState = () => {
-      setIsNavigating(true);
-      setProgress(40);
+      startProgress();
     };
 
-    window.addEventListener('popstate', handlePopState);
+    const handlePageShow = () => {
+      clearInterval(progressInterval);
+      clearTimeout(safetyTimeout);
+      setIsNavigating(false);
+      setProgress(0);
+    };
 
     const handleNavigationStart = () => {
-      setIsNavigating(true);
-      setProgress(25);
-      clearInterval(progressInterval);
-      progressInterval = setInterval(() => {
-        setProgress((prev) => {
-          if (prev >= 85) {
-            clearInterval(progressInterval);
-            return prev;
-          }
-          return prev + (prev < 50 ? 20 : 8);
-        });
-      }, 150);
+      startProgress();
     };
 
+    // Attach delegated click listener on document (capture phase)
+    document.addEventListener('click', handleDocumentClick, true);
+    window.addEventListener('popstate', handlePopState);
+    window.addEventListener('pageshow', handlePageShow);
     window.addEventListener('creatorin:navigation-start', handleNavigationStart);
 
     return () => {
       clearInterval(progressInterval);
-      observer.disconnect();
+      clearTimeout(safetyTimeout);
+      document.removeEventListener('click', handleDocumentClick, true);
       window.removeEventListener('popstate', handlePopState);
+      window.removeEventListener('pageshow', handlePageShow);
       window.removeEventListener('creatorin:navigation-start', handleNavigationStart);
-      const anchors = document.querySelectorAll('a[href^="/"]');
-      anchors.forEach((a) => {
-        a.removeEventListener('click', handleAnchorClick as EventListener);
-      });
     };
   }, []);
 
@@ -149,4 +139,3 @@ export function startRouteProgress() {
     window.dispatchEvent(new CustomEvent('creatorin:navigation-start'));
   }
 }
-

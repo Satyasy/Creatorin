@@ -64,6 +64,8 @@ import { UploadProjectModal } from '@/components/modals/UploadProjectModal';
 import { UploadServiceModal } from '@/components/modals/UploadServiceModal';
 import { AuthModal } from '@/components/modals/AuthModal';
 import { creatorService } from '@/services/creatorService';
+import { useToast } from '@/providers/ToastProvider';
+import { useLanguage } from '@/providers/LanguageProvider';
 import { createClient } from '@/lib/supabase/client';
 import { ShaderFill } from '@/lib/custom-effect-runtime';
 import { setup as setupConcentric, render as renderConcentric, manifest as manifestConcentric } from '@/lib/custom-effects/CodeComponentId_c2b302fbdfce8a1ec92a5a80b10a5916ab506ed7_430';
@@ -93,6 +95,8 @@ export const CreatorProfilePage: React.FC<CreatorProfilePageProps> = ({
 }) => {
   const router = useRouter();
   const { user: authUser, updateUser, refreshUser } = useAuth();
+  const { showToast } = useToast();
+  const { t } = useLanguage();
   const currentUser = propUser !== undefined ? propUser : authUser;
   const isEffectiveOwner = Boolean(isOwnProfile);
   const isCreatorShell = currentUser?.role === 'creator';
@@ -180,23 +184,15 @@ export const CreatorProfilePage: React.FC<CreatorProfilePageProps> = ({
     if (isTogglingFollow) return;
 
     if (!currentUser) {
-      setAuthModalConfig({
-        title: 'Masuk untuk Mengikuti Kreator',
-        description: 'Anda harus masuk ke akun Creatorin terlebih dahulu untuk mengikuti kreator ini dan memantau pembaruan karya mereka.',
-        action: async () => {
-          try {
-            setIsTogglingFollow(true);
-            const res = await creatorService.toggleFollow(creator.id, true);
-            setIsFollowing(true);
-            setFollowersCount(res.followersCount);
-          } catch (err) {
-            console.error('Follow failed after auth:', err);
-          } finally {
-            setIsTogglingFollow(false);
-          }
+      showToast({
+        type: 'warning',
+        title: t('toast.authRequired', 'Perlu Masuk Akun'),
+        message: t('toast.followAuth', 'Anda harus masuk ke akun Creatorin terlebih dahulu untuk mengikuti profil kreator ini.'),
+        action: {
+          label: t('action.signIn', 'Masuk ke Akun'),
+          onClick: () => router.push('/sign-in'),
         },
       });
-      setIsAuthModalOpen(true);
       return;
     }
 
@@ -246,6 +242,18 @@ export const CreatorProfilePage: React.FC<CreatorProfilePageProps> = ({
   // Toggle bookmark on service
   const toggleSaveService = (id: string, e: React.MouseEvent) => {
     e.stopPropagation();
+    if (!currentUser) {
+      showToast({
+        type: 'warning',
+        title: t('toast.authRequired', 'Perlu Masuk Akun'),
+        message: t('toast.saveServiceAuth', 'Anda harus masuk ke akun Creatorin terlebih dahulu untuk menyimpan layanan favorit.'),
+        action: {
+          label: t('action.signIn', 'Masuk ke Akun'),
+          onClick: () => router.push('/sign-in'),
+        },
+      });
+      return;
+    }
     setSavedServiceIds(prev => {
       const next = new Set(prev);
       if (next.has(id)) {
@@ -259,9 +267,14 @@ export const CreatorProfilePage: React.FC<CreatorProfilePageProps> = ({
 
   // Copy link
   const handleCopyLink = () => {
-    navigator.clipboard?.writeText?.(window.location.href);
+    const canonicalUrl = `${window.location.origin}/creator/${creator.slug || creator.id}`;
+    navigator.clipboard?.writeText?.(canonicalUrl);
     setCopiedLinkSuccess(true);
     setIsMoreMenuOpen(false);
+    showToast({
+      type: 'success',
+      message: t('toast.profileCopied', 'Tautan profil berhasil disalin!'),
+    });
     setTimeout(() => setCopiedLinkSuccess(false), 3000);
   };
 
@@ -535,7 +548,16 @@ export const CreatorProfilePage: React.FC<CreatorProfilePageProps> = ({
                 {/* Own Profile: Edit Profil Mode Toggle */}
                 <button
                   id="btn-edit-profile"
-                  onClick={() => setIsEditModeActive(!isEditModeActive)}
+                  onClick={() => {
+                    if (!isEditModeActive) {
+                      setIsEditModeActive(true);
+                      setTempName(creatorName);
+                      setTempRoleTitle(creatorRoleTitle);
+                      setEditingSection('name');
+                    } else {
+                      setIsEditModeActive(false);
+                    }
+                  }}
                   className={`flex items-center gap-2 h-10 px-5 rounded-xl text-sm font-semibold transition-colors cursor-pointer shadow-xs ${
                     isEditModeActive
                       ? 'bg-emerald-600 hover:bg-emerald-700 text-white'
@@ -543,7 +565,7 @@ export const CreatorProfilePage: React.FC<CreatorProfilePageProps> = ({
                   }`}
                 >
                   {isEditModeActive ? <Check className="w-3.5 h-3.5" /> : <Pencil className="w-3.5 h-3.5" />}
-                  <span>{isEditModeActive ? 'Selesai Edit' : 'Edit Profil'}</span>
+                  <span>{isEditModeActive ? t('action.finishEdit', 'Selesai Edit') : t('action.editProfile', 'Edit Profil')}</span>
                 </button>
               </>
             ) : (

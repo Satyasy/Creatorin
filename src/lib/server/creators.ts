@@ -1,6 +1,6 @@
 import { getDb } from '@/lib/db';
 import { profiles, creatorProfiles, services, projects, reviews, collaborationRooms } from '@/lib/db/schema';
-import { eq, desc, and } from 'drizzle-orm';
+import { eq, or, desc, and } from 'drizzle-orm';
 import { toCreator } from '@/services/creatorService';
 import type { Creator, CreatorService } from '@/types';
 
@@ -57,9 +57,12 @@ export async function getCreatorServerData(idOrSlug: string): Promise<CreatorSer
       .from(creatorProfiles)
       .innerJoin(profiles, eq(creatorProfiles.profileId, profiles.id));
 
+    const strippedId = idOrSlug.replace(/^creator-/, '');
     const creatorList = isUuid
       ? await creatorQuery.where(eq(profiles.id, idOrSlug)).limit(1)
-      : await creatorQuery.where(eq(creatorProfiles.slug, idOrSlug)).limit(1);
+      : await creatorQuery
+          .where(or(eq(creatorProfiles.slug, idOrSlug), eq(creatorProfiles.slug, strippedId)))
+          .limit(1);
 
     if (!creatorList || creatorList.length === 0) {
       return null;

@@ -2,6 +2,8 @@ import type { Metadata, Viewport } from "next";
 import "../index.css";
 import { Suspense } from "react";
 import { AuthProvider } from "@/providers/AuthProvider";
+import { LanguageProvider } from "@/providers/LanguageProvider";
+import { ToastProvider } from "@/providers/ToastProvider";
 import { RouteProgressBar } from "@/components/common/RouteProgressBar";
 
 export const viewport: Viewport = {
@@ -122,10 +124,14 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
       </head>
       <body className="antialiased font-sans overflow-x-clip text-base leading-6" suppressHydrationWarning>
         <AuthProvider>
-          <Suspense fallback={null}>
-            <RouteProgressBar />
-          </Suspense>
-          {children}
+          <LanguageProvider>
+            <ToastProvider>
+              <Suspense fallback={null}>
+                <RouteProgressBar />
+              </Suspense>
+              {children}
+            </ToastProvider>
+          </LanguageProvider>
         </AuthProvider>
       </body>
     </html>

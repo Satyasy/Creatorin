@@ -102,13 +102,7 @@ export const JelajahKreatorPage: React.FC<JelajahKreatorPageProps> = ({
       .getCreators()
       .then((fetched) => {
         if (fetched && fetched.length > 0) {
-          // Merge with DEFAULT_CREATORS so top Figma mock creator Qaesyaar Aqeel is always available
-          const existingIds = new Set(fetched.map((c) => c.id));
-          const combined = [
-            ...DEFAULT_CREATORS.filter((dc) => !existingIds.has(dc.id)),
-            ...fetched
-          ];
-          setCreators(combined);
+          setCreators(fetched);
         }
       })
       .catch(() => {

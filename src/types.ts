@@ -43,6 +43,8 @@ export interface Creator {
   id: string;
   name: string;
   username?: string;
+  slug?: string;
+  email?: string;
   avatar: string;
   category: CreatorCategory;
   roleTitle: string;
