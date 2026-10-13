@@ -4,6 +4,8 @@ import React, { useState, useMemo, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/providers/AuthProvider';
+import { useToast } from '@/providers/ToastProvider';
+import { useLanguage } from '@/providers/LanguageProvider';
 import { 
   Search, 
   Clock, 
@@ -35,6 +37,7 @@ import { ScrollReveal } from '@/components/common/ScrollReveal';
 import { toCreator } from '@/services/creatorService';
 import { chatService } from '@/services/chatService';
 import { ActivePage, AuthState, Creator, CreatorService } from '@/types';
+import { useAuthModal } from '@/providers/AuthModalProvider';
 
 interface ExploreServicesPageProps {
   currentUser?: AuthState['user'];
@@ -55,6 +58,9 @@ export const ExploreServicesPage: React.FC<ExploreServicesPageProps> = ({
 }) => {
   const router = useRouter();
   const { user: authUser } = useAuth();
+  const { openAuthModal } = useAuthModal();
+  const { showToast } = useToast();
+  const { t } = useLanguage();
   const currentUser = propUser !== undefined ? propUser : authUser;
 
   const navigateTo = (page: ActivePage, path?: string) => {
@@ -111,6 +117,13 @@ export const ExploreServicesPage: React.FC<ExploreServicesPageProps> = ({
   const [savedServiceIds, setSavedServiceIds] = useState<string[]>([]);
 
   const toggleSaveService = (serviceId: string) => {
+    if (!currentUser) {
+      openAuthModal({
+        title: t('auth.loginRequired', 'Masuk ke Akun Creatorin'),
+        description: t('toast.saveServiceAuth', 'Anda harus masuk ke akun Creatorin terlebih dahulu untuk menyimpan layanan favorit.'),
+      });
+      return;
+    }
     setSavedServiceIds(prev =>
       prev.includes(serviceId) ? prev.filter(id => id !== serviceId) : [...prev, serviceId]
     );
@@ -723,6 +736,18 @@ const DEFAULT_SERVICES: ServiceWithCreator[] = [
   ]);
 
   const handleOpenOrder = (item: ServiceWithCreator) => {
+    if (!currentUser) {
+      showToast({
+        type: 'warning',
+        title: t('toast.authRequired', 'Perlu Masuk Akun'),
+        message: t('toast.orderServiceAuth', 'Silakan masuk ke akun Creatorin terlebih dahulu untuk memesan atau mendiskusikan paket layanan ini.'),
+        action: {
+          label: t('action.signIn', 'Masuk ke Akun'),
+          onClick: () => router.push('/sign-in'),
+        },
+      });
+      return;
+    }
     setOrderModalService(item);
     setOrderBriefNotes('');
     setIsSendingInquiry(false);

@@ -6,6 +6,7 @@ import { AlertCircle, ArrowLeft, RefreshCw } from 'lucide-react';
 import { CreatorProfilePage } from '@/views/CreatorProfilePage';
 import { CreatorProfileSkeleton } from '@/components/common/CreatorProfileSkeleton';
 import { creatorService } from '@/services/creatorService';
+import { useAuth } from '@/providers/AuthProvider';
 import type { Creator } from '@/types';
 
 interface CreatorProfileClientProps {
@@ -79,5 +80,20 @@ export function CreatorProfileClient({ id, initialCreator }: CreatorProfileClien
     );
   }
 
-  return <CreatorProfilePage creator={creator} />;
+  const { user: currentUser } = useAuth();
+  const isOwnProfile = Boolean(
+    currentUser &&
+      (currentUser.id === creator.id ||
+        (creator.email && currentUser.email === creator.email) ||
+        ((currentUser as any).slug && (currentUser as any).slug === creator.slug) ||
+        (creator.slug && (currentUser as any).username === creator.slug))
+  );
+
+  return (
+    <CreatorProfilePage
+      creator={creator}
+      currentUser={currentUser}
+      isOwnProfile={isOwnProfile}
+    />
+  );
 }

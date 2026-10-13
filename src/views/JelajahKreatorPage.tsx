@@ -24,6 +24,7 @@ import { creatorService } from '@/services/creatorService';
 import { DEFAULT_CREATORS } from '@/data/defaultCreators';
 import type { Creator, CreatorService, ActivePage, AuthState } from '@/types';
 import { useAuth } from '@/providers/AuthProvider';
+import { useLanguage } from '@/providers/LanguageProvider';
 
 interface JelajahKreatorPageProps {
   currentUser?: AuthState['user'];
@@ -66,6 +67,7 @@ export const JelajahKreatorPage: React.FC<JelajahKreatorPageProps> = ({
 }) => {
   const router = useRouter();
   const { user: authUser } = useAuth();
+  const { t } = useLanguage();
   const currentUser = propUser !== undefined ? propUser : authUser;
 
   const [creators, setCreators] = useState<Creator[]>(DEFAULT_CREATORS);
@@ -102,13 +104,7 @@ export const JelajahKreatorPage: React.FC<JelajahKreatorPageProps> = ({
       .getCreators()
       .then((fetched) => {
         if (fetched && fetched.length > 0) {
-          // Merge with DEFAULT_CREATORS so top Figma mock creator Qaesyaar Aqeel is always available
-          const existingIds = new Set(fetched.map((c) => c.id));
-          const combined = [
-            ...DEFAULT_CREATORS.filter((dc) => !existingIds.has(dc.id)),
-            ...fetched
-          ];
-          setCreators(combined);
+          setCreators(fetched);
         }
       })
       .catch(() => {
@@ -175,6 +171,15 @@ export const JelajahKreatorPage: React.FC<JelajahKreatorPageProps> = ({
 
   const toggleSave = (creatorId: string, e: React.MouseEvent) => {
     e.stopPropagation();
+    if (!currentUser) {
+      setAuthModalConfig({
+        title: t('auth.loginRequired', 'Masuk ke Akun Creatorin'),
+        description: t('auth.bookmarkRequired', 'Silakan masuk ke akun Creatorin Anda terlebih dahulu untuk menyimpan ke koleksi favorit.'),
+        action: () => toggleBookmark(creatorId),
+      });
+      setIsAuthModalOpen(true);
+      return;
+    }
     toggleBookmark(creatorId);
   };
 
@@ -563,7 +568,7 @@ export const JelajahKreatorPage: React.FC<JelajahKreatorPageProps> = ({
                         {/* Sub-info Row (Harga, Lokasi, Respon, Layanan) */}
                         <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-neutral-500 mt-2">
                           <span className="font-semibold text-neutral-800">
-                            Mulai {creator.formattedRate || `Rp${(creator.startingRate || 200000).toLocaleString('id-ID')}`}
+                            {t('card.startingFrom', 'Mulai')} {creator.formattedRate || `Rp${(creator.startingRate || 200000).toLocaleString('id-ID')}`}
                           </span>
                           <span>•</span>
                           <span className="flex items-center gap-1">
@@ -573,10 +578,10 @@ export const JelajahKreatorPage: React.FC<JelajahKreatorPageProps> = ({
                           <span>•</span>
                           <span className="flex items-center gap-1">
                             <Clock className="w-3 h-3 text-neutral-400" />
-                            {creator.responseTime || 'Merespons cepat'}
+                            {creator.responseTime || t('card.fastResponse', 'Merespons cepat')}
                           </span>
                           <span>•</span>
-                          <span>{creator.servicesAvailableCount || (creator.services?.length || 8)} Layanan tersedia</span>
+                          <span>{creator.servicesAvailableCount || (creator.services?.length || 8)} {t('card.servicesAvailable', 'Layanan tersedia')}</span>
                         </div>
 
                       </div>
@@ -595,7 +600,7 @@ export const JelajahKreatorPage: React.FC<JelajahKreatorPageProps> = ({
                             ? 'bg-blue-50 border-blue-200 text-blue-600' 
                             : 'border-neutral-200 text-neutral-600 hover:bg-neutral-50 hover:border-neutral-300'
                         }`}
-                        title="Simpan Kreator"
+                        title={isSaved ? t('card.removeSave', 'Hapus Simpan') : t('card.saveCreator', 'Simpan Kreator')}
                       >
                         <Bookmark className={`w-4 h-4 ${isSaved ? 'fill-blue-600' : ''}`} />
                       </button>
@@ -606,7 +611,7 @@ export const JelajahKreatorPage: React.FC<JelajahKreatorPageProps> = ({
                         onClick={(e) => handleOpenBrief(creator, e)}
                         className="h-10 px-5 sm:px-6 rounded-xl bg-[#0B1F3A] hover:bg-[#123B8C] text-white text-xs sm:text-sm font-semibold transition-all shadow-2xs hover:shadow-xs cursor-pointer flex items-center gap-2"
                       >
-                        <span>Hubungi</span>
+                        <span>{t('card.contact', 'Hubungi')}</span>
                       </button>
 
                     </div>

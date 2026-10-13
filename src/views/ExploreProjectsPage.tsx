@@ -4,6 +4,8 @@ import React, { useState, useMemo, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/providers/AuthProvider';
+import { useAuthModal } from '@/providers/AuthModalProvider';
+import { useLanguage } from '@/providers/LanguageProvider';
 import { 
   Search, 
   Play,
@@ -586,6 +588,8 @@ export const ExploreProjectsPage: React.FC<ExploreProjectsPageProps> = ({
 }) => {
   const router = useRouter();
   const { user: authUser } = useAuth();
+  const { openAuthModal } = useAuthModal();
+  const { t } = useLanguage();
   const currentUser = propUser !== undefined ? propUser : authUser;
 
   const navigateTo = (page: ActivePage, path?: string) => {
@@ -735,21 +739,35 @@ export const ExploreProjectsPage: React.FC<ExploreProjectsPageProps> = ({
 
   const handleToggleSave = (projId: string, e?: React.MouseEvent) => {
     if (e) e.stopPropagation();
+    if (!currentUser) {
+      openAuthModal({
+        title: t('auth.loginRequired', 'Masuk ke Akun Creatorin'),
+        description: t('auth.bookmarkRequired', 'Silakan masuk ke akun Creatorin Anda terlebih dahulu untuk menyimpan ke koleksi favorit.'),
+      });
+      return;
+    }
     const willSave = !savedPosts[projId];
     setSavedPosts(prev => ({
       ...prev,
       [projId]: willSave
     }));
-    showToast(willSave ? 'Disimpan ke Koleksi Favorit' : 'Dihapus dari Koleksi');
+    showToast(willSave ? t('toast.savedFavorite', 'Disimpan ke Koleksi Favorit') : t('toast.removedFavorite', 'Dihapus dari Koleksi'));
   };
 
   const handleToggleFollow = (creatorId: string, e?: React.MouseEvent) => {
     if (e) e.stopPropagation();
+    if (!currentUser) {
+      openAuthModal({
+        title: t('auth.loginRequired', 'Masuk ke Akun Creatorin'),
+        description: t('toast.followAuth', 'Anda harus masuk ke akun Creatorin terlebih dahulu untuk mengikuti kreator ini.'),
+      });
+      return;
+    }
     setFollowingCreators(prev => ({
       ...prev,
       [creatorId]: !prev[creatorId]
     }));
-    showToast(followingCreators[creatorId] ? 'Berhenti mengikuti' : 'Mengikuti kreator');
+    showToast(followingCreators[creatorId] ? t('action.following', 'Mengikuti kreator') : t('action.follow', 'Berhenti mengikuti'));
   };
 
   const handleAddComment = (e: React.FormEvent) => {
@@ -792,10 +810,10 @@ export const ExploreProjectsPage: React.FC<ExploreProjectsPageProps> = ({
         {/* H1 Page Title & Subtitle Matching Figma */}
         <div className="mb-6">
           <h1 className="font-display font-extrabold text-2xl sm:text-3xl lg:text-[34px] leading-tight text-[#0D0C22] tracking-tight">
-            Jelajah Proyek & Portofolio Kreator
+            {t('explore.projectsHeading', 'Jelajah Proyek & Portofolio Kreator')}
           </h1>
           <p className="text-sm text-[#737373] mt-1.5 max-w-2xl leading-relaxed">
-            Temukan portofolio nyata, video Reels, konten TikTok, dan sistem desain yang telah diproduksi oleh kreator top terverifikasi Creatorin.
+            {t('explore.projectsSubtitle', 'Temukan portofolio nyata, video Reels, konten TikTok, dan sistem desain yang telah diproduksi oleh kreator top terverifikasi Creatorin.')}
           </p>
         </div>
 
@@ -804,7 +822,7 @@ export const ExploreProjectsPage: React.FC<ExploreProjectsPageProps> = ({
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
             
             <h2 className="font-display font-bold text-base sm:text-lg text-[#0D0C22]">
-              Cari Proyek berdasarkan Kategori
+              {t('explore.projectsHeading', 'Cari Proyek berdasarkan Kategori')}
             </h2>
 
             {/* Filter Buttons Group */}
@@ -826,7 +844,7 @@ export const ExploreProjectsPage: React.FC<ExploreProjectsPageProps> = ({
                     ? 'border-[#0d0c22] bg-[#0d0c22] text-white shadow-2xs'
                     : 'border-neutral-200 bg-white hover:bg-neutral-50 text-neutral-600'
                 }`}
-                title="Reset Semua Filter"
+                title={t('filter.reset', 'Reset Semua Filter')}
               >
                 <SlidersHorizontal className="w-4 h-4" />
               </button>
@@ -1028,9 +1046,9 @@ export const ExploreProjectsPage: React.FC<ExploreProjectsPageProps> = ({
             <div className="w-16 h-16 rounded-full bg-neutral-100 flex items-center justify-center mx-auto mb-4 text-neutral-400">
               <Search className="w-8 h-8" />
             </div>
-            <h3 className="text-lg font-bold text-[#0d0c22]">Tidak Ada Konten Ditemukan</h3>
+            <h3 className="text-lg font-bold text-[#0d0c22]">{t('empty.projectsTitle', 'Tidak Ada Konten Ditemukan')}</h3>
             <p className="text-sm text-neutral-500 max-w-md mx-auto mt-1 mb-6">
-              Coba sesuaikan kata kunci pencarian atau ubah filter platform dan kategori untuk menemukan karya lainnya.
+              {t('empty.projectsDesc', 'Coba sesuaikan kata kunci pencarian atau ubah filter platform dan kategori untuk menemukan karya lainnya.')}
             </p>
             <button
               onClick={() => {
@@ -1043,7 +1061,7 @@ export const ExploreProjectsPage: React.FC<ExploreProjectsPageProps> = ({
               }}
               className="h-11 px-6 rounded-xl bg-[#0B1F3A] text-white text-sm font-semibold hover:bg-[#123B8C] transition cursor-pointer"
             >
-              Reset Semua Filter
+              {t('filter.reset', 'Reset Semua Filter')}
             </button>
           </div>
         ) : (

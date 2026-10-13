@@ -107,6 +107,24 @@ const ACCOUNTS = [
 
   // Additional High-Quality Creators
   {
+    email: 'qaesyaar.aqeel@creatorin.my.id',
+    fullName: 'Qaesyaar Aqeel',
+    role: 'creator',
+    avatarUrl: '/creatorin/avatar.png',
+    location: 'Bandung, Jawa Barat',
+    phone: '08129990001',
+    creatorProfile: {
+      slug: 'qaesyaar-aqeel',
+      headline: 'Brand Identity & Visual Designer',
+      bio: 'Membantu UMKM dan brand membangun identitas visual profesional, packaging, serta feed media sosial berkonversi tinggi.',
+      careerScore: 95,
+      rating: 5.0,
+      startingPrice: 'Rp 200.000',
+      skills: ['Brand Identity', 'Product Photography', 'Packaging', 'Social Media Feed', 'UI Mockups', 'Motion Graphics', 'Banner Promo'],
+      isPro: true
+    }
+  },
+  {
     email: 'sarah.amelia@creatorin.my.id',
     fullName: 'Sarah Amelia',
     role: 'creator',
@@ -254,6 +272,36 @@ const ACCOUNTS = [
 // 2. DATA LAYANAN (SERVICES) BERKUALITAS DENGAN STOCK FOTO UNSPLASH
 // ==============================================================================
 const SERVICES_DATA = [
+  {
+    creatorSlug: 'qaesyaar-aqeel',
+    title: 'Desain Identitas Brand & Logo UMKM',
+    category: 'Logo',
+    description: 'Konsep desain identitas visual lengkap dari logo primer, alternatif vertikal/horizontal, palet warna berkarakter, hingga guideline tipografi.',
+    price: 'Rp100.000',
+    priceNumeric: 100000,
+    estimatedDays: '3 Hari Kerja',
+    imageUrl: 'https://images.unsplash.com/photo-1626785774573-4b799315345d?w=800&auto=format&fit=crop&q=80'
+  },
+  {
+    creatorSlug: 'qaesyaar-aqeel',
+    title: 'Desain Feed Instagram Aesthetic (9 Grid)',
+    category: 'Feed Instagram',
+    description: 'Desain puzzle/grid Instagram 9 kotak dengan visual konsisten, template promosi, quote inspiratif, dan etalase produk siap posting.',
+    price: 'Rp50.000',
+    priceNumeric: 50000,
+    estimatedDays: '2 Hari Kerja',
+    imageUrl: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=800&auto=format&fit=crop&q=80'
+  },
+  {
+    creatorSlug: 'qaesyaar-aqeel',
+    title: 'Packaging & Label Design Siap Cetak',
+    category: 'Logo',
+    description: 'Desain kemasan box, pouch, atau stiker label botol dengan dieline presisi sesuai standar percetakan dan estetika modern.',
+    price: 'Rp70.000',
+    priceNumeric: 70000,
+    estimatedDays: '3 Hari Kerja',
+    imageUrl: 'https://images.unsplash.com/photo-1559056199-641a0ac8b55e?w=800&auto=format&fit=crop&q=80'
+  },
   {
     creatorSlug: 'creator-pro',
     title: 'Video Animasi Produk & Motion Reel 15 Detik',

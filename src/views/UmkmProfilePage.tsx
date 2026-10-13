@@ -244,8 +244,9 @@ export const UmkmProfilePage: React.FC<UmkmProfilePageProps> = ({
   };
 
   const handleCopyLink = () => {
+    const canonicalUrl = `${window.location.origin}/umkm/${initialProfile.id}`;
     if (navigator.clipboard) {
-      navigator.clipboard.writeText(window.location.href);
+      navigator.clipboard.writeText(canonicalUrl);
     }
     showToast('Tautan profil UMKM berhasil disalin ke clipboard!');
   };

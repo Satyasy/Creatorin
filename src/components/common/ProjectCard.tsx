@@ -3,6 +3,9 @@
 import React from 'react';
 import { Play, Layers, Bookmark } from 'lucide-react';
 import { FeedProject } from '@/types';
+import { useAuth } from '@/providers/AuthProvider';
+import { useAuthModal } from '@/providers/AuthModalProvider';
+import { useLanguage } from '@/providers/LanguageProvider';
 
 export interface ProjectCardProps {
   project: FeedProject;
@@ -23,6 +26,10 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({
   className = '',
   id,
 }) => {
+  const { user } = useAuth();
+  const { openAuthModal } = useAuthModal();
+  const { t } = useLanguage();
+
   const displayMedia =
     project.mediaType === 'carousel' && project.additionalMedia && project.additionalMedia.length > 0
       ? project.additionalMedia[activeMediaIndex] || project.mediaUrl || project.coverImage
@@ -85,6 +92,16 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({
             type="button"
             onClick={(e) => {
               e.stopPropagation();
+              if (!user) {
+                openAuthModal({
+                  title: t('auth.loginRequired', 'Masuk ke Akun Creatorin'),
+                  description: t(
+                    'auth.bookmarkRequired',
+                    'Silakan masuk ke akun Creatorin Anda terlebih dahulu untuk menyimpan ke koleksi favorit.'
+                  ),
+                });
+                return;
+              }
               onToggleSave(project.id, e);
             }}
             className={`w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center backdrop-blur-md transition-all duration-200 cursor-pointer ${
@@ -92,8 +109,8 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({
                 ? 'bg-amber-500 text-white shadow-md'
                 : 'bg-black/50 hover:bg-black/80 text-white border border-white/15'
             }`}
-            title={isSaved ? 'Hapus Simpan' : 'Simpan Proyek'}
-            aria-label={isSaved ? 'Hapus simpan proyek' : 'Simpan proyek ke koleksi'}
+            title={isSaved ? t('card.removeSave', 'Hapus Simpan') : t('card.saveProject', 'Simpan Proyek')}
+            aria-label={isSaved ? t('card.removeSave', 'Hapus simpan proyek') : t('card.saveProject', 'Simpan proyek ke koleksi')}
           >
             <Bookmark className={`w-3.5 h-3.5 ${isSaved ? 'fill-white' : ''}`} />
           </button>
