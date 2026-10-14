@@ -82,8 +82,6 @@ export interface Creator {
     source: string;
   };
   heroHeadline?: string;
-  followersCount?: number;
-  followingCount?: number;
   likesCount?: number;
   bannerQuote?: string;
   copyrightName?: string;

@@ -20,7 +20,6 @@ export function toCreator(c: any): Creator {
     joinedDate: c.createdAt ? new Date(c.createdAt).getFullYear().toString() : '',
     verified: false, proBadge: Boolean(c.isPro), isPromoted: Boolean(c.isPromoted),
     responseTime: c.responseTime || '', handle: `@${c.slug || c.id}`,
-    followersCount: Number(c.followersCount || 0),
     schoolName: c.schoolName || undefined,
     schoolStatus: c.schoolStatus || null,
     schoolBadge: c.schoolBadge || (c.schoolName && c.schoolStatus === 'approved' ? { schoolName: c.schoolName, verified: true } : null),
@@ -91,15 +90,5 @@ export const creatorService = {
     if (!response.ok) throw new Error('Gagal memuat karya.');
     const data = await response.json();
     return (data.projects || []).map((project: any) => toFeedProject(project));
-  },
-  async toggleFollow(creatorId: string, follow: boolean): Promise<{ success: boolean; isFollowing: boolean; followersCount: number }> {
-    const response = await fetch(`/api/creators/${encodeURIComponent(creatorId)}/follow`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ follow }),
-    });
-    const data = await response.json();
-    if (!response.ok) throw new Error(data.error || 'Gagal memperbarui status follow.');
-    return data;
   },
 };

@@ -43,7 +43,6 @@ export async function getCreatorServerData(idOrSlug: string): Promise<CreatorSer
         completedProjectsCount: creatorProfiles.completedProjectsCount,
         rating: creatorProfiles.rating,
         reviewsCount: creatorProfiles.reviewsCount,
-        followersCount: creatorProfiles.followersCount,
         schoolName: creatorProfiles.schoolName,
         schoolStatus: creatorProfiles.schoolStatus,
         startingPrice: creatorProfiles.startingPrice,

@@ -37,7 +37,6 @@ import {
   Mail,
   Laptop,
   User,
-  Heart,
   Eye,
   Camera,
   Upload,
@@ -111,9 +110,6 @@ export const UmkmProfilePage: React.FC<UmkmProfilePageProps> = ({
   const [profile, setProfile] = useState<UMKMProfile>(initialProfile);
   const [activeTab, setActiveTab] = useState<TabKey>('briefs');
   
-  // Follow / Save Brand State
-  const [isFollowing, setIsFollowing] = useState(false);
-  const [followersCount, setFollowersCount] = useState(0);
   const [prevProfileId, setPrevProfileId] = useState(initialProfile.id);
   if (initialProfile.id !== prevProfileId) {
     setPrevProfileId(initialProfile.id);
@@ -286,25 +282,6 @@ export const UmkmProfilePage: React.FC<UmkmProfilePageProps> = ({
     }
   };
 
-  const toggleFollow = () => {
-    if (!currentUser) {
-      setAuthModalConfig({
-        title: 'Masuk untuk ikuti brand',
-        description: `Masuk ke akun Anda untuk mengikuti ${profile.brandName}.`,
-      });
-      setIsAuthModalOpen(true);
-      return;
-    }
-    if (isFollowing) {
-      setIsFollowing(false);
-      setFollowersCount(prev => Math.max(0, prev - 1));
-      showToast(`Batal mengikuti ${profile.brandName}`);
-    } else {
-      setIsFollowing(true);
-      setFollowersCount(prev => prev + 1);
-      showToast(`Berhasil mengikuti ${profile.brandName}! Anda akan menerima notifikasi brief baru.`);
-    }
-  };
 
   const toggleSaveCollab = (id: string, e: React.MouseEvent) => {
     e.stopPropagation();

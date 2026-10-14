@@ -33,7 +33,6 @@ export async function GET(
         completedProjectsCount: creatorProfiles.completedProjectsCount,
         rating: creatorProfiles.rating,
         reviewsCount: creatorProfiles.reviewsCount,
-        followersCount: creatorProfiles.followersCount,
         schoolName: creatorProfiles.schoolName,
         schoolStatus: creatorProfiles.schoolStatus,
         startingPrice: creatorProfiles.startingPrice,

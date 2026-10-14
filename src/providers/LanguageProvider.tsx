@@ -87,8 +87,6 @@ const DICTIONARY: Record<Language, Translations> = {
     'empty.servicesDesc': 'Coba atur filter harga atau pilih kategori keahlian lainnya.',
 
     // Actions & Buttons
-    'action.follow': 'Follow',
-    'action.following': 'Following',
     'action.sendMessage': 'Kirim Pesan',
     'action.shareProfile': 'Bagikan Profil',
     'action.editProfile': 'Edit Profil',
@@ -108,7 +106,6 @@ const DICTIONARY: Record<Language, Translations> = {
     // Auth Modal
     'auth.loginRequired': 'Masuk ke akun',
     'auth.bookmarkRequired': 'Masuk ke akun Anda untuk menyimpan item ini.',
-    'auth.followRequired': 'Masuk ke akun Anda untuk mengikuti kreator ini.',
     'auth.emailLabel': 'Email',
     'auth.passwordLabel': 'Kata sandi',
     'auth.submitButton': 'Masuk',
@@ -128,7 +125,6 @@ const DICTIONARY: Record<Language, Translations> = {
 
     // Toasts & Alerts
     'toast.authRequired': 'Perlu Masuk Akun',
-    'toast.followAuth': 'Anda harus masuk ke akun Creatorin terlebih dahulu untuk mengikuti kreator ini.',
     'toast.saveServiceAuth': 'Anda harus masuk ke akun Creatorin terlebih dahulu untuk menyimpan layanan favorit.',
     'toast.orderServiceAuth': 'Silakan masuk ke akun Creatorin terlebih dahulu untuk memesan paket layanan ini.',
     'toast.chatAuth': 'Anda harus masuk akun terlebih dahulu untuk menghubungi kreator ini.',
@@ -149,7 +145,6 @@ const DICTIONARY: Record<Language, Translations> = {
     'profile.careerScore': 'Career Score',
     'profile.clientRating': 'Rating Klien',
     'profile.completedProjects': 'Proyek Selesai',
-    'profile.followers': 'Pengikut',
     'profile.responseTime': 'Waktu Respon',
     'profile.coreSkills': 'Keahlian Utama',
     'profile.softwareTools': 'Software & Tools',
@@ -474,8 +469,6 @@ const DICTIONARY: Record<Language, Translations> = {
     'empty.servicesDesc': 'Try adjusting price filters or selecting other skill categories.',
 
     // Actions & Buttons
-    'action.follow': 'Follow',
-    'action.following': 'Following',
     'action.sendMessage': 'Send Message',
     'action.shareProfile': 'Share Profile',
     'action.editProfile': 'Edit Profile',
@@ -495,7 +488,6 @@ const DICTIONARY: Record<Language, Translations> = {
     // Auth Modal
     'auth.loginRequired': 'Sign in',
     'auth.bookmarkRequired': 'Sign in to save this item to your favorites.',
-    'auth.followRequired': 'Sign in to follow this creator.',
     'auth.emailLabel': 'Email',
     'auth.passwordLabel': 'Password',
     'auth.submitButton': 'Sign in',
@@ -515,7 +507,6 @@ const DICTIONARY: Record<Language, Translations> = {
 
     // Toasts & Alerts
     'toast.authRequired': 'Sign In Required',
-    'toast.followAuth': 'You must sign in to Creatorin to follow this creator.',
     'toast.saveServiceAuth': 'You must sign in to Creatorin to bookmark favorite services.',
     'toast.orderServiceAuth': 'Please sign in to Creatorin to order or discuss this service.',
     'toast.chatAuth': 'You must sign in first to contact this creator.',
@@ -536,7 +527,6 @@ const DICTIONARY: Record<Language, Translations> = {
     'profile.careerScore': 'Career Score',
     'profile.clientRating': 'Client Rating',
     'profile.completedProjects': 'Completed Projects',
-    'profile.followers': 'Followers',
     'profile.responseTime': 'Response Time',
     'profile.coreSkills': 'Core Skills',
     'profile.softwareTools': 'Software & Tools',
