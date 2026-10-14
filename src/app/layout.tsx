@@ -1,11 +1,13 @@
 import type { Metadata, Viewport } from "next";
 import "../index.css";
 import { Suspense } from "react";
+import { GoogleAnalytics } from "@next/third-parties/google";
 import { AuthProvider } from "@/providers/AuthProvider";
 import { LanguageProvider } from "@/providers/LanguageProvider";
 import { AuthModalProvider } from "@/providers/AuthModalProvider";
 import { ToastProvider } from "@/providers/ToastProvider";
 import { RouteProgressBar } from "@/components/common/RouteProgressBar";
+import { GA_TRACKING_ID, IS_GA_ENABLED } from "@/lib/analytics";
 
 export const viewport: Viewport = {
   themeColor: "#155DFC",
@@ -137,6 +139,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
           </LanguageProvider>
         </AuthProvider>
       </body>
+      {IS_GA_ENABLED && GA_TRACKING_ID && <GoogleAnalytics gaId={GA_TRACKING_ID} />}
     </html>
   );
 }
