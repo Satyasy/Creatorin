@@ -6,6 +6,7 @@ import { FeedProject } from '@/types';
 import { useAuth } from '@/providers/AuthProvider';
 import { useAuthModal } from '@/providers/AuthModalProvider';
 import { useLanguage } from '@/providers/LanguageProvider';
+import { useToast } from '@/providers/ToastProvider';
 
 export interface ProjectCardProps {
   project: FeedProject;
@@ -28,6 +29,7 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({
 }) => {
   const { user } = useAuth();
   const { openAuthModal } = useAuthModal();
+  const { showToast } = useToast();
   const { t } = useLanguage();
 
   const displayMedia =
@@ -93,16 +95,23 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({
             onClick={(e) => {
               e.stopPropagation();
               if (!user) {
-                openAuthModal({
-                  title: t('auth.loginRequired', 'Masuk ke Akun Creatorin'),
-                  description: t(
+                showToast({
+                  type: 'warning',
+                  title: t('toast.authRequired', 'Perlu Masuk Akun'),
+                  message: t(
                     'auth.bookmarkRequired',
                     'Silakan masuk ke akun Creatorin Anda terlebih dahulu untuk menyimpan ke koleksi favorit.'
                   ),
+                  action: {
+                    label: t('action.signIn', 'Masuk ke Akun'),
+                    onClick: () => {
+                      if (typeof window !== 'undefined') window.location.href = '/sign-in';
+                    },
+                  },
                 });
                 return;
               }
-              onToggleSave(project.id, e);
+              onToggleSave?.(project.id, e);
             }}
             className={`w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center backdrop-blur-md transition-all duration-200 cursor-pointer ${
               isSaved

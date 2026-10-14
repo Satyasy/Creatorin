@@ -163,9 +163,14 @@ export const ExploreServicesPage: React.FC<ExploreServicesPageProps> = ({
 
   const toggleSaveService = (serviceId: string) => {
     if (!currentUser) {
-      openAuthModal({
-        title: t('auth.loginRequired', 'Masuk ke Akun Creatorin'),
-        description: t('toast.saveServiceAuth', 'Anda harus masuk ke akun Creatorin terlebih dahulu untuk menyimpan layanan favorit.'),
+      showToast({
+        type: 'warning',
+        title: t('toast.authRequired', 'Perlu Masuk Akun'),
+        message: t('toast.saveServiceAuth', 'Anda harus masuk ke akun Creatorin terlebih dahulu untuk menyimpan layanan favorit.'),
+        action: {
+          label: t('action.signIn', 'Masuk ke Akun'),
+          onClick: () => router.push('/sign-in'),
+        },
       });
       return;
     }

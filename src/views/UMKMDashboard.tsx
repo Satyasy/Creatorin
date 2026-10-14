@@ -21,6 +21,7 @@ import {
 import { creatorService } from '@/services/creatorService';
 import { useAuth } from '@/providers/AuthProvider';
 import { useLanguage } from '@/providers/LanguageProvider';
+import { useToast } from '@/providers/ToastProvider';
 import { FeedProject, CreatorService, Creator, AuthState } from '@/types';
 import { HomeHeroSection } from '@/components/home/HomeHeroSection';
 import { ProjectCard } from '@/components/common/ProjectCard';
@@ -658,6 +659,7 @@ const INITIAL_SHOWCASE_CREATORS: ShowcaseCreator[] = [
 export const UMKMDashboard = () => {
   const router = useRouter();
   const { user } = useAuth();
+  const { showToast } = useToast();
   const { t, language } = useLanguage();
   const [activeTab, setActiveTab] = useState<'creator' | 'layanan' | 'proyek'>('creator');
   const [searchQuery, setSearchQuery] = useState('');
@@ -788,17 +790,15 @@ export const UMKMDashboard = () => {
 
   const toggleBookmark = (creatorId: string) => {
     if (!user) {
-      setAuthModalConfig({
-        title: 'Masuk ke Akun Creatorin',
-        description: 'Silakan masuk ke akun Creatorin Anda terlebih dahulu untuk menyimpan ke koleksi favorit.',
-        action: () => {
-          setSavedCreators((prev) => ({
-            ...prev,
-            [creatorId]: !prev[creatorId],
-          }));
+      showToast({
+        type: 'warning',
+        title: t('toast.authRequired', 'Perlu Masuk Akun'),
+        message: t('auth.bookmarkRequired', 'Silakan masuk ke akun Creatorin Anda terlebih dahulu untuk menyimpan ke koleksi favorit.'),
+        action: {
+          label: t('action.signIn', 'Masuk ke Akun'),
+          onClick: () => router.push('/sign-in'),
         },
       });
-      setIsAuthModalOpen(true);
       return;
     }
     setSavedCreators((prev) => ({
@@ -809,17 +809,15 @@ export const UMKMDashboard = () => {
 
   const toggleBookmarkService = (serviceId: string) => {
     if (!user) {
-      setAuthModalConfig({
-        title: 'Masuk ke Akun Creatorin',
-        description: 'Silakan masuk ke akun Creatorin Anda terlebih dahulu untuk menyimpan ke koleksi favorit.',
-        action: () => {
-          setSavedServices((prev) => ({
-            ...prev,
-            [serviceId]: !prev[serviceId],
-          }));
+      showToast({
+        type: 'warning',
+        title: t('toast.authRequired', 'Perlu Masuk Akun'),
+        message: t('toast.saveServiceAuth', 'Anda harus masuk ke akun Creatorin terlebih dahulu untuk menyimpan layanan favorit.'),
+        action: {
+          label: t('action.signIn', 'Masuk ke Akun'),
+          onClick: () => router.push('/sign-in'),
         },
       });
-      setIsAuthModalOpen(true);
       return;
     }
     setSavedServices((prev) => ({
@@ -831,17 +829,15 @@ export const UMKMDashboard = () => {
   const toggleBookmarkProject = (projectId: string, e?: React.MouseEvent) => {
     if (e) e.stopPropagation();
     if (!user) {
-      setAuthModalConfig({
-        title: 'Masuk ke Akun Creatorin',
-        description: 'Silakan masuk ke akun Creatorin Anda terlebih dahulu untuk menyimpan ke koleksi favorit.',
-        action: () => {
-          setSavedProjects((prev) => ({
-            ...prev,
-            [projectId]: !prev[projectId],
-          }));
+      showToast({
+        type: 'warning',
+        title: t('toast.authRequired', 'Perlu Masuk Akun'),
+        message: t('auth.bookmarkRequired', 'Silakan masuk ke akun Creatorin Anda terlebih dahulu untuk menyimpan ke koleksi favorit.'),
+        action: {
+          label: t('action.signIn', 'Masuk ke Akun'),
+          onClick: () => router.push('/sign-in'),
         },
       });
-      setIsAuthModalOpen(true);
       return;
     }
     setSavedProjects((prev) => ({

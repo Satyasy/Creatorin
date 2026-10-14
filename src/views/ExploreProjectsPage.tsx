@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from '@/providers/AuthProvider';
 import { useAuthModal } from '@/providers/AuthModalProvider';
 import { useLanguage } from '@/providers/LanguageProvider';
+import { useToast } from '@/providers/ToastProvider';
 import { 
   Search, 
   Play,
@@ -589,6 +590,7 @@ export const ExploreProjectsPage: React.FC<ExploreProjectsPageProps> = ({
   const router = useRouter();
   const { user: authUser } = useAuth();
   const { openAuthModal } = useAuthModal();
+  const { showToast: showGlobalToast } = useToast();
   const { t, language } = useLanguage();
   const currentUser = propUser !== undefined ? propUser : authUser;
 
@@ -775,9 +777,14 @@ export const ExploreProjectsPage: React.FC<ExploreProjectsPageProps> = ({
   const handleToggleSave = (projId: string, e?: React.MouseEvent) => {
     if (e) e.stopPropagation();
     if (!currentUser) {
-      openAuthModal({
-        title: t('auth.loginRequired', 'Masuk ke Akun Creatorin'),
-        description: t('auth.bookmarkRequired', 'Silakan masuk ke akun Creatorin Anda terlebih dahulu untuk menyimpan ke koleksi favorit.'),
+      showGlobalToast({
+        type: 'warning',
+        title: t('toast.authRequired', 'Perlu Masuk Akun'),
+        message: t('auth.bookmarkRequired', 'Silakan masuk ke akun Creatorin Anda terlebih dahulu untuk menyimpan ke koleksi favorit.'),
+        action: {
+          label: t('action.signIn', 'Masuk ke Akun'),
+          onClick: () => router.push('/sign-in'),
+        },
       });
       return;
     }
@@ -792,9 +799,14 @@ export const ExploreProjectsPage: React.FC<ExploreProjectsPageProps> = ({
   const handleToggleFollow = (creatorId: string, e?: React.MouseEvent) => {
     if (e) e.stopPropagation();
     if (!currentUser) {
-      openAuthModal({
-        title: t('auth.loginRequired', 'Masuk ke Akun Creatorin'),
-        description: t('toast.followAuth', 'Anda harus masuk ke akun Creatorin terlebih dahulu untuk mengikuti kreator ini.'),
+      showGlobalToast({
+        type: 'warning',
+        title: t('toast.authRequired', 'Perlu Masuk Akun'),
+        message: t('toast.followAuth', 'Anda harus masuk ke akun Creatorin terlebih dahulu untuk mengikuti kreator ini.'),
+        action: {
+          label: t('action.signIn', 'Masuk ke Akun'),
+          onClick: () => router.push('/sign-in'),
+        },
       });
       return;
     }

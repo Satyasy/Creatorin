@@ -25,6 +25,7 @@ import { DEFAULT_CREATORS } from '@/data/defaultCreators';
 import type { Creator, CreatorService, ActivePage, AuthState } from '@/types';
 import { useAuth } from '@/providers/AuthProvider';
 import { useLanguage } from '@/providers/LanguageProvider';
+import { useToast } from '@/providers/ToastProvider';
 
 interface JelajahKreatorPageProps {
   currentUser?: AuthState['user'];
@@ -67,6 +68,7 @@ export const JelajahKreatorPage: React.FC<JelajahKreatorPageProps> = ({
 }) => {
   const router = useRouter();
   const { user: authUser } = useAuth();
+  const { showToast } = useToast();
   const { t, language } = useLanguage();
   const currentUser = propUser !== undefined ? propUser : authUser;
 
@@ -212,12 +214,15 @@ export const JelajahKreatorPage: React.FC<JelajahKreatorPageProps> = ({
   const toggleSave = (creatorId: string, e: React.MouseEvent) => {
     e.stopPropagation();
     if (!currentUser) {
-      setAuthModalConfig({
-        title: t('auth.loginRequired', 'Masuk ke Akun Creatorin'),
-        description: t('auth.bookmarkRequired', 'Silakan masuk ke akun Creatorin Anda terlebih dahulu untuk menyimpan ke koleksi favorit.'),
-        action: () => toggleBookmark(creatorId),
+      showToast({
+        type: 'warning',
+        title: t('toast.authRequired', 'Perlu Masuk Akun'),
+        message: t('auth.bookmarkRequired', 'Silakan masuk ke akun Creatorin Anda terlebih dahulu untuk menyimpan ke koleksi favorit.'),
+        action: {
+          label: t('action.signIn', 'Masuk ke Akun'),
+          onClick: () => router.push('/sign-in'),
+        },
       });
-      setIsAuthModalOpen(true);
       return;
     }
     toggleBookmark(creatorId);
