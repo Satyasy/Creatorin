@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from '@/providers/AuthProvider';
 import { useAuthModal } from '@/providers/AuthModalProvider';
 import { useLanguage } from '@/providers/LanguageProvider';
+import { useToast } from '@/providers/ToastProvider';
 import { creatorService } from '@/services/creatorService';
 import { Creator, CreatorCategory, CreatorService, AuthState, ActivePage } from '@/types';
 import { ProfileModal } from '@/components/modals/ProfileModal';
@@ -58,6 +59,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ currentUser: propUser,
   const router = useRouter();
   const { user: authUser } = useAuth();
   const { openAuthModal } = useAuthModal();
+  const { showToast } = useToast();
   const { t, language } = useLanguage();
   const currentUser = propUser !== undefined ? propUser : authUser;
 
@@ -112,13 +114,18 @@ export const LandingPage: React.FC<LandingPageProps> = ({ currentUser: propUser,
     creator: Creator;
   } | null>(null);
 
-  // Toggle Save Creator (Guarded with Auth Modal)
+  // Toggle Save Creator (Guarded with Toast Notification)
   const toggleSave = (id: string, e: React.MouseEvent) => {
     e.stopPropagation();
     if (!currentUser) {
-      openAuthModal({
-        title: t('auth.loginRequired', 'Masuk ke Akun Creatorin'),
-        description: t('auth.bookmarkRequired', 'Silakan masuk ke akun Creatorin Anda terlebih dahulu untuk menyimpan ke koleksi favorit.'),
+      showToast({
+        type: 'warning',
+        title: t('toast.authRequired', 'Perlu Masuk Akun'),
+        message: t('auth.bookmarkRequired', 'Silakan masuk ke akun Creatorin Anda terlebih dahulu untuk menyimpan ke koleksi favorit.'),
+        action: {
+          label: t('action.signIn', 'Masuk ke Akun'),
+          onClick: () => router.push('/sign-in'),
+        },
       });
       return;
     }
