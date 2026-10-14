@@ -21,6 +21,9 @@ export function toCreator(c: any): Creator {
     verified: false, proBadge: Boolean(c.isPro), isPromoted: Boolean(c.isPromoted),
     responseTime: c.responseTime || '', handle: `@${c.slug || c.id}`,
     followersCount: Number(c.followersCount || 0),
+    schoolName: c.schoolName || undefined,
+    schoolStatus: c.schoolStatus || null,
+    schoolBadge: c.schoolBadge || (c.schoolName && c.schoolStatus === 'approved' ? { schoolName: c.schoolName, verified: true } : null),
   };
 }
 

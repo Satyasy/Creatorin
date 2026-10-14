@@ -35,6 +35,7 @@ export async function GET(
         reviewsCount: creatorProfiles.reviewsCount,
         followersCount: creatorProfiles.followersCount,
         schoolName: creatorProfiles.schoolName,
+        schoolStatus: creatorProfiles.schoolStatus,
         startingPrice: creatorProfiles.startingPrice,
         skills: creatorProfiles.skills,
         languages: creatorProfiles.languages,
@@ -90,11 +91,18 @@ export async function GET(
         .where(and(eq(collaborationRooms.creatorId, creator.id), eq(collaborationRooms.status, "completed"))),
     ]);
 
+    const reviewList = creatorReviews || [];
+    const avgRating = reviewList.length > 0
+      ? (reviewList.reduce((acc, r) => acc + Number(r.rating || 0), 0) / reviewList.length).toFixed(1)
+      : (creator.rating ? Number(creator.rating).toFixed(1) : '0.0');
+
     return NextResponse.json({
       creator: {
         ...creator,
+        rating: Number(avgRating),
+        reviewsCount: reviewList.length > 0 ? reviewList.length : creator.reviewsCount,
         completedProjectsCount: Math.max(creator.completedProjectsCount, completedRooms.length),
-        schoolBadge: creator.schoolName
+        schoolBadge: (creator.schoolName && creator.schoolStatus === 'approved')
           ? {
               schoolName: creator.schoolName,
               verified: true,

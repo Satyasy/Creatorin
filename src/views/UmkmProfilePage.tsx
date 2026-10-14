@@ -684,20 +684,6 @@ export const UmkmProfilePage: React.FC<UmkmProfilePageProps> = ({
               </button>
             ) : (
               <>
-                {/* Ikuti Brand Button */}
-                <button
-                  id="btn-follow-brand"
-                  onClick={toggleFollow}
-                  className={`px-4 sm:px-5 py-2 sm:py-2.5 rounded-xl border text-xs sm:text-sm font-semibold transition cursor-pointer flex items-center gap-1.5 ${
-                    isFollowing
-                      ? 'border-neutral-300 bg-white hover:bg-neutral-50 text-neutral-800'
-                      : 'border-[#0B1F3A] bg-[#0B1F3A] hover:bg-[#123B8C] text-white'
-                  }`}
-                >
-                  <Heart className={`w-3.5 h-3.5 ${isFollowing ? 'fill-red-500 text-red-500' : ''}`} />
-                  <span>{isFollowing ? 'Mengikuti' : 'Ikuti Brand'}</span>
-                </button>
-
                 {/* Hubungi Brand Button */}
                 <button
                   id="btn-contact-brand"
@@ -769,7 +755,7 @@ export const UmkmProfilePage: React.FC<UmkmProfilePageProps> = ({
             )}
           </div>
 
-          {/* Inline Stats Row (Exact Match to Creator Profile Style in Reference Image) */}
+          {/* Inline Stats Row (100% Dinamis dari Database) */}
           <div className="flex flex-wrap items-center gap-x-5 gap-y-1.5 text-xs sm:text-sm text-neutral-500 mt-2.5 font-medium">
             <span>
               <strong className="text-[#171717] font-bold">
@@ -778,10 +764,16 @@ export const UmkmProfilePage: React.FC<UmkmProfilePageProps> = ({
               Proyek Selesai
             </span>
             <span>
-              <strong className="text-[#171717] font-bold">
-                {profile.stats.ratingFromCreators.toFixed(1)} ★
-              </strong>{' '}
-              ({profile.stats.reviewCount} Ulasan)
+              {profile.stats.reviewCount > 0 ? (
+                <>
+                  <strong className="text-[#171717] font-bold">
+                    {profile.stats.ratingFromCreators.toFixed(1)} ★
+                  </strong>{' '}
+                  ({profile.stats.reviewCount} Ulasan)
+                </>
+              ) : (
+                <span className="text-neutral-500">Belum ada ulasan</span>
+              )}
             </span>
             <span>
               <strong className="text-[#171717] font-bold">
@@ -1352,16 +1344,19 @@ export const UmkmProfilePage: React.FC<UmkmProfilePageProps> = ({
               {/* Divider Line */}
               <hr className="border-neutral-200/80 my-8" />
 
-              {/* Follower / Community Stats Row */}
+              {/* Community & Collab Stats Row */}
               <div className="flex flex-wrap items-center gap-6 sm:gap-8 text-sm text-neutral-600 font-normal">
                 <span>
-                  <strong className="text-[#171717] font-semibold">{followersCount.toLocaleString()}</strong> pengikut brand
+                  <strong className="text-[#171717] font-semibold">{profile.stats.completedProjects}</strong> kolaborasi selesai
                 </span>
                 <span>
-                  <strong className="text-[#171717] font-semibold">{profile.stats.completedProjects}</strong> kolaborasi kreator
+                  <strong className="text-[#171717] font-semibold">{profile.stats.activeBriefs}</strong> brief aktif
                 </span>
                 <span>
-                  <strong className="text-[#171717] font-semibold">100%</strong> escrow aman
+                  <strong className="text-[#171717] font-semibold">
+                    {profile.stats.reviewCount > 0 ? `${profile.stats.ratingFromCreators.toFixed(1)} ★` : 'Belum Ada'}
+                  </strong>{' '}
+                  rating kreator
                 </span>
               </div>
 
@@ -1381,7 +1376,7 @@ export const UmkmProfilePage: React.FC<UmkmProfilePageProps> = ({
                   <div className="w-4 h-4 rounded bg-[#0d0c22] text-white flex items-center justify-center text-[8px] font-black shrink-0">
                     PRO
                   </div>
-                  <span>Verified UMKM Escrow</span>
+                  <span>UMKM Terverifikasi</span>
                 </div>
 
                 <div className="flex items-center gap-3">
