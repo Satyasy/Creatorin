@@ -71,8 +71,8 @@ npx drizzle-kit push || {
     echo "⚠️ Drizzle push warning/notice (skipping if no changes)."
 }
 
-echo "🌱 Seeding initial & master data..."
-npm run seed || {
+echo "🌱 Seeding initial & master data (npm run db:seed)..."
+npm run db:seed || {
     echo "⚠️ Database seeder warning/notice (skipping if failed)."
 }
 

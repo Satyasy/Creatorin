@@ -16,6 +16,7 @@
     "test:api": "tsx scripts/test-api.ts",
     "test:creator-dashboard": "node scripts/verify-creator-dashboard.mjs",
     "test:explore": "node scripts/verify-explore.mjs",
+    "db:seed": "node scripts/seed-database.mjs",
     "seed": "node scripts/seed-database.mjs",
     "audit:lighthouse": "node scripts/audit-lighthouse.mjs"
   },

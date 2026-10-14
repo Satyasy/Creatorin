@@ -5,9 +5,16 @@ import path from 'path';
 import fs from 'fs';
 
 // Muat konfigurasi environment
-const envFiles = ['.env.local', '.env.production', '.env'];
+const envFiles = [
+  '.env.local',
+  '.env.production',
+  '.env',
+  path.resolve('/var/www/creatorin/shared/.env.production'),
+  path.resolve(process.cwd(), '../shared/.env.production'),
+  path.resolve(process.cwd(), 'shared/.env.production')
+];
 for (const file of envFiles) {
-  const fullPath = path.resolve(process.cwd(), file);
+  const fullPath = path.isAbsolute(file) ? file : path.resolve(process.cwd(), file);
   if (fs.existsSync(fullPath)) {
     dotenv.config({ path: fullPath });
     break;
@@ -1123,6 +1130,18 @@ const SCHOOL_ACHIEVEMENTS_DATA = [
 // ==============================================================================
 const REVIEWS_DATA = [
   {
+    creatorSlug: 'creator-pro',
+    businessEmail: 'umkm@creatorin.my.id',
+    reviewerName: 'Kopi Lereng Nusantara',
+    reviewerRole: 'Pemilik Brand UMKM F&B',
+    reviewerAvatar: 'https://images.unsplash.com/photo-1541167760496-1628856ab772?w=300&auto=format&fit=crop&q=80',
+    projectTitle: 'Video Komersial Peluncuran Kopi Arabika Specialty',
+    rating: 5.0,
+    amount: 1750000,
+    comment: 'Video promosi cinematik dengan motion graphic yang sangat memukau. Kualitas visualnya meningkatkan citra brand kopi kami secara signifikan!',
+    completedDate: '14 Okt 2026',
+  },
+  {
     creatorSlug: 'qaesyaar-aqeel',
     businessEmail: 'umkm@creatorin.my.id',
     reviewerName: 'Kopi Lereng Nusantara',
@@ -1632,25 +1651,87 @@ async function main() {
 
   // 4. Seed Project Briefs (Peluang Kerja dari UMKM)
   console.log('\n💼 Menyinkronkan Lowongan Brief UMKM...');
+  await sql`DELETE FROM brief_applications`;
   await sql`DELETE FROM project_briefs`;
+  const briefMap = new Map(); // title -> briefId
+
   for (const brf of BRIEFS_DATA) {
     const businessId = userMap.get(brf.businessEmail.toLowerCase());
     if (!businessId) continue;
 
+    const briefId = crypto.randomUUID();
     await sql`
       INSERT INTO project_briefs 
         (id, business_id, title, category, description, expected_output, budget, deadline, status, created_at)
       VALUES 
-        (${crypto.randomUUID()}, ${businessId}, ${brf.title}, ${brf.category}, ${brf.description}, ${brf.expectedOutput}, ${brf.budget}, ${brf.deadline}, ${brf.status}, NOW())
+        (${briefId}, ${businessId}, ${brf.title}, ${brf.category}, ${brf.description}, ${brf.expectedOutput}, ${brf.budget}, ${brf.deadline}, ${brf.status}, NOW())
     `;
+    briefMap.set(brf.title, briefId);
   }
   console.log(`✅ Berhasil menyisipkan ${BRIEFS_DATA.length} brief lowongan UMKM.`);
 
-  // 5. Seed Reviews, Invoices & Collaboration Rooms (Transaksi & Ulasan Selesai)
-  console.log('\n⭐ Menyinkronkan Kolaborasi & Ulasan Nyata (Reviews)...');
+  // 4b. Seed Brief Applications (Lamaran Kreator)
+  console.log('\n📝 Menyinkronkan Lamaran Kreatif (Brief Applications)...');
+  const APPLICATIONS_DATA = [
+    {
+      briefTitle: 'Desain Ulang Kemasan Standing Pouch Kopi Specialty 250gr',
+      creatorEmail: 'qaesyaar.aqeel@creatorin.my.id',
+      pitch: 'Halo tim Kopi Lereng! Saya memiliki pengalaman 4 tahun mendesain kemasan F&B siap cetak dengan dieline standar pabrik rotogravure. Saya siap buatkan 3 opsi konsep modern bernuansa heritage.',
+      proposedPrice: 'Rp 850.000',
+      status: 'accepted'
+    },
+    {
+      briefTitle: 'Desain Ulang Kemasan Standing Pouch Kopi Specialty 250gr',
+      creatorEmail: 'rahmat.hidayat@creatorin.my.id',
+      pitch: 'Saya siswa SMK DKV peraih medali emas LKS Packaging Design. Portofolio saya fokus pada kemasan kopi dan produk lokal dengan ilustrasi vektor presisi.',
+      proposedPrice: 'Rp 500.000',
+      status: 'pending'
+    },
+    {
+      briefTitle: 'Pembuatan 3 Video Edukasi TikTok Peternakan Sapi Perah',
+      creatorEmail: 'creator@creatorin.my.id',
+      pitch: 'Siap memproduksi 3 video vertikal 4K berorientasi viral hook dengan motion infographic yang menjelaskan nutrisi susu murni segar.',
+      proposedPrice: 'Rp 1.500.000',
+      status: 'accepted'
+    },
+    {
+      briefTitle: 'Kampanye Konten Video UGC Reels Serum Wajah Alami',
+      creatorEmail: 'sarah.amelia@creatorin.my.id',
+      pitch: 'Spesialis video UGC beauty & skincare dengan engagement tinggi. Kamera Sony A7IV + lighting studio siap menghasilkan visual aesthetic.',
+      proposedPrice: 'Rp 900.000',
+      status: 'pending'
+    },
+    {
+      briefTitle: 'Sesi Foto Katalog Studio Varian Sambal Kemasan Jar',
+      creatorEmail: 'budi.pratama@creatorin.my.id',
+      pitch: 'Studio foto komersial lengkap di Surabaya. Menyediakan garnish cabe segar, kayu jati, dan piring gerabah untuk nuansa otentik.',
+      proposedPrice: 'Rp 650.000',
+      status: 'pending'
+    }
+  ];
+
+  for (const app of APPLICATIONS_DATA) {
+    const briefId = briefMap.get(app.briefTitle);
+    const creatorId = userMap.get(app.creatorEmail.toLowerCase());
+    if (briefId && creatorId) {
+      await sql`
+        INSERT INTO brief_applications 
+          (id, brief_id, creator_id, pitch, proposed_price, status, created_at)
+        VALUES 
+          (${crypto.randomUUID()}, ${briefId}, ${creatorId}, ${app.pitch}, ${app.proposedPrice}, ${app.status}, NOW())
+      `;
+    }
+  }
+  console.log(`✅ Berhasil menyisipkan ${APPLICATIONS_DATA.length} lamaran brief aktif.`);
+
+  // 5. Seed Reviews, Invoices, Collaboration Rooms, Submissions & Revisions
+  console.log('\n⭐ Menyinkronkan Kolaborasi, Ruangan Kerja, Submisi & Ulasan (Reviews)...');
+  await sql`DELETE FROM revisions`;
+  await sql`DELETE FROM submissions`;
   await sql`DELETE FROM reviews`;
   await sql`DELETE FROM collaboration_rooms`;
   await sql`DELETE FROM invoices`;
+  await sql`DELETE FROM wallet_transactions`;
 
   for (const rev of REVIEWS_DATA) {
     const creatorId = creatorSlugMap.get(rev.creatorSlug);
@@ -1660,6 +1741,7 @@ async function main() {
     const invoiceId = crypto.randomUUID();
     const roomId = crypto.randomUUID();
     const reviewId = crypto.randomUUID();
+    const submissionId = crypto.randomUUID();
     const invoiceNum = `INV-${Date.now().toString().slice(-6)}-${Math.floor(100 + Math.random() * 900)}`;
 
     // 1. Invoice Lunas
@@ -1678,15 +1760,135 @@ async function main() {
         (${roomId}, ${invoiceId}, ${creatorId}, ${businessId}, ${rev.projectTitle}, ${rev.comment}, 'completed', NOW(), NOW())
     `;
 
-    // 3. Review Riil
+    // 3. Submisi Hasil Karya Selesai
+    await sql`
+      INSERT INTO submissions 
+        (id, room_id, version, notes, file_urls, status, submitted_at)
+      VALUES 
+        (${submissionId}, ${roomId}, 1, ${'Draf final siap rilis untuk: ' + rev.projectTitle}, ${['https://images.unsplash.com/photo-1541167760496-1628856ab772?w=1200&auto=format&fit=crop&q=80']}, 'approved', NOW())
+    `;
+
+    // 4. Review Riil
     await sql`
       INSERT INTO reviews 
         (id, creator_id, reviewer_id, room_id, reviewer_name, reviewer_role, reviewer_avatar, project_title, rating, comment, completed_date, created_at)
       VALUES 
         (${reviewId}, ${creatorId}, ${businessId}, ${roomId}, ${rev.reviewerName}, ${rev.reviewerRole}, ${rev.reviewerAvatar}, ${rev.projectTitle}, ${rev.rating}, ${rev.comment}, ${rev.completedDate}, NOW())
     `;
+
+    // 5. Transaksi Dompet (Kredit ke dompet kreator)
+    const [wal] = await sql`SELECT id FROM creator_wallets WHERE creator_id = ${creatorId} LIMIT 1`;
+    if (wal) {
+      await sql`
+        INSERT INTO wallet_transactions 
+          (id, wallet_id, type, amount, status, description, created_at)
+        VALUES 
+          (${crypto.randomUUID()}, ${wal.id}, 'project_payment', ${rev.amount || 750000}, 'completed', ${'Pembayaran selesai proyek: ' + rev.projectTitle}, NOW())
+      `;
+    }
   }
-  console.log(`✅ Berhasil menyisipkan ${REVIEWS_DATA.length} ulasan riil dan ruangan kolaborasi selesai.`);
+
+  // 5b. Tambahkan 1 Ruangan Kolaborasi Aktif (In Progress dengan Revisi Aktif)
+  const creatorProId = userMap.get('creator@creatorin.my.id');
+  const umkmId = userMap.get('umkm@creatorin.my.id');
+  if (creatorProId && umkmId) {
+    const activeInvId = crypto.randomUUID();
+    const activeRoomId = crypto.randomUUID();
+    const activeSubId = crypto.randomUUID();
+    const activeInvNum = `INV-ACTV-${Date.now().toString().slice(-5)}`;
+
+    await sql`
+      INSERT INTO invoices 
+        (id, invoice_number, creator_id, business_id, title, scope_description, total_amount, deadline_days, revision_rules, status, paid_at, created_at)
+      VALUES 
+        (${activeInvId}, ${activeInvNum}, ${creatorProId}, ${umkmId}, 'Kampanye Video Reels Menu Spesial Musim Hujan', 'Produksi 2 konten video reels vertikal 9:16 untuk peluncuran menu varian kopi rempah.', 1500000, 5, 'Maksimal 2 kali revisi minor.', 'paid', NOW(), NOW())
+    `;
+
+    await sql`
+      INSERT INTO collaboration_rooms 
+        (id, invoice_id, creator_id, business_id, title, brief_summary, status, deadline, created_at)
+      VALUES 
+        (${activeRoomId}, ${activeInvId}, ${creatorProId}, ${umkmId}, 'Kampanye Video Reels Menu Spesial Musim Hujan', 'Produksi 2 konten video reels vertikal 9:16 untuk peluncuran menu varian kopi rempah.', 'revision_requested', NOW() + INTERVAL '3 days', NOW())
+    `;
+
+    await sql`
+      INSERT INTO submissions 
+        (id, room_id, version, notes, file_urls, status, submitted_at)
+      VALUES 
+        (${activeSubId}, ${activeRoomId}, 1, 'Mohon dicek draf video reels varian Kopi Jahe Gula Aren (Hook awal & transisi produk).', ${['https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?w=1200&auto=format&fit=crop&q=80']}, 'revision_requested', NOW() - INTERVAL '1 day')
+    `;
+
+    await sql`
+      INSERT INTO revisions 
+        (id, room_id, submission_id, feedback, requested_at)
+      VALUES 
+        (${crypto.randomUUID()}, ${activeRoomId}, ${activeSubId}, 'Visual dan grading warnanya mantap mas! Hanya tolong perbesar teks promo diskon di 3 detik terakhir agar lebih eye-catching.', NOW())
+    `;
+
+    console.log(`✅ Berhasil menyisipkan 1 ruangan kolaborasi aktif (Status: revision_requested) untuk pengujian CRUD.`);
+  }
+
+  // 5c. Seed Percakapan & Pesan Chat Riil
+  console.log('\n💬 Menyinkronkan Percakapan & Pesan (Chat)...');
+  await sql`DELETE FROM messages`;
+  await sql`DELETE FROM conversations`;
+  if (creatorProId && umkmId) {
+    const convId = crypto.randomUUID();
+    await sql`
+      INSERT INTO conversations (id, participant_1_id, participant_2_id, last_message, last_message_time, updated_at)
+      VALUES (${convId}, ${umkmId}, ${creatorProId}, 'Siap mas, saya update revisi teks promo sore ini.', NOW(), NOW())
+    `;
+    const chatMsgs = [
+      { senderId: umkmId, content: 'Halo Creator Pro! Kami dari Kopi Lereng ingin buat konten video reels untuk varian menu kopi rempah terbaru.' },
+      { senderId: creatorProId, content: 'Halo Kopi Lereng Nusantara! Menarik sekali konsepnya. Untuk durasi target sekitar 30-45 detik dengan tempo energik atau warm-cinematic?' },
+      { senderId: umkmId, content: 'Lebih ke warm-cinematic mas, agar aroma dan suasana ngopi di lereng gunung terasa kental.' },
+      { senderId: creatorProId, content: 'Siap mas, saya update revisi teks promo sore ini.' },
+    ];
+    for (const msg of chatMsgs) {
+      await sql`
+        INSERT INTO messages (id, conversation_id, sender_id, content, is_read, metadata, created_at)
+        VALUES (${crypto.randomUUID()}, ${convId}, ${msg.senderId}, ${msg.content}, true, '{}', NOW())
+      `;
+    }
+    console.log(`✅ Berhasil menyisipkan thread percakapan dengan ${chatMsgs.length} pesan riil.`);
+  }
+
+  // 5d. Seed Notifikasi Riil
+  console.log('\n🔔 Menyinkronkan Notifikasi Riil Pengguna...');
+  await sql`DELETE FROM notifications`;
+  if (creatorProId) {
+    await sql`
+      INSERT INTO notifications (id, user_id, type, title, body, link_url, is_read, created_at)
+      VALUES 
+        (${crypto.randomUUID()}, ${creatorProId}, 'invoice', 'Pembayaran Diterima', 'Kopi Lereng Nusantara telah membayar invoice senilai Rp 1.500.000.', '/contracts', false, NOW()),
+        (${crypto.randomUUID()}, ${creatorProId}, 'revision', 'Permintaan Revisi', 'Klien memberikan masukan revisi pada draf video reels varian kopi rempah.', '/contracts', false, NOW())
+    `;
+  }
+  if (umkmId) {
+    await sql`
+      INSERT INTO notifications (id, user_id, type, title, body, link_url, is_read, created_at)
+      VALUES 
+        (${crypto.randomUUID()}, ${umkmId}, 'submission', 'Draf Baru Tersedia', 'Kreator telah mengunggah draf karya untuk Kampanye Video Reels.', '/dashboard', false, NOW()),
+        (${crypto.randomUUID()}, ${umkmId}, 'application', 'Pelamar Baru di Brief', 'Qaesyaar Aqeel mengajukan proposal untuk brief Desain Ulang Kemasan Kopi.', '/briefs', false, NOW())
+    `;
+  }
+  console.log('✅ Berhasil menyisipkan notifikasi riil untuk Creator Pro & UMKM.');
+
+  // 5e. Seed Komentar Portofolio Proyek (Project Comments)
+  console.log('\n💬 Menyinkronkan Komentar Portofolio (Project Comments)...');
+  await sql`DELETE FROM project_comments`;
+  const [firstProject] = await sql`SELECT id FROM projects LIMIT 1`;
+  if (firstProject && umkmId && creatorProId) {
+    await sql`
+      INSERT INTO project_comments (id, project_id, user_id, content, created_at)
+      VALUES 
+        (${crypto.randomUUID()}, ${firstProject.id}, ${umkmId}, 'Karya visual yang sangat inspiratif dan komposisi warnanya berani!', NOW() - INTERVAL '2 hours'),
+        (${crypto.randomUUID()}, ${firstProject.id}, ${creatorProId}, 'Terima kasih banyak atas apresiasi dan dukungannya!', NOW() - INTERVAL '1 hour')
+    `;
+    console.log('✅ Berhasil menyisipkan komentar portofolio.');
+  }
+
+  console.log(`✅ Berhasil menyisipkan total ${REVIEWS_DATA.length} ulasan riil, invoice, submisi, dan ruangan kolaborasi.`);
 
   // 6. Sinkronisasi Agregat Rating & Jumlah Proyek di creator_profiles
   console.log('\n📊 Memperbarui agregat rating dan riwayat ulasan di profil kreator...');
