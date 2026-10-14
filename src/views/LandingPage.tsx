@@ -58,8 +58,25 @@ export const LandingPage: React.FC<LandingPageProps> = ({ currentUser: propUser,
   const router = useRouter();
   const { user: authUser } = useAuth();
   const { openAuthModal } = useAuthModal();
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const currentUser = propUser !== undefined ? propUser : authUser;
+
+  const getCategoryLabel = (cat: string) => {
+    if (cat === 'Semua') return t('filter.category', 'Kategori');
+    if (language !== 'en') return cat;
+    const map: Record<string, string> = {
+      'Reels Instagram': 'Instagram Reels',
+      'Video Tiktok': 'TikTok Video',
+      'Feed Instagram': 'Instagram Feed',
+      'Poster': 'Poster',
+      'Banner': 'Promo Banner',
+      'Brosur': 'Brochure & Catalog',
+      'Logo': 'Logo & Branding',
+      'Foto Produk': 'Product Photography',
+      'UI/UX Design': 'UI/UX Design'
+    };
+    return map[cat] || cat;
+  };
 
   const navigateTo = (page: ActivePage, path: string) => {
     if (onNavigate) onNavigate(page);
@@ -296,7 +313,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ currentUser: propUser,
                     selectedCategory !== 'Semua' ? 'border-[#0B1F3A] text-[#0B1F3A] bg-neutral-50' : 'border-neutral-200 text-neutral-700 hover:border-neutral-300'
                   }`}
                 >
-                  <span>{selectedCategory === 'Semua' ? t('filter.category', 'Kategori') : selectedCategory}</span>
+                  <span>{selectedCategory === 'Semua' ? t('filter.category', 'Kategori') : getCategoryLabel(selectedCategory)}</span>
                   <ChevronDown className="w-3.5 h-3.5 text-neutral-400" />
                 </button>
 
@@ -323,7 +340,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ currentUser: propUser,
                           selectedCategory === cat ? 'font-bold text-[#0B1F3A]' : 'text-neutral-600'
                         }`}
                       >
-                        <span>{cat === 'Semua' ? t('filter.all', 'Semua') : cat}</span>
+                        <span>{cat === 'Semua' ? t('filter.all', 'Semua') : getCategoryLabel(cat)}</span>
                         {selectedCategory === cat && <Check className="w-3.5 h-3.5 text-[#0B1F3A]" />}
                       </button>
                     ))}
@@ -340,7 +357,13 @@ export const LandingPage: React.FC<LandingPageProps> = ({ currentUser: propUser,
                   }`}
                 >
                   <span>
-                    {selectedBudget === 'Semua' ? t('filter.budget', 'Budget') : selectedBudget === 'under500' ? '< Rp500rb' : selectedBudget === 'mid' ? 'Rp500rb - Rp1.5jt' : '> Rp1.5jt'}
+                    {selectedBudget === 'Semua' 
+                      ? t('filter.budget', 'Budget') 
+                      : selectedBudget === 'under500' 
+                        ? (language === 'en' ? '< IDR 500k' : '< Rp500rb') 
+                        : selectedBudget === 'mid' 
+                          ? (language === 'en' ? 'IDR 500k - 1.5M' : 'Rp500rb - Rp1.5jt') 
+                          : (language === 'en' ? '> IDR 1.5M' : '> Rp1.5jt')}
                   </span>
                   <ChevronDown className="w-3.5 h-3.5 text-neutral-400" />
                 </button>
@@ -525,7 +548,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ currentUser: propUser,
 
                           <div className="flex items-center gap-1 text-xs font-semibold text-neutral-700 ml-1">
                             <Check className="w-3.5 h-3.5 text-neutral-900 stroke-[3]" />
-                            <span>{creator.careerScore.completedProjects} proyek selesai</span>
+                            <span>{t('card.completedProjects', '{count} proyek selesai').replace('{count}', String(creator.careerScore.completedProjects))}</span>
                           </div>
 
                           {creator.isPromoted && (
@@ -538,7 +561,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ currentUser: propUser,
                         {/* Sub-info Row (Harga, Lokasi, Respon, Layanan) */}
                         <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-neutral-500 mt-2">
                           <span className="font-semibold text-neutral-800">
-                            {t('card.startingFrom', 'Mulai')} {creator.formattedRate}
+                            {t('card.startingFrom', 'Mulai')} {language === 'en' ? creator.formattedRate.replace('Rp', 'IDR ') : creator.formattedRate}
                           </span>
                           <span>•</span>
                           <span className="flex items-center gap-1">
@@ -634,11 +657,11 @@ export const LandingPage: React.FC<LandingPageProps> = ({ currentUser: propUser,
 
                                   <div className="flex items-center justify-between pt-0.5">
                                     <span className="text-[13px] sm:text-[14px] font-black text-[#171717] tracking-tight">
-                                      {service.formattedPrice}
+                                      {language === 'en' ? service.formattedPrice.replace('Rp', 'IDR ') : service.formattedPrice}
                                     </span>
                                     {service.deliveryDays && (
                                       <span className="text-[11px] font-medium text-neutral-400">
-                                        {service.deliveryDays}
+                                        {language === 'en' ? service.deliveryDays.replace('Hari Kerja', 'Working Days') : service.deliveryDays}
                                       </span>
                                     )}
                                   </div>
@@ -663,7 +686,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ currentUser: propUser,
                     ))}
                     {creator.skills.length > 5 && (
                       <span className="text-xs font-medium text-neutral-400 hover:text-neutral-700">
-                        +{creator.skills.length - 5} keahlian lainnya
+                        {t('card.moreSkills', '+{count} keahlian lainnya').replace('{count}', String(creator.skills.length - 5))}
                       </span>
                     )}
                   </div>

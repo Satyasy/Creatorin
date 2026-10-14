@@ -547,7 +547,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                   setNavSearchInput(e.target.value);
                   if (onSearch) onSearch(e.target.value);
                 }}
-                placeholder="Cari kreator, keahlian, atau video UGC..."
+                placeholder={t('nav.searchPlaceholder', 'Cari kreator, keahlian, atau video UGC...')}
                 className="w-full bg-transparent text-sm font-normal text-[#0D0C22] placeholder:text-[#55576A]/60 focus:outline-hidden"
               />
               <button 

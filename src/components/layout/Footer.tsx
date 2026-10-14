@@ -4,6 +4,7 @@ import React from 'react';
 import { useRouter } from 'next/navigation';
 import { ActivePage } from '@/types';
 import { Twitter, Instagram, Linkedin } from 'lucide-react';
+import { useLanguage } from '@/providers/LanguageProvider';
 
 interface FooterProps {
   onNavigate?: (page: ActivePage) => void;
@@ -12,6 +13,7 @@ interface FooterProps {
 
 export const Footer: React.FC<FooterProps> = ({ onNavigate, onOpenBrief }) => {
   const router = useRouter();
+  const { t } = useLanguage();
 
   const navigateTo = (page: ActivePage, path: string) => {
     if (onNavigate) {
@@ -117,9 +119,9 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, onOpenBrief }) => {
           {/* Sisi Kiri: Deskripsi & Informasi Ringkas */}
           <div className="lg:col-span-4 space-y-4 relative z-10">
             <div>
-              <h3 className="text-xs font-bold uppercase tracking-wider text-neutral-400 mb-2">Tentang Platform</h3>
+              <h3 className="text-xs font-bold uppercase tracking-wider text-neutral-400 mb-2">{t('footer.aboutTitle', 'Tentang Platform')}</h3>
               <p className="text-sm sm:text-base text-neutral-600 leading-relaxed font-normal max-w-sm">
-                Hubungkan bisnis dengan creator yang tepat untuk membangun karya dan kolaborasi yang berdampak dengan perlindungan pembayaran escrow terpercaya.
+                {t('footer.aboutDesc', 'Hubungkan bisnis dengan creator yang tepat untuk membangun karya dan kolaborasi yang berdampak dengan perlindungan pembayaran escrow terpercaya.')}
               </p>
             </div>
           </div>
@@ -129,7 +131,7 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, onOpenBrief }) => {
             
             {/* Kolom 1: Jelajahi */}
             <div>
-              <h4 className="text-xs font-bold uppercase tracking-wider text-[#0d0c22] mb-4">Jelajahi</h4>
+              <h4 className="text-xs font-bold uppercase tracking-wider text-[#0d0c22] mb-4">{t('footer.colExplore', 'Jelajahi')}</h4>
               <ul className="space-y-3 text-xs text-neutral-500 font-medium">
                 <li>
                   <button
@@ -137,7 +139,7 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, onOpenBrief }) => {
                     onClick={() => navigateTo('services', '/jelajah/layanan')}
                     className="hover:text-[#0d0c22] transition cursor-pointer text-left"
                   >
-                    Layanan Kreator
+                    {t('footer.creatorServices', 'Layanan Kreator')}
                   </button>
                 </li>
                 <li>
@@ -146,7 +148,7 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, onOpenBrief }) => {
                     onClick={() => navigateTo('projects', '/jelajah/proyek')}
                     className="hover:text-[#0d0c22] transition cursor-pointer text-left"
                   >
-                    Portofolio Project
+                    {t('footer.projectPortfolio', 'Portofolio Project')}
                   </button>
                 </li>
                 <li>
@@ -155,7 +157,7 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, onOpenBrief }) => {
                     onClick={() => navigateTo('creator-profile' as any, '/jelajah/kreator')}
                     className="hover:text-[#0d0c22] transition cursor-pointer text-left"
                   >
-                    Profil Kreator
+                    {t('footer.creatorProfiles', 'Profil Kreator')}
                   </button>
                 </li>
                 <li>
@@ -164,7 +166,7 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, onOpenBrief }) => {
                     onClick={() => navigateTo('briefs', '/briefs')}
                     className="hover:text-[#0d0c22] transition cursor-pointer text-left"
                   >
-                    Brief Proyek
+                    {t('footer.projectBriefs', 'Brief Proyek')}
                   </button>
                 </li>
                 <li>
@@ -173,7 +175,7 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, onOpenBrief }) => {
                     onClick={() => router.push('/contracts')}
                     className="hover:text-[#0d0c22] transition cursor-pointer text-left"
                   >
-                    Kontrak Kolaborasi
+                    {t('footer.collaborationContracts', 'Kontrak Kolaborasi')}
                   </button>
                 </li>
               </ul>
@@ -181,7 +183,7 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, onOpenBrief }) => {
 
             {/* Kolom 2: Untuk Bisnis */}
             <div>
-              <h4 className="text-xs font-bold uppercase tracking-wider text-[#0d0c22] mb-4">Untuk Bisnis</h4>
+              <h4 className="text-xs font-bold uppercase tracking-wider text-[#0d0c22] mb-4">{t('footer.colBusiness', 'Untuk Bisnis')}</h4>
               <ul className="space-y-3 text-xs text-neutral-500 font-medium">
                 <li>
                   <button
@@ -192,7 +194,7 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, onOpenBrief }) => {
                     }}
                     className="hover:text-[#0d0c22] transition cursor-pointer text-left"
                   >
-                    Mulai Brief
+                    {t('footer.startBrief', 'Mulai Brief')}
                   </button>
                 </li>
                 <li>
@@ -201,7 +203,7 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, onOpenBrief }) => {
                     onClick={() => navigateTo('creator-profile' as any, '/jelajah/kreator')}
                     className="hover:text-[#0d0c22] transition cursor-pointer text-left"
                   >
-                    Jelajahi Kreator
+                    {t('footer.exploreCreators', 'Jelajahi Kreator')}
                   </button>
                 </li>
                 <li>
@@ -210,7 +212,7 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, onOpenBrief }) => {
                     onClick={() => router.push('/wallet')}
                     className="hover:text-[#0d0c22] transition cursor-pointer text-left"
                   >
-                    Dompet & Pembayaran
+                    {t('footer.walletPayment', 'Dompet & Pembayaran')}
                   </button>
                 </li>
                 <li>
@@ -219,7 +221,7 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, onOpenBrief }) => {
                     onClick={() => navigateTo('home', '/')}
                     className="hover:text-[#0d0c22] transition cursor-pointer text-left"
                   >
-                    Cara Kerja
+                    {t('footer.howItWorks', 'Cara Kerja')}
                   </button>
                 </li>
               </ul>
@@ -227,7 +229,7 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, onOpenBrief }) => {
 
             {/* Kolom 3: Untuk Creator */}
             <div>
-              <h4 className="text-xs font-bold uppercase tracking-wider text-[#0d0c22] mb-4">Untuk Creator</h4>
+              <h4 className="text-xs font-bold uppercase tracking-wider text-[#0d0c22] mb-4">{t('footer.colCreator', 'Untuk Creator')}</h4>
               <ul className="space-y-3 text-xs text-neutral-500 font-medium">
                 <li>
                   <button
@@ -235,7 +237,7 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, onOpenBrief }) => {
                     onClick={() => navigateTo('explore', '/jelajah')}
                     className="hover:text-[#0d0c22] transition cursor-pointer text-left"
                   >
-                    Jelajah
+                    {t('footer.explore', 'Jelajah')}
                   </button>
                 </li>
                 <li>
@@ -244,7 +246,7 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, onOpenBrief }) => {
                     onClick={() => navigateTo('briefs', '/briefs')}
                     className="hover:text-[#0d0c22] transition cursor-pointer text-left"
                   >
-                    Lihat Brief Terbuka
+                    {t('footer.openBriefs', 'Lihat Brief Terbuka')}
                   </button>
                 </li>
                 <li>
@@ -253,7 +255,7 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, onOpenBrief }) => {
                     onClick={() => router.push('/profile')}
                     className="hover:text-[#0d0c22] transition cursor-pointer text-left"
                   >
-                    Kelola Profil
+                    {t('footer.manageProfile', 'Kelola Profil')}
                   </button>
                 </li>
                 <li>
@@ -262,7 +264,7 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, onOpenBrief }) => {
                     onClick={() => router.push('/wallet')}
                     className="hover:text-[#0d0c22] transition cursor-pointer text-left"
                   >
-                    Tarik Penghasilan
+                    {t('footer.withdrawEarnings', 'Tarik Penghasilan')}
                   </button>
                 </li>
               </ul>
@@ -270,7 +272,7 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, onOpenBrief }) => {
 
             {/* Kolom 4: Bantuan & Kebijakan */}
             <div>
-              <h4 className="text-xs font-bold uppercase tracking-wider text-[#0d0c22] mb-4">Bantuan & Legal</h4>
+              <h4 className="text-xs font-bold uppercase tracking-wider text-[#0d0c22] mb-4">{t('footer.colHelp', 'Bantuan & Legal')}</h4>
               <ul className="space-y-3 text-xs text-neutral-500 font-medium">
                 <li>
                   <button
@@ -278,7 +280,7 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, onOpenBrief }) => {
                     onClick={() => router.push('/terms')}
                     className="hover:text-[#0d0c22] transition cursor-pointer text-left"
                   >
-                    Syarat & Ketentuan
+                    {t('footer.terms', 'Syarat & Ketentuan')}
                   </button>
                 </li>
                 <li>
@@ -287,7 +289,7 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, onOpenBrief }) => {
                     onClick={() => router.push('/privacy')}
                     className="hover:text-[#0d0c22] transition cursor-pointer text-left"
                   >
-                    Kebijakan Privasi
+                    {t('footer.privacy', 'Kebijakan Privasi')}
                   </button>
                 </li>
                 <li>
@@ -296,7 +298,7 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, onOpenBrief }) => {
                     onClick={() => navigateTo('chat', '/chat')}
                     className="hover:text-[#0d0c22] transition cursor-pointer text-left"
                   >
-                    Hubungi Dukungan
+                    {t('footer.contactSupport', 'Hubungi Dukungan')}
                   </button>
                 </li>
                 <li>
@@ -305,7 +307,7 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, onOpenBrief }) => {
                     onClick={() => navigateTo('home', '/')}
                     className="hover:text-[#0d0c22] transition cursor-pointer text-left"
                   >
-                    FAQ
+                    {t('footer.faq', 'FAQ')}
                   </button>
                 </li>
               </ul>
@@ -318,7 +320,7 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, onOpenBrief }) => {
         {/* Official Ecosystem & Partner Endorsement Strip (Tanpa garis pemisah, ruang nafas lega) */}
         <div className="mt-12 sm:mt-14 mb-8 text-center">
           <p className="text-[11px] font-bold text-neutral-400 uppercase tracking-widest mb-4">
-            Didukung & Berkolaborasi Bersama Ekosistem Industri Digital Nasional
+            {t('footer.ecosystem', 'Didukung & Berkolaborasi Bersama Ekosistem Industri Digital Nasional')}
           </p>
           <div className="flex items-center justify-center">
             <img 
@@ -332,7 +334,7 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, onOpenBrief }) => {
         {/* Bagian Bawah: Copyright & Informasi Tambahan (Garis tipis halus tunggal) */}
         <div className="pt-6 border-t border-neutral-100 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-neutral-500">
           <p className="text-neutral-600 font-medium text-center sm:text-left">
-            © 2026 Creatorin. All rights reserved.
+            {t('footer.rights', '© 2026 Creatorin. All rights reserved.')}
           </p>
 
           <div className="flex items-center gap-5 sm:gap-6 text-xs text-neutral-500 font-medium">
@@ -341,17 +343,17 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, onOpenBrief }) => {
               onClick={() => router.push('/terms')}
               className="hover:text-[#0d0c22] transition cursor-pointer"
             >
-              Syarat Layanan
+              {t('footer.terms', 'Syarat Layanan')}
             </button>
             <button
               type="button"
               onClick={() => router.push('/privacy')}
               className="hover:text-[#0d0c22] transition cursor-pointer"
             >
-              Kebijakan Privasi
+              {t('footer.privacy', 'Kebijakan Privasi')}
             </button>
             <span className="text-neutral-400">
-              Platform Kolaborasi Kreator & Bisnis Indonesia
+              {t('footer.tagline', 'Platform Kolaborasi Kreator & Bisnis Indonesia')}
             </span>
           </div>
         </div>
