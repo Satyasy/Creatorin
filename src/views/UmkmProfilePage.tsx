@@ -256,8 +256,8 @@ export const UmkmProfilePage: React.FC<UmkmProfilePageProps> = ({
   const handleContactBrand = async () => {
     if (!currentUser) {
       setAuthModalConfig({
-        title: 'Masuk untuk Menghubungi Brand',
-        description: `Masuk ke akun Anda untuk memulai percakapan langsung dengan ${profile.brandName}.`,
+        title: 'Masuk untuk hubungi brand',
+        description: `Masuk ke akun Anda untuk mengirim pesan ke ${profile.brandName}.`,
       });
       setIsAuthModalOpen(true);
       return;
@@ -289,8 +289,8 @@ export const UmkmProfilePage: React.FC<UmkmProfilePageProps> = ({
   const toggleFollow = () => {
     if (!currentUser) {
       setAuthModalConfig({
-        title: 'Masuk untuk Mengikuti Brand',
-        description: `Masuk ke akun Creatorin Anda untuk mengikuti ${profile.brandName} dan menerima notifikasi saat ada lowongan brief baru.`,
+        title: 'Masuk untuk ikuti brand',
+        description: `Masuk ke akun Anda untuk mengikuti ${profile.brandName}.`,
       });
       setIsAuthModalOpen(true);
       return;

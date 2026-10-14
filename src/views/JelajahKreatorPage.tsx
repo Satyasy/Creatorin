@@ -174,8 +174,8 @@ export const JelajahKreatorPage: React.FC<JelajahKreatorPageProps> = ({
     e.stopPropagation();
     if (!currentUser) {
       setAuthModalConfig({
-        title: 'Masuk untuk Mengirim Brief Proyek',
-        description: 'Anda harus masuk ke akun Creatorin Anda terlebih dahulu untuk mengirimkan brief proyek kolaborasi ke kreator ini.',
+        title: 'Masuk untuk kirim brief',
+        description: 'Masuk ke akun Anda untuk mengirimkan brief proyek ke kreator ini.',
         action: () => {
           setTargetCreatorForBrief(creator);
           setIsBriefModalOpen(true);
@@ -822,8 +822,8 @@ export const JelajahKreatorPage: React.FC<JelajahKreatorPageProps> = ({
             setSelectedServiceForDetail(null);
             if (!currentUser) {
               setAuthModalConfig({
-                title: 'Masuk untuk Memesan Layanan',
-                description: 'Anda harus masuk ke akun Creatorin Anda terlebih dahulu untuk memulai pesanan dan diskusi proyek.',
+                title: 'Masuk untuk pesan layanan',
+                description: 'Masuk ke akun Anda untuk memesan layanan ini.',
                 action: () => {
                   router.push(`/chat?creatorId=${cr.id}`);
                 },
