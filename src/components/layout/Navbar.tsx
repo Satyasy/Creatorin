@@ -142,6 +142,22 @@ export const Navbar: React.FC<NavbarProps> = ({
     };
   }, []);
 
+  // Close mobile drawer on route change
+  useEffect(() => {
+    setMobileMenuOpen(false);
+  }, [pathname]);
+
+  // Close mobile drawer when resizing to desktop
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth >= 1024) {
+        setMobileMenuOpen(false);
+      }
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (onSearch) {
@@ -162,14 +178,16 @@ export const Navbar: React.FC<NavbarProps> = ({
     <header 
       id="main-header" 
       className={`sticky top-0 z-40 w-full transition-all duration-300 ease-in-out font-sans ${
-        isScrolled 
-          ? 'bg-white/70 backdrop-blur-xl shadow-xs border-b border-neutral-200/50' 
-          : isHomeActive 
-            ? 'bg-transparent border-b border-transparent' 
-            : 'bg-white/85 backdrop-blur-md border-b border-[#E1E3EA]'
+        mobileMenuOpen
+          ? 'bg-white border-b border-[#E1E3EA]'
+          : isScrolled 
+            ? 'bg-white/70 backdrop-blur-xl shadow-xs border-b border-neutral-200/50' 
+            : isHomeActive 
+              ? 'bg-transparent border-b border-transparent' 
+              : 'bg-white/85 backdrop-blur-md border-b border-[#E1E3EA]'
       }`}
       style={{
-        WebkitBackdropFilter: isScrolled ? 'blur(20px)' : isHomeActive ? undefined : 'blur(12px)',
+        WebkitBackdropFilter: mobileMenuOpen ? undefined : isScrolled ? 'blur(20px)' : isHomeActive ? undefined : 'blur(12px)',
       }}
     >
       <div className={`max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 transition-all duration-300 ease-in-out flex items-center justify-between gap-4 ${
@@ -322,8 +340,8 @@ export const Navbar: React.FC<NavbarProps> = ({
         {/* Sisi Kanan: Action Buttons & User Profile */}
         <div className="flex items-center gap-2.5 sm:gap-3 shrink-0 font-sans">
           
-          {/* Language Switcher Pill */}
-          <div className="flex items-center bg-[#F3F3F4] rounded-full p-0.5 border border-[#E1E3EA] text-xs font-semibold">
+          {/* Language Switcher Pill (Desktop only - mobile is in drawer) */}
+          <div className="hidden lg:flex items-center bg-[#F3F3F4] rounded-full p-0.5 border border-[#E1E3EA] text-xs font-semibold">
             <button
               type="button"
               onClick={() => setLanguage('id')}
@@ -354,7 +372,7 @@ export const Navbar: React.FC<NavbarProps> = ({
               <button
                 id="nav-chat-btn"
                 onClick={() => navigateTo('chat', '/chat')}
-                className="w-10 h-10 rounded-full hover:bg-[#F3F3F4] flex items-center justify-center text-[#55576A] hover:text-[#0D0C22] transition-colors relative cursor-pointer"
+                className="hidden sm:flex w-9 h-9 sm:w-10 sm:h-10 rounded-full hover:bg-[#F3F3F4] items-center justify-center text-[#55576A] hover:text-[#0D0C22] transition-colors relative cursor-pointer"
                 aria-label="Messages"
                 title="Buka Ruang Obrolan & Pesan"
               >
@@ -370,7 +388,7 @@ export const Navbar: React.FC<NavbarProps> = ({
               <button
                 id="nav-notifications-btn"
                 onClick={() => navigateTo('notifications', '/notifications')}
-                className="w-10 h-10 rounded-full hover:bg-[#F3F3F4] flex items-center justify-center text-[#55576A] hover:text-[#0D0C22] transition-colors relative cursor-pointer"
+                className="w-9 h-9 sm:w-10 sm:h-10 rounded-full hover:bg-[#F3F3F4] flex items-center justify-center text-[#55576A] hover:text-[#0D0C22] transition-colors relative cursor-pointer"
                 aria-label="Notifications"
                 title="Buka Notifikasi"
               >
@@ -399,7 +417,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                     <img
                       src={currentUser.avatar || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100&auto=format&fit=crop&q=80'}
                       alt={currentUser.name}
-                      className="w-9 h-9 rounded-full object-cover ring-1 ring-black/10 group-hover:ring-2 group-hover:ring-[#155DFC] transition-all"
+                      className="w-8 h-8 sm:w-9 sm:h-9 rounded-full object-cover ring-1 ring-black/10 group-hover:ring-2 group-hover:ring-[#155DFC] transition-all"
                     />
                   </div>
                 </button>
@@ -407,7 +425,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                 <button
                   id="nav-user-menu-toggle-btn"
                   onClick={() => setUserDropdownOpen(!userDropdownOpen)}
-                  className="p-1 rounded-full text-[#55576A] hover:text-[#0D0C22] hover:bg-[#F3F3F4] transition cursor-pointer"
+                  className="hidden sm:inline-flex p-1 rounded-full text-[#55576A] hover:text-[#0D0C22] hover:bg-[#F3F3F4] transition cursor-pointer"
                   title="Buka menu akun"
                   aria-expanded={userDropdownOpen}
                 >
@@ -503,7 +521,8 @@ export const Navbar: React.FC<NavbarProps> = ({
               )}
             </div>
           ) : (
-            <div className="flex items-center gap-2 sm:gap-3">
+            /* Auth Buttons: Desktop only (lg+). On mobile, accessible via Hamburger drawer */
+            <div className="hidden lg:flex items-center gap-2 sm:gap-3">
               <button
                 id="nav-signin-btn"
                 onClick={() => navigateTo('signin', '/sign-in')}
@@ -525,11 +544,13 @@ export const Navbar: React.FC<NavbarProps> = ({
             </div>
           )}
 
-          {/* Mobile Hamburger */}
+          {/* Mobile Hamburger Button */}
           <button
+            id="nav-mobile-toggle-btn"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             aria-label={mobileMenuOpen ? "Tutup menu navigasi" : "Buka menu navigasi"}
-            className="p-2 lg:hidden text-[#55576A] hover:text-[#0D0C22] rounded-lg hover:bg-[#F3F3F4] cursor-pointer"
+            aria-expanded={mobileMenuOpen}
+            className="p-2 lg:hidden text-[#55576A] hover:text-[#0D0C22] rounded-lg hover:bg-[#F3F3F4] cursor-pointer transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#155DFC]"
           >
             {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
           </button>
@@ -538,10 +559,17 @@ export const Navbar: React.FC<NavbarProps> = ({
 
       </div>
 
-      {/* Mobile Drawer Menu */}
+      {/* Mobile Drawer Menu (with backdrop overlay & full scroll support) */}
       {mobileMenuOpen && (
-        <div className="lg:hidden border-t border-[#E1E3EA] bg-white px-6 py-5 space-y-4 shadow-lg animate-in slide-in-from-top duration-200 font-sans">
-          {isSearchVisible && (
+        <div 
+          className="lg:hidden fixed inset-x-0 top-[64px] sm:top-[72px] bottom-0 bg-black/40 backdrop-blur-xs z-50 animate-in fade-in duration-200"
+          onClick={() => setMobileMenuOpen(false)}
+        >
+          <div 
+            className="w-full max-h-[calc(100vh-64px)] sm:max-h-[calc(100vh-72px)] overflow-y-auto bg-white border-t border-[#E1E3EA] px-5 py-5 space-y-4 shadow-2xl animate-in slide-in-from-top-3 duration-200 font-sans"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Search Bar in Mobile Menu */}
             <form onSubmit={handleSearchSubmit} className="flex items-center bg-[#F3F3F4] rounded-full p-1 pl-4 border border-[#E1E3EA]">
               <input
                 type="text"
@@ -561,17 +589,15 @@ export const Navbar: React.FC<NavbarProps> = ({
                 <Search className="w-4 h-4 text-white" />
               </button>
             </form>
-          )}
 
-          <div className="flex flex-col space-y-1 pt-2 text-sm">
             {/* Mobile Language Switcher */}
-            <div className="flex items-center justify-between py-2 px-3 mb-1 bg-[#F3F3F4] rounded-xl border border-[#E1E3EA]">
+            <div className="flex items-center justify-between py-2 px-3 bg-[#F3F3F4] rounded-xl border border-[#E1E3EA]">
               <span className="text-xs font-semibold text-[#55576A]">{t('settings.languageLabel', 'Bahasa Antarmuka')}</span>
               <div className="flex items-center bg-white rounded-full p-0.5 border border-[#E1E3EA] text-xs font-semibold">
                 <button
                   type="button"
                   onClick={() => setLanguage('id')}
-                  className={`px-2.5 py-1 rounded-full transition-colors cursor-pointer text-xs font-bold ${
+                  className={`px-3 py-1 rounded-full transition-colors cursor-pointer text-xs font-bold ${
                     language === 'id' ? 'bg-[#155DFC] text-white shadow-xs' : 'text-[#55576A]'
                   }`}
                 >
@@ -580,7 +606,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                 <button
                   type="button"
                   onClick={() => setLanguage('en')}
-                  className={`px-2.5 py-1 rounded-full transition-colors cursor-pointer text-xs font-bold ${
+                  className={`px-3 py-1 rounded-full transition-colors cursor-pointer text-xs font-bold ${
                     language === 'en' ? 'bg-[#155DFC] text-white shadow-xs' : 'text-[#55576A]'
                   }`}
                 >
@@ -589,84 +615,228 @@ export const Navbar: React.FC<NavbarProps> = ({
               </div>
             </div>
 
-            <button
-              onClick={() => {
-                setMobileMenuOpen(false);
-                navigateTo('home', '/');
-              }}
-              className={`py-2 px-3 text-left rounded-lg transition-colors ${
-                isHomeActive 
-                  ? 'text-[#0D0C22] font-semibold bg-[#F3F3F4]' 
-                  : 'text-[#55576A] font-medium hover:text-[#0D0C22]'
-              }`}
-            >
-              {t('nav.home', 'Beranda')}
-            </button>
-            <p className="px-3 pt-2 text-xs font-semibold text-[#737373]">{t('nav.browse', 'Jelajah')}</p>
-            <button
-              onClick={() => {
-                setMobileMenuOpen(false);
-                navigateTo('creator-profile', '/jelajah/kreator');
-              }}
-              className={`rounded-lg px-3 py-2 text-left transition-colors ${pathname?.startsWith('/jelajah/kreator') ? 'bg-[#E8F0FF] font-semibold text-[#155DFC]' : 'font-medium text-[#55576A] hover:text-[#0D0C22]'}`}
-            >
-              {t('nav.creators', 'Kreator')}
-            </button>
-            <button
-              onClick={() => {
-                setMobileMenuOpen(false);
-                navigateTo('services', '/jelajah/layanan');
-              }}
-              className={`rounded-lg px-3 py-2 text-left transition-colors ${pathname?.startsWith('/jelajah/layanan') ? 'bg-[#E8F0FF] font-semibold text-[#155DFC]' : 'font-medium text-[#55576A] hover:text-[#0D0C22]'}`}
-            >
-              {t('nav.services', 'Layanan')}
-            </button>
-            <button
-              onClick={() => {
-                setMobileMenuOpen(false);
-                navigateTo('projects', '/jelajah/proyek');
-              }}
-              className={`rounded-lg px-3 py-2 text-left transition-colors ${pathname?.startsWith('/jelajah/proyek') ? 'bg-[#E8F0FF] font-semibold text-[#155DFC]' : 'font-medium text-[#55576A] hover:text-[#0D0C22]'}`}
-            >
-              {t('nav.projects', 'Proyek')}
-            </button>
-            <button
-              onClick={() => {
-                setMobileMenuOpen(false);
-                navigateTo('briefs', '/briefs');
-              }}
-              className={`py-2 px-3 text-left rounded-lg transition-colors ${
-                pathname?.startsWith('/briefs') 
-                  ? 'text-[#155DFC] font-semibold bg-[#E8F0FF]' 
-                  : 'text-[#55576A] font-medium hover:text-[#0D0C22]'
-              }`}
-            >
-              {t('nav.briefs', 'Brief Proyek')}
-            </button>
-          </div>
+            {/* If Logged In: User Profile Header Card */}
+            {currentUser && (
+              <div className="p-3 bg-[#F8F9FA] rounded-xl border border-[#E1E3EA] flex items-center justify-between gap-3">
+                <div className="flex items-center gap-3 min-w-0">
+                  <img
+                    src={currentUser.avatar || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100&auto=format&fit=crop&q=80'}
+                    alt={currentUser.name}
+                    className="w-10 h-10 rounded-full object-cover ring-1 ring-black/10 shrink-0"
+                  />
+                  <div className="min-w-0">
+                    <p className="text-sm font-semibold text-[#0D0C22] truncate">{currentUser.name}</p>
+                    <p className="text-xs text-[#55576A] truncate">{currentUser.email}</p>
+                  </div>
+                </div>
+                <span className="text-[10px] font-semibold px-2 py-0.5 rounded-md bg-[#E8F0FF] text-[#155DFC] uppercase shrink-0">
+                  {currentUser.role || 'User'}
+                </span>
+              </div>
+            )}
 
-          {!currentUser && (
-            <div className="pt-4 border-t border-[#E1E3EA] flex gap-3">
+            {/* Primary Nav Links */}
+            <div className="flex flex-col space-y-1 text-sm">
               <button
                 onClick={() => {
                   setMobileMenuOpen(false);
-                  navigateTo('signin', '/sign-in');
+                  navigateTo('home', '/');
                 }}
-                className="flex-1 py-2.5 text-center text-sm font-semibold text-[#0D0C22] border border-[#E1E3EA] rounded-xl hover:bg-[#F3F3F4] transition-colors"
+                className={`py-2 px-3 text-left rounded-lg transition-colors font-medium ${
+                  isHomeActive 
+                    ? 'text-[#155DFC] font-semibold bg-[#E8F0FF]' 
+                    : 'text-[#55576A] hover:bg-[#F3F3F4] hover:text-[#0D0C22]'
+                }`}
               >
-                {t('nav.signIn', 'Masuk')}
+                {t('nav.home', 'Beranda')}
               </button>
+
+              <p className="px-3 pt-2 text-[11px] font-bold text-[#8C8F9F] uppercase tracking-wider">{t('nav.browse', 'Jelajah')}</p>
+              
               <button
                 onClick={() => {
                   setMobileMenuOpen(false);
-                  navigateTo('signup', '/sign-up');
+                  navigateTo('creator-profile', '/jelajah/kreator');
                 }}
-                className="flex-1 py-2.5 text-center text-sm font-semibold text-white bg-[#155DFC] hover:bg-[#1248C7] rounded-xl transition-colors shadow-xs"
+                className={`rounded-lg px-3 py-2 text-left transition-colors font-medium ${pathname?.startsWith('/jelajah/kreator') ? 'bg-[#E8F0FF] font-semibold text-[#155DFC]' : 'text-[#55576A] hover:bg-[#F3F3F4] hover:text-[#0D0C22]'}`}
               >
-                {t('nav.signUp', 'Mulai Gratis')}
+                {t('nav.creators', 'Kreator')}
+              </button>
+
+              <button
+                onClick={() => {
+                  setMobileMenuOpen(false);
+                  navigateTo('services', '/jelajah/layanan');
+                }}
+                className={`rounded-lg px-3 py-2 text-left transition-colors font-medium ${pathname?.startsWith('/jelajah/layanan') ? 'bg-[#E8F0FF] font-semibold text-[#155DFC]' : 'text-[#55576A] hover:bg-[#F3F3F4] hover:text-[#0D0C22]'}`}
+              >
+                {t('nav.services', 'Layanan')}
+              </button>
+
+              <button
+                onClick={() => {
+                  setMobileMenuOpen(false);
+                  navigateTo('projects', '/jelajah/proyek');
+                }}
+                className={`rounded-lg px-3 py-2 text-left transition-colors font-medium ${pathname?.startsWith('/jelajah/proyek') ? 'bg-[#E8F0FF] font-semibold text-[#155DFC]' : 'text-[#55576A] hover:bg-[#F3F3F4] hover:text-[#0D0C22]'}`}
+              >
+                {t('nav.projects', 'Proyek')}
+              </button>
+
+              <button
+                onClick={() => {
+                  setMobileMenuOpen(false);
+                  navigateTo('briefs', '/briefs');
+                }}
+                className={`py-2 px-3 text-left rounded-lg transition-colors font-medium ${
+                  pathname?.startsWith('/briefs') 
+                    ? 'text-[#155DFC] font-semibold bg-[#E8F0FF]' 
+                    : 'text-[#55576A] hover:bg-[#F3F3F4] hover:text-[#0D0C22]'
+                }`}
+              >
+                {t('nav.briefs', 'Brief Proyek')}
               </button>
             </div>
-          )}
+
+            {/* User Account Section if Logged In */}
+            {currentUser && (
+              <div className="pt-3 border-t border-[#E1E3EA] flex flex-col space-y-1 text-sm">
+                <p className="px-3 py-1 text-[11px] font-bold text-[#8C8F9F] uppercase tracking-wider">{t('nav.account', 'Akun Saya')}</p>
+                
+                <button
+                  onClick={() => {
+                    setMobileMenuOpen(false);
+                    navigateTo('creator-profile', '/profile');
+                  }}
+                  className="w-full px-3 py-2 text-left font-medium text-[#55576A] hover:bg-[#F3F3F4] hover:text-[#0D0C22] rounded-lg flex items-center gap-2.5 transition-colors"
+                >
+                  <User className="w-4 h-4 text-[#55576A]" />
+                  <span>{t('nav.profile', 'Profil Saya')}</span>
+                </button>
+
+                <button
+                  onClick={() => {
+                    setMobileMenuOpen(false);
+                    router.push('/wallet');
+                  }}
+                  className="w-full px-3 py-2 text-left font-medium text-[#55576A] hover:bg-[#F3F3F4] hover:text-[#0D0C22] rounded-lg flex items-center gap-2.5 transition-colors"
+                >
+                  <WalletCards className="w-4 h-4 text-[#55576A]" />
+                  <span>{t('nav.wallet', 'Dompet & Saldo')}</span>
+                </button>
+
+                <button
+                  onClick={() => {
+                    setMobileMenuOpen(false);
+                    navigateTo('chat', '/chat');
+                  }}
+                  className="w-full px-3 py-2 text-left font-medium text-[#55576A] hover:bg-[#F3F3F4] hover:text-[#0D0C22] rounded-lg flex items-center justify-between transition-colors"
+                >
+                  <div className="flex items-center gap-2.5">
+                    <MessageSquare className="w-4 h-4 text-[#55576A]" />
+                    <span>{t('nav.messages', 'Pesan & Obrolan')}</span>
+                  </div>
+                  {unreadMessages > 0 && (
+                    <span className="bg-[#155DFC] text-white text-[10px] font-bold px-2 py-0.5 rounded-full">
+                      {unreadMessages}
+                    </span>
+                  )}
+                </button>
+
+                <button
+                  onClick={() => {
+                    setMobileMenuOpen(false);
+                    navigateTo('notifications', '/notifications');
+                  }}
+                  className="w-full px-3 py-2 text-left font-medium text-[#55576A] hover:bg-[#F3F3F4] hover:text-[#0D0C22] rounded-lg flex items-center justify-between transition-colors"
+                >
+                  <div className="flex items-center gap-2.5">
+                    <Bell className="w-4 h-4 text-[#55576A]" />
+                    <span>{t('nav.notifications', 'Notifikasi')}</span>
+                  </div>
+                  {unreadNotifications > 0 && (
+                    <span className="bg-[#D92D20] text-white text-[10px] font-bold px-2 py-0.5 rounded-full">
+                      {unreadNotifications}
+                    </span>
+                  )}
+                </button>
+
+                {currentUser.role === 'creator' && (
+                  <button
+                    onClick={() => {
+                      setMobileMenuOpen(false);
+                      router.push('/contracts');
+                    }}
+                    className="w-full px-3 py-2 text-left font-medium text-[#55576A] hover:bg-[#F3F3F4] hover:text-[#0D0C22] rounded-lg flex items-center gap-2.5 transition-colors"
+                  >
+                    <FileCheck2 className="w-4 h-4 text-[#55576A]" />
+                    <span>{t('nav.contracts', 'Kontrak Saya')}</span>
+                  </button>
+                )}
+
+                {currentUser.role === 'school' && (
+                  <button
+                    onClick={() => {
+                      setMobileMenuOpen(false);
+                      router.push('/dashboard/school');
+                    }}
+                    className="w-full px-3 py-2 text-left font-medium text-[#55576A] hover:bg-[#F3F3F4] hover:text-[#0D0C22] rounded-lg flex items-center gap-2.5 transition-colors"
+                  >
+                    <GraduationCap className="w-4 h-4 text-[#55576A]" />
+                    <span>{t('nav.schoolDashboard', 'Dashboard Sekolah')}</span>
+                  </button>
+                )}
+
+                <button
+                  onClick={() => {
+                    setMobileMenuOpen(false);
+                    navigateTo('settings', '/settings');
+                  }}
+                  className="w-full px-3 py-2 text-left font-medium text-[#55576A] hover:bg-[#F3F3F4] hover:text-[#0D0C22] rounded-lg flex items-center gap-2.5 transition-colors"
+                >
+                  <Settings className="w-4 h-4 text-[#55576A]" />
+                  <span>{t('nav.settings', 'Pengaturan')}</span>
+                </button>
+
+                <div className="my-1 border-t border-[#E1E3EA]" />
+
+                <button
+                  onClick={async () => {
+                    setMobileMenuOpen(false);
+                    await handleSignOutAction();
+                  }}
+                  className="w-full px-3 py-2 text-left font-medium text-[#D92D20] hover:bg-[#FEE4E2] rounded-lg flex items-center gap-2.5 transition-colors"
+                >
+                  <LogOut className="w-4 h-4 text-[#D92D20]" />
+                  <span>{t('nav.signOut', 'Keluar')}</span>
+                </button>
+              </div>
+            )}
+
+            {/* If NOT Logged In: Auth Action Buttons */}
+            {!currentUser && (
+              <div className="pt-3 border-t border-[#E1E3EA] flex flex-col sm:flex-row gap-2.5">
+                <button
+                  onClick={() => {
+                    setMobileMenuOpen(false);
+                    navigateTo('signin', '/sign-in');
+                  }}
+                  className="w-full py-2.5 text-center text-sm font-semibold text-[#0D0C22] border border-[#E1E3EA] rounded-xl hover:bg-[#F3F3F4] transition-colors"
+                >
+                  {t('nav.signIn', 'Masuk')}
+                </button>
+                <button
+                  onClick={() => {
+                    setMobileMenuOpen(false);
+                    navigateTo('signup', '/sign-up');
+                  }}
+                  className="w-full py-2.5 text-center text-sm font-semibold text-white bg-[#155DFC] hover:bg-[#1248C7] rounded-xl transition-colors shadow-xs"
+                >
+                  {t('nav.signUp', 'Mulai Gratis')}
+                </button>
+              </div>
+            )}
+          </div>
         </div>
       )}
     </header>
