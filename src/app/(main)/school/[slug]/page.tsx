@@ -14,16 +14,16 @@ export async function generateMetadata({ params }: SchoolPublicRouteProps): Prom
 
   if (!school) {
     return {
-      title: 'Profil SMK Vokasi | Creatorin',
-      description: 'Halaman etalase talenta vokasi dan karya siswa binaan Creatorin.',
+      title: 'Showcase Portofolio Vokasi | Creatorin',
+      description: 'Etalase resmi portofolio karya dan proyek kreatif binaan sekolah vokasi di Creatorin.',
     };
   }
 
-  const title = `${school.name} - Hub Talenta Vokasi Kreatif | Creatorin`;
+  const title = `${school.name} - Showcase Portofolio Proyek Kreatif | Creatorin`;
   const description =
     school.description ||
     school.tagline ||
-    `Etalase resmi portofolio karya kreatif dan profil siswa bertalenta dari ${school.name} di Creatorin.`;
+    `Etalase resmi portofolio karya kreatif dan proyek industri binaan ${school.name} di Creatorin.`;
   const canonicalUrl = `${APP_URL}/school/${school.slug}`;
 
   return {
