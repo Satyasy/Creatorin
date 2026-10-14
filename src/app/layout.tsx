@@ -1,13 +1,12 @@
 import type { Metadata, Viewport } from "next";
 import "../index.css";
 import { Suspense } from "react";
-import { GoogleAnalytics } from "@next/third-parties/google";
 import { AuthProvider } from "@/providers/AuthProvider";
 import { LanguageProvider } from "@/providers/LanguageProvider";
 import { AuthModalProvider } from "@/providers/AuthModalProvider";
 import { ToastProvider } from "@/providers/ToastProvider";
 import { RouteProgressBar } from "@/components/common/RouteProgressBar";
-import { GA_TRACKING_ID, IS_GA_ENABLED } from "@/lib/analytics";
+import { GA_TRACKING_ID } from "@/lib/analytics";
 
 export const viewport: Viewport = {
   themeColor: "#155DFC",
@@ -108,6 +107,26 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
   return (
     <html lang="id" className="overflow-x-clip" suppressHydrationWarning>
       <head>
+        {/* Google tag (gtag.js) */}
+        {GA_TRACKING_ID && (
+          <>
+            <script
+              async
+              src={`https://www.googletagmanager.com/gtag/js?id=${GA_TRACKING_ID}`}
+            />
+            <script
+              id="google-tag-analytics"
+              dangerouslySetInnerHTML={{
+                __html: `
+                  window.dataLayer = window.dataLayer || [];
+                  function gtag(){dataLayer.push(arguments);}
+                  gtag('js', new Date());
+                  gtag('config', '${GA_TRACKING_ID}');
+                `,
+              }}
+            />
+          </>
+        )}
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link rel="preconnect" href="https://api.creatorin.my.id" crossOrigin="use-credentials" />
@@ -139,7 +158,6 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
           </LanguageProvider>
         </AuthProvider>
       </body>
-      {IS_GA_ENABLED && GA_TRACKING_ID && <GoogleAnalytics gaId={GA_TRACKING_ID} />}
     </html>
   );
 }
