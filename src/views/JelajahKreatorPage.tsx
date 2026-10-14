@@ -25,6 +25,7 @@ import { DEFAULT_CREATORS } from '@/data/defaultCreators';
 import type { Creator, CreatorService, ActivePage, AuthState } from '@/types';
 import { useAuth } from '@/providers/AuthProvider';
 import { useLanguage } from '@/providers/LanguageProvider';
+import { useToast } from '@/providers/ToastProvider';
 
 interface JelajahKreatorPageProps {
   currentUser?: AuthState['user'];
@@ -67,8 +68,49 @@ export const JelajahKreatorPage: React.FC<JelajahKreatorPageProps> = ({
 }) => {
   const router = useRouter();
   const { user: authUser } = useAuth();
-  const { t } = useLanguage();
+  const { showToast } = useToast();
+  const { t, language } = useLanguage();
   const currentUser = propUser !== undefined ? propUser : authUser;
+
+  const getCategoryLabel = (cat: string) => {
+    if (cat === 'Semua Kategori') return t('filter.allCategories', 'Semua Kategori');
+    if (cat === 'Brand Identity') return t('category.logo', 'Brand Identity');
+    if (cat === 'Feed Instagram') return t('category.feed', 'Feed Instagram');
+    if (cat === 'Kemasan') return 'Packaging';
+    if (cat === 'Video & UGC') return 'Video & UGC';
+    if (cat === 'Motion & Animasi') return 'Motion & Animation';
+    if (cat === 'Foto Produk') return t('category.productPhoto', 'Foto Produk');
+    return cat;
+  };
+
+  const getBudgetLabel = (id: string) => {
+    if (id === 'all') return t('filter.allBudget', 'Semua Budget');
+    if (id === 'under250') return t('budget.under250', '< Rp250.000');
+    if (id === '250to500') return t('budget.250to500', 'Rp250.000 - Rp500.000');
+    if (id === 'above500') return t('budget.above500', '> Rp500.000');
+    return id;
+  };
+
+  const getLocationLabel = (loc: string) => {
+    if (loc === 'Semua Lokasi') return t('filter.allLocations', 'Semua Lokasi');
+    return loc;
+  };
+
+  const getSortLabel = (id: string) => {
+    if (id === 'score') return t('sort.highestScore', 'Skor Karir Tertinggi');
+    if (id === 'rating') return t('sort.highestRating', 'Rating Tertinggi');
+    if (id === 'projects') return t('sort.mostProjects', 'Proyek Terbanyak');
+    if (id === 'rate-asc') return t('sort.lowestRate', 'Tarif Terendah');
+    return id;
+  };
+
+  const formatRate = (creator: Creator) => {
+    const rateNum = creator.startingRate || 200000;
+    if (language === 'en') {
+      return `From IDR ${rateNum.toLocaleString('en-US')}`;
+    }
+    return `${t('card.startingFrom', 'Mulai')} ${creator.formattedRate || `Rp${rateNum.toLocaleString('id-ID')}`}`;
+  };
 
   const [creators, setCreators] = useState<Creator[]>(DEFAULT_CREATORS);
   const [searchQuery, setSearchQuery] = useState('');
@@ -172,12 +214,15 @@ export const JelajahKreatorPage: React.FC<JelajahKreatorPageProps> = ({
   const toggleSave = (creatorId: string, e: React.MouseEvent) => {
     e.stopPropagation();
     if (!currentUser) {
-      setAuthModalConfig({
-        title: t('auth.loginRequired', 'Masuk ke Akun Creatorin'),
-        description: t('auth.bookmarkRequired', 'Silakan masuk ke akun Creatorin Anda terlebih dahulu untuk menyimpan ke koleksi favorit.'),
-        action: () => toggleBookmark(creatorId),
+      showToast({
+        type: 'warning',
+        title: t('toast.authRequired', 'Perlu Masuk Akun'),
+        message: t('auth.bookmarkRequired', 'Silakan masuk ke akun Creatorin Anda terlebih dahulu untuk menyimpan ke koleksi favorit.'),
+        action: {
+          label: t('action.signIn', 'Masuk ke Akun'),
+          onClick: () => router.push('/sign-in'),
+        },
       });
-      setIsAuthModalOpen(true);
       return;
     }
     toggleBookmark(creatorId);
@@ -286,10 +331,10 @@ export const JelajahKreatorPage: React.FC<JelajahKreatorPageProps> = ({
         {/* H1 Page Title & Subtitle Matching Figma node #4474:7603 */}
         <div className="mb-6">
           <h1 className="font-display font-extrabold text-2xl sm:text-3xl lg:text-[34px] leading-tight text-[#0D0C22] tracking-tight">
-            Jelajah Profil Kreator & Talenta Terverifikasi
+            {t('nav.creators', 'Jelajah Profil Kreator & Talenta Terverifikasi')}
           </h1>
           <p className="text-sm text-[#737373] mt-1.5 max-w-2xl leading-relaxed">
-            Telusuri portofolio karya asli, bandingkan Career Score & performa nyata kreator, dan hubungi langsung.
+            {t('hero.subtitle', 'Telusuri portofolio karya asli, bandingkan Career Score & performa nyata kreator, dan hubungi langsung.')}
           </p>
         </div>
 
@@ -299,7 +344,7 @@ export const JelajahKreatorPage: React.FC<JelajahKreatorPageProps> = ({
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
             
             <h2 className="font-display font-bold text-base sm:text-lg text-[#0D0C22]">
-              Cari Talenta berdasarkan Kategori
+              {t('explore.heading', 'Cari Talenta berdasarkan Kategori')}
             </h2>
 
             {/* Filter Buttons Group */}
@@ -314,7 +359,7 @@ export const JelajahKreatorPage: React.FC<JelajahKreatorPageProps> = ({
                     ? 'border-[#0D0C22] bg-[#0D0C22] text-white'
                     : 'border-[#E5E5E5] bg-white text-[#404040] hover:bg-neutral-50'
                 }`}
-                title="Urutkan & Filter"
+                title={t('filter.reset', 'Urutkan & Filter')}
               >
                 <SlidersHorizontal className="w-4 h-4" />
               </button>
@@ -330,7 +375,7 @@ export const JelajahKreatorPage: React.FC<JelajahKreatorPageProps> = ({
                       : 'border-[#E5E5E5] bg-white text-[#404040] hover:border-neutral-300'
                   }`}
                 >
-                  <span>{selectedCategory === 'Semua Kategori' ? 'Kategori' : selectedCategory}</span>
+                  <span>{selectedCategory === 'Semua Kategori' ? t('filter.category', 'Kategori') : getCategoryLabel(selectedCategory)}</span>
                   <ChevronDown className="w-3.5 h-3.5 text-neutral-400" />
                 </button>
 
@@ -348,7 +393,7 @@ export const JelajahKreatorPage: React.FC<JelajahKreatorPageProps> = ({
                           selectedCategory === cat ? 'text-[#155DFC] font-bold bg-blue-50/50' : 'text-neutral-700'
                         }`}
                       >
-                        <span>{cat}</span>
+                        <span>{getCategoryLabel(cat)}</span>
                         {selectedCategory === cat && <Check className="w-3.5 h-3.5 text-[#155DFC]" />}
                       </button>
                     ))}
@@ -369,8 +414,8 @@ export const JelajahKreatorPage: React.FC<JelajahKreatorPageProps> = ({
                 >
                   <span>
                     {selectedBudget === 'all' 
-                      ? 'Budget' 
-                      : BUDGET_OPTIONS.find((b) => b.id === selectedBudget)?.label || 'Budget'}
+                      ? t('filter.budget', 'Budget') 
+                      : getBudgetLabel(selectedBudget)}
                   </span>
                   <ChevronDown className="w-3.5 h-3.5 text-neutral-400" />
                 </button>
@@ -389,7 +434,7 @@ export const JelajahKreatorPage: React.FC<JelajahKreatorPageProps> = ({
                           selectedBudget === b.id ? 'text-[#155DFC] font-bold bg-blue-50/50' : 'text-neutral-700'
                         }`}
                       >
-                        <span>{b.label}</span>
+                        <span>{getBudgetLabel(b.id)}</span>
                         {selectedBudget === b.id && <Check className="w-3.5 h-3.5 text-[#155DFC]" />}
                       </button>
                     ))}
@@ -408,7 +453,7 @@ export const JelajahKreatorPage: React.FC<JelajahKreatorPageProps> = ({
                       : 'border-[#E5E5E5] bg-white text-[#404040] hover:border-neutral-300'
                   }`}
                 >
-                  <span>{selectedLocation === 'Semua Lokasi' ? 'Lokasi' : selectedLocation}</span>
+                  <span>{selectedLocation === 'Semua Lokasi' ? t('filter.location', 'Lokasi') : selectedLocation}</span>
                   <ChevronDown className="w-3.5 h-3.5 text-neutral-400" />
                 </button>
 
@@ -426,7 +471,7 @@ export const JelajahKreatorPage: React.FC<JelajahKreatorPageProps> = ({
                           selectedLocation === loc ? 'text-[#155DFC] font-bold bg-blue-50/50' : 'text-neutral-700'
                         }`}
                       >
-                        <span>{loc}</span>
+                        <span>{loc === 'Semua Lokasi' ? t('filter.allLocations', 'Semua Lokasi') : loc}</span>
                         {selectedLocation === loc && <Check className="w-3.5 h-3.5 text-[#155DFC]" />}
                       </button>
                     ))}
@@ -438,13 +483,13 @@ export const JelajahKreatorPage: React.FC<JelajahKreatorPageProps> = ({
               {openDropdown === 'sort' && (
                 <div className="absolute right-0 mt-1.5 top-10 w-56 bg-white rounded-2xl border border-neutral-200 shadow-xl py-2 z-30 animate-in fade-in">
                   <div className="px-4 py-1.5 text-[11px] font-bold text-neutral-400 uppercase tracking-wider">
-                    Urutkan Berdasarkan
+                    {t('sort.byTitle', 'Urutkan Berdasarkan')}
                   </div>
                   {[
-                    { id: 'score', label: 'Skor Karir Tertinggi' },
-                    { id: 'rating', label: 'Rating Tertinggi' },
-                    { id: 'projects', label: 'Proyek Terbanyak' },
-                    { id: 'rate-asc', label: 'Tarif Terendah' },
+                    { id: 'score' },
+                    { id: 'rating' },
+                    { id: 'projects' },
+                    { id: 'rate-asc' },
                   ].map((s) => (
                     <button
                       key={s.id}
@@ -457,7 +502,7 @@ export const JelajahKreatorPage: React.FC<JelajahKreatorPageProps> = ({
                         selectedSort === s.id ? 'text-[#155DFC] font-bold bg-blue-50/50' : 'text-neutral-700'
                       }`}
                     >
-                      <span>{s.label}</span>
+                      <span>{getSortLabel(s.id)}</span>
                       {selectedSort === s.id && <Check className="w-3.5 h-3.5 text-[#155DFC]" />}
                     </button>
                   ))}
@@ -471,7 +516,7 @@ export const JelajahKreatorPage: React.FC<JelajahKreatorPageProps> = ({
                   onClick={resetFilters}
                   className="text-xs text-[#155DFC] hover:underline font-semibold px-2 py-1 transition cursor-pointer"
                 >
-                  Reset Filter ({activeFiltersCount})
+                  {t('filter.reset', 'Reset Filter')} ({activeFiltersCount})
                 </button>
               )}
 
@@ -482,7 +527,7 @@ export const JelajahKreatorPage: React.FC<JelajahKreatorPageProps> = ({
         {/* Results Count Summary */}
         <div className="flex items-center justify-between mb-6">
           <p className="text-xs sm:text-sm text-[#737373]">
-            Menampilkan <span className="font-bold text-[#0D0C22]">{filteredCreators.length}</span> profil kreator terverifikasi
+            {t('filter.showingCreators', 'Menampilkan {count} kreator terverifikasi').replace('{count}', String(filteredCreators.length))}
           </p>
         </div>
 
@@ -555,7 +600,7 @@ export const JelajahKreatorPage: React.FC<JelajahKreatorPageProps> = ({
 
                           <div className="flex items-center gap-1 text-xs font-semibold text-neutral-700 ml-1">
                             <Check className="w-3.5 h-3.5 text-neutral-900 stroke-[3]" />
-                            <span>{creator.careerScore?.completedProjects ?? 88} proyek selesai</span>
+                            <span>{t('home.verifiedProjects', '{count} proyek selesai').replace('{count}', String(creator.careerScore?.completedProjects ?? 88))}</span>
                           </div>
 
                           {creator.isPromoted && (
@@ -568,7 +613,7 @@ export const JelajahKreatorPage: React.FC<JelajahKreatorPageProps> = ({
                         {/* Sub-info Row (Harga, Lokasi, Respon, Layanan) */}
                         <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-neutral-500 mt-2">
                           <span className="font-semibold text-neutral-800">
-                            {t('card.startingFrom', 'Mulai')} {creator.formattedRate || `Rp${(creator.startingRate || 200000).toLocaleString('id-ID')}`}
+                            {formatRate(creator)}
                           </span>
                           <span>•</span>
                           <span className="flex items-center gap-1">
@@ -701,11 +746,11 @@ export const JelajahKreatorPage: React.FC<JelajahKreatorPageProps> = ({
 
                                   <div className="flex items-center justify-between pt-0.5">
                                     <span className="text-[13px] sm:text-[14px] font-black text-[#171717] tracking-tight">
-                                      {service.formattedPrice}
+                                      {language === 'en' ? (service.formattedPrice || '').replace('Rp', 'IDR ') : service.formattedPrice}
                                     </span>
                                     {service.deliveryDays && (
                                       <span className="text-[11px] font-medium text-neutral-400">
-                                        {service.deliveryDays}
+                                        {language === 'en' ? service.deliveryDays.replace(/hari kerja/gi, 'Working Days').replace(/hari/gi, 'Days') : service.deliveryDays}
                                       </span>
                                     )}
                                   </div>
@@ -730,7 +775,7 @@ export const JelajahKreatorPage: React.FC<JelajahKreatorPageProps> = ({
                     ))}
                     {creator.skills && creator.skills.length > 5 && (
                       <span className="text-xs font-medium text-neutral-400 hover:text-neutral-700">
-                        +{creator.skills.length - 5} keahlian lainnya
+                        {t('card.moreSkills', '+{count} keahlian lainnya').replace('{count}', String(creator.skills.length - 5))}
                       </span>
                     )}
                   </div>
@@ -743,16 +788,16 @@ export const JelajahKreatorPage: React.FC<JelajahKreatorPageProps> = ({
       ) : (
         <div className="text-center py-16 bg-white rounded-3xl border border-neutral-200">
           <Sparkles className="w-10 h-10 text-neutral-300 mx-auto mb-3" />
-          <h3 className="text-lg font-bold text-[#0D0C22]">Tidak Ada Kreator yang Sesuai</h3>
+          <h3 className="text-lg font-bold text-[#0D0C22]">{t('empty.creatorsTitle', 'Tidak Ada Kreator yang Sesuai')}</h3>
           <p className="text-xs text-neutral-500 max-w-sm mx-auto mt-1">
-            Coba sesuaikan kata kunci pencarian atau reset filter untuk melihat kreator berbakat lainnya.
+            {t('empty.creatorsDesc', 'Coba sesuaikan kata kunci pencarian atau reset filter untuk melihat kreator berbakat lainnya.')}
           </p>
           {activeFiltersCount > 0 && (
             <button
               onClick={resetFilters}
               className="mt-4 px-4 py-2 rounded-xl bg-[#0D0C22] text-white text-xs font-semibold hover:bg-neutral-800 transition-colors cursor-pointer"
             >
-              Reset Semua Filter
+              {t('filter.reset', 'Reset Semua Filter')}
             </button>
           )}
         </div>

@@ -163,11 +163,14 @@ export const Navbar: React.FC<NavbarProps> = ({
       id="main-header" 
       className={`sticky top-0 z-40 w-full transition-all duration-300 ease-in-out font-sans ${
         isScrolled 
-          ? 'bg-white/95 backdrop-blur-md shadow-xs border-b border-[#E1E3EA]' 
+          ? 'bg-white/70 backdrop-blur-xl shadow-xs border-b border-neutral-200/50' 
           : isHomeActive 
             ? 'bg-transparent border-b border-transparent' 
-            : 'bg-white border-b border-[#E1E3EA]'
+            : 'bg-white/85 backdrop-blur-md border-b border-[#E1E3EA]'
       }`}
+      style={{
+        WebkitBackdropFilter: isScrolled ? 'blur(20px)' : isHomeActive ? undefined : 'blur(12px)',
+      }}
     >
       <div className={`max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 transition-all duration-300 ease-in-out flex items-center justify-between gap-4 ${
         isScrolled ? 'h-16' : 'h-[72px]'
@@ -547,7 +550,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                   setNavSearchInput(e.target.value);
                   if (onSearch) onSearch(e.target.value);
                 }}
-                placeholder="Cari kreator, keahlian, atau video UGC..."
+                placeholder={t('nav.searchPlaceholder', 'Cari kreator, keahlian, atau video UGC...')}
                 className="w-full bg-transparent text-sm font-normal text-[#0D0C22] placeholder:text-[#55576A]/60 focus:outline-hidden"
               />
               <button 

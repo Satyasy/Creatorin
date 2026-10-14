@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from '@/providers/AuthProvider';
 import { useAuthModal } from '@/providers/AuthModalProvider';
 import { useLanguage } from '@/providers/LanguageProvider';
+import { useToast } from '@/providers/ToastProvider';
 import { 
   Search, 
   Play,
@@ -589,8 +590,44 @@ export const ExploreProjectsPage: React.FC<ExploreProjectsPageProps> = ({
   const router = useRouter();
   const { user: authUser } = useAuth();
   const { openAuthModal } = useAuthModal();
-  const { t } = useLanguage();
+  const { showToast: showGlobalToast } = useToast();
+  const { t, language } = useLanguage();
   const currentUser = propUser !== undefined ? propUser : authUser;
+
+  const getCategoryLabel = (cat: string) => {
+    if (cat === 'Semua') return t('category.all', 'Semua');
+    if (cat === 'Reels Instagram') return t('category.reels', 'Reels Instagram');
+    if (cat === 'Video Tiktok' || cat === 'Video TikTok') return t('category.tiktok', 'Video TikTok');
+    if (cat === 'UI/UX Design') return t('category.uiux', 'UI/UX Design');
+    if (cat === 'Foto Produk') return t('category.productPhoto', 'Foto Produk');
+    if (cat === 'Feed Instagram') return t('category.feed', 'Feed Instagram');
+    if (cat === 'Logo & Branding') return t('category.logo', 'Logo & Branding');
+    return cat;
+  };
+
+  const getPlatformLabel = (id: string) => {
+    if (id === 'all') return t('platform.all', 'Semua Platform');
+    if (id === 'instagram') return 'Instagram';
+    if (id === 'tiktok') return 'TikTok';
+    if (id === 'direct') return t('platform.direct', 'Creatorin Upload');
+    return id;
+  };
+
+  const getFormatLabel = (id: string) => {
+    if (id === 'all') return t('format.all', 'Semua Format');
+    if (id === 'video') return t('format.video', 'Video / Reels');
+    if (id === 'carousel') return t('format.carousel', 'Carousel Multi-slide');
+    if (id === 'image') return t('format.image', 'Foto / Desain Tunggal');
+    return id;
+  };
+
+  const getSortLabel = (id: string) => {
+    if (id === 'popular') return t('sort.popular', 'Paling Populer');
+    if (id === 'likes') return t('sort.mostLiked', 'Terbanyak Disukai');
+    if (id === 'views') return t('sort.mostViewed', 'Terbanyak Dilihat');
+    if (id === 'latest') return t('sort.newest', 'Terbaru');
+    return id;
+  };
 
   const navigateTo = (page: ActivePage, path?: string) => {
     if (onNavigate) {
@@ -740,9 +777,14 @@ export const ExploreProjectsPage: React.FC<ExploreProjectsPageProps> = ({
   const handleToggleSave = (projId: string, e?: React.MouseEvent) => {
     if (e) e.stopPropagation();
     if (!currentUser) {
-      openAuthModal({
-        title: t('auth.loginRequired', 'Masuk ke Akun Creatorin'),
-        description: t('auth.bookmarkRequired', 'Silakan masuk ke akun Creatorin Anda terlebih dahulu untuk menyimpan ke koleksi favorit.'),
+      showGlobalToast({
+        type: 'warning',
+        title: t('toast.authRequired', 'Perlu Masuk Akun'),
+        message: t('auth.bookmarkRequired', 'Silakan masuk ke akun Creatorin Anda terlebih dahulu untuk menyimpan ke koleksi favorit.'),
+        action: {
+          label: t('action.signIn', 'Masuk ke Akun'),
+          onClick: () => router.push('/sign-in'),
+        },
       });
       return;
     }
@@ -757,9 +799,14 @@ export const ExploreProjectsPage: React.FC<ExploreProjectsPageProps> = ({
   const handleToggleFollow = (creatorId: string, e?: React.MouseEvent) => {
     if (e) e.stopPropagation();
     if (!currentUser) {
-      openAuthModal({
-        title: t('auth.loginRequired', 'Masuk ke Akun Creatorin'),
-        description: t('toast.followAuth', 'Anda harus masuk ke akun Creatorin terlebih dahulu untuk mengikuti kreator ini.'),
+      showGlobalToast({
+        type: 'warning',
+        title: t('toast.authRequired', 'Perlu Masuk Akun'),
+        message: t('toast.followAuth', 'Anda harus masuk ke akun Creatorin terlebih dahulu untuk mengikuti kreator ini.'),
+        action: {
+          label: t('action.signIn', 'Masuk ke Akun'),
+          onClick: () => router.push('/sign-in'),
+        },
       });
       return;
     }
@@ -857,7 +904,7 @@ export const ExploreProjectsPage: React.FC<ExploreProjectsPageProps> = ({
                     selectedCategory !== 'Semua' ? 'border-[#0d0c22] text-[#0d0c22] bg-neutral-50' : 'border-neutral-200 text-neutral-700 hover:border-neutral-300'
                   }`}
                 >
-                  <span>{selectedCategory === 'Semua' ? 'Kategori' : selectedCategory}</span>
+                  <span>{selectedCategory === 'Semua' ? t('filter.category', 'Kategori') : getCategoryLabel(selectedCategory)}</span>
                   <ChevronDown className="w-3.5 h-3.5 text-neutral-400" />
                 </button>
 
@@ -874,7 +921,7 @@ export const ExploreProjectsPage: React.FC<ExploreProjectsPageProps> = ({
                           selectedCategory === cat ? 'font-bold text-[#0d0c22]' : 'text-neutral-600'
                         }`}
                       >
-                        <span>{cat}</span>
+                        <span>{getCategoryLabel(cat)}</span>
                         {selectedCategory === cat && <Check className="w-3.5 h-3.5 text-[#0d0c22]" />}
                       </button>
                     ))}
@@ -892,12 +939,8 @@ export const ExploreProjectsPage: React.FC<ExploreProjectsPageProps> = ({
                 >
                   <span>
                     {selectedPlatform === 'all' 
-                      ? 'Platform' 
-                      : selectedPlatform === 'instagram' 
-                      ? 'Instagram' 
-                      : selectedPlatform === 'tiktok' 
-                      ? 'TikTok' 
-                      : 'Creatorin Upload'}
+                      ? t('filter.platform', 'Platform') 
+                      : getPlatformLabel(selectedPlatform)}
                   </span>
                   <ChevronDown className="w-3.5 h-3.5 text-neutral-400" />
                 </button>
@@ -915,7 +958,7 @@ export const ExploreProjectsPage: React.FC<ExploreProjectsPageProps> = ({
                           selectedPlatform === p.id ? 'font-bold text-[#0d0c22]' : 'text-neutral-600'
                         }`}
                       >
-                        <span>{p.label}</span>
+                        <span>{getPlatformLabel(p.id)}</span>
                         {selectedPlatform === p.id && <Check className="w-3.5 h-3.5 text-[#0d0c22]" />}
                       </button>
                     ))}
@@ -933,12 +976,8 @@ export const ExploreProjectsPage: React.FC<ExploreProjectsPageProps> = ({
                 >
                   <span>
                     {selectedFormat === 'all' 
-                      ? 'Format Media' 
-                      : selectedFormat === 'video' 
-                      ? 'Video / Reels' 
-                      : selectedFormat === 'carousel' 
-                      ? 'Carousel' 
-                      : 'Foto / Desain'}
+                      ? t('filter.format', 'Format Media') 
+                      : getFormatLabel(selectedFormat)}
                   </span>
                   <ChevronDown className="w-3.5 h-3.5 text-neutral-400" />
                 </button>
@@ -946,10 +985,10 @@ export const ExploreProjectsPage: React.FC<ExploreProjectsPageProps> = ({
                 {openDropdown === 'format' && (
                   <div className="absolute left-0 mt-1.5 w-52 bg-white rounded-2xl border border-neutral-200 shadow-xl py-2 z-40 animate-in fade-in">
                     {[
-                      { id: 'all', label: 'Semua Format' },
-                      { id: 'video', label: 'Video / Reels' },
-                      { id: 'carousel', label: 'Carousel Multi-slide' },
-                      { id: 'image', label: 'Foto / Desain Tunggal' },
+                      { id: 'all' },
+                      { id: 'video' },
+                      { id: 'carousel' },
+                      { id: 'image' },
                     ].map((fmt) => (
                       <button
                         key={fmt.id}
@@ -961,7 +1000,7 @@ export const ExploreProjectsPage: React.FC<ExploreProjectsPageProps> = ({
                           selectedFormat === fmt.id ? 'font-bold text-[#0d0c22]' : 'text-neutral-600'
                         }`}
                       >
-                        <span>{fmt.label}</span>
+                        <span>{getFormatLabel(fmt.id)}</span>
                         {selectedFormat === fmt.id && <Check className="w-3.5 h-3.5 text-[#0d0c22]" />}
                       </button>
                     ))}
@@ -978,13 +1017,8 @@ export const ExploreProjectsPage: React.FC<ExploreProjectsPageProps> = ({
                   }`}
                 >
                   <span>
-                    {selectedSort === 'popular'
-                      ? 'Urutkan: Populer'
-                      : selectedSort === 'likes'
-                      ? 'Urutkan: Likes'
-                      : selectedSort === 'views'
-                      ? 'Urutkan: Views'
-                      : 'Urutkan: Terbaru'}
+                    {t('sort.prefix', 'Urutkan: ')}
+                    {getSortLabel(selectedSort)}
                   </span>
                   <ChevronDown className="w-3.5 h-3.5 text-neutral-400" />
                 </button>
@@ -992,10 +1026,10 @@ export const ExploreProjectsPage: React.FC<ExploreProjectsPageProps> = ({
                 {openDropdown === 'sort' && (
                   <div className="absolute right-0 mt-1.5 w-48 bg-white rounded-2xl border border-neutral-200 shadow-xl py-2 z-40 animate-in fade-in">
                     {[
-                      { id: 'popular', label: 'Paling Populer' },
-                      { id: 'likes', label: 'Terbanyak Disukai' },
-                      { id: 'views', label: 'Terbanyak Dilihat' },
-                      { id: 'latest', label: 'Terbaru' },
+                      { id: 'popular' },
+                      { id: 'likes' },
+                      { id: 'views' },
+                      { id: 'latest' },
                     ].map((s) => (
                       <button
                         key={s.id}
@@ -1007,7 +1041,7 @@ export const ExploreProjectsPage: React.FC<ExploreProjectsPageProps> = ({
                           selectedSort === s.id ? 'font-bold text-[#0d0c22]' : 'text-neutral-600'
                         }`}
                       >
-                        <span>{s.label}</span>
+                        <span>{getSortLabel(s.id)}</span>
                         {selectedSort === s.id && <Check className="w-3.5 h-3.5 text-[#0d0c22]" />}
                       </button>
                     ))}
@@ -1028,11 +1062,11 @@ export const ExploreProjectsPage: React.FC<ExploreProjectsPageProps> = ({
 
           {searchQuery && (
             <div className="flex items-center gap-2 mt-3 text-xs font-medium text-neutral-600">
-              <span>Hasil pencarian dari navbar: <strong className="text-[#0d0c22]">"{searchQuery}"</strong></span>
+              <span>{t('filter.searchResultsNavbar', 'Hasil pencarian:')} <strong className="text-[#0d0c22]">"{searchQuery}"</strong></span>
               <button
                 onClick={() => setSearchQuery('')}
                 className="text-neutral-400 hover:text-neutral-800 p-0.5 rounded cursor-pointer"
-                title="Hapus filter pencarian"
+                title={t('filter.clearSearch', 'Hapus filter pencarian')}
               >
                 <X className="w-3.5 h-3.5" />
               </button>

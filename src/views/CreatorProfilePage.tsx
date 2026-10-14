@@ -451,9 +451,14 @@ export const CreatorProfilePage: React.FC<CreatorProfilePageProps> = ({
   const toggleSaveProject = (id: string, e: React.MouseEvent) => {
     e.stopPropagation();
     if (!currentUser) {
-      openAuthModal({
-        title: t('auth.loginRequired', 'Masuk ke Akun Creatorin'),
-        description: t('auth.bookmarkRequired', 'Silakan masuk ke akun Creatorin Anda terlebih dahulu untuk menyimpan ke koleksi favorit.'),
+      showToast({
+        type: 'warning',
+        title: t('toast.authRequired', 'Perlu Masuk Akun'),
+        message: t('auth.bookmarkRequired', 'Silakan masuk ke akun Creatorin Anda terlebih dahulu untuk menyimpan ke koleksi favorit.'),
+        action: {
+          label: t('action.signIn', 'Masuk ke Akun'),
+          onClick: () => router.push('/sign-in'),
+        },
       });
       return;
     }
@@ -472,9 +477,14 @@ export const CreatorProfilePage: React.FC<CreatorProfilePageProps> = ({
   const toggleSaveService = (id: string, e: React.MouseEvent) => {
     e.stopPropagation();
     if (!currentUser) {
-      openAuthModal({
-        title: t('auth.loginRequired', 'Masuk ke Akun Creatorin'),
-        description: t('toast.saveServiceAuth', 'Anda harus masuk ke akun Creatorin terlebih dahulu untuk menyimpan layanan favorit.'),
+      showToast({
+        type: 'warning',
+        title: t('toast.authRequired', 'Perlu Masuk Akun'),
+        message: t('toast.saveServiceAuth', 'Anda harus masuk ke akun Creatorin terlebih dahulu untuk menyimpan layanan favorit.'),
+        action: {
+          label: t('action.signIn', 'Masuk ke Akun'),
+          onClick: () => router.push('/sign-in'),
+        },
       });
       return;
     }

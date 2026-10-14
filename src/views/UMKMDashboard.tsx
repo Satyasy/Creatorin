@@ -20,6 +20,8 @@ import {
 } from 'lucide-react';
 import { creatorService } from '@/services/creatorService';
 import { useAuth } from '@/providers/AuthProvider';
+import { useLanguage } from '@/providers/LanguageProvider';
+import { useToast } from '@/providers/ToastProvider';
 import { FeedProject, CreatorService, Creator, AuthState } from '@/types';
 import { HomeHeroSection } from '@/components/home/HomeHeroSection';
 import { ProjectCard } from '@/components/common/ProjectCard';
@@ -657,6 +659,8 @@ const INITIAL_SHOWCASE_CREATORS: ShowcaseCreator[] = [
 export const UMKMDashboard = () => {
   const router = useRouter();
   const { user } = useAuth();
+  const { showToast } = useToast();
+  const { t, language } = useLanguage();
   const [activeTab, setActiveTab] = useState<'creator' | 'layanan' | 'proyek'>('creator');
   const [searchQuery, setSearchQuery] = useState('');
   const [savedCreators, setSavedCreators] = useState<Record<string, boolean>>({});
@@ -786,17 +790,15 @@ export const UMKMDashboard = () => {
 
   const toggleBookmark = (creatorId: string) => {
     if (!user) {
-      setAuthModalConfig({
-        title: 'Masuk ke Akun Creatorin',
-        description: 'Silakan masuk ke akun Creatorin Anda terlebih dahulu untuk menyimpan ke koleksi favorit.',
-        action: () => {
-          setSavedCreators((prev) => ({
-            ...prev,
-            [creatorId]: !prev[creatorId],
-          }));
+      showToast({
+        type: 'warning',
+        title: t('toast.authRequired', 'Perlu Masuk Akun'),
+        message: t('auth.bookmarkRequired', 'Silakan masuk ke akun Creatorin Anda terlebih dahulu untuk menyimpan ke koleksi favorit.'),
+        action: {
+          label: t('action.signIn', 'Masuk ke Akun'),
+          onClick: () => router.push('/sign-in'),
         },
       });
-      setIsAuthModalOpen(true);
       return;
     }
     setSavedCreators((prev) => ({
@@ -807,17 +809,15 @@ export const UMKMDashboard = () => {
 
   const toggleBookmarkService = (serviceId: string) => {
     if (!user) {
-      setAuthModalConfig({
-        title: 'Masuk ke Akun Creatorin',
-        description: 'Silakan masuk ke akun Creatorin Anda terlebih dahulu untuk menyimpan ke koleksi favorit.',
-        action: () => {
-          setSavedServices((prev) => ({
-            ...prev,
-            [serviceId]: !prev[serviceId],
-          }));
+      showToast({
+        type: 'warning',
+        title: t('toast.authRequired', 'Perlu Masuk Akun'),
+        message: t('toast.saveServiceAuth', 'Anda harus masuk ke akun Creatorin terlebih dahulu untuk menyimpan layanan favorit.'),
+        action: {
+          label: t('action.signIn', 'Masuk ke Akun'),
+          onClick: () => router.push('/sign-in'),
         },
       });
-      setIsAuthModalOpen(true);
       return;
     }
     setSavedServices((prev) => ({
@@ -829,17 +829,15 @@ export const UMKMDashboard = () => {
   const toggleBookmarkProject = (projectId: string, e?: React.MouseEvent) => {
     if (e) e.stopPropagation();
     if (!user) {
-      setAuthModalConfig({
-        title: 'Masuk ke Akun Creatorin',
-        description: 'Silakan masuk ke akun Creatorin Anda terlebih dahulu untuk menyimpan ke koleksi favorit.',
-        action: () => {
-          setSavedProjects((prev) => ({
-            ...prev,
-            [projectId]: !prev[projectId],
-          }));
+      showToast({
+        type: 'warning',
+        title: t('toast.authRequired', 'Perlu Masuk Akun'),
+        message: t('auth.bookmarkRequired', 'Silakan masuk ke akun Creatorin Anda terlebih dahulu untuk menyimpan ke koleksi favorit.'),
+        action: {
+          label: t('action.signIn', 'Masuk ke Akun'),
+          onClick: () => router.push('/sign-in'),
         },
       });
-      setIsAuthModalOpen(true);
       return;
     }
     setSavedProjects((prev) => ({
@@ -1102,7 +1100,7 @@ export const UMKMDashboard = () => {
       <HomeHeroSection
         onExploreClick={() => router.push('/jelajah/kreator')}
         onSecondaryClick={user ? () => setIsBriefModalOpen(true) : () => router.push('/sign-in')}
-        secondaryText={user ? 'Buat Brief Proyek' : 'Bergabung Creatorin'}
+        secondaryText={user ? t('hero.createBrief', 'Buat Brief Proyek') : t('hero.joinBtn', 'Bergabung Creatorin')}
       />
 
       {/* Main Content Area */}
@@ -1120,7 +1118,7 @@ export const UMKMDashboard = () => {
             }`}
           >
             <User className="w-4 h-4 text-inherit" />
-            <span>Creator</span>
+            <span>{t('tabs.creators', 'Creator')}</span>
           </button>
 
           <button
@@ -1133,7 +1131,7 @@ export const UMKMDashboard = () => {
             }`}
           >
             <Package className="w-4 h-4 text-inherit" />
-            <span>Layanan</span>
+            <span>{t('tabs.services', 'Layanan')}</span>
           </button>
 
           <button
@@ -1146,7 +1144,7 @@ export const UMKMDashboard = () => {
             }`}
           >
             <Layers className="w-4 h-4 text-inherit" />
-            <span>Proyek</span>
+            <span>{t('tabs.projects', 'Proyek')}</span>
           </button>
         </div>
 
@@ -1159,7 +1157,7 @@ export const UMKMDashboard = () => {
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="What type of design are you interested in?"
+            placeholder={t('home.searchPlaceholder', 'What type of design are you interested in?')}
             className="w-full bg-transparent text-xs sm:text-sm md:text-[15px] text-[#0D0C22] placeholder:text-[#6F7285] focus:outline-hidden py-1"
           />
           {searchQuery && (
@@ -1167,7 +1165,7 @@ export const UMKMDashboard = () => {
               type="button"
               onClick={() => setSearchQuery('')}
               className="p-1 text-[#6F7285] hover:text-[#0D0C22] cursor-pointer shrink-0"
-              aria-label="Hapus pencarian"
+              aria-label={t('home.resetSearch', 'Hapus pencarian')}
             >
               <X className="w-4 h-4" />
             </button>
@@ -1188,13 +1186,13 @@ export const UMKMDashboard = () => {
           <section aria-label="Daftar Rekomendasi Kreator" className="space-y-6">
             {filteredCreators.length === 0 ? (
               <div className="rounded-2xl border border-[#E1E3EA] bg-white p-12 text-center my-8">
-                <p className="text-sm font-semibold text-[#0D0C22]">Belum ada kreator yang cocok dengan pencarian.</p>
+                <p className="text-sm font-semibold text-[#0D0C22]">{t('home.noCreatorsFound', 'Belum ada kreator yang cocok dengan pencarian.')}</p>
                 <button
                   type="button"
                   onClick={() => setSearchQuery('')}
                   className="mt-3 text-xs font-semibold text-[#155DFC] hover:underline cursor-pointer"
                 >
-                  Reset pencarian
+                  {t('home.resetSearch', 'Reset pencarian')}
                 </button>
               </div>
             ) : (
@@ -1241,17 +1239,19 @@ export const UMKMDashboard = () => {
                           </span>
                           <span className="inline-flex items-center gap-1 text-xs font-medium text-[#55576A]">
                             <Check className="w-3 h-3 text-[#16803C] stroke-[2.5]" />
-                            <span>{creator.completedProjects} proyek selesai</span>
+                            <span>{t('home.verifiedProjects', '{count} proyek selesai').replace('{count}', String(creator.completedProjects))}</span>
                           </span>
                           {creator.isPromoted && (
                             <span className="text-xs font-medium text-[#6F7285]">
-                              Promoted
+                              {t('home.promoted', 'Promoted')}
                             </span>
                           )}
                         </div>
 
                         <div className="flex flex-wrap items-center gap-x-2 gap-y-1 mt-1 text-xs text-[#55576A]">
-                          <span className="font-semibold text-[#0D0C22]">{creator.startingRateText}</span>
+                          <span className="font-semibold text-[#0D0C22]">
+                            {language === 'en' ? 'From IDR ' + creator.startingRateText.replace('Rp', '').trim() : creator.startingRateText}
+                          </span>
                           <span>&middot;</span>
                           <span className="inline-flex items-center gap-1">
                             <MapPin className="w-3 h-3 text-[#6F7285]" />
@@ -1259,10 +1259,10 @@ export const UMKMDashboard = () => {
                           </span>
                           <span>&middot;</span>
                           <span>
-                            <strong className="font-semibold text-[#0D0C22]">{creator.careerScore}%</strong> Skor Karir
+                            <strong className="font-semibold text-[#0D0C22]">{creator.careerScore}%</strong> {t('profile.careerScore', 'Skor Karir')}
                           </span>
                           <span>&middot;</span>
-                          <span>{creator.servicesCount} Layanan tersedia</span>
+                          <span>{creator.servicesCount} {t('card.servicesAvailable', 'Layanan tersedia')}</span>
                         </div>
                       </div>
                     </div>
@@ -1282,7 +1282,7 @@ export const UMKMDashboard = () => {
                         onClick={() => handleOpenChatWithCreator(creator.id)}
                         className="rounded-full bg-[#0D0C22] hover:bg-black active:bg-neutral-900 text-white px-5 py-2 text-xs sm:text-sm font-semibold transition-all cursor-pointer shadow-xs active:scale-95"
                       >
-                        Hubungi
+                        {t('card.contact', 'Hubungi')}
                       </button>
                     </div>
                   </div>
@@ -1315,7 +1315,9 @@ export const UMKMDashboard = () => {
                           </h4>
                           <div className="flex items-center justify-between text-xs pt-1">
                             <span className="font-bold text-[#0D0C22]">{service.price}</span>
-                            <span className="text-[11px] sm:text-xs text-[#6F7285] font-medium">{service.duration}</span>
+                            <span className="text-[11px] sm:text-xs text-[#6F7285] font-medium">
+                              {language === 'en' ? service.duration.replace('Hari Kerja', 'Working Days') : service.duration}
+                            </span>
                           </div>
                         </div>
                       </div>
@@ -1350,13 +1352,13 @@ export const UMKMDashboard = () => {
           <section aria-label="Daftar Layanan Kreator">
             {filteredServices.length === 0 ? (
               <div className="rounded-2xl border border-[#E1E3EA] bg-white p-12 text-center my-8">
-                <p className="text-sm font-semibold text-[#0D0C22]">Belum ada layanan yang cocok dengan pencarian.</p>
+                <p className="text-sm font-semibold text-[#0D0C22]">{t('empty.servicesTitle', 'Belum ada layanan yang cocok dengan pencarian.')}</p>
                 <button
                   type="button"
                   onClick={() => setSearchQuery('')}
                   className="mt-3 text-xs font-semibold text-[#155DFC] hover:underline cursor-pointer"
                 >
-                  Reset pencarian
+                  {t('home.resetSearch', 'Reset pencarian')}
                 </button>
               </div>
             ) : (
@@ -1416,7 +1418,7 @@ export const UMKMDashboard = () => {
                       {/* Estimate */}
                       <div className="flex items-center gap-1.5 text-xs text-[#55576A] mt-2.5">
                         <Clock className="w-3.5 h-3.5 text-[#6F7285] shrink-0" />
-                        <span>Estimasi: {service.duration}</span>
+                        <span>{language === 'en' ? 'Estimated: ' + service.duration.replace('Hari Kerja', 'Working Days') : 'Estimasi: ' + service.duration}</span>
                       </div>
                     </div>
 
@@ -1424,7 +1426,7 @@ export const UMKMDashboard = () => {
                     <div className="pt-3 border-t border-[#F3F4F6] mt-4 flex items-center justify-between gap-2">
                       <div>
                         <span className="text-[10px] uppercase font-bold text-[#6F7285] tracking-wider block leading-none">
-                          HARGA
+                          {t('profile.price', 'HARGA')}
                         </span>
                         <span className="text-sm sm:text-base font-bold text-[#0D0C22] mt-0.5 block leading-tight">
                           {service.price}
@@ -1437,7 +1439,7 @@ export const UMKMDashboard = () => {
                           onClick={() => handleOpenChatWithCreator(service.creatorId)}
                           className="rounded-full bg-[#0D0C22] hover:bg-black active:bg-neutral-900 text-white px-3.5 sm:px-4 py-1.5 text-xs font-semibold transition-all cursor-pointer shadow-xs active:scale-95"
                         >
-                          Diskusikan
+                          {t('card.discuss', 'Diskusikan')}
                         </button>
                       </div>
                     </div>
@@ -1453,13 +1455,13 @@ export const UMKMDashboard = () => {
           <section aria-label="Daftar Portofolio Proyek">
             {filteredProjects.length === 0 ? (
               <div className="rounded-2xl border border-[#E1E3EA] bg-white p-12 text-center my-8">
-                <p className="text-sm font-semibold text-[#0D0C22]">Belum ada proyek yang cocok dengan pencarian.</p>
+                <p className="text-sm font-semibold text-[#0D0C22]">{t('empty.projectsTitle', 'Belum ada proyek yang cocok dengan pencarian.')}</p>
                 <button
                   type="button"
                   onClick={() => setSearchQuery('')}
                   className="mt-3 text-xs font-semibold text-[#155DFC] hover:underline cursor-pointer"
                 >
-                  Reset pencarian
+                  {t('home.resetSearch', 'Reset pencarian')}
                 </button>
               </div>
             ) : (
@@ -1479,7 +1481,7 @@ export const UMKMDashboard = () => {
                       username: project.creatorHandle.replace('@', ''),
                       avatar: project.creatorAvatar,
                       category: 'Image',
-                      roleTitle: 'Kreator Profesional',
+                      roleTitle: language === 'en' ? 'Professional Creator' : 'Kreator Profesional',
                       bio: `${project.creatorName} di Creatorin`,
                       location: 'Indonesia',
                       startingRate: 250000,
@@ -1550,7 +1552,7 @@ export const UMKMDashboard = () => {
             }}
             className="bg-[#0D0C22] hover:bg-black active:bg-neutral-900 text-white px-8 py-3 rounded-full text-xs sm:text-sm font-semibold shadow-xs transition-all active:scale-98 cursor-pointer"
           >
-            Lihat Selengkapnya
+            {t('action.viewMore', 'Lihat Selengkapnya')}
           </button>
         </div>
 

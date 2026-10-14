@@ -79,69 +79,96 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
       <div
         aria-live="polite"
         aria-atomic="true"
-        className="fixed bottom-5 right-5 z-70 flex flex-col gap-2.5 max-w-sm sm:max-w-md w-full pointer-events-none p-2 sm:p-0"
+        className="fixed bottom-5 right-5 z-70 flex flex-col gap-2 max-w-[310px] sm:max-w-[330px] w-full pointer-events-none p-3 sm:p-0"
       >
         {toasts.map((toast) => {
           const durationSec = ((toast.duration || 4500) / 1000).toFixed(2);
           const isWarning = toast.type === 'warning';
           const isSuccess = toast.type === 'success';
           const isError = toast.type === 'error';
+          const hasAction = Boolean(toast.action);
 
           return (
             <div
               key={toast.id}
               role="status"
-              className="pointer-events-auto relative overflow-hidden bg-[#0D0C22] text-white rounded-2xl shadow-2xl border border-neutral-800 p-4 transition-all duration-300 animate-in fade-in slide-in-from-bottom-5 font-sans"
+              onClick={() => {
+                if (toast.action) {
+                  hideToast(toast.id);
+                  toast.action.onClick();
+                }
+              }}
+              className={`pointer-events-auto relative overflow-hidden bg-gradient-to-br from-[#0B172E] via-[#0D0C22] to-[#070D19] text-white rounded-2xl shadow-[0_15px_35px_-8px_rgba(21,93,252,0.35)] border border-[#155DFC]/35 p-3 sm:p-3.5 transition-all duration-300 animate-in fade-in slide-in-from-bottom-5 font-sans ${
+                hasAction ? 'cursor-pointer hover:border-[#155DFC]/60 hover:shadow-[0_20px_45px_-8px_rgba(21,93,252,0.45)] active:scale-[0.99]' : ''
+              }`}
             >
-              <div className="flex items-start gap-3">
+              {/* Silhouette Gradient Background with Creatorin Brand Primary Colors */}
+              <div className="pointer-events-none absolute inset-0 overflow-hidden select-none">
+                {/* Upper-right primary gradient silhouette orb */}
+                <div className="absolute -top-14 -right-12 w-40 h-40 rounded-full bg-gradient-to-br from-[#155DFC]/40 via-[#03ACFD]/25 to-transparent blur-2xl opacity-90" />
+
+                {/* Lower-left primary gradient silhouette orb */}
+                <div className="absolute -bottom-14 -left-12 w-32 h-32 rounded-full bg-gradient-to-tr from-[#155DFC]/30 via-[#03ACFD]/15 to-transparent blur-2xl opacity-80" />
+
+                {/* Artistic vector silhouette mesh overlay */}
+                <svg
+                  className="absolute inset-0 w-full h-full opacity-15"
+                  xmlns="http://www.w3.org/2000/svg"
+                  preserveAspectRatio="none"
+                  viewBox="0 0 350 150"
+                >
+                  <defs>
+                    <linearGradient id={`toastSiluet-${toast.id}`} x1="0%" y1="0%" x2="100%" y2="100%">
+                      <stop offset="0%" stopColor="#155DFC" stopOpacity="0.9" />
+                      <stop offset="50%" stopColor="#03ACFD" stopOpacity="0.6" />
+                      <stop offset="100%" stopColor="#0D0C22" stopOpacity="0.2" />
+                    </linearGradient>
+                  </defs>
+                  <path d="M0,50 C80,10 180,80 350,20 L350,0 L0,0 Z" fill={`url(#toastSiluet-${toast.id})`} />
+                  <circle cx="310" cy="30" r="60" fill={`url(#toastSiluet-${toast.id})`} />
+                  <path d="M0,120 C100,90 200,140 350,110 L350,150 L0,150 Z" fill={`url(#toastSiluet-${toast.id})`} />
+                </svg>
+              </div>
+
+              <div className="relative z-10 flex items-start gap-2.5">
                 <div className="shrink-0 mt-0.5">
-                  {isSuccess && <CheckCircle2 className="w-5 h-5 text-emerald-400" />}
-                  {isWarning && <AlertCircle className="w-5 h-5 text-amber-400" />}
-                  {isError && <AlertCircle className="w-5 h-5 text-rose-400" />}
-                  {!isSuccess && !isWarning && !isError && <Info className="w-5 h-5 text-blue-400" />}
+                  <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-gradient-to-br from-[#155DFC]/35 to-[#03ACFD]/20 border border-[#155DFC]/40 flex items-center justify-center shadow-xs">
+                    {isSuccess && <CheckCircle2 className="w-4 h-4 text-emerald-400" />}
+                    {isWarning && <AlertCircle className="w-4 h-4 text-amber-300" />}
+                    {isError && <AlertCircle className="w-4 h-4 text-rose-400" />}
+                    {!isSuccess && !isWarning && !isError && <Info className="w-4 h-4 text-[#03ACFD]" />}
+                  </div>
                 </div>
 
-                <div className="flex-1 min-w-0 pr-2">
+                <div className="flex-1 min-w-0 pr-1">
                   {toast.title && (
-                    <h4 className="text-xs font-bold text-white tracking-tight mb-0.5">
+                    <h4 className="text-xs font-bold text-white tracking-tight mb-0.5 leading-snug">
                       {toast.title}
                     </h4>
                   )}
-                  <p className="text-xs text-neutral-300 leading-relaxed font-normal">
+                  <p className="text-[11px] sm:text-xs text-neutral-300 leading-snug font-normal">
                     {toast.message}
                   </p>
-
-                  {toast.action && (
-                    <div className="mt-3">
-                      <button
-                        type="button"
-                        onClick={() => {
-                          hideToast(toast.id);
-                          toast.action?.onClick();
-                        }}
-                        className="px-3.5 py-1.5 rounded-lg bg-[#155DFC] hover:bg-[#1248C7] text-white text-[11px] font-bold transition-colors cursor-pointer shadow-xs inline-flex items-center gap-1.5"
-                      >
-                        <span>{toast.action.label}</span>
-                      </button>
-                    </div>
-                  )}
                 </div>
 
                 <button
                   type="button"
-                  onClick={() => hideToast(toast.id)}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    hideToast(toast.id);
+                  }}
                   className="shrink-0 -mr-1 -mt-1 p-1 text-neutral-400 hover:text-white rounded-lg hover:bg-white/10 transition-colors cursor-pointer"
                   aria-label="Tutup notifikasi"
                 >
-                  <X className="w-4 h-4" />
+                  <X className="w-3.5 h-3.5" />
                 </button>
               </div>
 
               {/* Animated Progress Line Countdown Indicator */}
               {toast.duration && toast.duration > 0 && (
-                <div className="absolute bottom-0 left-0 right-0 h-1 bg-white/10 overflow-hidden">
+                <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-white/10 overflow-hidden">
                   <div
-                    className="h-full bg-[#155DFC]"
+                    className="h-full bg-gradient-to-r from-[#155DFC] via-[#03ACFD] to-[#1248C7]"
                     style={{
                       animation: `shrinkToastProgress ${durationSec}s linear forwards`,
                     }}

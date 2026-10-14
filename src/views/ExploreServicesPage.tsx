@@ -60,8 +60,53 @@ export const ExploreServicesPage: React.FC<ExploreServicesPageProps> = ({
   const { user: authUser } = useAuth();
   const { openAuthModal } = useAuthModal();
   const { showToast } = useToast();
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const currentUser = propUser !== undefined ? propUser : authUser;
+
+  const getCategoryLabel = (cat: string) => {
+    if (cat === 'Semua') return t('category.all', 'Semua');
+    if (cat === 'Reels Instagram') return t('category.reels', 'Reels Instagram');
+    if (cat === 'Video Tiktok' || cat === 'Video TikTok') return t('category.tiktok', 'Video TikTok');
+    if (cat === 'Feed Instagram') return t('category.feed', 'Feed Instagram');
+    if (cat === 'Poster') return t('category.poster', 'Poster');
+    if (cat === 'Banner') return t('category.banner', 'Banner');
+    if (cat === 'Brosur') return t('category.brochure', 'Brosur');
+    if (cat === 'Logo') return t('category.logo', 'Logo');
+    if (cat === 'Foto Produk') return t('category.productPhoto', 'Foto Produk');
+    return cat;
+  };
+
+  const getBudgetLabel = (val: string) => {
+    if (val === 'Semua') return t('filter.allBudget', 'Semua Budget');
+    if (val === 'under500') return t('budget.under500', '< Rp500rb');
+    if (val === 'mid') return t('budget.mid500to15', 'Rp500rb - Rp1.5jt');
+    if (val === 'high') return t('budget.above15', '> Rp1.5jt');
+    return val;
+  };
+
+  const getDeliveryLabel = (val: string) => {
+    if (val === 'Semua') return t('filter.allTimes', 'Semua Waktu');
+    if (val === 'fast') return t('duration.fast', '⚡ 1-2 Hari');
+    if (val === 'standard') return t('duration.standard', '3-4 Hari');
+    if (val === 'relaxed') return t('duration.relaxed', '5+ Hari');
+    return val;
+  };
+
+  const getScoreLabel = (val: string) => {
+    if (val === 'Semua') return t('filter.allScoresRatings', 'Semua Rating & Score');
+    if (val === '95+') return 'Score 95+';
+    if (val === '90+') return 'Score 90+';
+    if (val === 'rating49') return 'Rating 4.9+';
+    return val;
+  };
+
+  const formatDelivery = (deliveryDays?: string) => {
+    if (!deliveryDays) return t('card.tbd', 'Belum ditentukan');
+    if (language === 'en') {
+      return deliveryDays.replace(/hari kerja/gi, 'Working Days').replace(/hari/gi, 'Days');
+    }
+    return deliveryDays.toLowerCase().includes('hari') ? deliveryDays : `${deliveryDays} Hari Kerja`;
+  };
 
   const navigateTo = (page: ActivePage, path?: string) => {
     if (onNavigate) {
@@ -118,9 +163,14 @@ export const ExploreServicesPage: React.FC<ExploreServicesPageProps> = ({
 
   const toggleSaveService = (serviceId: string) => {
     if (!currentUser) {
-      openAuthModal({
-        title: t('auth.loginRequired', 'Masuk ke Akun Creatorin'),
-        description: t('toast.saveServiceAuth', 'Anda harus masuk ke akun Creatorin terlebih dahulu untuk menyimpan layanan favorit.'),
+      showToast({
+        type: 'warning',
+        title: t('toast.authRequired', 'Perlu Masuk Akun'),
+        message: t('toast.saveServiceAuth', 'Anda harus masuk ke akun Creatorin terlebih dahulu untuk menyimpan layanan favorit.'),
+        action: {
+          label: t('action.signIn', 'Masuk ke Akun'),
+          onClick: () => router.push('/sign-in'),
+        },
       });
       return;
     }
@@ -865,7 +915,7 @@ const DEFAULT_SERVICES: ServiceWithCreator[] = [
                     selectedCategory !== 'Semua' ? 'border-[#0d0c22] text-[#0d0c22] bg-neutral-50' : 'border-neutral-200 text-neutral-700 hover:border-neutral-300'
                   }`}
                 >
-                  <span>{selectedCategory === 'Semua' ? 'Kategori' : selectedCategory}</span>
+                  <span>{selectedCategory === 'Semua' ? t('filter.category', 'Kategori') : getCategoryLabel(selectedCategory)}</span>
                   <ChevronDown className="w-3.5 h-3.5 text-neutral-400" />
                 </button>
 
@@ -892,7 +942,7 @@ const DEFAULT_SERVICES: ServiceWithCreator[] = [
                           selectedCategory === cat ? 'font-bold text-[#0d0c22]' : 'text-neutral-600'
                         }`}
                       >
-                        <span>{cat}</span>
+                        <span>{getCategoryLabel(cat)}</span>
                         {selectedCategory === cat && <Check className="w-3.5 h-3.5 text-[#0d0c22]" />}
                       </button>
                     ))}
@@ -909,7 +959,7 @@ const DEFAULT_SERVICES: ServiceWithCreator[] = [
                   }`}
                 >
                   <span>
-                    {selectedBudget === 'Semua' ? 'Budget' : selectedBudget === 'under500' ? '< Rp500rb' : selectedBudget === 'mid' ? 'Rp500rb - Rp1.5jt' : '> Rp1.5jt'}
+                    {selectedBudget === 'Semua' ? t('filter.budget', 'Budget') : getBudgetLabel(selectedBudget)}
                   </span>
                   <ChevronDown className="w-3.5 h-3.5 text-neutral-400" />
                 </button>
@@ -917,10 +967,10 @@ const DEFAULT_SERVICES: ServiceWithCreator[] = [
                 {openDropdown === 'budget' && (
                   <div className="absolute left-0 mt-1.5 w-52 bg-white rounded-2xl border border-neutral-200 shadow-xl py-2 z-30 animate-in fade-in">
                     {[
-                      { label: 'Semua Budget', val: 'Semua' },
-                      { label: 'Di bawah Rp500.000', val: 'under500' },
-                      { label: 'Rp500.000 - Rp1.500.000', val: 'mid' },
-                      { label: 'Di atas Rp1.500.000', val: 'high' }
+                      { label: t('filter.allBudget', 'Semua Budget'), val: 'Semua' },
+                      { label: t('filter.under500k', 'Di bawah Rp500.000'), val: 'under500' },
+                      { label: t('filter.midBudget', 'Rp500.000 - Rp1.500.000'), val: 'mid' },
+                      { label: t('filter.highBudget', 'Di atas Rp1.500.000'), val: 'high' }
                     ].map((b) => (
                       <button
                         key={b.val}
@@ -949,7 +999,7 @@ const DEFAULT_SERVICES: ServiceWithCreator[] = [
                   }`}
                 >
                   <span>
-                    {selectedDelivery === 'Semua' ? 'Pengerjaan' : selectedDelivery === 'fast' ? '⚡ 1-2 Hari' : selectedDelivery === 'standard' ? '3-4 Hari' : '5+ Hari'}
+                    {selectedDelivery === 'Semua' ? t('filter.duration', 'Pengerjaan') : getDeliveryLabel(selectedDelivery)}
                   </span>
                   <ChevronDown className="w-3.5 h-3.5 text-neutral-400" />
                 </button>
@@ -957,10 +1007,10 @@ const DEFAULT_SERVICES: ServiceWithCreator[] = [
                 {openDropdown === 'durasi' && (
                   <div className="absolute left-0 mt-1.5 w-52 bg-white rounded-2xl border border-neutral-200 shadow-xl py-2 z-30 animate-in fade-in">
                     {[
-                      { label: 'Semua Waktu', val: 'Semua' },
-                      { label: '⚡ Kilat (1-2 Hari Kerja)', val: 'fast' },
-                      { label: 'Standard (3-4 Hari Kerja)', val: 'standard' },
-                      { label: 'Proyek Besar (5+ Hari)', val: 'relaxed' }
+                      { label: t('filter.allTimes', 'Semua Waktu'), val: 'Semua' },
+                      { label: t('duration.fastFull', '⚡ Kilat (1-2 Hari Kerja)'), val: 'fast' },
+                      { label: t('duration.standardFull', 'Standard (3-4 Hari Kerja)'), val: 'standard' },
+                      { label: t('duration.relaxedFull', 'Proyek Besar (5+ Hari)'), val: 'relaxed' }
                     ].map((d) => (
                       <button
                         key={d.val}
@@ -989,7 +1039,7 @@ const DEFAULT_SERVICES: ServiceWithCreator[] = [
                   }`}
                 >
                   <span>
-                    {selectedScore === 'Semua' ? 'Rating / Score' : selectedScore === '95+' ? 'Score 95+' : selectedScore === '90+' ? 'Score 90+' : 'Rating 4.9+'}
+                    {selectedScore === 'Semua' ? t('filter.rating', 'Rating / Score') : getScoreLabel(selectedScore)}
                   </span>
                   <ChevronDown className="w-3.5 h-3.5 text-neutral-400" />
                 </button>
@@ -997,10 +1047,10 @@ const DEFAULT_SERVICES: ServiceWithCreator[] = [
                 {openDropdown === 'score' && (
                   <div className="absolute right-0 mt-1.5 w-56 bg-white rounded-[16px] border border-black/10 shadow-lg py-2 z-30 animate-in fade-in">
                     {[
-                      { label: 'Semua Rating & Score', val: 'Semua' },
+                      { label: t('filter.allScoresRatings', 'Semua Rating & Score'), val: 'Semua' },
                       { label: 'Career Score 95+ (Top 1%)', val: '95+' },
                       { label: 'Career Score 90+ (Top Tier)', val: '90+' },
-                      { label: 'Rating Bintang 4.9+', val: 'rating49' }
+                      { label: 'Rating 4.9+', val: 'rating49' }
                     ].map((s) => (
                       <button
                         key={s.val}
@@ -1032,8 +1082,8 @@ const DEFAULT_SERVICES: ServiceWithCreator[] = [
               <div className="w-12 h-12 bg-neutral-100 text-neutral-400 rounded-full flex items-center justify-center mx-auto mb-3">
                 <Search className="w-6 h-6" />
               </div>
-              <h3 className="text-lg font-bold text-[#0d0c22]">Tidak ada layanan yang sesuai</h3>
-              <p className="text-sm text-neutral-500 mt-1">Coba kata kunci lain atau bersihkan filter.</p>
+              <h3 className="text-lg font-bold text-[#0d0c22]">{t('empty.servicesTitle', 'Tidak Ada Layanan Ditemukan')}</h3>
+              <p className="text-sm text-neutral-500 mt-1">{t('empty.servicesDesc', 'Coba kata kunci lain atau bersihkan filter.')}</p>
               <button
                 onClick={() => {
                   setSelectedCategory('Semua');
@@ -1045,16 +1095,15 @@ const DEFAULT_SERVICES: ServiceWithCreator[] = [
                 }}
                 className="mt-4 px-4 py-2 rounded-full bg-neutral-100 hover:bg-neutral-200 text-xs font-bold text-[#0d0c22] cursor-pointer"
               >
-                Reset Semua Filter
+                {t('filter.reset', 'Reset Semua Filter')}
               </button>
             </div>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5 sm:gap-6">
               {filteredServices.map((item, sIdx) => {
                 const coverImage = item.coverImage || '';
-                const formattedDelivery = item.deliveryDays
-                  ? (item.deliveryDays.toLowerCase().includes('hari') ? item.deliveryDays : `${item.deliveryDays} Hari Kerja`)
-                  : 'Belum ditentukan';
+                const formattedDelivery = formatDelivery(item.deliveryDays);
+                const displayPrice = language === 'en' ? item.formattedPrice.replace('Rp', 'IDR ') : item.formattedPrice;
 
                 return (
                   <ScrollReveal
@@ -1132,7 +1181,7 @@ const DEFAULT_SERVICES: ServiceWithCreator[] = [
                         className="flex items-center gap-1.5 text-xs text-[#55576A] mb-5 cursor-pointer"
                       >
                         <Clock className="w-3.5 h-3.5 text-neutral-400 stroke-[1.75]" />
-                        <span>Estimasi: {formattedDelivery}</span>
+                        <span>{t('card.estimateHeader', 'Estimasi: {time}').replace('{time}', formattedDelivery)}</span>
                       </div>
                     </div>
 
@@ -1140,10 +1189,10 @@ const DEFAULT_SERVICES: ServiceWithCreator[] = [
                     <div className="flex items-center justify-between pt-3.5 gap-2 border-t border-[#F5F5F5]">
                       <div onClick={() => setSelectedServiceForDetail(item)} className="cursor-pointer min-w-0">
                         <span className="text-[10px] text-[#737373] font-semibold uppercase tracking-wider block mb-0.5">
-                          HARGA
+                          {t('card.priceHeader', 'HARGA')}
                         </span>
                         <span className="text-sm sm:text-base font-extrabold text-[#0D0C22] truncate block">
-                          {item.formattedPrice}
+                          {displayPrice}
                         </span>
                       </div>
 
@@ -1154,7 +1203,7 @@ const DEFAULT_SERVICES: ServiceWithCreator[] = [
                           onClick={() => handleOpenOrder(item)}
                           className="h-9 px-4 rounded-full bg-[#0D0C22] hover:bg-[#1a1936] text-white text-xs sm:text-sm font-semibold transition-colors shadow-xs cursor-pointer"
                         >
-                          Diskusikan
+                          {t('card.discuss', 'Diskusikan')}
                         </button>
                       </div>
                     </div>
@@ -1185,7 +1234,7 @@ const DEFAULT_SERVICES: ServiceWithCreator[] = [
                 <div className="flex items-center gap-2 text-xs text-neutral-500 mt-1">
                   <span>Oleh {orderModalService.creator.name}</span>
                   <span>•</span>
-                  <span>Estimasi {orderModalService.deliveryDays || '3 Hari Kerja'}</span>
+                  <span>{formatDelivery(orderModalService.deliveryDays)}</span>
                 </div>
               </div>
               <button
@@ -1201,26 +1250,28 @@ const DEFAULT_SERVICES: ServiceWithCreator[] = [
               {/* Price summary */}
               <div className="bg-neutral-50 p-4 rounded-2xl border border-neutral-100 flex items-center justify-between">
                 <div>
-                  <span className="text-xs text-neutral-400 font-bold uppercase">Total Biaya Layanan</span>
-                  <p className="text-xl font-black text-[#0d0c22]">{orderModalService.formattedPrice}</p>
+                  <span className="text-xs text-neutral-400 font-bold uppercase">{t('service.totalCost', 'Total Biaya Layanan')}</span>
+                  <p className="text-xl font-black text-[#0d0c22]">
+                    {language === 'en' ? orderModalService.formattedPrice.replace('Rp', 'IDR ') : orderModalService.formattedPrice}
+                  </p>
                 </div>
                 <div className="text-right">
-                  <span className="text-xs text-neutral-400 font-bold uppercase">Estimasi Pengerjaan</span>
-                  <p className="text-sm font-bold text-neutral-800">{orderModalService.deliveryDays || '3 Hari Kerja'}</p>
+                  <span className="text-xs text-neutral-400 font-bold uppercase">{t('service.estimateDelivery', 'Estimasi Pengerjaan')}</span>
+                  <p className="text-sm font-bold text-neutral-800">{formatDelivery(orderModalService.deliveryDays)}</p>
                 </div>
               </div>
 
               {/* Input Kirim Pesan untuk Kreator */}
               <div>
                 <label className="block text-xs font-bold text-[#0d0c22] mb-1.5">
-                  Kirim pesan untuk kreator
+                  {t('service.sendMessageToCreator', 'Kirim pesan untuk kreator')}
                 </label>
                 <textarea
                   rows={4}
                   required
                   value={orderBriefNotes}
                   onChange={(e) => setOrderBriefNotes(e.target.value)}
-                  placeholder="Tulis pesan atau pertanyaan Anda terkait layanan ini ke kreator..."
+                  placeholder={t('service.messagePlaceholder', 'Tulis pesan atau pertanyaan Anda terkait layanan ini ke kreator...')}
                   className="w-full px-3.5 py-2.5 rounded-xl border border-neutral-300 text-sm focus:outline-hidden focus:ring-2 focus:ring-[#0d0c22] resize-none"
                 />
               </div>
@@ -1232,7 +1283,7 @@ const DEFAULT_SERVICES: ServiceWithCreator[] = [
                   onClick={() => setOrderModalService(null)}
                   className="px-5 py-2.5 rounded-full border border-neutral-300 text-xs font-bold text-neutral-700 hover:bg-neutral-100 transition cursor-pointer"
                 >
-                  Batal
+                  {t('action.cancel', 'Batal')}
                 </button>
                 <button
                   type="submit"
@@ -1240,11 +1291,11 @@ const DEFAULT_SERVICES: ServiceWithCreator[] = [
                   className="px-6 py-2.5 rounded-full bg-[#0D0C22] hover:bg-[#1a1936] text-white text-xs sm:text-sm font-bold shadow-sm transition cursor-pointer flex items-center gap-2 disabled:opacity-60"
                 >
                   {isSendingInquiry ? (
-                    <span>Mengirim...</span>
+                    <span>{t('service.sending', 'Mengirim...')}</span>
                   ) : (
                     <>
                       <Send className="w-3.5 h-3.5" />
-                      <span>Kirim Pesan</span>
+                      <span>{t('action.sendMessage', 'Kirim Pesan')}</span>
                     </>
                   )}
                 </button>
