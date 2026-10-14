@@ -82,8 +82,6 @@ export interface Creator {
     source: string;
   };
   heroHeadline?: string;
-  followersCount?: number;
-  followingCount?: number;
   likesCount?: number;
   bannerQuote?: string;
   copyrightName?: string;
@@ -92,6 +90,9 @@ export interface Creator {
   handle?: string;
   collections?: { id: string; title: string; count: number; coverImage: string }[];
   reviewsList?: { id: string; clientName: string; clientCompany: string; rating: number; comment: string; date: string; projectTitle: string }[];
+  schoolName?: string;
+  schoolStatus?: 'pending' | 'approved' | 'rejected' | string | null;
+  schoolBadge?: { schoolName: string; verified: boolean } | null;
 }
 
 export interface ProjectListing {

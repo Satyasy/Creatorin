@@ -694,8 +694,8 @@ export const UMKMDashboard = () => {
   const handleOpenChatWithCreator = (creatorId: string) => {
     if (!user) {
       setAuthModalConfig({
-        title: 'Masuk untuk Menghubungi Kreator',
-        description: 'Anda harus masuk ke akun Creatorin Anda terlebih dahulu untuk memulai obrolan langsung dan mendiskusikan kebutuhan kolaborasi.',
+        title: 'Masuk untuk hubungi kreator',
+        description: 'Masuk ke akun Anda untuk memulai percakapan dengan kreator ini.',
         action: () => {
           router.push(`/chat?creatorId=${creatorId}`);
         },

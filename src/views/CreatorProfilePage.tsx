@@ -180,10 +180,6 @@ export const CreatorProfilePage: React.FC<CreatorProfilePageProps> = ({
   const [isFilterDropdownOpen, setIsFilterDropdownOpen] = useState(false);
   const [isMoreMenuOpen, setIsMoreMenuOpen] = useState(false);
   
-  // Follow state
-  const [isFollowing, setIsFollowing] = useState(false);
-  const [followersCount, setFollowersCount] = useState(creator.followersCount || 0);
-  const followingCount = creator.followingCount ?? 0;
   const [likesCount, setLikesCount] = useState(creator.likesCount ?? 0);
 
   // Modals state
@@ -209,7 +205,6 @@ export const CreatorProfilePage: React.FC<CreatorProfilePageProps> = ({
     title: 'Masuk ke Akun Creatorin',
     description: 'Masuk untuk melanjutkan tindakan ini dan membuka akses ke seluruh fitur kolaborasi.',
   });
-  const [isTogglingFollow, setIsTogglingFollow] = useState(false);
 
   // In-place inline edit profile state
   const [isEditModeActive, setIsEditModeActive] = useState(false);
@@ -400,36 +395,6 @@ export const CreatorProfilePage: React.FC<CreatorProfilePageProps> = ({
   }, [creator.id]);
   const [isDetailMuted, setIsDetailMuted] = useState(true);
   const [detailMediaIndex, setDetailMediaIndex] = useState(0);
-
-  // Handle follow toggle with auth guard and backend persistence
-  const toggleFollow = async () => {
-    if (isTogglingFollow) return;
-
-    if (!currentUser) {
-      showToast({
-        type: 'warning',
-        title: t('toast.authRequired', 'Perlu Masuk Akun'),
-        message: t('toast.followAuth', 'Anda harus masuk ke akun Creatorin terlebih dahulu untuk mengikuti profil kreator ini.'),
-        action: {
-          label: t('action.signIn', 'Masuk ke Akun'),
-          onClick: () => router.push('/sign-in'),
-        },
-      });
-      return;
-    }
-
-    const nextState = !isFollowing;
-    setIsTogglingFollow(true);
-    try {
-      const res = await creatorService.toggleFollow(creator.id, nextState);
-      setIsFollowing(res.isFollowing);
-      setFollowersCount(res.followersCount);
-    } catch (err: any) {
-      alert(err.message || 'Gagal memperbarui status follow.');
-    } finally {
-      setIsTogglingFollow(false);
-    }
-  };
 
   // Toggle like on shot/project
   const toggleLikeShot = (id: string, e: React.MouseEvent) => {
@@ -805,21 +770,6 @@ export const CreatorProfilePage: React.FC<CreatorProfilePageProps> = ({
               </>
             ) : (
               <>
-                {/* Public Profile: Follow Toggle Button */}
-                <button
-                  id="btn-follow-toggle"
-                  onClick={toggleFollow}
-                  disabled={isTogglingFollow}
-                  className={`h-10 px-5 rounded-xl border text-sm font-semibold transition-colors cursor-pointer inline-flex items-center justify-center gap-2 ${
-                    isFollowing
-                      ? 'border-[#E2E8F0] bg-white text-[#171717] hover:bg-[#F8FAFC]'
-                      : 'border-[#0B1F3A] bg-[#0B1F3A] text-white hover:bg-[#123B8C]'
-                  } ${isTogglingFollow ? 'opacity-70 cursor-not-allowed' : ''}`}
-                >
-                  {isTogglingFollow && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
-                  <span>{isFollowing ? 'Following' : 'Follow'}</span>
-                </button>
-
                 {/* Public Profile: Kirim Pesan */}
                 <button
                   id="btn-send-message-primary"
@@ -872,40 +822,44 @@ export const CreatorProfilePage: React.FC<CreatorProfilePageProps> = ({
             {creatorRoleTitle || 'Design in business. Business in design.'}
           </p>
 
-          {/* Inline Stats Row (Standardized scale spacing gap-x-6 gap-y-2) */}
+          {/* Inline Stats Row (100% Dinamis dari Database) */}
           <div className="mt-3 flex flex-wrap items-center gap-x-6 gap-y-2 text-sm font-normal text-[#64748B]">
             <span>
               <strong className="text-[#0F172A] font-semibold">
-                {creator.stats?.completedProjects || '142+'}
+                {creator.stats?.completedProjects ?? creator.careerScore?.completedProjects ?? 0}
               </strong>{' '}
               Proyek Selesai
             </span>
             <span>
-              <strong className="text-[#0F172A] font-semibold">
-                {creator.rating || '4.9'} ★
-              </strong>{' '}
-              ({creator.reviewCount ?? 0} Ulasan)
+              {Number(creator.reviewCount ?? 0) > 0 ? (
+                <>
+                  <strong className="text-[#0F172A] font-semibold">
+                    {Number(creator.rating || 0).toFixed(1)} ★
+                  </strong>{' '}
+                  ({creator.reviewCount} Ulasan)
+                </>
+              ) : (
+                <span className="text-[#64748B]">Belum ada ulasan</span>
+              )}
             </span>
-            <span>
-              <strong className="text-[#0F172A] font-semibold">
-                {followersCount.toLocaleString()}
-              </strong>{' '}
-              Pengikut
-            </span>
-            <span>
-              <strong className="text-[#0F172A] font-semibold">
-                {creator.careerScore?.overall ?? 0}%
-              </strong>{' '}
-              Skor Karir
-            </span>
+            {(creator.careerScore?.overall ?? 0) > 0 && (
+              <span>
+                <strong className="text-[#0F172A] font-semibold">
+                  {creator.careerScore?.overall}%
+                </strong>{' '}
+                Skor Karir
+              </span>
+            )}
             <span className="text-[#a1a1a1]">
               <MapPin className="w-3.5 h-3.5 inline-block mr-1 -mt-0.5 text-[#0d0c22]" />
               {creator.location || 'Indonesia'}
             </span>
-            <span className="text-[#a1a1a1]">
-              <Laptop className="w-3.5 h-3.5 inline-block mr-1 -mt-0.5 text-[#0d0c22]" />
-              SMK Telkom Sidoarjo
-            </span>
+            {(creator.schoolBadge?.schoolName || (creator.schoolStatus === 'approved' && creator.schoolName)) && (
+              <span className="text-[#0B1F3A] font-medium">
+                <Laptop className="w-3.5 h-3.5 inline-block mr-1 -mt-0.5 text-[#0B1F3A]" />
+                {creator.schoolBadge?.schoolName || creator.schoolName}
+              </span>
+            )}
           </div>
 
         </div>
@@ -1389,7 +1343,13 @@ export const CreatorProfilePage: React.FC<CreatorProfilePageProps> = ({
 
               {/* List Sederhana Ulasan Klien dengan Spacing Lega dan Divider Tipis */}
               <div className="divide-y divide-neutral-200/70">
-                {sortedReviews.map((rev) => (
+                {sortedReviews.length === 0 ? (
+                  <div className="py-12 text-center text-neutral-500 bg-neutral-50 rounded-2xl border border-neutral-100 mt-4">
+                    <p className="text-sm font-medium">Belum ada ulasan untuk kreator ini.</p>
+                    <p className="text-xs text-neutral-400 mt-1">Ulasan akan otomatis tampil setelah kolaborasi proyek selesai diserahterimakan.</p>
+                  </div>
+                ) : (
+                  sortedReviews.map((rev) => (
                   <div key={rev.id} className="py-7 sm:py-8 first:pt-2 space-y-3.5">
                     
                     {/* Baris Klien & Rating */}
@@ -1450,7 +1410,7 @@ export const CreatorProfilePage: React.FC<CreatorProfilePageProps> = ({
                     </p>
 
                   </div>
-                ))}
+                )))}
               </div>
 
             </div>
@@ -1650,17 +1610,19 @@ export const CreatorProfilePage: React.FC<CreatorProfilePageProps> = ({
               {/* Divider Line */}
               <hr className="border-neutral-200/80 my-8" />
 
-              {/* Follower Stats Row */}
+              {/* Stats Row */}
               <div className="flex flex-wrap items-center gap-6 sm:gap-8 text-sm text-neutral-600 font-normal">
                 <span>
-                  <strong className="text-[#0d0c22] font-semibold">{creator.followersCount || 0}</strong> followers
+                  <strong className="text-[#0d0c22] font-semibold">{creator.stats?.completedProjects ?? creator.careerScore?.completedProjects ?? 0}</strong> proyek selesai
                 </span>
                 <span>
-                  <strong className="text-[#0d0c22] font-semibold">{creator.followingCount || 0}</strong> following
+                  <strong className="text-[#0d0c22] font-semibold">{creator.skills.length}</strong> keahlian terverifikasi
                 </span>
-                <span>
-                  <strong className="text-[#0d0c22] font-semibold">{creator.skills.length}</strong> keahlian
-                </span>
+                {(creator.careerScore?.overall ?? 0) > 0 && (
+                  <span>
+                    <strong className="text-[#0d0c22] font-semibold">{creator.careerScore?.overall}%</strong> skor rekam jejak
+                  </span>
+                )}
               </div>
 
             </div>

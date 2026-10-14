@@ -256,8 +256,8 @@ export const ProjectDetailModal: React.FC<ProjectDetailModalProps> = ({
     } else if (creator?.id) {
       if (!user) {
         setAuthModalConfig({
-          title: 'Masuk untuk Menghubungi Kreator',
-          description: 'Anda harus masuk akun terlebih dahulu untuk memulai obrolan langsung dan mendiskusikan kebutuhan kolaborasi.',
+          title: 'Masuk untuk hubungi kreator',
+          description: 'Masuk ke akun Anda untuk memulai percakapan dengan kreator ini.',
           action: () => {
             router.push(`/chat?creatorId=${creator.id}`);
           },
@@ -269,8 +269,8 @@ export const ProjectDetailModal: React.FC<ProjectDetailModalProps> = ({
     } else {
       if (!user) {
         setAuthModalConfig({
-          title: 'Masuk untuk Memulai Pesan',
-          description: 'Anda harus masuk akun terlebih dahulu untuk mengakses fitur pesan & kolaborasi.',
+          title: 'Masuk untuk kirim pesan',
+          description: 'Masuk ke akun Anda untuk memulai percakapan.',
           action: () => {
             router.push('/chat');
           },

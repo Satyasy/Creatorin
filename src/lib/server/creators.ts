@@ -43,8 +43,8 @@ export async function getCreatorServerData(idOrSlug: string): Promise<CreatorSer
         completedProjectsCount: creatorProfiles.completedProjectsCount,
         rating: creatorProfiles.rating,
         reviewsCount: creatorProfiles.reviewsCount,
-        followersCount: creatorProfiles.followersCount,
         schoolName: creatorProfiles.schoolName,
+        schoolStatus: creatorProfiles.schoolStatus,
         startingPrice: creatorProfiles.startingPrice,
         skills: creatorProfiles.skills,
         languages: creatorProfiles.languages,
@@ -70,7 +70,7 @@ export async function getCreatorServerData(idOrSlug: string): Promise<CreatorSer
 
     const rawCreator = creatorList[0];
 
-    const [creatorServices, completedRooms] = await Promise.all([
+    const [creatorServices, completedRooms, creatorReviews] = await Promise.all([
       db
         .select()
         .from(services)
@@ -80,18 +80,40 @@ export async function getCreatorServerData(idOrSlug: string): Promise<CreatorSer
         .select({ id: collaborationRooms.id })
         .from(collaborationRooms)
         .where(and(eq(collaborationRooms.creatorId, rawCreator.id), eq(collaborationRooms.status, 'completed'))),
+      db
+        .select()
+        .from(reviews)
+        .where(eq(reviews.creatorId, rawCreator.id))
+        .orderBy(desc(reviews.createdAt)),
     ]);
+
+    const reviewList = creatorReviews || [];
+    const avgRating = reviewList.length > 0
+      ? (reviewList.reduce((acc, r) => acc + Number(r.rating || 0), 0) / reviewList.length).toFixed(1)
+      : (rawCreator.rating ? Number(rawCreator.rating).toFixed(1) : '0.0');
 
     const formattedCreator = toCreator({
       ...rawCreator,
+      rating: Number(avgRating),
+      reviewsCount: reviewList.length > 0 ? reviewList.length : rawCreator.reviewsCount,
       completedProjectsCount: Math.max(rawCreator.completedProjectsCount, completedRooms.length),
-      schoolBadge: rawCreator.schoolName
+      schoolBadge: (rawCreator.schoolName && rawCreator.schoolStatus === 'approved')
         ? {
             schoolName: rawCreator.schoolName,
             verified: true,
           }
         : null,
     });
+
+    formattedCreator.reviewsList = reviewList.map((rev) => ({
+      id: rev.id,
+      clientName: rev.reviewerName,
+      clientCompany: rev.reviewerRole,
+      rating: Number(rev.rating),
+      comment: rev.comment,
+      date: rev.completedDate,
+      projectTitle: rev.projectTitle,
+    }));
 
     formattedCreator.services = (creatorServices || []).map((service): CreatorService => ({
       id: service.id,

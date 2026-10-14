@@ -28,7 +28,6 @@ export async function GET(req: NextRequest) {
         completedProjectsCount: creatorProfiles.completedProjectsCount,
         rating: creatorProfiles.rating,
         reviewsCount: creatorProfiles.reviewsCount,
-        followersCount: creatorProfiles.followersCount,
         schoolName: creatorProfiles.schoolName,
         startingPrice: creatorProfiles.startingPrice,
         skills: creatorProfiles.skills,

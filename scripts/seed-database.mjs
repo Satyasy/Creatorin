@@ -16,10 +16,15 @@ for (const file of envFiles) {
 
 const connectionString = 
   process.env.DATABASE_URL || 
-  'postgresql://creatorin_user:Cr3at0rIn_Secure_2026_Db@127.0.0.1:5432/creatorin_db';
+  'postgresql://postgres.lhmmutetdnnbehsjdxwq:CreatorinPostgres2026!Secure@aws-0-us-east-1.pooler.supabase.com:6543/postgres?sslmode=require';
 
 console.log('🌱 Menghubungkan ke PostgreSQL untuk eksekusi Database Seeder...');
-const sql = postgres(connectionString, { max: 10, idle_timeout: 20 });
+const isLocal = connectionString.includes('127.0.0.1') || connectionString.includes('localhost');
+const sql = postgres(connectionString, {
+  max: 10,
+  idle_timeout: 20,
+  ssl: isLocal ? false : { rejectUnauthorized: false }
+});
 
 function hashPassword(password) {
   const salt = crypto.randomBytes(16).toString('hex');
@@ -226,13 +231,35 @@ const ACCOUNTS = [
       headline: 'Talenta Vokasi DKV - Medalis LKS Desain Grafis',
       bio: 'Siswa berprestasi SMK Negeri 1 Surabaya dengan spesialisasi ilustrasi digital, layout brosur, dan konten media sosial.',
       careerScore: 92,
-      rating: 4.9,
+      rating: 4.8,
       startingPrice: 'Rp 150.000',
       skills: ['Brosur', 'Banner', 'Vector Art', 'Feed Instagram'],
       schoolName: 'SMK Negeri 1 Surabaya',
       schoolStatus: 'approved',
       major: 'Desain Komunikasi Visual',
       classGrade: 'XII DKV 1',
+      isPro: false
+    }
+  },
+  {
+    email: 'alya.putri@creatorin.my.id',
+    fullName: 'Alya Putri (Siswa SMK)',
+    role: 'creator',
+    avatarUrl: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=300&auto=format&fit=crop&q=80',
+    location: 'Surabaya',
+    phone: '08210000010',
+    creatorProfile: {
+      slug: 'alya-putri',
+      headline: 'Siswa Vokasi Animasi 2D & Motion Graphic',
+      bio: 'Siswa SMK Negeri 1 Surabaya jurusan Animasi. Sedang mengajukan verifikasi ke pihak sekolah untuk program teaching factory.',
+      careerScore: 84,
+      rating: 0,
+      startingPrice: 'Rp 100.000',
+      skills: ['Animasi 2D', 'Storyboard', 'Character Design'],
+      schoolName: 'SMK Negeri 1 Surabaya',
+      schoolStatus: 'pending',
+      major: 'Animasi & Multimedia',
+      classGrade: 'XI ANM 2',
       isPro: false
     }
   },
@@ -632,6 +659,60 @@ const SCHOOL_ACHIEVEMENTS_DATA = [
 ];
 
 // ==============================================================================
+// 6. DATA ULASAN & TESTIMONI RIIL KOLABORASI UMKM & KREATOR
+// ==============================================================================
+const REVIEWS_DATA = [
+  {
+    creatorSlug: 'qaesyaar-aqeel',
+    businessEmail: 'umkm@creatorin.my.id',
+    reviewerName: 'Kopi Lereng Nusantara',
+    reviewerRole: 'Pemilik Brand UMKM F&B',
+    reviewerAvatar: 'https://images.unsplash.com/photo-1541167760496-1628856ab772?w=300&auto=format&fit=crop&q=80',
+    projectTitle: 'Desain Kemasan Pouch Kopi Specialty 250g',
+    rating: 5.0,
+    amount: 1200000,
+    comment: 'Hasil desain packaging sangat rapi dengan pola dieline akurat siap cetak. Komunikasi cepat dan revisi selesai dalam hitungan jam. Sangat direkomendasikan untuk UMKM.',
+    completedDate: '12 Okt 2026',
+  },
+  {
+    creatorSlug: 'sarah-amelia',
+    businessEmail: 'glowlab@creatorin.my.id',
+    reviewerName: 'GlowLab Skincare Indonesia',
+    reviewerRole: 'Brand Marketing Lead',
+    reviewerAvatar: 'https://images.unsplash.com/photo-1556228720-195a672e8a03?w=300&auto=format&fit=crop&q=80',
+    projectTitle: 'Serial Video Reels UGC Botanical Serum',
+    rating: 5.0,
+    amount: 900000,
+    comment: 'Penyampaian video UGC sangat natural dan hook videonya terbukti menaikkan konversi checkout di TikTok Shop. Kualitas audio dan lighting sangat jernih.',
+    completedDate: '8 Okt 2026',
+  },
+  {
+    creatorSlug: 'kevin-sanjaya',
+    businessEmail: 'batik.pusaka@creatorin.my.id',
+    reviewerName: 'Batik Pusaka Heritage',
+    reviewerRole: 'Creative Director',
+    reviewerAvatar: 'https://images.unsplash.com/photo-1617627143750-d86bc21e42bb?w=300&auto=format&fit=crop&q=80',
+    projectTitle: 'Animasi Logo Bumper & Video Promo Koleksi Modern',
+    rating: 4.9,
+    amount: 1500000,
+    comment: 'Animasi motion graphic bernuansa elegan dan mengangkat prestise motif batik tradisional ke level modern. Eksekusi timing audio visual sangat pas.',
+    completedDate: '5 Okt 2026',
+  },
+  {
+    creatorSlug: 'rahmat-hidayat',
+    businessEmail: 'umkm@creatorin.my.id',
+    reviewerName: 'Kopi Lereng Nusantara',
+    reviewerRole: 'Pemilik Brand UMKM F&B',
+    reviewerAvatar: 'https://images.unsplash.com/photo-1541167760496-1628856ab772?w=300&auto=format&fit=crop&q=80',
+    projectTitle: 'Desain Brosur Edukasi & Flyer Pameran Kopi',
+    rating: 4.8,
+    amount: 450000,
+    comment: 'Meskipun masih berstatus siswa SMK vokasi, etos kerja Rahmat sangat disiplin. Vektor ilustrasinya berkarakter kuat dan layout infografisnya sangat mudah dipahami.',
+    completedDate: '1 Okt 2026',
+  },
+];
+
+// ==============================================================================
 // EKSEKUSI SEEDING DATABASE
 // ==============================================================================
 async function main() {
@@ -775,7 +856,8 @@ async function main() {
         `;
       }
 
-      // Hubungkan Siswa Vokasi (Rahmat Hidayat) ke SMK ini
+      // Hubungkan Siswa Vokasi (Approved & Pending) ke SMK ini
+      await sql`DELETE FROM student_school_relations WHERE school_id = ${schoolId}`;
       const rahmatId = userMap.get('rahmat.hidayat@creatorin.my.id');
       if (rahmatId) {
         await sql`
@@ -783,7 +865,15 @@ async function main() {
             (id, student_id, school_id, school_status, is_featured, graduation_year, major, class_grade, request_date, approved_at, created_at)
           VALUES 
             (${crypto.randomUUID()}, ${rahmatId}, ${schoolId}, 'approved', true, '2026', 'Desain Komunikasi Visual', 'XII DKV 1', NOW(), NOW(), NOW())
-          ON CONFLICT DO NOTHING
+        `;
+      }
+      const alyaId = userMap.get('alya.putri@creatorin.my.id');
+      if (alyaId) {
+        await sql`
+          INSERT INTO student_school_relations 
+            (id, student_id, school_id, school_status, is_featured, graduation_year, major, class_grade, request_date, approved_at, created_at)
+          VALUES 
+            (${crypto.randomUUID()}, ${alyaId}, ${schoolId}, 'pending', false, '2026', 'Animasi & Multimedia', 'XI ANM 2', NOW(), null, NOW())
         `;
       }
     }
@@ -836,6 +926,69 @@ async function main() {
     `;
   }
   console.log(`✅ Berhasil menyisipkan ${BRIEFS_DATA.length} brief lowongan UMKM.`);
+
+  // 5. Seed Reviews, Invoices & Collaboration Rooms (Transaksi & Ulasan Selesai)
+  console.log('\n⭐ Menyinkronkan Kolaborasi & Ulasan Nyata (Reviews)...');
+  await sql`DELETE FROM reviews`;
+  await sql`DELETE FROM collaboration_rooms`;
+  await sql`DELETE FROM invoices`;
+
+  for (const rev of REVIEWS_DATA) {
+    const creatorId = creatorSlugMap.get(rev.creatorSlug);
+    const businessId = userMap.get(rev.businessEmail.toLowerCase());
+    if (!creatorId || !businessId) continue;
+
+    const invoiceId = crypto.randomUUID();
+    const roomId = crypto.randomUUID();
+    const reviewId = crypto.randomUUID();
+    const invoiceNum = `INV-${Date.now().toString().slice(-6)}-${Math.floor(100 + Math.random() * 900)}`;
+
+    // 1. Invoice Lunas
+    await sql`
+      INSERT INTO invoices 
+        (id, invoice_number, creator_id, business_id, title, scope_description, total_amount, deadline_days, revision_rules, status, paid_at, created_at)
+      VALUES 
+        (${invoiceId}, ${invoiceNum}, ${creatorId}, ${businessId}, ${rev.projectTitle}, ${rev.comment}, ${rev.amount || 750000}, 3, 'Maksimal 2 kali revisi minor.', 'paid', NOW(), NOW())
+    `;
+
+    // 2. Collaboration Room Selesai (Completed)
+    await sql`
+      INSERT INTO collaboration_rooms 
+        (id, invoice_id, creator_id, business_id, title, brief_summary, status, approved_at, created_at)
+      VALUES 
+        (${roomId}, ${invoiceId}, ${creatorId}, ${businessId}, ${rev.projectTitle}, ${rev.comment}, 'completed', NOW(), NOW())
+    `;
+
+    // 3. Review Riil
+    await sql`
+      INSERT INTO reviews 
+        (id, creator_id, reviewer_id, room_id, reviewer_name, reviewer_role, reviewer_avatar, project_title, rating, comment, completed_date, created_at)
+      VALUES 
+        (${reviewId}, ${creatorId}, ${businessId}, ${roomId}, ${rev.reviewerName}, ${rev.reviewerRole}, ${rev.reviewerAvatar}, ${rev.projectTitle}, ${rev.rating}, ${rev.comment}, ${rev.completedDate}, NOW())
+    `;
+  }
+  console.log(`✅ Berhasil menyisipkan ${REVIEWS_DATA.length} ulasan riil dan ruangan kolaborasi selesai.`);
+
+  // 6. Sinkronisasi Agregat Rating & Jumlah Proyek di creator_profiles
+  console.log('\n📊 Memperbarui agregat rating dan riwayat ulasan di profil kreator...');
+  for (const [slug, profileId] of creatorSlugMap.entries()) {
+    const creatorReviews = await sql`SELECT rating FROM reviews WHERE creator_id = ${profileId}`;
+    const completedRooms = await sql`SELECT id FROM collaboration_rooms WHERE creator_id = ${profileId} AND status = 'completed'`;
+    
+    let avgRating = '0.0';
+    if (creatorReviews.length > 0) {
+      const sum = creatorReviews.reduce((acc, r) => acc + Number(r.rating || 0), 0);
+      avgRating = (sum / creatorReviews.length).toFixed(1);
+    }
+    
+    await sql`
+      UPDATE creator_profiles SET 
+        rating = ${avgRating},
+        reviews_count = ${creatorReviews.length},
+        completed_projects_count = ${completedRooms.length}
+      WHERE profile_id = ${profileId}
+    `;
+  }
 
   console.log('\n==================================================');
   console.log('🎉 SEEDING DATABASE SELESAI DENGAN SUKSES 100%!');

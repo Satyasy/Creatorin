@@ -3,7 +3,6 @@ import {
   X, 
   Send, 
   CheckCircle2, 
-  ShieldCheck, 
   Layers, 
   ChevronDown, 
   CreditCard, 
@@ -227,16 +226,10 @@ export const ProjectBriefModal: React.FC<ProjectBriefModalProps> = ({
         {/* Top Header Bar */}
         <div className="px-6 sm:px-8 py-5 border-b border-[#E5E5E5] flex items-center justify-between bg-white/95">
           <div>
-            <h2 id="brief-modal-title" className="text-base sm:text-lg font-bold text-[#0D0C22] flex items-center gap-2">
-              <span>
-                {selectedCreator 
-                  ? t('briefModal.sendToTitle', 'Kirim Brief Proyek ke {name}').replace('{name}', selectedCreator.name) 
-                  : t('briefModal.createTitle', 'Buat Brief Proyek Baru')}
-              </span>
-              <span className="hidden sm:inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-blue-50 text-[#155DFC] text-[11px] font-semibold">
-                <ShieldCheck className="w-3.5 h-3.5" />
-                <span>{t('briefModal.escrowProtected', 'Escrow Dilindungi')}</span>
-              </span>
+            <h2 id="brief-modal-title" className="text-base sm:text-lg font-bold text-[#0D0C22]">
+              {selectedCreator 
+                ? t('briefModal.sendToTitle', 'Kirim Brief Proyek ke {name}').replace('{name}', selectedCreator.name) 
+                : t('briefModal.createTitle', 'Buat Brief Proyek Baru')}
             </h2>
             <p className="text-xs text-neutral-500 mt-0.5">
               {selectedCreator 
@@ -534,16 +527,6 @@ export const ProjectBriefModal: React.FC<ProjectBriefModalProps> = ({
                 </div>
               </div>
 
-              {/* Escrow Payment Security Note */}
-              <div className="p-3.5 rounded-2xl bg-amber-50/70 border border-amber-200/80 flex items-start gap-2.5 text-xs text-amber-900">
-                <ShieldCheck className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
-                <p>
-                  <strong>{language === 'en' ? 'Escrow Protected Guarantee: ' : 'Garansi Dana Terlindungi: '}</strong>
-                  {language === 'en' 
-                    ? 'Your payment will only be released to the creator after you approve the submitted deliverables according to the project brief.' 
-                    : 'Pembayaran Anda hanya akan diteruskan ke kreator setelah hasil pekerjaan Anda setujui sesuai brief proyek.'}
-                </p>
-              </div>
 
               {/* Form Action Buttons */}
               <div className="pt-2 flex items-center justify-end gap-3 border-t border-[#E5E5E5]">

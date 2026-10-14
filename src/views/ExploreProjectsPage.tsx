@@ -689,7 +689,6 @@ export const ExploreProjectsPage: React.FC<ExploreProjectsPageProps> = ({
   // Likes & Save simulation state
   const [likedPosts, setLikedPosts] = useState<Record<string, boolean>>({});
   const [savedPosts, setSavedPosts] = useState<Record<string, boolean>>({});
-  const [followingCreators, setFollowingCreators] = useState<Record<string, boolean>>({});
   const [commentInput, setCommentInput] = useState('');
   const [postComments, setPostComments] = useState<Record<string, { user: string; text: string; time: string }[]>>({});
   const [toastMessage, setToastMessage] = useState<string | null>(null);
@@ -796,26 +795,6 @@ export const ExploreProjectsPage: React.FC<ExploreProjectsPageProps> = ({
     showToast(willSave ? t('toast.savedFavorite', 'Disimpan ke Koleksi Favorit') : t('toast.removedFavorite', 'Dihapus dari Koleksi'));
   };
 
-  const handleToggleFollow = (creatorId: string, e?: React.MouseEvent) => {
-    if (e) e.stopPropagation();
-    if (!currentUser) {
-      showGlobalToast({
-        type: 'warning',
-        title: t('toast.authRequired', 'Perlu Masuk Akun'),
-        message: t('toast.followAuth', 'Anda harus masuk ke akun Creatorin terlebih dahulu untuk mengikuti kreator ini.'),
-        action: {
-          label: t('action.signIn', 'Masuk ke Akun'),
-          onClick: () => router.push('/sign-in'),
-        },
-      });
-      return;
-    }
-    setFollowingCreators(prev => ({
-      ...prev,
-      [creatorId]: !prev[creatorId]
-    }));
-    showToast(followingCreators[creatorId] ? t('action.following', 'Mengikuti kreator') : t('action.follow', 'Berhenti mengikuti'));
-  };
 
   const handleAddComment = (e: React.FormEvent) => {
     e.preventDefault();

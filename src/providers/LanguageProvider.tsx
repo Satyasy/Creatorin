@@ -87,8 +87,6 @@ const DICTIONARY: Record<Language, Translations> = {
     'empty.servicesDesc': 'Coba atur filter harga atau pilih kategori keahlian lainnya.',
 
     // Actions & Buttons
-    'action.follow': 'Follow',
-    'action.following': 'Following',
     'action.sendMessage': 'Kirim Pesan',
     'action.shareProfile': 'Bagikan Profil',
     'action.editProfile': 'Edit Profil',
@@ -106,15 +104,14 @@ const DICTIONARY: Record<Language, Translations> = {
     'action.viewMore': 'Lihat Selengkapnya',
 
     // Auth Modal
-    'auth.loginRequired': 'Masuk ke Akun Creatorin',
-    'auth.bookmarkRequired': 'Silakan masuk ke akun Creatorin Anda terlebih dahulu untuk menyimpan ke koleksi favorit.',
-    'auth.followRequired': 'Anda harus masuk ke akun Creatorin terlebih dahulu untuk mengikuti kreator ini.',
-    'auth.emailLabel': 'Email Address',
-    'auth.passwordLabel': 'Kata Sandi',
-    'auth.submitButton': 'Masuk Sekarang',
-    'auth.processing': 'Memproses Masuk...',
-    'auth.noAccount': 'Belum memiliki akun?',
-    'auth.signUpLink': 'Daftar Akun Baru',
+    'auth.loginRequired': 'Masuk ke akun',
+    'auth.bookmarkRequired': 'Masuk ke akun Anda untuk menyimpan item ini.',
+    'auth.emailLabel': 'Email',
+    'auth.passwordLabel': 'Kata sandi',
+    'auth.submitButton': 'Masuk',
+    'auth.processing': 'Memproses...',
+    'auth.noAccount': 'Belum punya akun?',
+    'auth.signUpLink': 'Daftar',
     'auth.emptyCredentials': 'Harap masukkan email dan kata sandi.',
     'auth.invalidCredentials': 'Email atau kata sandi tidak valid.',
     'auth.networkError': 'Terjadi kendala jaringan.',
@@ -128,7 +125,6 @@ const DICTIONARY: Record<Language, Translations> = {
 
     // Toasts & Alerts
     'toast.authRequired': 'Perlu Masuk Akun',
-    'toast.followAuth': 'Anda harus masuk ke akun Creatorin terlebih dahulu untuk mengikuti kreator ini.',
     'toast.saveServiceAuth': 'Anda harus masuk ke akun Creatorin terlebih dahulu untuk menyimpan layanan favorit.',
     'toast.orderServiceAuth': 'Silakan masuk ke akun Creatorin terlebih dahulu untuk memesan paket layanan ini.',
     'toast.chatAuth': 'Anda harus masuk akun terlebih dahulu untuk menghubungi kreator ini.',
@@ -149,7 +145,6 @@ const DICTIONARY: Record<Language, Translations> = {
     'profile.careerScore': 'Career Score',
     'profile.clientRating': 'Rating Klien',
     'profile.completedProjects': 'Proyek Selesai',
-    'profile.followers': 'Pengikut',
     'profile.responseTime': 'Waktu Respon',
     'profile.coreSkills': 'Keahlian Utama',
     'profile.softwareTools': 'Software & Tools',
@@ -344,7 +339,6 @@ const DICTIONARY: Record<Language, Translations> = {
     // Project Brief Modal
     'briefModal.createTitle': 'Buat Brief Proyek Baru',
     'briefModal.sendToTitle': 'Kirim Brief Proyek ke {name}',
-    'briefModal.escrowProtected': 'Escrow Dilindungi',
     'briefModal.descGeneric': 'Terbitkan kebutuhan proyek Anda untuk mendapatkan penawaran dari kreator terverifikasi.',
     'briefModal.descSpecific': 'Rincikan kebutuhan proyek kolaborasi Anda dengan aman dan transparan.',
     'briefModal.titleLabel': 'Judul Kebutuhan Proyek',
@@ -475,8 +469,6 @@ const DICTIONARY: Record<Language, Translations> = {
     'empty.servicesDesc': 'Try adjusting price filters or selecting other skill categories.',
 
     // Actions & Buttons
-    'action.follow': 'Follow',
-    'action.following': 'Following',
     'action.sendMessage': 'Send Message',
     'action.shareProfile': 'Share Profile',
     'action.editProfile': 'Edit Profile',
@@ -494,18 +486,17 @@ const DICTIONARY: Record<Language, Translations> = {
     'action.viewMore': 'See More',
 
     // Auth Modal
-    'auth.loginRequired': 'Sign In to Creatorin',
-    'auth.bookmarkRequired': 'Please sign in to your Creatorin account first to bookmark and save favorite items to your collection.',
-    'auth.followRequired': 'Please sign in to your Creatorin account first to follow this creator.',
-    'auth.emailLabel': 'Email Address',
+    'auth.loginRequired': 'Sign in',
+    'auth.bookmarkRequired': 'Sign in to save this item to your favorites.',
+    'auth.emailLabel': 'Email',
     'auth.passwordLabel': 'Password',
-    'auth.submitButton': 'Sign In Now',
+    'auth.submitButton': 'Sign in',
     'auth.processing': 'Signing in...',
-    'auth.noAccount': "Don't have an account yet?",
-    'auth.signUpLink': 'Sign Up Free',
-    'auth.emptyCredentials': 'Please enter both email and password.',
+    'auth.noAccount': "Don't have an account?",
+    'auth.signUpLink': 'Sign up',
+    'auth.emptyCredentials': 'Please enter your email and password.',
     'auth.invalidCredentials': 'Invalid email or password.',
-    'auth.networkError': 'Network connection error.',
+    'auth.networkError': 'Network error. Please try again.',
 
     // Profile Edit Confirmation & Success
     'profile.confirmFinishTitle': 'Finish & Save Changes?',
@@ -516,7 +507,6 @@ const DICTIONARY: Record<Language, Translations> = {
 
     // Toasts & Alerts
     'toast.authRequired': 'Sign In Required',
-    'toast.followAuth': 'You must sign in to Creatorin to follow this creator.',
     'toast.saveServiceAuth': 'You must sign in to Creatorin to bookmark favorite services.',
     'toast.orderServiceAuth': 'Please sign in to Creatorin to order or discuss this service.',
     'toast.chatAuth': 'You must sign in first to contact this creator.',
@@ -537,7 +527,6 @@ const DICTIONARY: Record<Language, Translations> = {
     'profile.careerScore': 'Career Score',
     'profile.clientRating': 'Client Rating',
     'profile.completedProjects': 'Completed Projects',
-    'profile.followers': 'Followers',
     'profile.responseTime': 'Response Time',
     'profile.coreSkills': 'Core Skills',
     'profile.softwareTools': 'Software & Tools',
@@ -732,7 +721,6 @@ const DICTIONARY: Record<Language, Translations> = {
     // Project Brief Modal
     'briefModal.createTitle': 'Create New Project Brief',
     'briefModal.sendToTitle': 'Send Project Brief to {name}',
-    'briefModal.escrowProtected': 'Escrow Secured',
     'briefModal.descGeneric': 'Publish your project requirements to receive competitive proposals from verified creators.',
     'briefModal.descSpecific': 'Specify your project collaboration requirements clearly, transparently, and securely.',
     'briefModal.titleLabel': 'Project Title / Goal',
