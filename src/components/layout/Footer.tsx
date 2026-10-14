@@ -3,7 +3,7 @@
 import React from 'react';
 import { useRouter } from 'next/navigation';
 import { ActivePage } from '@/types';
-import { Twitter, Instagram, Linkedin, ShieldCheck } from 'lucide-react';
+import { Twitter, Instagram, Linkedin } from 'lucide-react';
 import { useLanguage } from '@/providers/LanguageProvider';
 
 interface FooterProps {
@@ -54,14 +54,8 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, onOpenBrief }) => {
 
             {/* Brand Mission & Tagline */}
             <p className="text-sm text-[#55576A] leading-relaxed max-w-sm">
-              {t('footer.aboutDesc', 'Platform kolaborasi terpercaya antara kreator bertalenta dan bisnis di Indonesia. Bangun karya berdampak dengan perlindungan pembayaran escrow yang aman & transparan.')}
+              {t('footer.aboutDesc', 'Platform kolaborasi terpercaya antara kreator bertalenta dan bisnis di Indonesia. Bangun karya berdampak dengan kemudahan kolaborasi yang aman dan transparan.')}
             </p>
-
-            {/* Micro Badge: Escrow Protection */}
-            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#F3F3F4] border border-[#E1E3EA] text-xs font-medium text-[#55576A]">
-              <ShieldCheck className="w-3.5 h-3.5 text-[#155DFC]" />
-              <span>{t('footer.escrowProtected', 'Transaksi Terproteksi Sistem Escrow')}</span>
-            </div>
 
             {/* Social Media Links */}
             <div className="pt-2">

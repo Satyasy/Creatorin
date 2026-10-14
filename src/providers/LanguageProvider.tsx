@@ -344,7 +344,6 @@ const DICTIONARY: Record<Language, Translations> = {
     // Project Brief Modal
     'briefModal.createTitle': 'Buat Brief Proyek Baru',
     'briefModal.sendToTitle': 'Kirim Brief Proyek ke {name}',
-    'briefModal.escrowProtected': 'Escrow Dilindungi',
     'briefModal.descGeneric': 'Terbitkan kebutuhan proyek Anda untuk mendapatkan penawaran dari kreator terverifikasi.',
     'briefModal.descSpecific': 'Rincikan kebutuhan proyek kolaborasi Anda dengan aman dan transparan.',
     'briefModal.titleLabel': 'Judul Kebutuhan Proyek',
@@ -732,7 +731,6 @@ const DICTIONARY: Record<Language, Translations> = {
     // Project Brief Modal
     'briefModal.createTitle': 'Create New Project Brief',
     'briefModal.sendToTitle': 'Send Project Brief to {name}',
-    'briefModal.escrowProtected': 'Escrow Secured',
     'briefModal.descGeneric': 'Publish your project requirements to receive competitive proposals from verified creators.',
     'briefModal.descSpecific': 'Specify your project collaboration requirements clearly, transparently, and securely.',
     'briefModal.titleLabel': 'Project Title / Goal',
