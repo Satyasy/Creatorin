@@ -71,6 +71,11 @@ npx drizzle-kit push || {
     echo "⚠️ Drizzle push warning/notice (skipping if no changes)."
 }
 
+echo "🌱 Seeding initial & master data..."
+npm run seed || {
+    echo "⚠️ Database seeder warning/notice (skipping if failed)."
+}
+
 # 5. Build Next.js Application
 echo "🔨 5/6. Building Next.js standalone application..."
 npm run build

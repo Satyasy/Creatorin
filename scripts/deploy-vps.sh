@@ -105,6 +105,8 @@ EOF
 # 8. Install Dependencies & Build Next.js
 echo "🔨 Installing npm dependencies & compiling production build..."
 npm ci || npm install
+npx drizzle-kit push || true
+npm run seed || true
 npm run build
 
 # 9. Configure PM2 Cluster Configuration (ecosystem.config.cjs)
