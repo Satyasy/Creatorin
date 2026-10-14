@@ -558,6 +558,8 @@ export interface PublicSchoolProfile {
     category: string;
     thumbnail: string;
     createdDate: string;
+    description?: string;
+    externalLink?: string;
   }[];
   studentProjects: {
     id: string;
@@ -568,6 +570,8 @@ export interface PublicSchoolProfile {
     thumbnail: string;
     createdDate: string;
     viewsCount?: string;
+    description?: string;
+    externalLink?: string;
   }[];
   students: {
     id: string;
