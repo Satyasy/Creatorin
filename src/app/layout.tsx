@@ -6,7 +6,7 @@ import { LanguageProvider } from "@/providers/LanguageProvider";
 import { AuthModalProvider } from "@/providers/AuthModalProvider";
 import { ToastProvider } from "@/providers/ToastProvider";
 import { RouteProgressBar } from "@/components/common/RouteProgressBar";
-import { GA_TRACKING_ID } from "@/lib/analytics";
+import { GA_TRACKING_ID, CLARITY_PROJECT_ID } from "@/lib/analytics";
 
 export const viewport: Viewport = {
   themeColor: "#155DFC",
@@ -126,6 +126,22 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
               }}
             />
           </>
+        )}
+        {/* Microsoft Clarity */}
+        {CLARITY_PROJECT_ID && (
+          <script
+            id="microsoft-clarity"
+            type="text/javascript"
+            dangerouslySetInnerHTML={{
+              __html: `
+                (function(c,l,a,r,i,t,y){
+                    c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+                    t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+                    y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+                })(window, document, "clarity", "script", "${CLARITY_PROJECT_ID}");
+              `,
+            }}
+          />
         )}
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
