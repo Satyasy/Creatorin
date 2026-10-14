@@ -185,20 +185,24 @@ const ACCOUNTS = [
   },
   {
     email: 'budi.pratama@creatorin.my.id',
-    fullName: 'Budi Pratama',
+    fullName: 'Budi Pratama (Siswa SMK)',
     role: 'creator',
     avatarUrl: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=300&auto=format&fit=crop&q=80',
     location: 'Surabaya',
     phone: '08180000005',
     creatorProfile: {
       slug: 'budi-pratama',
-      headline: 'Commercial Photographer & Food Stylist',
-      bio: 'Fotografi katalog produk e-commerce dan foto editorial studio untuk menu restoran dan produk ritel.',
-      careerScore: 93,
+      headline: 'Siswa Vokasi Fotografi Komersial & Food Styling',
+      bio: 'Fotografi katalog produk e-commerce dan foto editorial studio untuk menu restoran dan produk UMKM binaan sekolah.',
+      careerScore: 90,
       rating: 4.8,
-      startingPrice: 'Rp 350.000',
+      startingPrice: 'Rp 200.000',
       skills: ['Foto Produk', 'Video Sinematik', 'Komersial', 'Color Grading'],
-      isPro: true
+      schoolName: 'SMK Negeri 1 Surabaya',
+      schoolStatus: 'approved',
+      major: 'Desain Komunikasi Visual',
+      classGrade: 'XII DKV 2',
+      isPro: false
     }
   },
   {
@@ -263,6 +267,28 @@ const ACCOUNTS = [
       isPro: false
     }
   },
+  {
+    email: 'rian.pratama@creatorin.my.id',
+    fullName: 'Rian Pratama (Siswa SMK)',
+    role: 'creator',
+    avatarUrl: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=300&auto=format&fit=crop&q=80',
+    location: 'Surabaya',
+    phone: '08210000011',
+    creatorProfile: {
+      slug: 'rian-pratama',
+      headline: 'Siswa Vokasi UI/UX & Web Development',
+      bio: 'Siswa SMK Negeri 1 Surabaya konsentrasi Rekayasa Perangkat Lunak. Sedang mengajukan verifikasi ke pihak sekolah.',
+      careerScore: 80,
+      rating: 0,
+      startingPrice: 'Rp 150.000',
+      skills: ['UI Mockups', 'Web Design', 'Figma', 'Frontend'],
+      schoolName: 'SMK Negeri 1 Surabaya',
+      schoolStatus: 'pending',
+      major: 'Rekayasa Perangkat Lunak',
+      classGrade: 'XI RPL 1',
+      isPro: false
+    }
+  },
 
   // Additional UMKM Businesses
   {
@@ -291,6 +317,268 @@ const ACCOUNTS = [
       category: 'Fashion & Wastra Nusantara',
       description: 'UMKM pelestari motif batik tradisional Solo dengan potongan busana siap pakai kontemporer untuk generasi muda.',
       website: 'https://batikpusaka.id'
+    }
+  },
+
+  // --------------------------------------------------------------------------
+  // Tambahan Sekolah Mitra Vokasi
+  // --------------------------------------------------------------------------
+  {
+    email: 'school.telkom@creatorin.my.id',
+    fullName: 'SMK Telkom Sidoarjo',
+    role: 'school',
+    avatarUrl: 'https://images.unsplash.com/photo-1562774053-701939374585?w=300&auto=format&fit=crop&q=80',
+    location: 'Sidoarjo, Jawa Timur',
+    phone: '08140000002',
+    schoolInfo: {
+      name: 'SMK Telkom Sidoarjo',
+      slug: 'smk-telkom-sidoarjo',
+      tagline: 'Pelopor Vokasi Teknologi Informasi & Desain Grafis Modern',
+      description: 'Sekolah kejuruan terakreditasi A berbasis kurikulum industri digital dengan teaching factory unggulan di bidang UI/UX dan multimedia.',
+      city: 'Sidoarjo',
+      address: 'Jl. Raya Pecantingan, Sekardangan, Sidoarjo',
+      website: 'https://smktelkom-sda.sch.id',
+      picName: 'Rahmat Triyono, S.Kom., M.T.',
+      picContact: '081298765432',
+      isVerified: true
+    }
+  },
+  {
+    email: 'school.rus@creatorin.my.id',
+    fullName: 'SMK Raden Umar Said (RUS) Kudus',
+    role: 'school',
+    avatarUrl: 'https://images.unsplash.com/photo-1509062522246-3755977927d7?w=300&auto=format&fit=crop&q=80',
+    location: 'Kudus, Jawa Tengah',
+    phone: '08140000003',
+    schoolInfo: {
+      name: 'SMK Raden Umar Said Kudus',
+      slug: 'smk-raden-umar-said',
+      tagline: 'Pusat Keunggulan Animasi 3D & Industri Kreatif Bertaraf Global',
+      description: 'Sekolah vokasi animasi terdepan di Asia Tenggara dengan studio animasi berstandar Hollywood dan kolaborasi industri internasional.',
+      city: 'Kudus',
+      address: 'Jl. Sukun Raya No. 9, Besito, Gebog, Kudus',
+      website: 'https://smkrus.sch.id',
+      picName: 'Fariduddin, S.Pd., M.Sn.',
+      picContact: '081322334455',
+      isVerified: true
+    }
+  },
+
+  // --------------------------------------------------------------------------
+  // Siswa SMK Telkom Sidoarjo, SMK RUS Kudus & SMKN 1 Surabaya
+  // --------------------------------------------------------------------------
+  {
+    email: 'citra.kirana@creatorin.my.id',
+    fullName: 'Citra Kirana (Siswa SMK)',
+    role: 'creator',
+    avatarUrl: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=300&auto=format&fit=crop&q=80',
+    location: 'Sidoarjo',
+    phone: '08210000012',
+    creatorProfile: {
+      slug: 'citra-kirana',
+      headline: 'Siswa Vokasi UI/UX & Digital Packaging',
+      bio: 'Siswa berprestasi SMK Telkom Sidoarjo peminatan UI/UX design dan kemasan digital ramah lingkungan.',
+      careerScore: 91,
+      rating: 4.9,
+      startingPrice: 'Rp 200.000',
+      skills: ['UI/UX Design', 'Packaging', 'Mobile App', 'Wireframing'],
+      schoolName: 'SMK Telkom Sidoarjo',
+      schoolStatus: 'approved',
+      major: 'Rekayasa Perangkat Lunak & Desain',
+      classGrade: 'XII RPL 1',
+      isPro: false
+    }
+  },
+  {
+    email: 'fajar.nugraha@creatorin.my.id',
+    fullName: 'Fajar Nugraha (Siswa SMK)',
+    role: 'creator',
+    avatarUrl: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=300&auto=format&fit=crop&q=80',
+    location: 'Sidoarjo',
+    phone: '08210000013',
+    creatorProfile: {
+      slug: 'fajar-nugraha',
+      headline: 'Siswa Vokasi Web Frontend & Dashboard UI',
+      bio: 'Siswa SMK Telkom Sidoarjo. Mengajukan approval akun ke pihak sekolah untuk program magang industri teaching factory.',
+      careerScore: 82,
+      rating: 0,
+      startingPrice: 'Rp 150.000',
+      skills: ['Frontend', 'Tailwind', 'React', 'Next.js'],
+      schoolName: 'SMK Telkom Sidoarjo',
+      schoolStatus: 'pending',
+      major: 'Rekayasa Perangkat Lunak',
+      classGrade: 'XI RPL 2',
+      isPro: false
+    }
+  },
+  {
+    email: 'gilang.ramadhan@creatorin.my.id',
+    fullName: 'Gilang Ramadhan (Siswa SMK)',
+    role: 'creator',
+    avatarUrl: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=300&auto=format&fit=crop&q=80',
+    location: 'Kudus',
+    phone: '08210000014',
+    creatorProfile: {
+      slug: 'gilang-ramadhan',
+      headline: 'Siswa Vokasi 3D Character Artist & VFX',
+      bio: 'Siswa SMK Raden Umar Said Kudus. Berpengalaman mengerjakan aset 3D rigging, render photoreal, dan efek visual komersial.',
+      careerScore: 95,
+      rating: 5.0,
+      startingPrice: 'Rp 400.000',
+      skills: ['3D Modeling', 'Character Rigging', 'Blender', 'Maya', 'VFX'],
+      schoolName: 'SMK Raden Umar Said Kudus',
+      schoolStatus: 'approved',
+      major: 'Animasi 3D & Game Art',
+      classGrade: 'XII ANM 1',
+      isPro: false
+    }
+  },
+  {
+    email: 'nabila.syakieb@creatorin.my.id',
+    fullName: 'Nabila Syakieb (Siswa SMK)',
+    role: 'creator',
+    avatarUrl: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=300&auto=format&fit=crop&q=80',
+    location: 'Kudus',
+    phone: '08210000015',
+    creatorProfile: {
+      slug: 'nabila-syakieb',
+      headline: 'Siswa Vokasi 2D Concept Artist & Background Design',
+      bio: 'Siswa SMK Raden Umar Said Kudus peminatan ilustrasi latar belakang dan concept design. Menunggu approval sekolah.',
+      careerScore: 85,
+      rating: 0,
+      startingPrice: 'Rp 150.000',
+      skills: ['Concept Art', 'Background Art', 'Digital Painting'],
+      schoolName: 'SMK Raden Umar Said Kudus',
+      schoolStatus: 'pending',
+      major: 'Animasi 2D',
+      classGrade: 'XI ANM 3',
+      isPro: false
+    }
+  },
+  {
+    email: 'siti.nurhaliza@creatorin.my.id',
+    fullName: 'Siti Nurhaliza (Siswa SMK)',
+    role: 'creator',
+    avatarUrl: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=300&auto=format&fit=crop&q=80',
+    location: 'Surabaya',
+    phone: '08210000016',
+    creatorProfile: {
+      slug: 'siti-nurhaliza',
+      headline: 'Siswa Vokasi Ilustrasi Vektor & Tipografi',
+      bio: 'Pengajuan akun ke SMK Negeri 1 Surabaya telah diverifikasi dengan catatan perbaikan portofolio.',
+      careerScore: 76,
+      rating: 0,
+      startingPrice: 'Rp 100.000',
+      skills: ['Vector Art', 'Tipografi', 'Desain Stiker'],
+      schoolName: 'SMK Negeri 1 Surabaya',
+      schoolStatus: 'rejected',
+      major: 'Desain Komunikasi Visual',
+      classGrade: 'X DKV 3',
+      isPro: false
+    }
+  },
+
+  // --------------------------------------------------------------------------
+  // Kreator Independen Tambahan
+  // --------------------------------------------------------------------------
+  {
+    email: 'farhan.maulana@creatorin.my.id',
+    fullName: 'Farhan Maulana',
+    role: 'creator',
+    avatarUrl: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=300&auto=format&fit=crop&q=80',
+    location: 'Bandung',
+    phone: '08128880001',
+    creatorProfile: {
+      slug: 'farhan-maulana',
+      headline: 'Senior UI/UX Designer & Design System Specialist',
+      bio: 'Mendesain antarmuka web & aplikasi mobile responsif dengan fokus utama pada metrik konversi dan kemudahan pakai untuk UMKM.',
+      careerScore: 97,
+      rating: 4.9,
+      startingPrice: 'Rp 600.000',
+      skills: ['UI/UX Design', 'Design System', 'Figma', 'Prototyping', 'User Research'],
+      isPro: true
+    }
+  },
+  {
+    email: 'mega.utami@creatorin.my.id',
+    fullName: 'Mega Utami',
+    role: 'creator',
+    avatarUrl: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=300&auto=format&fit=crop&q=80',
+    location: 'Yogyakarta',
+    phone: '08128880002',
+    creatorProfile: {
+      slug: 'mega-utami',
+      headline: 'Content Creator & UGC Video Specialist F&B',
+      bio: 'Spesialis video review kuliner dan produk UMKM lokal dengan gaya storytelling autentik dan engagement tinggi.',
+      careerScore: 94,
+      rating: 5.0,
+      startingPrice: 'Rp 300.000',
+      skills: ['Video TikTok', 'Reels Instagram', 'Food Vlogging', 'Storytelling'],
+      isPro: true
+    }
+  },
+  {
+    email: 'andi.wijaya@creatorin.my.id',
+    fullName: 'Andi Wijaya',
+    role: 'creator',
+    avatarUrl: 'https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?w=300&auto=format&fit=crop&q=80',
+    location: 'Semarang',
+    phone: '08128880003',
+    creatorProfile: {
+      slug: 'andi-wijaya',
+      headline: 'Junior Graphic Designer & Social Media Specialist',
+      bio: 'Kreator baru di Creatorin. Siap membantu UMKM membuat aset visual media sosial dengan tarif terjangkau.',
+      careerScore: 78,
+      rating: 0,
+      startingPrice: 'Rp 100.000',
+      skills: ['Canva', 'Photoshop', 'Feed Instagram', 'Poster'],
+      isPro: false
+    }
+  },
+
+  // --------------------------------------------------------------------------
+  // UMKM Tambahan
+  // --------------------------------------------------------------------------
+  {
+    email: 'dapur.sambal@creatorin.my.id',
+    fullName: 'Dapur Sambal Bu Rudy',
+    role: 'business',
+    avatarUrl: 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=300&auto=format&fit=crop&q=80',
+    location: 'Surabaya, Jawa Timur',
+    phone: '08139990002',
+    businessProfile: {
+      companyName: 'Dapur Sambal Bu Rudy',
+      category: 'Kuliner Nusantara',
+      description: 'UMKM kuliner khas Jawa Timur produsen aneka sambal botol kemasan siap saji dan lauk kering oleh-oleh nusantara.',
+      website: 'https://dapursambal.id'
+    }
+  },
+  {
+    email: 'kriya.kayu@creatorin.my.id',
+    fullName: 'Kriya Kayu Jati Perhutani',
+    role: 'business',
+    avatarUrl: 'https://images.unsplash.com/photo-1538688525198-9b88f6f53126?w=300&auto=format&fit=crop&q=80',
+    location: 'Jepara, Jawa Tengah',
+    phone: '08139990003',
+    businessProfile: {
+      companyName: 'Kriya Kayu Jati Perhutani',
+      category: 'Kriya & Dekorasi Rumah',
+      description: 'Pengrajin mebel dan perkakas dapur kayu jati solid ramah lingkungan dengan sertifikasi ekspor SVLK.',
+      website: 'https://kriyakayujepara.id'
+    }
+  },
+  {
+    email: 'susu.bromo@creatorin.my.id',
+    fullName: 'Susu Segar Lereng Bromo',
+    role: 'business',
+    avatarUrl: 'https://images.unsplash.com/photo-1527153857715-3908f2ae5e81?w=300&auto=format&fit=crop&q=80',
+    location: 'Pasuruan, Jawa Timur',
+    phone: '08139990004',
+    businessProfile: {
+      companyName: 'Susu Segar Lereng Bromo',
+      category: 'Peternakan & Minuman Organik',
+      description: 'Koperasi peternak sapi perah lereng Gunung Bromo yang memproduksi susu pasteurisasi murni dan yogurt segar.',
+      website: 'https://susubromo.id'
     }
   }
 ];
@@ -448,6 +736,76 @@ const SERVICES_DATA = [
     priceNumeric: 175000,
     estimatedDays: '2 Hari Kerja',
     imageUrl: 'https://images.unsplash.com/photo-1509198397868-475647b2a1e5?w=800&auto=format&fit=crop&q=80'
+  },
+  {
+    creatorSlug: 'citra-kirana',
+    title: 'Desain Label Botol & Jar Sambal Siap Cetak',
+    category: 'Packaging',
+    description: 'Desain stiker label kemasan jar kaca atau botol plastik dengan spesifikasi ukuran presisi, barcode, info nilai gizi, dan visual menggugah selera.',
+    price: 'Rp200.000',
+    priceNumeric: 200000,
+    estimatedDays: '3 Hari Kerja',
+    imageUrl: 'https://images.unsplash.com/photo-1559056199-641a0ac8b55e?w=800&auto=format&fit=crop&q=80'
+  },
+  {
+    creatorSlug: 'citra-kirana',
+    title: 'UI/UX Prototipe Aplikasi Mobile Toko Online UMKM',
+    category: 'UI/UX',
+    description: 'Desain tampilan antarmuka mobile app interaktif di Figma mulai dari alur browsing produk, keranjang, hingga halaman checkout.',
+    price: 'Rp350.000',
+    priceNumeric: 350000,
+    estimatedDays: '4 Hari Kerja',
+    imageUrl: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&auto=format&fit=crop&q=80'
+  },
+  {
+    creatorSlug: 'gilang-ramadhan',
+    title: 'Visualisasi 3D Furnitur & Perabot Kayu Realistis',
+    category: '3D Visual',
+    description: 'Pembuatan model 3D mebel, kursi, meja, atau perkakas dekorasi rumah dengan tekstur serat kayu alami dan pencahayaan studio ultra high-res.',
+    price: 'Rp450.000',
+    priceNumeric: 450000,
+    estimatedDays: '4 Hari Kerja',
+    imageUrl: 'https://images.unsplash.com/photo-1538688525198-9b88f6f53126?w=800&auto=format&fit=crop&q=80'
+  },
+  {
+    creatorSlug: 'gilang-ramadhan',
+    title: 'Animasi Karakter 3D Rigged & Turntable Showcase',
+    category: '3D Visual',
+    description: 'Modeling karakter 3D lengkap dengan skeleton rigging dan animasi rotasi 360 derajat untuk game art, maskot, atau iklan komersial.',
+    price: 'Rp600.000',
+    priceNumeric: 600000,
+    estimatedDays: '5 Hari Kerja',
+    imageUrl: 'https://images.unsplash.com/photo-1534447677768-be436bb09401?w=800&auto=format&fit=crop&q=80'
+  },
+  {
+    creatorSlug: 'farhan-maulana',
+    title: 'Desain Website E-Commerce Responsif & Sistem Desain',
+    category: 'UI/UX',
+    description: 'Perancangan lengkap website toko online UMKM di Figma dengan sistem desain modular, komponen token, dan prototipe interaktif siap handoff ke developer.',
+    price: 'Rp850.000',
+    priceNumeric: 850000,
+    estimatedDays: '5 Hari Kerja',
+    imageUrl: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&auto=format&fit=crop&q=80'
+  },
+  {
+    creatorSlug: 'mega-utami',
+    title: 'Video UGC Review Kuliner & Unboxing Produk Makanan',
+    category: 'Video Tiktok',
+    description: 'Video review autentik dengan visual estetik, ekspresi natural, pencahayaan jernih, dan storytelling persuasif yang meningkatkan kepercayaan pembeli.',
+    price: 'Rp350.000',
+    priceNumeric: 350000,
+    estimatedDays: '2 Hari Kerja',
+    imageUrl: 'https://images.unsplash.com/photo-1551024709-8f23befc6f87?w=800&auto=format&fit=crop&q=80'
+  },
+  {
+    creatorSlug: 'andi-wijaya',
+    title: 'Desain Banner Promosi Media Sosial & Marketplace',
+    category: 'Banner',
+    description: 'Paket 3 banner promosi diskon, peluncuran produk baru, atau seasonal sale untuk toko online dan Instagram Story.',
+    price: 'Rp100.000',
+    priceNumeric: 100000,
+    estimatedDays: '2 Hari Kerja',
+    imageUrl: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=800&auto=format&fit=crop&q=80'
   }
 ];
 
@@ -512,20 +870,20 @@ const PROJECTS_DATA = [
   {
     creatorSlug: 'budi-pratama',
     title: 'Fotografi Studio Produk Keramik Kerajinan Tangan',
-    category: 'Commercial Photo',
-    description: 'Pemotretan cangkir dan vas gerabah dengan pencahayaan softbox dramatis menonjolkan tekstur tanah liat.',
+    category: 'Karya Siswa SMK',
+    description: 'Pemotretan cangkir dan vas gerabah dengan pencahayaan softbox dramatis menonjolkan tekstur tanah liat karya teaching factory.',
     mediaUrl: 'https://images.unsplash.com/photo-1610701596007-11502861dcfa?w=800&auto=format&fit=crop&q=80',
     viewsCount: '890',
-    isFeaturedSchool: false
+    isFeaturedSchool: true
   },
   {
     creatorSlug: 'budi-pratama',
     title: 'Katalog Menu Minuman Kopi Es Karamel & Latte',
-    category: 'Food Photography',
-    description: 'Foto close-up tetesan embun dan gradasi susu kopi dengan depth of field sempit yang menggiurkan.',
+    category: 'Karya Siswa SMK',
+    description: 'Foto close-up tetesan embun dan gradasi susu kopi dengan depth of field sempit untuk kolaborasi kafe lokal.',
     mediaUrl: 'https://images.unsplash.com/photo-1461023058943-07fcbe16d735?w=800&auto=format&fit=crop&q=80',
     viewsCount: '2.340',
-    isFeaturedSchool: false
+    isFeaturedSchool: true
   },
   {
     creatorSlug: 'dimas-anggara',
@@ -562,6 +920,78 @@ const PROJECTS_DATA = [
     mediaUrl: 'https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?w=800&auto=format&fit=crop&q=80',
     viewsCount: '2.480',
     isFeaturedSchool: true
+  },
+  {
+    creatorSlug: 'alya-putri',
+    title: 'Animasi Karakter 2D Maskot Wisata Bahari Nusantara',
+    category: 'Karya Siswa SMK',
+    description: 'Desain karakter animasi 2D lumba-lumba ramah lingkungan untuk materi edukasi konservasi laut terumbu karang.',
+    mediaUrl: 'https://images.unsplash.com/photo-1534447677768-be436bb09401?w=800&auto=format&fit=crop&q=80',
+    viewsCount: '1.780',
+    isFeaturedSchool: true
+  },
+  {
+    creatorSlug: 'rian-pratama',
+    title: 'Dashboard Analitik Penjualan Toko Online Ramah Pengguna',
+    category: 'Karya Siswa SMK',
+    description: 'Rancangan UI/UX dashboard e-commerce dengan sistem komponen rapi di Figma dan prototype interaktif.',
+    mediaUrl: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&auto=format&fit=crop&q=80',
+    viewsCount: '1.420',
+    isFeaturedSchool: true
+  },
+  {
+    creatorSlug: 'citra-kirana',
+    title: 'Desain Kemasan Jar Sambal Kemasan Ramah Lingkungan',
+    category: 'Karya Siswa SMK',
+    description: 'Eksplorasi kemasan jar kaca dengan segel ramah lingkungan dan warna earthy warm untuk produk sambal tradisional nusantara.',
+    mediaUrl: 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=800&auto=format&fit=crop&q=80',
+    viewsCount: '1.930',
+    isFeaturedSchool: true
+  },
+  {
+    creatorSlug: 'citra-kirana',
+    title: 'Redesain Aplikasi Mobile Pasar Vokasi Edukasi',
+    category: 'Karya Siswa SMK',
+    description: 'Prototipe Figma antarmuka aplikasi belanja produk karya siswa kejuruan dengan alur transaksi ringkas.',
+    mediaUrl: 'https://images.unsplash.com/photo-1507238691740-187a5b1d37b8?w=800&auto=format&fit=crop&q=80',
+    viewsCount: '1.450',
+    isFeaturedSchool: true
+  },
+  {
+    creatorSlug: 'gilang-ramadhan',
+    title: '3D Render Set Meja & Kursi Jati Solid Minimalis',
+    category: 'Karya Siswa SMK',
+    description: 'Model 3D photorealistic mebel kayu jati karya teaching factory studio animasi dengan material PBR detail tinggi.',
+    mediaUrl: 'https://images.unsplash.com/photo-1538688525198-9b88f6f53126?w=800&auto=format&fit=crop&q=80',
+    viewsCount: '2.840',
+    isFeaturedSchool: true
+  },
+  {
+    creatorSlug: 'gilang-ramadhan',
+    title: 'Karakter 3D Animasi Pendekar Nusantara "Gatotkaca"',
+    category: 'Karya Siswa SMK',
+    description: 'Karya 3D sculpting dan texturing karakter mitologi Jawa kontemporer yang dibuat di studio animasi sekolah binaan Djarum Foundation.',
+    mediaUrl: 'https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?w=800&auto=format&fit=crop&q=80',
+    viewsCount: '3.620',
+    isFeaturedSchool: true
+  },
+  {
+    creatorSlug: 'farhan-maulana',
+    title: 'Sistem Desain Antarmuka E-Commerce Kuliner Tradisional',
+    category: 'UI/UX Design',
+    description: 'Dokumentasi sistem desain terstruktur mencakup token warna, tipografi, dan puluhan komponen antarmuka responsif.',
+    mediaUrl: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&auto=format&fit=crop&q=80',
+    viewsCount: '2.190',
+    isFeaturedSchool: false
+  },
+  {
+    creatorSlug: 'mega-utami',
+    title: 'Kampanye Video Reels Resep Masakan & Review Sambal',
+    category: 'UGC & Video',
+    description: 'Konten video memasak cepat (quick cooking video) menggunakan bumbu siap saji UMKM yang ditonton 200rb kali di Instagram.',
+    mediaUrl: 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=800&auto=format&fit=crop&q=80',
+    viewsCount: '4.890',
+    isFeaturedSchool: false
   }
 ];
 
@@ -627,6 +1057,36 @@ const BRIEFS_DATA = [
     expectedOutput: '2 video TikTok dengan hook kuat, subtitle dinamis, dan musik berlisensi komersial.',
     budget: 'Rp500.000',
     deadline: '3 Hari',
+    status: 'open'
+  },
+  {
+    businessEmail: 'dapur.sambal@creatorin.my.id',
+    title: 'Desain Etiket Botol Sambal Ijo Cumi & Sambal Terasi',
+    category: 'Desain Kemasan',
+    description: 'Dibutuhkan desainer untuk merancang etiket stiker botol sambal nusantara varian baru. Harus memuat informasi expired date, nomor P-IRT, dan ilustrasi cabe segar.',
+    expectedOutput: 'File PDF/AI siap cetak sesuai ukuran keliling botol 150ml, mock up 3D.',
+    budget: 'Rp800.000',
+    deadline: '5 Hari',
+    status: 'open'
+  },
+  {
+    businessEmail: 'kriya.kayu@creatorin.my.id',
+    title: 'Visualisasi 3D Katalog Set Meja Makan Kayu Jati Jepara',
+    category: '3D Visual',
+    description: 'Kami ingin memvisualisasikan koleksi meja makan kayu jati terbaru dalam suasana ruang makan modern Skandinavia untuk katalog promosi ekspor.',
+    expectedOutput: '5 gambar render resolusi 4K dari berbagai sudut ruang makan.',
+    budget: 'Rp1.800.000',
+    deadline: '7 Hari',
+    status: 'open'
+  },
+  {
+    businessEmail: 'susu.bromo@creatorin.my.id',
+    title: 'Pembuatan 3 Video Edukasi TikTok Peternakan Sapi Perah',
+    category: 'Video Kreatif',
+    description: 'Mencari kreator konten video untuk mendokumentasikan proses pemerahan susu higienis di lereng Bromo dengan gaya vlogging santai dan informatif.',
+    expectedOutput: '3 video vertikal durasi 30-45 detik beserta teks penjelasan dan backsound ceria.',
+    budget: 'Rp1.000.000',
+    deadline: '6 Hari',
     status: 'open'
   }
 ];
@@ -710,6 +1170,66 @@ const REVIEWS_DATA = [
     comment: 'Meskipun masih berstatus siswa SMK vokasi, etos kerja Rahmat sangat disiplin. Vektor ilustrasinya berkarakter kuat dan layout infografisnya sangat mudah dipahami.',
     completedDate: '1 Okt 2026',
   },
+  {
+    creatorSlug: 'citra-kirana',
+    businessEmail: 'dapur.sambal@creatorin.my.id',
+    reviewerName: 'Dapur Sambal Bu Rudy',
+    reviewerRole: 'Owner & Operasional',
+    reviewerAvatar: 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=300&auto=format&fit=crop&q=80',
+    projectTitle: 'Desain Kemasan Jar Sambal Bawang & Kemasan Karton Box',
+    rating: 5.0,
+    amount: 750000,
+    comment: 'Siswa SMK Telkom Sidoarjo ini komunikasinya sangat profesional! Hasil label jar sambal kami langsung dicetak percetakan tanpa revisi ukuran sama sekali.',
+    completedDate: '11 Okt 2026',
+  },
+  {
+    creatorSlug: 'gilang-ramadhan',
+    businessEmail: 'kriya.kayu@creatorin.my.id',
+    reviewerName: 'Kriya Kayu Jati Perhutani',
+    reviewerRole: 'Direktur Produksi',
+    reviewerAvatar: 'https://images.unsplash.com/photo-1538688525198-9b88f6f53126?w=300&auto=format&fit=crop&q=80',
+    projectTitle: 'Visualisasi 3D Photoreal Set Meja Kursi Jati Minimalis',
+    rating: 5.0,
+    amount: 1400000,
+    comment: 'Luar biasa! Serat kayu jati dan pencahayaannya terlihat begitu nyata seperti foto asli di showroom. Standar siswa SMK RUS Kudus memang sekelas studio profesional.',
+    completedDate: '9 Okt 2026',
+  },
+  {
+    creatorSlug: 'farhan-maulana',
+    businessEmail: 'dapur.sambal@creatorin.my.id',
+    reviewerName: 'Dapur Sambal Bu Rudy',
+    reviewerRole: 'Digital Marketing Lead',
+    reviewerAvatar: 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=300&auto=format&fit=crop&q=80',
+    projectTitle: 'Desain UI/UX Website Toko Online & Sistem Checkout Sambal',
+    rating: 5.0,
+    amount: 2500000,
+    comment: 'Farhan merancang alur belanja yang sangat simpel dan mudah dimengerti bahkan oleh pelanggan lansia kami. Penjualan website melonjak signifikan.',
+    completedDate: '7 Okt 2026',
+  },
+  {
+    creatorSlug: 'mega-utami',
+    businessEmail: 'susu.bromo@creatorin.my.id',
+    reviewerName: 'Susu Segar Lereng Bromo',
+    reviewerRole: 'Manajer Pemasaran',
+    reviewerAvatar: 'https://images.unsplash.com/photo-1527153857715-3908f2ae5e81?w=300&auto=format&fit=crop&q=80',
+    projectTitle: 'Video UGC Edukasi Manfaat Susu Pasteurisasi Alami',
+    rating: 5.0,
+    amount: 850000,
+    comment: 'Storytelling Mega sangat hidup dan hangat! Video unggahannya di TikTok mendapatkan respons luar biasa dan membawa banyak pesanan susu botol baru.',
+    completedDate: '4 Okt 2026',
+  },
+  {
+    creatorSlug: 'budi-pratama',
+    businessEmail: 'dapur.sambal@creatorin.my.id',
+    reviewerName: 'Dapur Sambal Bu Rudy',
+    reviewerRole: 'Owner & Operasional',
+    reviewerAvatar: 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=300&auto=format&fit=crop&q=80',
+    projectTitle: 'Foto Katalog Produk Studio Varian Sambal Nusantara',
+    rating: 4.8,
+    amount: 600000,
+    comment: 'Komposisi pencahayaan dan styling cabe uleg di samping jar sambal sangat menggugah selera. Kualitas foto sangat jernih untuk banner marketplace.',
+    completedDate: '2 Okt 2026',
+  }
 ];
 
 // ==============================================================================
@@ -855,28 +1375,227 @@ async function main() {
             (${crypto.randomUUID()}, ${schoolId}, ${ach.title}, ${ach.year}, ${ach.category}, ${ach.description}, ${ach.imageUrl}, NOW())
         `;
       }
+    }
+  }
 
-      // Hubungkan Siswa Vokasi (Approved & Pending) ke SMK ini
-      await sql`DELETE FROM student_school_relations WHERE school_id = ${schoolId}`;
-      const rahmatId = userMap.get('rahmat.hidayat@creatorin.my.id');
-      if (rahmatId) {
+  // 1b. Hubungkan Siswa Vokasi (Approved, Pending, Rejected) & Penilaian Sekolah
+  // --- A. SMK NEGERI 1 SURABAYA ---
+  const [smkRecord] = await sql`SELECT id FROM schools WHERE slug = 'smk-negeri-1-surabaya' LIMIT 1`;
+  if (smkRecord) {
+    const schoolId = smkRecord.id;
+    console.log(`\n🏫 Menyinkronkan Relasi Siswa & Penilaian SMK Negeri 1 Surabaya (${schoolId})...`);
+    await sql`DELETE FROM student_school_relations WHERE school_id = ${schoolId}`;
+    await sql`DELETE FROM school_assessments WHERE school_id = ${schoolId}`;
+
+    const rahmatId = userMap.get('rahmat.hidayat@creatorin.my.id');
+    const budiId = userMap.get('budi.pratama@creatorin.my.id');
+    const alyaId = userMap.get('alya.putri@creatorin.my.id');
+    const rianId = userMap.get('rian.pratama@creatorin.my.id');
+    const sitiId = userMap.get('siti.nurhaliza@creatorin.my.id');
+
+    // Siswa 1: Rahmat Hidayat (Approved, Featured)
+    if (rahmatId) {
+      await sql`
+        INSERT INTO student_school_relations 
+          (id, student_id, school_id, school_status, is_featured, graduation_year, major, class_grade, request_date, approved_at, created_at)
+        VALUES 
+          (${crypto.randomUUID()}, ${rahmatId}, ${schoolId}, 'approved', true, '2026', 'Desain Komunikasi Visual', 'XII DKV 1', NOW(), NOW(), NOW())
+      `;
+      const assId = crypto.randomUUID();
+      await sql`
+        INSERT INTO school_assessments 
+          (id, student_id, school_id, status, final_score, notes, updated_at, created_at)
+        VALUES 
+          (${assId}, ${rahmatId}, ${schoolId}, 'completed', 90.0, 'Portofolio siap industri dengan pemahaman teknis dan etos kerja prima.', NOW(), NOW())
+      `;
+      const rubricItems = [
+        { criterion: 'Kemampuan Teknis', score: 92, weight: 40 },
+        { criterion: 'Tanggung Jawab', score: 88, weight: 20 },
+        { criterion: 'Komunikasi', score: 90, weight: 20 },
+        { criterion: 'Kedisiplinan', score: 90, weight: 20 },
+      ];
+      for (const rub of rubricItems) {
         await sql`
-          INSERT INTO student_school_relations 
-            (id, student_id, school_id, school_status, is_featured, graduation_year, major, class_grade, request_date, approved_at, created_at)
+          INSERT INTO assessment_items 
+            (id, assessment_id, criterion, score, weight)
           VALUES 
-            (${crypto.randomUUID()}, ${rahmatId}, ${schoolId}, 'approved', true, '2026', 'Desain Komunikasi Visual', 'XII DKV 1', NOW(), NOW(), NOW())
-        `;
-      }
-      const alyaId = userMap.get('alya.putri@creatorin.my.id');
-      if (alyaId) {
-        await sql`
-          INSERT INTO student_school_relations 
-            (id, student_id, school_id, school_status, is_featured, graduation_year, major, class_grade, request_date, approved_at, created_at)
-          VALUES 
-            (${crypto.randomUUID()}, ${alyaId}, ${schoolId}, 'pending', false, '2026', 'Animasi & Multimedia', 'XI ANM 2', NOW(), null, NOW())
+            (${crypto.randomUUID()}, ${assId}, ${rub.criterion}, ${rub.score}, ${rub.weight})
         `;
       }
     }
+
+    // Siswa 2: Budi Pratama (Approved, Featured)
+    if (budiId) {
+      await sql`
+        INSERT INTO student_school_relations 
+          (id, student_id, school_id, school_status, is_featured, graduation_year, major, class_grade, request_date, approved_at, created_at)
+        VALUES 
+          (${crypto.randomUUID()}, ${budiId}, ${schoolId}, 'approved', true, '2025', 'Desain Komunikasi Visual', 'XII DKV 2', NOW(), NOW(), NOW())
+      `;
+      const assId2 = crypto.randomUUID();
+      await sql`
+        INSERT INTO school_assessments 
+          (id, student_id, school_id, status, final_score, notes, updated_at, created_at)
+        VALUES 
+          (${assId2}, ${budiId}, ${schoolId}, 'draft', 82.5, 'Karya fotografi komersial sangat baik, perlu pendampingan komunikasi revisi.', NOW(), NOW())
+      `;
+      const rubricItems2 = [
+        { criterion: 'Kemampuan Teknis', score: 85, weight: 40 },
+        { criterion: 'Tanggung Jawab', score: 80, weight: 20 },
+        { criterion: 'Komunikasi', score: 80, weight: 20 },
+        { criterion: 'Kedisiplinan', score: 85, weight: 20 },
+      ];
+      for (const rub of rubricItems2) {
+        await sql`
+          INSERT INTO assessment_items 
+            (id, assessment_id, criterion, score, weight)
+          VALUES 
+            (${crypto.randomUUID()}, ${assId2}, ${rub.criterion}, ${rub.score}, ${rub.weight})
+        `;
+      }
+    }
+
+    // Siswa 3: Alya Putri (Pending)
+    if (alyaId) {
+      await sql`
+        INSERT INTO student_school_relations 
+          (id, student_id, school_id, school_status, is_featured, graduation_year, major, class_grade, request_date, approved_at, created_at)
+        VALUES 
+          (${crypto.randomUUID()}, ${alyaId}, ${schoolId}, 'pending', false, '2026', 'Animasi & Multimedia', 'XI ANM 2', NOW(), null, NOW())
+      `;
+    }
+
+    // Siswa 4: Rian Pratama (Pending)
+    if (rianId) {
+      await sql`
+        INSERT INTO student_school_relations 
+          (id, student_id, school_id, school_status, is_featured, graduation_year, major, class_grade, request_date, approved_at, created_at)
+        VALUES 
+          (${crypto.randomUUID()}, ${rianId}, ${schoolId}, 'pending', false, '2026', 'Rekayasa Perangkat Lunak', 'XI RPL 1', NOW(), null, NOW())
+      `;
+    }
+
+    // Siswa 5: Siti Nurhaliza (Rejected)
+    if (sitiId) {
+      await sql`
+        INSERT INTO student_school_relations 
+          (id, student_id, school_id, school_status, is_featured, graduation_year, major, class_grade, request_date, approved_at, created_at)
+        VALUES 
+          (${crypto.randomUUID()}, ${sitiId}, ${schoolId}, 'rejected', false, '2027', 'Desain Komunikasi Visual', 'X DKV 3', NOW(), null, NOW())
+      `;
+    }
+
+    console.log(`✅ Berhasil menyisipkan 5 relasi siswa SMKN 1 Surabaya (2 Approved, 2 Pending, 1 Rejected).`);
+  }
+
+  // --- B. SMK TELKOM SIDOARJO ---
+  const [telkomRecord] = await sql`SELECT id FROM schools WHERE slug = 'smk-telkom-sidoarjo' LIMIT 1`;
+  if (telkomRecord) {
+    const schoolId = telkomRecord.id;
+    console.log(`\n🏫 Menyinkronkan Relasi Siswa & Penilaian SMK Telkom Sidoarjo (${schoolId})...`);
+    await sql`DELETE FROM student_school_relations WHERE school_id = ${schoolId}`;
+    await sql`DELETE FROM school_assessments WHERE school_id = ${schoolId}`;
+
+    const citraId = userMap.get('citra.kirana@creatorin.my.id');
+    const fajarId = userMap.get('fajar.nugraha@creatorin.my.id');
+
+    // Siswa: Citra Kirana (Approved, Featured)
+    if (citraId) {
+      await sql`
+        INSERT INTO student_school_relations 
+          (id, student_id, school_id, school_status, is_featured, graduation_year, major, class_grade, request_date, approved_at, created_at)
+        VALUES 
+          (${crypto.randomUUID()}, ${citraId}, ${schoolId}, 'approved', true, '2026', 'Rekayasa Perangkat Lunak & Desain', 'XII RPL 1', NOW(), NOW(), NOW())
+      `;
+      const assId = crypto.randomUUID();
+      await sql`
+        INSERT INTO school_assessments 
+          (id, student_id, school_id, status, final_score, notes, updated_at, created_at)
+        VALUES 
+          (${assId}, ${citraId}, ${schoolId}, 'completed', 91.0, 'Portofolio UI/UX sangat matang dengan riset pengguna yang solid dan prototipe presisi.', NOW(), NOW())
+      `;
+      const rubricItems = [
+        { criterion: 'Kemampuan Teknis', score: 93, weight: 40 },
+        { criterion: 'Tanggung Jawab', score: 90, weight: 20 },
+        { criterion: 'Komunikasi', score: 90, weight: 20 },
+        { criterion: 'Kedisiplinan', score: 91, weight: 20 },
+      ];
+      for (const rub of rubricItems) {
+        await sql`
+          INSERT INTO assessment_items 
+            (id, assessment_id, criterion, score, weight)
+          VALUES 
+            (${crypto.randomUUID()}, ${assId}, ${rub.criterion}, ${rub.score}, ${rub.weight})
+        `;
+      }
+    }
+
+    // Siswa: Fajar Nugraha (Pending)
+    if (fajarId) {
+      await sql`
+        INSERT INTO student_school_relations 
+          (id, student_id, school_id, school_status, is_featured, graduation_year, major, class_grade, request_date, approved_at, created_at)
+        VALUES 
+          (${crypto.randomUUID()}, ${fajarId}, ${schoolId}, 'pending', false, '2026', 'Rekayasa Perangkat Lunak', 'XI RPL 2', NOW(), null, NOW())
+      `;
+    }
+
+    console.log(`✅ Berhasil menyisipkan 2 relasi siswa SMK Telkom Sidoarjo (1 Approved, 1 Pending).`);
+  }
+
+  // --- C. SMK RADEN UMAR SAID (RUS) KUDUS ---
+  const [rusRecord] = await sql`SELECT id FROM schools WHERE slug = 'smk-raden-umar-said' LIMIT 1`;
+  if (rusRecord) {
+    const schoolId = rusRecord.id;
+    console.log(`\n🏫 Menyinkronkan Relasi Siswa & Penilaian SMK RUS Kudus (${schoolId})...`);
+    await sql`DELETE FROM student_school_relations WHERE school_id = ${schoolId}`;
+    await sql`DELETE FROM school_assessments WHERE school_id = ${schoolId}`;
+
+    const gilangId = userMap.get('gilang.ramadhan@creatorin.my.id');
+    const nabilaId = userMap.get('nabila.syakieb@creatorin.my.id');
+
+    // Siswa: Gilang Ramadhan (Approved, Featured)
+    if (gilangId) {
+      await sql`
+        INSERT INTO student_school_relations 
+          (id, student_id, school_id, school_status, is_featured, graduation_year, major, class_grade, request_date, approved_at, created_at)
+        VALUES 
+          (${crypto.randomUUID()}, ${gilangId}, ${schoolId}, 'approved', true, '2026', 'Animasi 3D & Game Art', 'XII ANM 1', NOW(), NOW(), NOW())
+      `;
+      const assId = crypto.randomUUID();
+      await sql`
+        INSERT INTO school_assessments 
+          (id, student_id, school_id, status, final_score, notes, updated_at, created_at)
+        VALUES 
+          (${assId}, ${gilangId}, ${schoolId}, 'completed', 95.0, 'Kualitas aset 3D rigging dan tekstur fotorealistik sebanding standar studio internasional.', NOW(), NOW())
+      `;
+      const rubricItems = [
+        { criterion: 'Kemampuan Teknis', score: 96, weight: 40 },
+        { criterion: 'Tanggung Jawab', score: 94, weight: 20 },
+        { criterion: 'Komunikasi', score: 95, weight: 20 },
+        { criterion: 'Kedisiplinan', score: 95, weight: 20 },
+      ];
+      for (const rub of rubricItems) {
+        await sql`
+          INSERT INTO assessment_items 
+            (id, assessment_id, criterion, score, weight)
+          VALUES 
+            (${crypto.randomUUID()}, ${assId}, ${rub.criterion}, ${rub.score}, ${rub.weight})
+        `;
+      }
+    }
+
+    // Siswa: Nabila Syakieb (Pending)
+    if (nabilaId) {
+      await sql`
+        INSERT INTO student_school_relations 
+          (id, student_id, school_id, school_status, is_featured, graduation_year, major, class_grade, request_date, approved_at, created_at)
+        VALUES 
+          (${crypto.randomUUID()}, ${nabilaId}, ${schoolId}, 'pending', false, '2026', 'Animasi 2D', 'XI ANM 3', NOW(), null, NOW())
+      `;
+    }
+
+    console.log(`✅ Berhasil menyisipkan 2 relasi siswa SMK RUS Kudus (1 Approved, 1 Pending).`);
   }
 
   // 2. Seed Services (Katalog Layanan Jasa)
