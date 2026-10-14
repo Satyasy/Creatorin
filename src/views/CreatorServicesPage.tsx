@@ -231,110 +231,92 @@ export function CreatorServicesPage() {
         </section>
 
         {/* ==================================================================== */}
-        {/* 3-COLUMN GRID CONTAINER (Figma Node 5414:15490)                       */}
+        {/* RESPONSIVE GRID CONTAINER (Matching UMKM card scale)                 */}
         {/* ==================================================================== */}
-        <div className="mt-6 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+        <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-5 lg:gap-6">
           
           {/* ------------------------------------------------------------------ */}
-          {/* ITEM 1: Upload Proyek Tile (Figma Node 5414:15647)                 */}
+          {/* ITEM 1: Upload Proyek Tile (Compact scale)                         */}
           {/* ------------------------------------------------------------------ */}
           <button
             id="btn-upload-service-tile"
             data-testid="btn-upload-service-tile"
             type="button"
             onClick={() => setIsUploadModalOpen(true)}
-            className="group relative flex min-h-[560px] w-full flex-col items-center justify-center rounded-[6px] border border-dashed border-[#ACACAC] bg-white p-8 text-center transition-all hover:border-[#0D0C22] hover:bg-neutral-50/50 cursor-pointer shadow-xs hover:shadow-md"
+            className="group relative flex min-h-[300px] sm:min-h-[320px] w-full flex-col items-center justify-center rounded-2xl border border-dashed border-[#ACACAC] bg-white p-5 sm:p-6 text-center transition-all hover:border-[#0D0C22] hover:bg-neutral-50/50 cursor-pointer shadow-xs hover:shadow-md"
           >
-            <div className="flex flex-col items-center justify-center max-w-[402px]">
-              {/* Plus Vector Icon (Figma 63.68 x 52.96 px) */}
-              <div className="flex items-center justify-center transition-transform duration-300 group-hover:scale-110">
+            <div className="flex flex-col items-center justify-center max-w-[240px]">
+              {/* Plus Vector Icon */}
+              <div className="flex items-center justify-center">
                 <svg
-                  width="64"
-                  height="53"
+                  width="44"
+                  height="36"
                   viewBox="0 0 64 53"
                   fill="none"
                   xmlns="http://www.w3.org/2000/svg"
                   className="text-[#B0B0B0] group-hover:text-[#0D0C22] transition-colors"
                 >
-                  <path d="M32.3297 0V52.9998" stroke="currentColor" strokeWidth="3.6" />
-                  <path d="M63.729 26.8841H0.000499456" stroke="currentColor" strokeWidth="3.6" />
+                  <path d="M32.3297 0V52.9998" stroke="currentColor" strokeWidth="4" />
+                  <path d="M63.729 26.8841H0.000499456" stroke="currentColor" strokeWidth="4" />
                 </svg>
               </div>
 
               {/* Tile Headline */}
-              <h2 className="mt-6 text-[24px] font-bold leading-tight text-black group-hover:text-[#0D0C22]">
+              <h2 className="mt-4 text-base sm:text-lg font-bold leading-tight text-black group-hover:text-[#0D0C22]">
                 Upload Proyek
               </h2>
 
               {/* Tile Subtitle */}
-              <p className="mt-2 text-[12px] font-normal leading-[1.4] text-black">
+              <p className="mt-1.5 text-xs font-normal leading-relaxed text-neutral-500">
                 Show off your best work. Get feedback, likes and be a part of a growing community.
               </p>
             </div>
           </button>
 
           {/* ------------------------------------------------------------------ */}
-          {/* SERVICE CARDS (Figma Node 5414:15491 & variants)                   */}
+          {/* SERVICE CARDS (Matching UMKM Card Dimensions)                      */}
           {/* ------------------------------------------------------------------ */}
           {services.map((srv) => (
             <div
               key={srv.id}
-              className="group flex min-h-[560px] flex-col justify-between rounded-[24px] border border-[rgba(229,229,229,0.9)] bg-white p-5 text-left transition-all hover:border-neutral-300 hover:shadow-lg"
+              className="group flex flex-col justify-between rounded-2xl border border-[#E1E3EA] bg-white p-3.5 sm:p-4 text-left shadow-[0px_1px_2px_rgba(13,12,34,0.06)] hover:border-[#B7BBC9] hover:shadow-md transition-all"
             >
               <div>
-                {/* Cover Image Container (Figma height: 292.91px, rounded-16px) */}
+                {/* Cover Image Container (UMKM aspect 16/10) */}
                 <div
                   onClick={() => setSelectedServiceForDetail(srv)}
-                  className="relative h-[292.91px] w-full overflow-hidden rounded-[16px] bg-[#F5F5F5] cursor-pointer"
+                  className="relative aspect-[16/10] w-full overflow-hidden rounded-xl bg-neutral-100 cursor-pointer"
                   title="Lihat detail layanan"
                 >
                   {srv.coverImage ? (
                     <img
                       src={srv.coverImage}
                       alt={srv.title}
-                      className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.02]"
+                      className="h-full w-full object-cover"
                       onError={(e) => {
                         (e.currentTarget as HTMLImageElement).src = '/figma/service-figma.png';
                       }}
                     />
                   ) : (
                     <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-neutral-100 to-neutral-200">
-                      <span className="text-sm font-semibold text-neutral-400">
+                      <span className="text-xs font-semibold text-neutral-400">
                         {srv.tag || srv.category || 'Layanan'}
                       </span>
                     </div>
                   )}
                 </div>
 
-                {/* Badges Row (Category Tag & Status Badge) */}
-                <div className="flex items-center justify-between gap-2 pt-4">
-                  {/* Category Tag */}
-                  <span className="inline-block rounded-[6px] bg-[#F5F5F5] px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.0617em] text-[#525252]">
+                {/* Category Tag */}
+                <div className="mt-3">
+                  <span className="inline-block rounded bg-[#F3F4F6] px-2 py-0.5 text-[10px] sm:text-[11px] font-semibold uppercase tracking-wide text-[#55576A]">
                     {srv.tag || srv.category || 'Layanan'}
                   </span>
-
-                  {/* Status Badge */}
-                  {srv.isActive !== false ? (
-                    <div className="flex items-center gap-1.5 rounded-full border border-[#A4F4CF] bg-[#ECFDF5] px-2.5 py-1">
-                      <span className="size-1.5 rounded-full bg-[#00BC7D] opacity-65" />
-                      <span className="text-[10px] font-bold leading-[15px] tracking-[0.0117em] text-[#007A55]">
-                        Aktif Tayang
-                      </span>
-                    </div>
-                  ) : (
-                    <div className="flex items-center gap-1.5 rounded-full border border-[#E5E5E5] bg-[#F5F5F5] px-2.5 py-1">
-                      <span className="size-1.5 rounded-full bg-[#A1A1A1]" />
-                      <span className="text-[10px] font-bold leading-[15px] tracking-[0.0117em] text-[#525252]">
-                        Draft
-                      </span>
-                    </div>
-                  )}
                 </div>
 
                 {/* Service Title */}
                 <h3
                   onClick={() => setSelectedServiceForDetail(srv)}
-                  className="pt-2.5 cursor-pointer text-[17px] font-bold leading-[23.38px] tracking-[-0.0254em] text-[#0D0C22] transition-colors group-hover:text-[#155DFC] line-clamp-2"
+                  className="mt-2 cursor-pointer font-display font-semibold text-sm sm:text-[15px] leading-snug text-[#0D0C22] transition-colors group-hover:text-[#155DFC] line-clamp-2"
                   title="Lihat detail layanan"
                 >
                   {srv.title}
@@ -343,7 +325,7 @@ export function CreatorServicesPage() {
                 {/* Description */}
                 <p
                   onClick={() => setSelectedServiceForDetail(srv)}
-                  className="pt-1.5 line-clamp-2 cursor-pointer text-[12px] font-normal leading-[19.5px] text-[#737373]"
+                  className="mt-1 line-clamp-2 cursor-pointer text-xs leading-relaxed text-[#55576A]"
                 >
                   {srv.description || 'Pengerjaan profesional dengan jaminan kepatuhan brief dan revisi cepat.'}
                 </p>
@@ -351,28 +333,28 @@ export function CreatorServicesPage() {
                 {/* Duration / Estimasi */}
                 <div
                   onClick={() => setSelectedServiceForDetail(srv)}
-                  className="flex cursor-pointer items-center gap-1.5 pt-4 pb-6 text-[12px] font-normal leading-4 text-[#737373]"
+                  className="mt-2.5 flex cursor-pointer items-center gap-1.5 text-xs text-[#55576A]"
                 >
-                  {/* Clock SVG from Figma (14x14) */}
+                  {/* Clock SVG (13x13) */}
                   <svg
-                    width="14"
-                    height="14"
+                    width="13"
+                    height="13"
                     viewBox="0 0 14 14"
                     fill="none"
                     xmlns="http://www.w3.org/2000/svg"
-                    className="shrink-0 text-[#737373]"
+                    className="shrink-0 text-[#6F7285]"
                   >
                     <path
                       d="M7 3.5V7L9.33333 8.16667"
                       stroke="currentColor"
-                      strokeWidth="1.02"
+                      strokeWidth="1.1"
                       strokeLinecap="round"
                       strokeLinejoin="round"
                     />
                     <path
                       d="M6.99935 12.8337C10.221 12.8337 12.8327 10.222 12.8327 7.00033C12.8327 3.77866 10.221 1.16699 6.99935 1.16699C3.77769 1.16699 1.16602 3.77866 1.16602 7.00033C1.16602 10.222 3.77769 12.8337 6.99935 12.8337Z"
                       stroke="currentColor"
-                      strokeWidth="1.02"
+                      strokeWidth="1.1"
                       strokeLinecap="round"
                       strokeLinejoin="round"
                     />
@@ -389,16 +371,16 @@ export function CreatorServicesPage() {
               </div>
 
               {/* Footer / Bottom Row */}
-              <div className="flex items-center justify-between gap-2 border-t border-[#F5F5F5] pt-2">
+              <div className="mt-4 flex items-center justify-between gap-2 border-t border-[#F3F4F6] pt-3">
                 {/* Price column */}
                 <div
                   onClick={() => setSelectedServiceForDetail(srv)}
                   className="cursor-pointer min-w-0"
                 >
-                  <span className="block text-[10px] font-bold uppercase tracking-[0.0617em] text-[#A1A1A1]">
+                  <span className="block text-[10px] font-bold uppercase tracking-wider text-[#6F7285] leading-none">
                     HARGA
                   </span>
-                  <span className="block truncate text-[16px] font-black leading-6 tracking-[-0.0195em] text-[#0D0C22]">
+                  <span className="block truncate text-sm sm:text-base font-bold leading-tight text-[#0D0C22] mt-0.5">
                     {srv.formattedPrice ||
                       (srv.price ? `Rp${srv.price.toLocaleString('id-ID')}` : 'Rp1.500.000')}
                   </span>
@@ -413,7 +395,7 @@ export function CreatorServicesPage() {
                       e.stopPropagation();
                       handleToggleServiceActive(srv.id);
                     }}
-                    className={`rounded-full border border-[#E5E5E5] px-3 py-1.5 text-[12px] font-semibold leading-4 transition cursor-pointer ${
+                    className={`rounded-full border border-[#E1E3EA] px-2.5 sm:px-3 py-1 text-[11px] font-semibold transition cursor-pointer ${
                       srv.isActive !== false
                         ? 'text-[#404040] hover:border-red-200 hover:bg-red-50 hover:text-red-600'
                         : 'text-[#404040] hover:border-emerald-300 hover:bg-emerald-50 hover:text-emerald-700'
@@ -422,20 +404,20 @@ export function CreatorServicesPage() {
                     {srv.isActive !== false ? 'Nonaktifkan' : 'Aktifkan'}
                   </button>
 
-                  {/* Trash Button (14x14 Trash SVG from Figma) */}
+                  {/* Trash Button */}
                   <button
                     type="button"
                     onClick={(e) => {
                       e.stopPropagation();
                       handleDeleteService(srv.id, srv.title);
                     }}
-                    className="flex size-8 items-center justify-center rounded-full border border-[#E5E5E5] text-neutral-700 transition hover:border-red-200 hover:bg-red-50 hover:text-red-600 cursor-pointer"
+                    className="flex size-7 items-center justify-center rounded-full border border-[#E1E3EA] text-neutral-600 transition hover:border-red-200 hover:bg-red-50 hover:text-red-600 cursor-pointer"
                     title="Hapus Layanan"
                     aria-label="Hapus Layanan"
                   >
                     <svg
-                      width="14"
-                      height="14"
+                      width="12"
+                      height="12"
                       viewBox="0 0 14 14"
                       fill="none"
                       xmlns="http://www.w3.org/2000/svg"

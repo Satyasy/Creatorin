@@ -14,6 +14,7 @@ import {
 } from 'lucide-react';
 import { Creator } from '@/types';
 import { briefService } from '@/services/briefService';
+import { useLanguage } from '@/providers/LanguageProvider';
 
 interface ProjectBriefModalProps {
   isOpen: boolean;
@@ -69,6 +70,7 @@ export const ProjectBriefModal: React.FC<ProjectBriefModalProps> = ({
   onSuccess,
   initialData
 }) => {
+  const { t, language } = useLanguage();
   const selectedCreator = targetCreator ?? preselectedCreator ?? null;
 
   // Form States matching Figma node 5386:10952
@@ -226,16 +228,20 @@ export const ProjectBriefModal: React.FC<ProjectBriefModalProps> = ({
         <div className="px-6 sm:px-8 py-5 border-b border-[#E5E5E5] flex items-center justify-between bg-white/95">
           <div>
             <h2 id="brief-modal-title" className="text-base sm:text-lg font-bold text-[#0D0C22] flex items-center gap-2">
-              <span>{selectedCreator ? `Kirim Brief Proyek ke ${selectedCreator.name}` : 'Buat Brief Proyek Baru'}</span>
+              <span>
+                {selectedCreator 
+                  ? t('briefModal.sendToTitle', 'Kirim Brief Proyek ke {name}').replace('{name}', selectedCreator.name) 
+                  : t('briefModal.createTitle', 'Buat Brief Proyek Baru')}
+              </span>
               <span className="hidden sm:inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-blue-50 text-[#155DFC] text-[11px] font-semibold">
                 <ShieldCheck className="w-3.5 h-3.5" />
-                <span>Escrow Dilindungi</span>
+                <span>{t('briefModal.escrowProtected', 'Escrow Dilindungi')}</span>
               </span>
             </h2>
             <p className="text-xs text-neutral-500 mt-0.5">
               {selectedCreator 
-                ? 'Rincikan kebutuhan proyek kolaborasi Anda dengan aman dan transparan.' 
-                : 'Terbitkan kebutuhan proyek Anda untuk mendapatkan penawaran dari kreator terverifikasi.'}
+                ? t('briefModal.descSpecific', 'Rincikan kebutuhan proyek kolaborasi Anda dengan aman dan transparan.')
+                : t('briefModal.descGeneric', 'Terbitkan kebutuhan proyek Anda untuk mendapatkan penawaran dari kreator terverifikasi.')}
             </p>
           </div>
 
@@ -243,7 +249,7 @@ export const ProjectBriefModal: React.FC<ProjectBriefModalProps> = ({
             type="button"
             onClick={handleResetAndClose}
             className="w-9 h-9 rounded-full hover:bg-neutral-100 flex items-center justify-center text-neutral-400 hover:text-neutral-700 transition cursor-pointer"
-            aria-label="Tutup modal"
+            aria-label={language === 'en' ? 'Close modal' : 'Tutup modal'}
           >
             <X className="w-5 h-5" />
           </button>
@@ -256,11 +262,11 @@ export const ProjectBriefModal: React.FC<ProjectBriefModalProps> = ({
               <div className="w-16 h-16 bg-emerald-50 text-emerald-600 rounded-full flex items-center justify-center mx-auto ring-8 ring-emerald-50/50">
                 <CheckCircle2 className="w-8 h-8" />
               </div>
-              <h3 className="text-xl font-bold text-[#0D0C22]">Brief Berhasil Diterbitkan!</h3>
+              <h3 className="text-xl font-bold text-[#0D0C22]">{t('briefModal.successTitle', 'Brief Berhasil Diterbitkan!')}</h3>
               <p className="text-xs sm:text-sm text-neutral-600 max-w-md mx-auto leading-relaxed">
                 {selectedCreator 
-                  ? `Brief proyek Anda telah dikirimkan ke ${selectedCreator.name}. Anda akan menerima respons dalam waktu dekat.` 
-                  : 'Brief proyek Anda telah berhasil dipasang dan siap menerima proposal penawaran dari kreator terbaik.'}
+                  ? t('briefModal.successDescSpecific', 'Brief proyek Anda telah dikirimkan ke {name}. Anda akan menerima respons dalam waktu dekat.').replace('{name}', selectedCreator.name)
+                  : t('briefModal.successDescGeneric', 'Brief proyek Anda telah berhasil dipasang dan siap menerima proposal penawaran dari kreator terbaik.')}
               </p>
               <div className="pt-4">
                 <button
@@ -268,7 +274,7 @@ export const ProjectBriefModal: React.FC<ProjectBriefModalProps> = ({
                   onClick={handleResetAndClose}
                   className="px-7 py-2.5 rounded-xl bg-[#0B1F3A] hover:bg-[#123B8C] text-white text-xs sm:text-sm font-semibold transition cursor-pointer shadow-xs"
                 >
-                  Selesai
+                  {t('briefModal.doneBtn', 'Selesai')}
                 </button>
               </div>
             </div>
@@ -291,11 +297,13 @@ export const ProjectBriefModal: React.FC<ProjectBriefModalProps> = ({
                     />
                     <div className="min-w-0">
                       <div className="text-xs sm:text-sm font-bold text-[#0D0C22] truncate">{selectedCreator.name}</div>
-                      <div className="text-[11px] text-neutral-500 truncate">{selectedCreator.roleTitle} • Mulai {selectedCreator.formattedRate}</div>
+                      <div className="text-[11px] text-neutral-500 truncate">
+                        {selectedCreator.roleTitle} • {language === 'en' ? 'Starting ' : 'Mulai '}{language === 'en' ? selectedCreator.formattedRate.replace('Rp', 'IDR ') : selectedCreator.formattedRate}
+                      </div>
                     </div>
                   </div>
                   <span className="hidden sm:inline-block text-[11px] font-semibold text-[#155DFC] bg-blue-50 px-2.5 py-1 rounded-full shrink-0">
-                    Kreator Tujuan
+                    {language === 'en' ? 'Target Creator' : 'Kreator Tujuan'}
                   </span>
                 </div>
               )}
@@ -343,7 +351,7 @@ export const ProjectBriefModal: React.FC<ProjectBriefModalProps> = ({
                   required
                   value={projectTitle}
                   onChange={(e) => setProjectTitle(e.target.value)}
-                  placeholder="Ketik judul proyek..."
+                  placeholder={language === 'en' ? 'Type project title...' : 'Ketik judul proyek...'}
                   className="w-full text-2xl sm:text-3xl md:text-[34px] leading-tight font-extrabold tracking-tight text-[#0D0C22] placeholder:text-[#D4D4D4] outline-none bg-transparent"
                 />
               </div>
@@ -355,7 +363,7 @@ export const ProjectBriefModal: React.FC<ProjectBriefModalProps> = ({
                 <div className="rounded-2xl border border-[#E5E5E5] bg-white p-4 shadow-[0_1px_0_0_rgba(0,0,0,0.05)] flex flex-col justify-between gap-3">
                   <div className="flex items-center justify-between">
                     <span className="text-[11px] font-bold text-[#737373] tracking-[0.055em] uppercase">
-                      Harga (Rp)
+                      {language === 'en' ? 'Price (IDR)' : 'Harga (Rp)'}
                     </span>
                     <div className="w-8 h-8 rounded-xl bg-[#F5F5F5] flex items-center justify-center text-[#737373]">
                       <CreditCard className="w-4 h-4" />
@@ -364,7 +372,7 @@ export const ProjectBriefModal: React.FC<ProjectBriefModalProps> = ({
 
                   <div className="h-[42px] px-3 rounded-xl border border-[#E5E5E5] bg-white flex items-center gap-1.5 focus-within:border-[#155DFC] focus-within:ring-2 focus-within:ring-[#155DFC]/10 transition-all">
                     <span className="text-xs font-bold text-[#A1A1A1] select-none">
-                      Rp
+                      {language === 'en' ? 'IDR' : 'Rp'}
                     </span>
                     <input
                       type="text"
@@ -381,7 +389,7 @@ export const ProjectBriefModal: React.FC<ProjectBriefModalProps> = ({
                 <div className="rounded-2xl border border-[#E5E5E5] bg-white p-4 shadow-[0_1px_0_0_rgba(0,0,0,0.05)] flex flex-col justify-between gap-3" ref={deadlineRef}>
                   <div className="flex items-center justify-between">
                     <span className="text-[11px] font-bold text-[#737373] tracking-[0.055em] uppercase">
-                      Waktu Pengerjaan
+                      {language === 'en' ? 'Delivery Time' : 'Waktu Pengerjaan'}
                     </span>
                     <div className="w-8 h-8 rounded-xl bg-[#F5F5F5] flex items-center justify-center text-[#737373]">
                       <Clock className="w-4 h-4" />
@@ -395,7 +403,7 @@ export const ProjectBriefModal: React.FC<ProjectBriefModalProps> = ({
                         value={deadline}
                         onChange={(e) => setDeadline(e.target.value)}
                         onFocus={() => setIsDeadlineOpen(true)}
-                        placeholder="3 Hari Kerja"
+                        placeholder={language === 'en' ? '3 Working Days' : '3 Hari Kerja'}
                         className="text-base font-black text-[#0D0C22] placeholder:text-[#D4D4D4] w-full bg-transparent outline-none tracking-tight"
                       />
                       <button
@@ -419,7 +427,7 @@ export const ProjectBriefModal: React.FC<ProjectBriefModalProps> = ({
                             }}
                             className="w-full px-3 py-1.5 text-left text-xs font-semibold text-[#0D0C22] hover:bg-neutral-50 transition cursor-pointer"
                           >
-                            {d}
+                            {language === 'en' ? d.replace('Hari Kerja', 'Working Days') : d}
                           </button>
                         ))}
                       </div>
@@ -431,7 +439,7 @@ export const ProjectBriefModal: React.FC<ProjectBriefModalProps> = ({
                 <div className="rounded-2xl border border-[#E5E5E5]/90 bg-[#FAFAFA]/70 p-4 flex flex-col justify-between gap-3">
                   <div className="flex items-center justify-between">
                     <span className="text-[11px] font-bold text-[#A1A1A1] tracking-[0.055em] uppercase">
-                      Pelamar Terdaftar
+                      {language === 'en' ? 'Registered Applicants' : 'Pelamar Terdaftar'}
                     </span>
                     <div className="w-8 h-8 rounded-xl bg-[#EFF6FF] flex items-center justify-center text-[#155DFC]">
                       <Users className="w-4 h-4" />
@@ -443,7 +451,7 @@ export const ProjectBriefModal: React.FC<ProjectBriefModalProps> = ({
                       {applicantsCount}
                     </span>
                     <span className="text-sm font-semibold text-[#737373]">
-                      Pelamar
+                      {language === 'en' ? (applicantsCount === 1 ? 'Applicant' : 'Applicants') : 'Pelamar'}
                     </span>
                   </div>
                 </div>
@@ -453,7 +461,7 @@ export const ProjectBriefModal: React.FC<ProjectBriefModalProps> = ({
               {/* 4. Deskripsi Proyek Section (Figma node 5386:11059) */}
               <div>
                 <label className="block text-xs font-bold text-[#737373] tracking-[0.05em] uppercase mb-2">
-                  Deskripsi Proyek
+                  {language === 'en' ? 'Project Description' : 'Deskripsi Proyek'}
                 </label>
                 <div className="rounded-2xl border border-[#E5E5E5] bg-[#FAFAFA] p-4 focus-within:bg-white focus-within:border-[#155DFC] focus-within:ring-2 focus-within:ring-[#155DFC]/10 transition-all">
                   <textarea
@@ -461,7 +469,7 @@ export const ProjectBriefModal: React.FC<ProjectBriefModalProps> = ({
                     required
                     value={description}
                     onChange={(e) => setDescription(e.target.value)}
-                    placeholder="Tuliskan detail kebutuhan proyek, konsep, atau tujuan yang ingin dicapai..."
+                    placeholder={language === 'en' ? 'Describe project requirements, concepts, or key campaign goals...' : 'Tuliskan detail kebutuhan proyek, konsep, atau tujuan yang ingin dicapai...'}
                     className="w-full min-h-[140px] bg-transparent outline-none text-sm sm:text-base text-[#0D0C22] placeholder:text-[#A1A1A1] leading-relaxed resize-y"
                   />
                 </div>
@@ -470,18 +478,18 @@ export const ProjectBriefModal: React.FC<ProjectBriefModalProps> = ({
               {/* 5. Tagar Section (Figma node 5386:11106) */}
               <div>
                 <label className="block text-xs font-bold text-[#737373] tracking-[0.05em] uppercase mb-2">
-                  Tagar
+                  {language === 'en' ? 'Hashtags' : 'Tagar'}
                 </label>
                 <div className="rounded-2xl border border-[#E5E5E5] bg-[#FAFAFA] p-3 focus-within:bg-white focus-within:border-[#155DFC] focus-within:ring-2 focus-within:ring-[#155DFC]/10 transition-all flex flex-wrap items-center gap-2">
-                  {tags.map((t) => (
+                  {tags.map((tItem) => (
                     <span
-                      key={t}
+                      key={tItem}
                       className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-50 text-[#155DFC] text-xs font-semibold"
                     >
-                      <span>#{t}</span>
+                      <span>#{tItem}</span>
                       <button
                         type="button"
-                        onClick={() => handleRemoveTag(t)}
+                        onClick={() => handleRemoveTag(tItem)}
                         className="hover:text-blue-800 cursor-pointer"
                       >
                         <X className="w-3 h-3" />
@@ -496,14 +504,16 @@ export const ProjectBriefModal: React.FC<ProjectBriefModalProps> = ({
                     onBlur={() => {
                       if (tagInput.trim()) handleAddTag(tagInput);
                     }}
-                    placeholder={tags.length === 0 ? "Ketik tagar lalu tekan Enter atau Koma (misal: Reels, Branding)" : "Tambah tagar..."}
+                    placeholder={tags.length === 0 ? (language === 'en' ? 'Type hashtag then press Enter or Comma (e.g. Reels, Branding)' : 'Ketik tagar lalu tekan Enter atau Koma (misal: Reels, Branding)') : (language === 'en' ? 'Add hashtag...' : 'Tambah tagar...')}
                     className="flex-1 min-w-[200px] bg-transparent outline-none text-xs sm:text-sm text-[#0D0C22] placeholder:text-[#A1A1A1]"
                   />
                 </div>
 
                 {/* Popular Tag Quick Suggestions */}
                 <div className="mt-2 flex flex-wrap items-center gap-1.5">
-                  <span className="text-[11px] font-medium text-neutral-400 mr-1">Rekomendasi tagar:</span>
+                  <span className="text-[11px] font-medium text-neutral-400 mr-1">
+                    {language === 'en' ? 'Recommended tags:' : 'Rekomendasi tagar:'}
+                  </span>
                   {POPULAR_TAG_SUGGESTIONS.map((sug) => {
                     const isAdded = tags.includes(sug);
                     return (
@@ -528,7 +538,10 @@ export const ProjectBriefModal: React.FC<ProjectBriefModalProps> = ({
               <div className="p-3.5 rounded-2xl bg-amber-50/70 border border-amber-200/80 flex items-start gap-2.5 text-xs text-amber-900">
                 <ShieldCheck className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
                 <p>
-                  <strong>Garansi Dana Terlindungi:</strong> Pembayaran Anda hanya akan diteruskan ke kreator setelah hasil pekerjaan Anda setujui sesuai brief proyek.
+                  <strong>{language === 'en' ? 'Escrow Protected Guarantee: ' : 'Garansi Dana Terlindungi: '}</strong>
+                  {language === 'en' 
+                    ? 'Your payment will only be released to the creator after you approve the submitted deliverables according to the project brief.' 
+                    : 'Pembayaran Anda hanya akan diteruskan ke kreator setelah hasil pekerjaan Anda setujui sesuai brief proyek.'}
                 </p>
               </div>
 
@@ -539,7 +552,7 @@ export const ProjectBriefModal: React.FC<ProjectBriefModalProps> = ({
                   onClick={handleResetAndClose}
                   className="px-5 py-2.5 text-xs sm:text-sm font-semibold text-neutral-600 hover:text-neutral-900 rounded-xl hover:bg-neutral-100 transition cursor-pointer"
                 >
-                  Batal
+                  {language === 'en' ? 'Cancel' : 'Batal'}
                 </button>
                 <button
                   type="submit"
@@ -547,7 +560,13 @@ export const ProjectBriefModal: React.FC<ProjectBriefModalProps> = ({
                   className="px-6 py-2.5 rounded-xl bg-[#0B1F3A] hover:bg-[#123B8C] text-white text-xs sm:text-sm font-semibold flex items-center gap-2 transition cursor-pointer shadow-xs disabled:opacity-50"
                 >
                   <Send className="w-4 h-4" />
-                  <span>{isSubmitting ? 'Menerbitkan...' : selectedCreator ? 'Kirim Brief ke Kreator' : 'Pasang Brief Proyek'}</span>
+                  <span>
+                    {isSubmitting 
+                      ? (language === 'en' ? 'Publishing...' : 'Menerbitkan...') 
+                      : selectedCreator 
+                        ? (language === 'en' ? 'Send Brief to Creator' : 'Kirim Brief ke Kreator') 
+                        : (language === 'en' ? 'Post Project Brief' : 'Pasang Brief Proyek')}
+                  </span>
                 </button>
               </div>
 

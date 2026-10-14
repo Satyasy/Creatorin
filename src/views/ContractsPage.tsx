@@ -4,6 +4,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useEffect, useMemo, useState } from 'react';
 import { BriefcaseBusiness, CheckCircle2, Clock3, FileText, MessageSquareText, Search } from 'lucide-react';
+import { useLanguage } from '@/providers/LanguageProvider';
 
 type ContractStatus = 'pending' | 'accepted' | 'rejected';
 type StatusFilter = 'all' | 'accepted' | 'pending';
@@ -49,6 +50,7 @@ const statusCopy: Record<ContractStatus, { label: string; className: string }> =
 };
 
 export function ContractsPage() {
+  const { t, language } = useLanguage();
   const [contracts, setContracts] = useState<ContractItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [query, setQuery] = useState('');
@@ -96,18 +98,18 @@ export function ContractsPage() {
         <div className="mx-auto max-w-[1180px] px-4 py-8 sm:px-6 lg:px-10 lg:py-10">
           <div className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
             <div className="max-w-3xl">
-              <p className="text-sm font-medium text-[#155DFC]">Contracts</p>
+              <p className="text-sm font-medium text-[#155DFC]">{t('contracts.badge', 'Contracts')}</p>
               <h1 className="mt-2 text-3xl font-semibold tracking-[-0.035em] sm:text-4xl">
-                Brief yang sedang kamu lamar.
+                {t('contracts.pageHeading', 'Brief yang sedang kamu lamar.')}
               </h1>
               <p className="mt-3 text-sm leading-6 text-[#62635E] sm:text-base">
-                Pantau lamaran yang sudah diterima dan yang masih menunggu keputusan UMKM.
+                {t('contracts.pageSubheading', 'Pantau lamaran yang sudah diterima dan yang masih menunggu keputusan UMKM.')}
               </p>
             </div>
 
             <div className="grid grid-cols-2 gap-3 sm:min-w-[300px]">
-              <SummaryCard label="Accepted" value={acceptedCount} />
-              <SummaryCard label="Menunggu" value={pendingCount} />
+              <SummaryCard label={t('contracts.accepted', 'Accepted')} value={acceptedCount} />
+              <SummaryCard label={t('contracts.pending', 'Menunggu')} value={pendingCount} />
             </div>
           </div>
 
@@ -118,25 +120,25 @@ export function ContractsPage() {
         <div className="mb-5 flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
           <div className="flex min-h-12 items-center gap-3 border-b-2 border-[#171714] bg-transparent lg:w-[420px]">
             <Search className="h-5 w-5 shrink-0 text-[#62635E]" strokeWidth={1.6} aria-hidden="true" />
-            <label htmlFor="contract-search" className="sr-only">Cari lamaran brief</label>
+            <label htmlFor="contract-search" className="sr-only">{t('contracts.searchPlaceholder', 'Cari lamaran brief')}</label>
             <input
               id="contract-search"
               value={query}
               onChange={(event) => setQuery(event.target.value)}
-              placeholder="Cari brief, UMKM, atau kategori"
+              placeholder={t('contracts.searchPlaceholder', 'Cari brief, UMKM, atau kategori')}
               className="min-w-0 flex-1 bg-transparent text-sm outline-none placeholder:text-[#62635E]"
             />
           </div>
 
           <div className="flex flex-wrap gap-2" aria-label="Filter status lamaran">
-            <FilterButton active={filter === 'all'} onClick={() => setFilter('all')}>Semua</FilterButton>
-            <FilterButton active={filter === 'accepted'} onClick={() => setFilter('accepted')}>Accepted</FilterButton>
-            <FilterButton active={filter === 'pending'} onClick={() => setFilter('pending')}>Menunggu</FilterButton>
+            <FilterButton active={filter === 'all'} onClick={() => setFilter('all')}>{t('contracts.all', 'Semua')}</FilterButton>
+            <FilterButton active={filter === 'accepted'} onClick={() => setFilter('accepted')}>{t('contracts.accepted', 'Accepted')}</FilterButton>
+            <FilterButton active={filter === 'pending'} onClick={() => setFilter('pending')}>{t('contracts.pending', 'Menunggu')}</FilterButton>
           </div>
         </div>
 
         {loading ? (
-          <div className="border-y border-[#DFE0DA] py-14 text-sm text-[#62635E]">Memuat daftar lamaran...</div>
+          <div className="border-y border-[#DFE0DA] py-14 text-sm text-[#62635E]">{t('contracts.loading', 'Memuat daftar lamaran...')}</div>
         ) : visibleContracts.length ? (
           <div className="grid gap-4">
             {visibleContracts.map((item) => (
@@ -146,12 +148,12 @@ export function ContractsPage() {
         ) : (
           <div className="border-y border-[#DFE0DA] py-16 text-center">
             <FileText className="mx-auto h-9 w-9 text-[#62635E]" strokeWidth={1.5} />
-            <h2 className="mt-4 text-lg font-semibold">Belum ada lamaran yang cocok</h2>
+            <h2 className="mt-4 text-lg font-semibold">{t('contracts.emptyTitle', 'Belum ada lamaran yang cocok')}</h2>
             <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-[#62635E]">
-              Coba ubah filter, atau buka papan brief untuk melamar proyek baru.
+              {t('contracts.emptyDesc', 'Coba ubah filter, atau buka papan brief untuk melamar proyek baru.')}
             </p>
             <Link href="/briefs" className="mt-5 inline-flex min-h-11 items-center rounded-lg bg-[#171714] px-5 text-sm font-semibold text-white hover:bg-[#30312D] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#155DFC]">
-              Buka papan brief
+              {t('contracts.openBriefs', 'Buka papan brief')}
             </Link>
           </div>
         )}
@@ -161,19 +163,25 @@ export function ContractsPage() {
 }
 
 function ContractCard({ item }: { item: ContractItem }) {
-  const status = statusCopy[item.status] ?? statusCopy.pending;
+  const { t, language } = useLanguage();
   const isAccepted = item.status === 'accepted';
+  const statusLabel = item.status === 'accepted' 
+    ? t('contracts.accepted', 'Accepted') 
+    : item.status === 'rejected' 
+    ? t('contracts.rejected', 'Tidak lanjut') 
+    : t('contracts.pending', 'Menunggu review');
+  const statusClass = statusCopy[item.status]?.className ?? statusCopy.pending.className;
 
   return (
     <article className="grid gap-4 border border-[#DFE0DA] bg-white p-4 sm:grid-cols-[minmax(0,1fr)_190px] sm:p-5">
       <div className="min-w-0">
         <div className="flex flex-wrap items-center gap-2">
-          <span className={`inline-flex min-h-8 items-center gap-1.5 rounded-md border px-2.5 text-xs font-semibold ${status.className}`}>
+          <span className={`inline-flex min-h-8 items-center gap-1.5 rounded-md border px-2.5 text-xs font-semibold ${statusClass}`}>
             {isAccepted ? <CheckCircle2 className="h-3.5 w-3.5" /> : <Clock3 className="h-3.5 w-3.5" />}
-            {status.label}
+            {statusLabel}
           </span>
           <span className="text-xs text-[#62635E]">{item.category}</span>
-          <span className="text-xs text-[#62635E]">Dilamar {item.appliedAt}</span>
+          <span className="text-xs text-[#62635E]">{t('contracts.appliedOn', 'Dilamar {date}').replace('{date}', item.appliedAt)}</span>
         </div>
 
         <h2 className="mt-3 line-clamp-2 text-lg font-semibold leading-6 tracking-[-0.02em]">
@@ -199,16 +207,16 @@ function ContractCard({ item }: { item: ContractItem }) {
       <div className="flex flex-col justify-between gap-4 border-t border-[#DFE0DA] pt-4 sm:border-l sm:border-t-0 sm:pl-5 sm:pt-0">
         <div className="grid gap-3 text-sm">
           <div>
-            <p className="text-xs text-[#62635E]">Penawaran kamu</p>
+            <p className="text-xs text-[#62635E]">{language === 'en' ? 'Your proposal' : 'Penawaran kamu'}</p>
             <p className="mt-1 font-semibold">{item.proposedPrice || item.budget}</p>
           </div>
           <div>
-            <p className="text-xs text-[#62635E]">Budget brief</p>
+            <p className="text-xs text-[#62635E]">{language === 'en' ? 'Brief budget' : 'Budget brief'}</p>
             <p className="mt-1 font-semibold">{item.budget}</p>
           </div>
           <div>
             <p className="text-xs text-[#62635E]">Deadline</p>
-            <p className="mt-1 font-semibold">{item.deadline || 'Sesuai brief'}</p>
+            <p className="mt-1 font-semibold">{item.deadline === 'Sesuai brief' && language === 'en' ? 'As in brief' : (item.deadline || 'Sesuai brief')}</p>
           </div>
         </div>
 
@@ -216,12 +224,12 @@ function ContractCard({ item }: { item: ContractItem }) {
           {isAccepted && (
             <Link href="/chat" className="inline-flex min-h-11 items-center justify-center gap-2 rounded-lg bg-[#171714] px-4 text-sm font-semibold text-white hover:bg-[#30312D] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#155DFC]">
               <MessageSquareText className="h-4 w-4" strokeWidth={1.7} />
-              Buka chat
+              {t('contracts.chatBusiness', 'Buka chat')}
             </Link>
           )}
           <Link href={`/briefs/${item.briefId}`} className="inline-flex min-h-11 items-center justify-center gap-2 rounded-lg border border-[#B7BBC9] px-4 text-sm font-semibold hover:bg-[#F3F5F7] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#155DFC]">
             <BriefcaseBusiness className="h-4 w-4" strokeWidth={1.7} />
-            Lihat brief
+            {t('contracts.viewBriefDetail', 'Lihat brief')}
           </Link>
         </div>
       </div>

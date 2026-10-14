@@ -3,6 +3,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { ArrowUpRight, Sparkles } from 'lucide-react';
+import { useLanguage } from '@/providers/LanguageProvider';
 
 interface HomeHeroSectionProps {
   onExploreClick?: () => void;
@@ -15,10 +16,13 @@ interface HomeHeroSectionProps {
 export const HomeHeroSection: React.FC<HomeHeroSectionProps> = ({
   onExploreClick,
   onSecondaryClick,
-  secondaryText = 'Bergabung Creatorin',
+  secondaryText,
   secondaryHref = '/briefs',
-  badgeText = 'Platform Kolaborasi Kreatif',
+  badgeText,
 }) => {
+  const { t } = useLanguage();
+  const effectiveBadge = badgeText || t('hero.badge', 'Platform Kolaborasi Kreatif');
+  const effectiveSecondary = secondaryText || t('hero.joinBtn', 'Bergabung Creatorin');
   return (
     <section className="relative w-full overflow-hidden bg-white border-b border-[#E1E3EA] -mt-20 lg:-mt-20 pt-28 sm:pt-36 lg:pt-40 pb-16 sm:pb-20">
       {/* Symmetrical Ambient Soft-Blue Glow */}
@@ -49,23 +53,23 @@ export const HomeHeroSection: React.FC<HomeHeroSectionProps> = ({
         <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-md bg-white border border-[#E1E3EA] shadow-xs mb-5 sm:mb-6">
           <Sparkles className="w-3.5 h-3.5 text-[#0D0C22]" />
           <span className="text-xs sm:text-sm font-medium text-[#0D0C22]">
-            {badgeText}
+            {effectiveBadge}
           </span>
         </div>
 
         {/* Symmetrical 2-Line Headline */}
         <h1 className="max-w-[960px] mx-auto flex flex-col items-center text-center tracking-[-0.035em] leading-[1.04]">
           <span className="font-display font-medium sm:font-semibold text-4xl sm:text-6xl md:text-7xl lg:text-[80px] xl:text-[88px] text-[#0A0A0A]">
-            Temukan Talenta Kreatif
+            {t('hero.titleLine1', 'Temukan Talenta Kreatif')}
           </span>
           <span className="font-['Playfair_Display',serif] italic font-normal text-4xl sm:text-6xl md:text-7xl lg:text-[80px] xl:text-[88px] text-[#0A0A0A] mt-1 sm:mt-2">
-            Wujudkan Ide Digital
+            {t('hero.titleLine2', 'Wujudkan Ide Digital')}
           </span>
         </h1>
 
         {/* Paragraph */}
         <p className="mt-5 sm:mt-6 max-w-[620px] mx-auto text-sm sm:text-base lg:text-[17px] text-[#525252] leading-relaxed font-normal">
-          Temukan creator berbakat untuk kebutuhan digitalmu, atau tampilkan keahlianmu dan dapatkan project yang tepat.
+          {t('hero.subtitle', 'Temukan creator berbakat untuk kebutuhan digitalmu, atau tampilkan keahlianmu dan dapatkan project yang tepat.')}
         </p>
 
         {/* Symmetrical Action Buttons */}
@@ -75,7 +79,7 @@ export const HomeHeroSection: React.FC<HomeHeroSectionProps> = ({
             onClick={onExploreClick}
             className="inline-flex items-center gap-3 pl-6 pr-2 py-2 rounded-full bg-[#155DFC] hover:bg-[#1248C7] active:bg-[#0E3A9E] text-white text-sm sm:text-[15px] font-medium shadow-[0px_4px_6px_-1px_rgba(21,93,252,0.25),0px_2px_4px_-1px_rgba(21,93,252,0.15)] transition-all group cursor-pointer"
           >
-            <span>Jelajah Kreator</span>
+            <span>{t('hero.exploreBtn', 'Jelajah Kreator')}</span>
             <span className="w-8 h-8 rounded-full bg-white flex items-center justify-center text-[#155DFC] shadow-xs group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform">
               <ArrowUpRight className="w-4 h-4" />
             </span>
@@ -87,14 +91,14 @@ export const HomeHeroSection: React.FC<HomeHeroSectionProps> = ({
               onClick={onSecondaryClick}
               className="inline-flex items-center justify-center text-sm sm:text-[15px] font-medium text-[#525252] hover:text-[#0D0C22] transition-colors cursor-pointer"
             >
-              {secondaryText}
+              {effectiveSecondary}
             </button>
           ) : (
             <Link
               href={secondaryHref}
               className="inline-flex items-center justify-center text-sm sm:text-[15px] font-medium text-[#525252] hover:text-[#0D0C22] transition-colors"
             >
-              {secondaryText}
+              {effectiveSecondary}
             </Link>
           )}
         </div>
