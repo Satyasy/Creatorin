@@ -43,7 +43,8 @@ import {
   Zap,
   Users,
   Pencil,
-  Settings
+  Settings,
+  Loader2
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/providers/AuthProvider';
@@ -115,10 +116,33 @@ export const UmkmProfilePage: React.FC<UmkmProfilePageProps> = ({
   const [activeTab, setActiveTab] = useState<TabKey>('briefs');
   
   const [prevProfileId, setPrevProfileId] = useState(initialProfile.id);
-  if (initialProfile.id !== prevProfileId) {
+  const [prevCoverBanner, setPrevCoverBanner] = useState(initialProfile.coverBanner);
+  if (
+    initialProfile.id !== prevProfileId ||
+    (initialProfile.coverBanner && initialProfile.coverBanner !== prevCoverBanner)
+  ) {
     setPrevProfileId(initialProfile.id);
-    setProfile(initialProfile);
+    setPrevCoverBanner(initialProfile.coverBanner);
+    setProfile(prev => ({
+      ...initialProfile,
+      coverBanner: initialProfile.coverBanner || prev.coverBanner,
+      logo: initialProfile.logo || prev.logo,
+    }));
   }
+
+  useEffect(() => {
+    if (initialProfile) {
+      setProfile(prev => ({
+        ...prev,
+        ...initialProfile,
+        coverBanner: initialProfile.coverBanner || prev.coverBanner || currentUser?.coverUrl || '',
+        logo: initialProfile.logo || prev.logo || currentUser?.avatar || '',
+        brandName: initialProfile.brandName || prev.brandName,
+        bio: initialProfile.bio || prev.bio,
+      }));
+    }
+  }, [initialProfile, currentUser?.coverUrl, currentUser?.avatar]);
+
   const [isMoreMenuOpen, setIsMoreMenuOpen] = useState(false);
   const [savedCollabIds, setSavedCollabIds] = useState<Set<string>>(new Set());
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
@@ -192,11 +216,12 @@ export const UmkmProfilePage: React.FC<UmkmProfilePageProps> = ({
   const [isSubmittingProposal, setIsSubmittingProposal] = useState(false);
 
   // In-place inline edit state
-  const isUmkmOwner = currentUser?.role === 'umkm';
+  const isUmkmOwner = currentUser?.role === 'umkm' || (currentUser as any)?.role === 'business';
   const [isEditModeActive, setIsEditModeActive] = useState(false);
   const [inlineSection, setInlineSection] = useState<'name' | 'tagline' | null>(null);
   const [tempBrandName, setTempBrandName] = useState(profile.brandName);
   const [tempTagline, setTempTagline] = useState(profile.tagline || '');
+  const [isSavingInline, setIsSavingInline] = useState(false);
 
   // User Profile Mode Refs & Handlers
   const coverFileInputRef = React.useRef<HTMLInputElement>(null);
@@ -358,31 +383,63 @@ export const UmkmProfilePage: React.FC<UmkmProfilePageProps> = ({
   const handleSaveProfile = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const response = await fetch('/api/onboarding', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ fullName: editForm.brandName, companyName: editForm.brandName, businessCategory: editForm.category, description: editForm.bio, website: editForm.website, location: editForm.location }) });
-      if (!response.ok) throw new Error((await response.json()).error || 'Gagal menyimpan profil.');
-    } catch (error) { showToast(error instanceof Error ? error.message : 'Gagal menyimpan profil.'); return; }
-    setProfile(prev => ({
-      ...prev,
-      brandName: editForm.brandName,
-      tagline: editForm.tagline,
-      bio: editForm.bio,
-      industry: editForm.industry,
-      category: editForm.category,
-      location: editForm.location,
-      website: editForm.website,
-      instagram: editForm.instagram,
-      marketplaceUrl: editForm.marketplaceUrl,
-      whatsapp: editForm.whatsapp,
-      brandGuide: {
-        primaryColor: prev.brandGuide?.primaryColor || '#78350f',
-        secondaryColor: prev.brandGuide?.secondaryColor || '#fef3c7',
-        brandValues: prev.brandGuide?.brandValues || ['Kualitas Alami', 'Kolaborasi Terbuka'],
-        targetAudience: editForm.targetAudience,
-        sampleShippingPolicy: editForm.samplePolicy
+      const response = await fetch('/api/onboarding', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          fullName: editForm.brandName,
+          companyName: editForm.brandName,
+          businessCategory: editForm.category,
+          description: editForm.bio,
+          website: editForm.website,
+          location: editForm.location,
+        }),
+      });
+      if (!response.ok) {
+        const errData = await response.json().catch(() => ({}));
+        throw new Error(errData.error || 'Gagal menyimpan profil.');
       }
-    }));
-    setIsEditModalOpen(false);
-    showToast('Profil UMKM berhasil diperbarui!');
+      setProfile(prev => ({
+        ...prev,
+        brandName: editForm.brandName,
+        tagline: editForm.tagline,
+        bio: editForm.bio,
+        industry: editForm.industry,
+        category: editForm.category,
+        location: editForm.location,
+        website: editForm.website,
+        instagram: editForm.instagram,
+        marketplaceUrl: editForm.marketplaceUrl,
+        whatsapp: editForm.whatsapp,
+        brandGuide: {
+          primaryColor: prev.brandGuide?.primaryColor || '#78350f',
+          secondaryColor: prev.brandGuide?.secondaryColor || '#fef3c7',
+          brandValues: prev.brandGuide?.brandValues || ['Kualitas Alami', 'Kolaborasi Terbuka'],
+          targetAudience: editForm.targetAudience,
+          sampleShippingPolicy: editForm.samplePolicy,
+        },
+      }));
+      setIsEditModalOpen(false);
+
+      updateUser({
+        name: editForm.brandName,
+        location: editForm.location,
+        bio: editForm.bio,
+      });
+      await refreshUser();
+
+      showSuccessModal({
+        title: 'Profil Brand Berhasil Disimpan',
+        message: 'Pembaruan profil UMKM Anda telah berhasil disimpan ke database.',
+        duration: 2500,
+      });
+    } catch (error) {
+      showGlobalToast({
+        type: 'error',
+        title: 'Gagal Menyimpan Profil',
+        message: error instanceof Error ? error.message : 'Gagal menyimpan profil.',
+      });
+    }
   };
 
   const handleCreateNewBrief = async (e: React.FormEvent) => {
@@ -585,7 +642,7 @@ export const UmkmProfilePage: React.FC<UmkmProfilePageProps> = ({
         {/* Rounded Top Banner Card */}
         <div className="relative w-full rounded-2xl sm:rounded-3xl lg:rounded-[32px] overflow-hidden bg-[#f3f3f4] h-44 sm:h-56 md:h-64 lg:h-72">
           <img
-            src={profile.coverBanner}
+            src={profile.coverBanner || currentUser?.coverUrl || 'https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=1200'}
             alt={profile.brandName}
             className="w-full h-full object-cover"
           />
@@ -608,7 +665,7 @@ export const UmkmProfilePage: React.FC<UmkmProfilePageProps> = ({
           <div className="relative inline-block self-start">
             <div className="w-24 h-24 sm:w-32 sm:h-32 md:w-36 md:h-36 rounded-full p-1 sm:p-1.5 bg-white shadow-xl shadow-black/8 ring-1 ring-neutral-900/5 relative group">
               <img
-                src={profile.logo}
+                src={profile.logo || currentUser?.avatar || 'https://images.unsplash.com/photo-1559496417-e7f25cb247f3?w=150'}
                 alt={profile.brandName}
                 className="w-full h-full rounded-full object-cover"
               />
@@ -2191,19 +2248,76 @@ export const UmkmProfilePage: React.FC<UmkmProfilePageProps> = ({
               </button>
               <button
                 type="button"
-                onClick={() => {
-                  if (inlineSection === 'name') {
-                    setProfile(prev => ({ ...prev, brandName: tempBrandName }));
-                    showToast('Nama brand berhasil diperbarui!');
-                  } else if (inlineSection === 'tagline') {
-                    setProfile(prev => ({ ...prev, tagline: tempTagline }));
-                    showToast('Tagline brand berhasil diperbarui!');
+                disabled={isSavingInline}
+                onClick={async () => {
+                  setIsSavingInline(true);
+                  try {
+                    if (inlineSection === 'name') {
+                      const res = await fetch('/api/onboarding', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                          fullName: tempBrandName,
+                          companyName: tempBrandName,
+                          businessCategory: profile.category || 'Retail / Brand',
+                          description: profile.bio || '',
+                          website: profile.website || '',
+                          location: profile.location || '',
+                        }),
+                      });
+                      if (!res.ok) {
+                        const errData = await res.json().catch(() => ({}));
+                        throw new Error(errData.error || 'Gagal memperbarui nama brand.');
+                      }
+                      setProfile(prev => ({ ...prev, brandName: tempBrandName }));
+                      updateUser({ name: tempBrandName });
+                      await refreshUser();
+                      showSuccessModal({
+                        title: 'Nama Brand Diperbarui',
+                        message: 'Nama usaha Anda telah berhasil disimpan ke database.',
+                        duration: 2500,
+                      });
+                    } else if (inlineSection === 'tagline') {
+                      const res = await fetch('/api/profile', {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                          bio: tempTagline || profile.bio,
+                        }),
+                      });
+                      if (!res.ok) {
+                        const errData = await res.json().catch(() => ({}));
+                        throw new Error(errData.error || 'Gagal memperbarui slogan.');
+                      }
+                      setProfile(prev => ({ ...prev, tagline: tempTagline }));
+                      await refreshUser();
+                      showSuccessModal({
+                        title: 'Slogan Brand Diperbarui',
+                        message: 'Slogan usaha Anda telah berhasil disimpan.',
+                        duration: 2500,
+                      });
+                    }
+                    setInlineSection(null);
+                  } catch (err: any) {
+                    showGlobalToast({
+                      type: 'error',
+                      title: 'Gagal Memperbarui',
+                      message: err?.message || 'Terjadi kesalahan saat memperbarui.',
+                    });
+                  } finally {
+                    setIsSavingInline(false);
                   }
-                  setInlineSection(null);
                 }}
-                className="px-4 py-1.5 rounded-xl bg-[#0D0C22] hover:bg-neutral-800 text-white text-xs font-bold cursor-pointer transition shadow-xs"
+                className="px-4 py-1.5 rounded-xl bg-[#0D0C22] hover:bg-neutral-800 text-white text-xs font-bold cursor-pointer transition shadow-xs disabled:opacity-50 inline-flex items-center gap-1.5"
               >
-                Simpan
+                {isSavingInline ? (
+                  <>
+                    <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                    <span>Menyimpan...</span>
+                  </>
+                ) : (
+                  <span>Simpan</span>
+                )}
               </button>
             </div>
           </div>

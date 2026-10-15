@@ -22,6 +22,7 @@ import {
   LogOut 
 } from 'lucide-react';
 import { useConfirmModal } from '@/providers/ConfirmModalProvider';
+import { useSuccessModal } from '@/providers/SuccessModalProvider';
 import { uploadImageWithRetry } from '@/lib/uploadHelper';
 
 export const SettingsPage: React.FC = () => {
@@ -75,6 +76,7 @@ export const SettingsPage: React.FC = () => {
   // Global hooks
   const { language, setLanguage, t } = useLanguage();
   const { showToast } = useToast();
+  const { showSuccessModal } = useSuccessModal();
 
   // Notification states
   const [notifyPush, setNotifyPush] = useState(true);
@@ -108,6 +110,11 @@ export const SettingsPage: React.FC = () => {
         throw new Error(data.error || 'Gagal menyimpan foto profil.');
       }
       await refreshUser();
+      showSuccessModal({
+        title: 'Foto Profil Diperbarui',
+        message: 'Foto profil Anda berhasil disimpan ke database.',
+        duration: 2500,
+      });
       showToast({
         type: 'success',
         message: 'Foto profil berhasil diperbarui!',
@@ -137,6 +144,17 @@ export const SettingsPage: React.FC = () => {
     e.preventDefault();
     setIsSaving(true);
     setSaveError('');
+
+    if (newPassword && newPassword !== confirmPassword) {
+      setSaveError('Konfirmasi kata sandi tidak cocok.');
+      setIsSaving(false);
+      return;
+    }
+    if (newPassword && newPassword.length < 8) {
+      setSaveError('Kata sandi baru minimal 8 karakter.');
+      setIsSaving(false);
+      return;
+    }
 
     try {
       // Call account settings API
@@ -170,6 +188,11 @@ export const SettingsPage: React.FC = () => {
 
       await refreshUser();
       setIsSavedToast(true);
+      showSuccessModal({
+        title: 'Pengaturan Berhasil Disimpan',
+        message: 'Perubahan profil dan preferensi akun Anda telah berhasil diperbarui di server.',
+        duration: 2500,
+      });
       showToast({
         type: 'success',
         message: t('settings.saveSuccess', 'Pengaturan berhasil disimpan!'),

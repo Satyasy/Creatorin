@@ -154,6 +154,7 @@ export async function POST(req: NextRequest) {
         role: userProfile.role,
         fullName: userProfile.fullName,
         avatarUrl: userProfile.avatarUrl,
+        coverUrl: userProfile.coverUrl || '',
         location: userProfile.location,
         phone: userProfile.phone,
       },

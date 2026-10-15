@@ -3,6 +3,7 @@ import { getAuthenticatedUser } from "@/lib/api-auth";
 import { getDb } from "@/lib/db";
 import { profiles, creatorProfiles, businessProfiles, schoolProfiles } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
+import { deleteCache } from "@/lib/redis";
 
 export async function GET(req: NextRequest) {
   const user = await getAuthenticatedUser(req);
@@ -72,6 +73,7 @@ export async function POST(req: NextRequest) {
       phone,
       location,
       avatarUrl,
+      coverUrl,
       // Creator fields
       headline,
       bio,
@@ -96,6 +98,7 @@ export async function POST(req: NextRequest) {
         ...(phone !== undefined && { phone }),
         ...(location !== undefined && { location }),
         ...(avatarUrl !== undefined && { avatarUrl }),
+        ...(coverUrl !== undefined && { coverUrl }),
         updatedAt: new Date(),
       })
       .where(eq(profiles.id, user.id));
@@ -163,6 +166,13 @@ export async function POST(req: NextRequest) {
           },
         });
     }
+
+    // Invalidate user session details and public profile caches
+    await Promise.all([
+      deleteCache(`user:me:${user.id}`),
+      deleteCache("profile:slug:*"),
+      deleteCache("creators:*"),
+    ]);
 
     return NextResponse.json({
       success: true,

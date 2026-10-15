@@ -77,7 +77,7 @@ export async function PUT(req: NextRequest) {
   }
 
   const body = await req.json();
-  const { fullName, phone, location, avatarUrl, coverUrl, headline, bio, skills, startingPrice } = body;
+  const { fullName, phone, location, avatarUrl, coverUrl, headline, bio, skills, startingPrice, companyName, businessCategory, website } = body;
 
   try {
     if (fullName !== undefined || phone !== undefined || location !== undefined || avatarUrl !== undefined || coverUrl !== undefined) {
@@ -116,18 +116,24 @@ export async function PUT(req: NextRequest) {
         });
     }
 
-    if (user.role === "business" && bio !== undefined) {
+    if (user.role === "business" && (bio !== undefined || companyName !== undefined || businessCategory !== undefined || website !== undefined)) {
       await db
         .insert(businessProfiles)
         .values({
           profileId: user.id,
-          companyName: user.fullName || "Perusahaan",
-          businessCategory: "Umum",
-          description: bio,
+          companyName: companyName || user.fullName || "Perusahaan",
+          businessCategory: businessCategory || "Umum",
+          description: bio || "",
+          website: website || null,
         })
         .onConflictDoUpdate({
           target: businessProfiles.profileId,
-          set: { description: bio },
+          set: {
+            ...(bio !== undefined ? { description: bio } : {}),
+            ...(companyName !== undefined ? { companyName } : {}),
+            ...(businessCategory !== undefined ? { businessCategory } : {}),
+            ...(website !== undefined ? { website } : {}),
+          },
         });
     }
 

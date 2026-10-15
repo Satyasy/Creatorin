@@ -137,6 +137,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           email: serverUser.email,
           role: serverUser.role,
           avatar: serverUser.avatar,
+          coverUrl: serverUser.coverUrl || '',
           location: serverUser.location,
           phone: serverUser.phone,
           bio: serverUser.bio,
