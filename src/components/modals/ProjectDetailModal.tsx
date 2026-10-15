@@ -19,6 +19,7 @@ import { useAuth } from '@/providers/AuthProvider';
 import { useToast } from '@/providers/ToastProvider';
 import { useLanguage } from '@/providers/LanguageProvider';
 import { AuthModal } from '@/components/modals/AuthModal';
+import { DiscussInquiryModal } from '@/components/modals/DiscussInquiryModal';
 import { startRouteProgress } from '@/components/common/RouteProgressBar';
 
 export interface ProjectDetailModalProps {
@@ -98,6 +99,7 @@ export const ProjectDetailModal: React.FC<ProjectDetailModalProps> = ({
   const { user } = useAuth();
   const { showToast } = useToast();
   const { t } = useLanguage();
+  const [isInquiryOpen, setIsInquiryOpen] = useState(false);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [authModalConfig, setAuthModalConfig] = useState<{
     title: string;
@@ -282,6 +284,19 @@ export const ProjectDetailModal: React.FC<ProjectDetailModalProps> = ({
     }
   };
 
+  const handleOpenDiscuss = () => {
+    if (!user) {
+      setAuthModalConfig({
+        title: 'Masuk untuk diskusikan proyek',
+        description: 'Masuk ke akun Creatorin Anda untuk mendiskusikan kebutuhan proyek dengan kreator ini.',
+        action: () => setIsInquiryOpen(true),
+      });
+      setIsAuthModalOpen(true);
+      return;
+    }
+    setIsInquiryOpen(true);
+  };
+
   const handleCreatorClick = () => {
     if (onViewCreatorProfile && creator) {
       onViewCreatorProfile(creator);
@@ -434,10 +449,10 @@ export const ProjectDetailModal: React.FC<ProjectDetailModalProps> = ({
               </button>
               <button
                 type="button"
-                onClick={handleSendMessage}
+                onClick={handleOpenDiscuss}
                 className="rounded-full bg-[#0D0C22] hover:bg-black active:bg-neutral-900 text-white px-6 py-2.5 text-xs sm:text-sm font-semibold transition-all active:scale-95 cursor-pointer shadow-xs"
               >
-                Kirim Pesan
+                {t('card.discuss', 'Diskusikan')}
               </button>
             </div>
           </header>
@@ -608,6 +623,43 @@ export const ProjectDetailModal: React.FC<ProjectDetailModalProps> = ({
           if (authModalConfig.action) {
             authModalConfig.action();
           }
+        }}
+      />
+
+      {/* Inquiry Form Modal */}
+      <DiscussInquiryModal
+        isOpen={isInquiryOpen}
+        onClose={() => setIsInquiryOpen(false)}
+        item={{
+          id: currentProject.id,
+          title: currentProject.title,
+          tag: categoryLabel,
+          formattedPrice:
+            creator?.formattedRate ||
+            (creator?.startingRate
+              ? `🪙 ${creator.startingRate.toLocaleString('id-ID')}`
+              : '🪙 250.000'),
+          price: creator?.startingRate || 250000,
+          deliveryDays: '3-5 Hari Kerja',
+          coverImage: galleryImages[activeImageIndex] || currentProject.coverImage || currentProject.mediaUrl,
+          description: description,
+        }}
+        creator={{
+          id: creator?.id || currentProject.creatorId || 'creator-unknown',
+          name: creatorName,
+          username: creator?.username || creatorSlug,
+          avatar: creator?.avatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80',
+          roleTitle: creator?.roleTitle || 'Kreator Profesional',
+        }}
+        itemType="project"
+        onSuccess={(convId, crId) => {
+          setIsInquiryOpen(false);
+          handleSmoothClose();
+          startRouteProgress();
+          if (onNavigate) {
+            onNavigate('chat');
+          }
+          router.push(`/chat?conversationId=${convId}&creatorId=${crId}`);
         }}
       />
     </div>

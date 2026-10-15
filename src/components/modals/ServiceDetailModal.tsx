@@ -19,6 +19,7 @@ import { useAuth } from '@/providers/AuthProvider';
 import { useToast } from '@/providers/ToastProvider';
 import { useLanguage } from '@/providers/LanguageProvider';
 import { AuthModal } from '@/components/modals/AuthModal';
+import { DiscussInquiryModal } from '@/components/modals/DiscussInquiryModal';
 import { startRouteProgress } from '@/components/common/RouteProgressBar';
 
 export interface ServiceDetailModalProps {
@@ -126,6 +127,7 @@ export const ServiceDetailModal: React.FC<ServiceDetailModalProps> = ({
   const { user } = useAuth();
   const { showToast } = useToast();
   const { t } = useLanguage();
+  const [isInquiryOpen, setIsInquiryOpen] = useState(false);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [authModalConfig, setAuthModalConfig] = useState<{
     title: string;
@@ -210,54 +212,17 @@ export const ServiceDetailModal: React.FC<ServiceDetailModalProps> = ({
     }
   };
 
-  const handleGoToChat = () => {
+  const handleOpenDiscuss = () => {
     if (!user) {
-      showToast({
-        type: 'warning',
-        title: t('toast.authRequired', 'Perlu Masuk Akun'),
-        message: t('toast.chatAuth', 'Anda harus masuk akun terlebih dahulu untuk menghubungi kreator ini.'),
-        action: {
-          label: t('action.signIn', 'Masuk ke Akun'),
-          onClick: () => {
-            handleSmoothClose();
-            router.push('/sign-in');
-          },
-        },
+      setAuthModalConfig({
+        title: 'Masuk untuk diskusikan layanan',
+        description: 'Masuk ke akun Creatorin Anda untuk mendiskusikan kebutuhan layanan dengan kreator ini.',
+        action: () => setIsInquiryOpen(true),
       });
+      setIsAuthModalOpen(true);
       return;
     }
-    handleSmoothClose();
-    if (creator?.id) {
-      router.push(`/chat?creatorId=${creator.id}`);
-    } else {
-      router.push('/chat');
-    }
-  };
-
-  const handleOrder = (srvToOrder = currentService) => {
-    if (!user) {
-      showToast({
-        type: 'warning',
-        title: t('toast.authRequired', 'Perlu Masuk Akun'),
-        message: t('toast.orderServiceAuth', 'Silakan masuk ke akun Creatorin terlebih dahulu untuk memesan paket layanan ini.'),
-        action: {
-          label: t('action.signIn', 'Masuk ke Akun'),
-          onClick: () => {
-            handleSmoothClose();
-            router.push('/sign-in');
-          },
-        },
-      });
-      return;
-    }
-
-    if (onOrderService && creator) {
-      onOrderService(srvToOrder, creator);
-    } else if (creator?.id) {
-      router.push(`/chat?creatorId=${creator.id}`);
-    } else {
-      router.push('/chat');
-    }
+    setIsInquiryOpen(true);
   };
 
   const handleExploreMore = () => {
@@ -412,10 +377,10 @@ export const ServiceDetailModal: React.FC<ServiceDetailModalProps> = ({
                 </button>
                 <button
                   type="button"
-                  onClick={handleGoToChat}
+                  onClick={handleOpenDiscuss}
                   className="rounded-full bg-[#0D0C22] hover:bg-black active:bg-neutral-900 text-white px-5 sm:px-6 py-2.5 text-xs sm:text-sm font-semibold transition-all cursor-pointer shadow-xs active:scale-98"
                 >
-                  Diskusikan Layanan
+                  {t('card.discuss', 'Diskusikan')}
                 </button>
               </div>
             </header>
@@ -604,10 +569,10 @@ export const ServiceDetailModal: React.FC<ServiceDetailModalProps> = ({
 
                       <button
                         type="button"
-                        onClick={() => handleOrder()}
+                        onClick={handleOpenDiscuss}
                         className="rounded-full bg-[#0D0C22] hover:bg-black active:bg-neutral-900 text-white px-4 py-1.5 text-xs font-semibold transition-all cursor-pointer shadow-xs active:scale-95"
                       >
-                        Pesan Layanan
+                        {t('card.discuss', 'Diskusikan')}
                       </button>
                     </div>
                   </article>
@@ -634,6 +599,39 @@ export const ServiceDetailModal: React.FC<ServiceDetailModalProps> = ({
           if (authModalConfig.action) {
             authModalConfig.action();
           }
+        }}
+      />
+
+      {/* Inquiry Form Modal */}
+      <DiscussInquiryModal
+        isOpen={isInquiryOpen}
+        onClose={() => setIsInquiryOpen(false)}
+        item={{
+          id: currentService.id,
+          title: currentService.title,
+          tag: currentService.tag || 'Layanan Kreatif',
+          formattedPrice,
+          price: currentService.price,
+          deliveryDays: formattedDelivery,
+          coverImage: currentService.coverImage || activeImage,
+          description: currentService.description,
+        }}
+        creator={{
+          id: creator?.id || 'creator-unknown',
+          name: creatorName,
+          username: creator?.username,
+          avatar: creatorAvatar,
+          roleTitle: creator?.roleTitle,
+        }}
+        itemType="service"
+        onSuccess={(convId, crId) => {
+          setIsInquiryOpen(false);
+          handleSmoothClose();
+          startRouteProgress();
+          if (onNavigate) {
+            onNavigate('chat');
+          }
+          router.push(`/chat?conversationId=${convId}&creatorId=${crId}`);
         }}
       />
     </div>
