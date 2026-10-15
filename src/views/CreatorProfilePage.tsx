@@ -51,7 +51,8 @@ import {
   Pencil,
   Link as LinkIcon,
   Loader2,
-  UploadCloud
+  UploadCloud,
+  Settings
 } from 'lucide-react';
 import { uploadImageWithRetry } from '@/lib/uploadHelper';
 import { useRouter, useSearchParams } from 'next/navigation';
@@ -800,6 +801,17 @@ export const CreatorProfilePage: React.FC<CreatorProfilePageProps> = ({
                 >
                   {isEditModeActive ? <Check className="w-3.5 h-3.5" /> : <Pencil className="w-3.5 h-3.5" />}
                   <span>{isEditModeActive ? t('action.finishEdit', 'Selesai Edit') : t('action.editProfile', 'Edit Profil')}</span>
+                </button>
+
+                {/* Own Profile: Pengaturan Akun */}
+                <button
+                  id="btn-profile-settings"
+                  onClick={() => router.push('/settings')}
+                  className="flex items-center gap-1.5 h-10 px-4 rounded-xl border border-[#E2E8F0] bg-white text-neutral-700 hover:text-neutral-900 hover:bg-[#F8FAFC] text-sm font-semibold transition-colors cursor-pointer"
+                  title="Buka Pengaturan Akun"
+                >
+                  <Settings className="w-4 h-4 text-neutral-500" />
+                  <span className="hidden sm:inline">Pengaturan</span>
                 </button>
               </>
             ) : (

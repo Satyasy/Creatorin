@@ -42,7 +42,8 @@ import {
   Upload,
   Zap,
   Users,
-  Pencil
+  Pencil,
+  Settings
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/providers/AuthProvider';
@@ -676,18 +677,31 @@ export const UmkmProfilePage: React.FC<UmkmProfilePageProps> = ({
 
             {/* Button 2: Edit Profil Mode Toggle (Owner UMKM) OR Hubungi Brand (Creator/Visitor) */}
             {isUmkmOwner ? (
-              <button
-                id="btn-edit-profile"
-                onClick={() => setIsEditModeActive(!isEditModeActive)}
-                className={`px-5 py-2 sm:py-2.5 rounded-xl text-xs sm:text-sm font-semibold transition cursor-pointer flex items-center gap-1.5 ${
-                  isEditModeActive
-                    ? 'bg-emerald-600 hover:bg-emerald-700 text-white'
-                    : 'border border-[#E2E8F0] bg-white hover:bg-neutral-50 text-[#171717]'
-                }`}
-              >
-                {isEditModeActive ? <Check className="w-3.5 h-3.5" /> : <Pencil className="w-3.5 h-3.5" />}
-                <span>{isEditModeActive ? 'Selesai Edit' : 'Edit Profil'}</span>
-              </button>
+              <>
+                <button
+                  id="btn-edit-profile"
+                  onClick={() => setIsEditModeActive(!isEditModeActive)}
+                  className={`px-5 py-2 sm:py-2.5 rounded-xl text-xs sm:text-sm font-semibold transition cursor-pointer flex items-center gap-1.5 ${
+                    isEditModeActive
+                      ? 'bg-emerald-600 hover:bg-emerald-700 text-white'
+                      : 'border border-[#E2E8F0] bg-white hover:bg-neutral-50 text-[#171717]'
+                  }`}
+                >
+                  {isEditModeActive ? <Check className="w-3.5 h-3.5" /> : <Pencil className="w-3.5 h-3.5" />}
+                  <span>{isEditModeActive ? 'Selesai Edit' : 'Edit Profil'}</span>
+                </button>
+
+                {/* Button 3: Pengaturan Akun UMKM */}
+                <button
+                  id="btn-umkm-settings"
+                  onClick={() => router.push('/settings')}
+                  className="px-4 py-2 sm:py-2.5 rounded-xl text-xs sm:text-sm font-semibold transition cursor-pointer flex items-center gap-1.5 border border-[#E2E8F0] bg-white hover:bg-neutral-50 text-[#171717]"
+                  title="Buka Pengaturan Akun"
+                >
+                  <Settings className="w-3.5 h-3.5 text-neutral-500" />
+                  <span>Pengaturan</span>
+                </button>
+              </>
             ) : (
               <>
                 {/* Hubungi Brand Button */}

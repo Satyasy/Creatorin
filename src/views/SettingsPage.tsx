@@ -18,13 +18,31 @@ import {
   Save, 
   Camera, 
   ArrowLeft,
-  Loader2 
+  Loader2,
+  LogOut 
 } from 'lucide-react';
 import { uploadImageWithRetry } from '@/lib/uploadHelper';
 
 export const SettingsPage: React.FC = () => {
   const router = useRouter();
-  const { user, refreshUser } = useAuth();
+  const { user, refreshUser, logout } = useAuth();
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
+
+  const handleLogout = async () => {
+    if (window.confirm('Apakah Anda yakin ingin keluar dari akun ini?')) {
+      setIsLoggingOut(true);
+      try {
+        await logout();
+        showToast({
+          type: 'info',
+          message: 'Anda telah berhasil keluar dari akun.',
+        });
+        window.location.href = '/';
+      } finally {
+        setIsLoggingOut(false);
+      }
+    }
+  };
 
   const [activeTab, setActiveTab] = useState<'profile' | 'preferences' | 'security'>('profile');
 
@@ -160,7 +178,7 @@ export const SettingsPage: React.FC = () => {
       <div className="max-w-4xl mx-auto px-6">
         
         {/* Top Back / Header */}
-        <div className="flex items-center justify-between mb-8">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
           <div className="flex items-center gap-3">
             <button
               onClick={() => router.back()}
@@ -178,6 +196,17 @@ export const SettingsPage: React.FC = () => {
               </p>
             </div>
           </div>
+
+          <button
+            type="button"
+            id="btn-settings-header-logout"
+            onClick={handleLogout}
+            disabled={isLoggingOut}
+            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl border border-red-200 bg-red-50 hover:bg-red-100 text-red-600 text-xs sm:text-sm font-semibold transition-colors cursor-pointer w-fit disabled:opacity-50"
+          >
+            {isLoggingOut ? <Loader2 className="w-4 h-4 animate-spin" /> : <LogOut className="w-4 h-4" />}
+            <span>{isLoggingOut ? 'Mengeluarkan...' : t('nav.signOut', 'Keluar Akun')}</span>
+          </button>
         </div>
 
         {/* Tab Navigation */}
@@ -491,6 +520,31 @@ export const SettingsPage: React.FC = () => {
           </div>
 
         </form>
+
+        {/* Sesi Akun & Logout Card */}
+        <div className="mt-8 bg-white rounded-2xl border border-red-100 p-6 sm:p-7 shadow-2xs">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div>
+              <h3 className="text-sm font-bold text-red-950 flex items-center gap-2">
+                <LogOut className="w-4 h-4 text-red-600" />
+                <span>Sesi Akun & Keluar</span>
+              </h3>
+              <p className="text-xs text-neutral-500 mt-1 leading-relaxed">
+                Keluar dari sesi saat ini pada perangkat ini ({user?.email || 'akun terdaftar'}). Anda dapat masuk kembali kapan saja.
+              </p>
+            </div>
+            <button
+              type="button"
+              id="btn-settings-footer-logout"
+              onClick={handleLogout}
+              disabled={isLoggingOut}
+              className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl border border-red-200 bg-red-50 hover:bg-red-100 text-red-600 text-xs sm:text-sm font-semibold transition-colors cursor-pointer w-full sm:w-auto shrink-0 disabled:opacity-50"
+            >
+              {isLoggingOut ? <Loader2 className="w-4 h-4 animate-spin" /> : <LogOut className="w-4 h-4" />}
+              <span>{isLoggingOut ? 'Mengeluarkan...' : 'Keluar dari Akun Ini'}</span>
+            </button>
+          </div>
+        </div>
 
       </div>
     </div>
