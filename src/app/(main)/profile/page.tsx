@@ -18,7 +18,7 @@ export default function MyProfilePage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (user?.role !== 'creator' || !user.id) { setLoading(false); return; }
+    if ((user?.role !== 'creator' && user?.role !== 'admin') || !user.id) { setLoading(false); return; }
     creatorService.getCreatorDetail(user.id)
       .then(setCreator)
       .catch(() => setCreator(null))

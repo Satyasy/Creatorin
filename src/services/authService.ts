@@ -21,6 +21,7 @@ export interface UserSession {
 export function mapRoleToFrontend(dbRole: string): UserRole {
   if (dbRole === 'business') return 'umkm';
   if (dbRole === 'school') return 'school';
+  if (dbRole === 'admin') return 'admin';
   return 'creator';
 }
 

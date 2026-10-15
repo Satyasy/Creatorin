@@ -15,7 +15,8 @@ import {
   GraduationCap,
   WalletCards,
   FileCheck2,
-  ArrowUpRight
+  ArrowUpRight,
+  ShieldCheck
 } from 'lucide-react';
 import { ActivePage, AuthState } from '@/types';
 import { useAuth } from '@/providers/AuthProvider';
@@ -489,6 +490,20 @@ export const Navbar: React.FC<NavbarProps> = ({
                     >
                       <GraduationCap className="w-4 h-4 text-[#55576A]" />
                       <span>{t('nav.schoolDashboard', 'Dashboard Sekolah')}</span>
+                    </button>
+                  )}
+
+                  {currentUser.role === 'admin' && (
+                    <button
+                      id="nav-user-admin-btn"
+                      onClick={() => {
+                        setUserDropdownOpen(false);
+                        router.push('/admin');
+                      }}
+                      className="w-full px-4 py-2.5 text-left text-xs font-medium text-[#55576A] hover:bg-[#F3F3F4] hover:text-[#0D0C22] flex items-center gap-2.5 cursor-pointer transition-colors"
+                    >
+                      <ShieldCheck className="w-4 h-4 text-[#155DFC]" />
+                      <span>Panel Admin</span>
                     </button>
                   )}
 

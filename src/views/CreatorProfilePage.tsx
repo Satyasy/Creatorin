@@ -51,7 +51,8 @@ import {
   Link as LinkIcon,
   Loader2,
   UploadCloud,
-  Settings
+  Settings,
+  Sparkles
 } from 'lucide-react';
 import { uploadImageWithRetry } from '@/lib/uploadHelper';
 import { useRouter, useSearchParams } from 'next/navigation';
@@ -252,31 +253,42 @@ export const CreatorProfilePage: React.FC<CreatorProfilePageProps> = ({
     setIsSavingProfile(true);
     try {
       let avatarUrl = creatorAvatar;
+      let hasNewAvatar = false;
       if (avatarFile) {
         const uploadResult = await uploadImageWithRetry(avatarFile, 'avatars');
         avatarUrl = uploadResult.url;
-        setCreatorAvatar(avatarUrl);
-        setAvatarFile(null);
-        creator.avatar = avatarUrl;
-        updateUser({ avatar: avatarUrl });
+        hasNewAvatar = true;
       }
 
       let coverUrl = creatorBannerColor;
+      let hasNewCover = false;
       if (bannerFile) {
         const uploadResult = await uploadImageWithRetry(bannerFile, 'avatars');
         coverUrl = uploadResult.url;
-        setCreatorBannerColor(coverUrl);
-        setBannerFile(null);
-        creator.coverUrl = coverUrl;
-        updateUser({ coverUrl });
+        hasNewCover = true;
       }
 
       const payload: { fullName?: string; headline?: string; bio?: string; avatarUrl?: string; coverUrl?: string } = {};
       if (tempName && tempName !== creator.name) payload.fullName = tempName;
       if (tempRoleTitle && tempRoleTitle !== creator.roleTitle) payload.headline = tempRoleTitle;
       if (tempBio && tempBio !== creator.bio) payload.bio = tempBio;
-      if (avatarUrl && avatarUrl !== creator.avatar) payload.avatarUrl = avatarUrl;
-      if (coverUrl && coverUrl !== (creator.coverUrl || '#0063b4')) payload.coverUrl = coverUrl;
+      if (hasNewAvatar || (avatarUrl && avatarUrl !== creator.avatar)) payload.avatarUrl = avatarUrl;
+      if (hasNewCover || (coverUrl && coverUrl !== (creator.coverUrl || '#0063b4'))) payload.coverUrl = coverUrl;
+
+      // Update local state
+      if (hasNewAvatar) {
+        setCreatorAvatar(avatarUrl);
+        setAvatarFile(null);
+        creator.avatar = avatarUrl;
+        updateUser({ avatar: avatarUrl });
+      }
+
+      if (hasNewCover) {
+        setCreatorBannerColor(coverUrl);
+        setBannerFile(null);
+        creator.coverUrl = coverUrl;
+        updateUser({ coverUrl });
+      }
 
       if (Object.keys(payload).length > 0) {
         const response = await fetch('/api/profile', {
@@ -314,7 +326,12 @@ export const CreatorProfilePage: React.FC<CreatorProfilePageProps> = ({
       }
 
       setIsConfirmFinishOpen(false);
-      setIsSuccessFinishOpen(true);
+      showSuccessModal({
+        title: 'Profil Berhasil Disimpan',
+        message: 'Pembaruan data profil, foto, dan sampul banner Anda telah berhasil disimpan ke database.',
+        duration: 2500,
+      });
+      setIsEditModeActive(false);
     } catch (error) {
       showToast({
         type: 'error',

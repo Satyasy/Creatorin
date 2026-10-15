@@ -1255,29 +1255,49 @@ const REVIEWS_DATA = [
 // EKSEKUSI SEEDING DATABASE
 // ==============================================================================
 async function main() {
+  const forceSeed = process.env.FORCE_SEED === 'true';
   console.log('🚀 Memulai sinkronisasi data komprehensif ke database...\n');
+  if (forceSeed) {
+    console.log('⚠️ Mode FORCE_SEED aktif: Profil dan data lama akan ditimpa.');
+  } else {
+    console.log('🛡️ Mode Proteksi Data aktif: Profil yang sudah ada, avatar, banner, dan transaksi tidak akan ditimpa/dihapus.');
+  }
+
   const userMap = new Map(); // email -> userId
   const creatorSlugMap = new Map(); // slug -> profileId
 
   // 1. Seed Profil Pengguna & Peran
   for (const acc of ACCOUNTS) {
     console.log(`👤 Menyinkronkan akun: ${acc.email} (${acc.role})...`);
-    const [existing] = await sql`SELECT id FROM profiles WHERE LOWER(email) = LOWER(${acc.email}) LIMIT 1`;
+    const [existing] = await sql`SELECT id, avatar_url, full_name, cover_url FROM profiles WHERE LOWER(email) = LOWER(${acc.email}) LIMIT 1`;
     let userId;
 
     if (existing) {
       userId = existing.id;
-      await sql`
-        UPDATE profiles SET 
-          full_name = ${acc.fullName}, 
-          role = ${acc.role}, 
-          password_hash = ${defaultPasswordHash}, 
-          avatar_url = ${acc.avatarUrl}, 
-          location = ${acc.location}, 
-          phone = ${acc.phone}, 
-          updated_at = NOW() 
-        WHERE id = ${userId}
-      `;
+      if (forceSeed) {
+        await sql`
+          UPDATE profiles SET 
+            full_name = ${acc.fullName}, 
+            role = ${acc.role}, 
+            password_hash = ${defaultPasswordHash}, 
+            avatar_url = ${acc.avatarUrl}, 
+            location = ${acc.location}, 
+            phone = ${acc.phone}, 
+            updated_at = NOW() 
+          WHERE id = ${userId}
+        `;
+      } else {
+        // Safe update: Never overwrite user-customized name, password, avatar, or banner!
+        await sql`
+          UPDATE profiles SET 
+            role = COALESCE(role, ${acc.role}), 
+            avatar_url = COALESCE(avatar_url, ${acc.avatarUrl}), 
+            location = COALESCE(location, ${acc.location}), 
+            phone = COALESCE(phone, ${acc.phone}), 
+            updated_at = NOW() 
+          WHERE id = ${userId}
+        `;
+      }
     } else {
       userId = crypto.randomUUID();
       await sql`
@@ -1295,21 +1315,23 @@ async function main() {
       creatorSlugMap.set(cp.slug, userId);
       const [existingCp] = await sql`SELECT profile_id FROM creator_profiles WHERE profile_id = ${userId} LIMIT 1`;
       if (existingCp) {
-        await sql`
-          UPDATE creator_profiles SET 
-            headline = ${cp.headline},
-            bio = ${cp.bio},
-            career_score = ${cp.careerScore},
-            rating = ${cp.rating},
-            starting_price = ${cp.startingPrice},
-            skills = ${JSON.stringify(cp.skills)},
-            school_name = ${cp.schoolName || null},
-            school_status = ${cp.schoolStatus || 'pending'},
-            major = ${cp.major || null},
-            class_grade = ${cp.classGrade || null},
-            is_pro = ${cp.isPro ?? false}
-          WHERE profile_id = ${userId}
-        `;
+        if (forceSeed) {
+          await sql`
+            UPDATE creator_profiles SET 
+              headline = ${cp.headline},
+              bio = ${cp.bio},
+              career_score = ${cp.careerScore},
+              rating = ${cp.rating},
+              starting_price = ${cp.startingPrice},
+              skills = ${JSON.stringify(cp.skills)},
+              school_name = ${cp.schoolName || null},
+              school_status = ${cp.schoolStatus || 'pending'},
+              major = ${cp.major || null},
+              class_grade = ${cp.classGrade || null},
+              is_pro = ${cp.isPro ?? false}
+            WHERE profile_id = ${userId}
+          `;
+        }
       } else {
         await sql`
           INSERT INTO creator_profiles 
@@ -1332,14 +1354,16 @@ async function main() {
       const bp = acc.businessProfile;
       const [existingBp] = await sql`SELECT profile_id FROM business_profiles WHERE profile_id = ${userId} LIMIT 1`;
       if (existingBp) {
-        await sql`
-          UPDATE business_profiles SET 
-            company_name = ${bp.companyName},
-            business_category = ${bp.category},
-            description = ${bp.description},
-            website = ${bp.website}
-          WHERE profile_id = ${userId}
-        `;
+        if (forceSeed) {
+          await sql`
+            UPDATE business_profiles SET 
+              company_name = ${bp.companyName},
+              business_category = ${bp.category},
+              description = ${bp.description},
+              website = ${bp.website}
+            WHERE profile_id = ${userId}
+          `;
+        }
       } else {
         await sql`
           INSERT INTO business_profiles 
@@ -1619,273 +1643,313 @@ async function main() {
 
   // 2. Seed Services (Katalog Layanan Jasa)
   console.log('\n🎨 Menyinkronkan Layanan Kreatif (Services)...');
-  await sql`DELETE FROM services`;
-  for (const srv of SERVICES_DATA) {
-    const creatorId = creatorSlugMap.get(srv.creatorSlug);
-    if (!creatorId) continue;
+  const [{ count: currentServicesCount }] = await sql`SELECT COUNT(*)::int as count FROM services`;
+  if (!forceSeed && currentServicesCount > 0) {
+    console.log(`🛡️ Layanan sudah ada (${currentServicesCount} data). Melewati penghapusan/seeding services demi proteksi data.`);
+  } else {
+    await sql`DELETE FROM services`;
+    for (const srv of SERVICES_DATA) {
+      const creatorId = creatorSlugMap.get(srv.creatorSlug);
+      if (!creatorId) continue;
 
-    await sql`
-      INSERT INTO services 
-        (id, creator_id, title, category, description, price, price_numeric, estimated_days, image_url, is_active, created_at)
-      VALUES 
-        (${crypto.randomUUID()}, ${creatorId}, ${srv.title}, ${srv.category}, ${srv.description}, ${srv.price}, ${srv.priceNumeric}, ${srv.estimatedDays}, ${srv.imageUrl}, true, NOW())
-    `;
+      await sql`
+        INSERT INTO services 
+          (id, creator_id, title, category, description, price, price_numeric, estimated_days, image_url, is_active, created_at)
+        VALUES 
+          (${crypto.randomUUID()}, ${creatorId}, ${srv.title}, ${srv.category}, ${srv.description}, ${srv.price}, ${srv.priceNumeric}, ${srv.estimatedDays}, ${srv.imageUrl}, true, NOW())
+      `;
+    }
+    console.log(`✅ Berhasil menyisipkan ${SERVICES_DATA.length} layanan jasa aktif.`);
   }
-  console.log(`✅ Berhasil menyisipkan ${SERVICES_DATA.length} layanan jasa aktif.`);
 
   // 3. Seed Projects (Showcase Karya Portofolio)
   console.log('\n📁 Menyinkronkan Portofolio Karya (Projects)...');
-  await sql`DELETE FROM projects`;
-  for (const prj of PROJECTS_DATA) {
-    const creatorId = creatorSlugMap.get(prj.creatorSlug);
-    if (!creatorId) continue;
+  const [{ count: currentProjectsCount }] = await sql`SELECT COUNT(*)::int as count FROM projects`;
+  if (!forceSeed && currentProjectsCount > 0) {
+    console.log(`🛡️ Portofolio proyek sudah ada (${currentProjectsCount} data). Melewati penghapusan/seeding projects demi proteksi data.`);
+  } else {
+    await sql`DELETE FROM projects`;
+    for (const prj of PROJECTS_DATA) {
+      const creatorId = creatorSlugMap.get(prj.creatorSlug);
+      if (!creatorId) continue;
 
-    await sql`
-      INSERT INTO projects 
-        (id, creator_id, title, category, description, creator_handle, media_url, media_type, views_count, is_featured_school, created_at)
-      VALUES 
-        (${crypto.randomUUID()}, ${creatorId}, ${prj.title}, ${prj.category}, ${prj.description}, ${'@' + prj.creatorSlug}, ${prj.mediaUrl}, 'image', ${prj.viewsCount}, ${prj.isFeaturedSchool}, NOW())
-    `;
+      await sql`
+        INSERT INTO projects 
+          (id, creator_id, title, category, description, creator_handle, media_url, media_type, views_count, is_featured_school, created_at)
+        VALUES 
+          (${crypto.randomUUID()}, ${creatorId}, ${prj.title}, ${prj.category}, ${prj.description}, ${'@' + prj.creatorSlug}, ${prj.mediaUrl}, 'image', ${prj.viewsCount}, ${prj.isFeaturedSchool}, NOW())
+      `;
+    }
+    console.log(`✅ Berhasil menyisipkan ${PROJECTS_DATA.length} portofolio proyek.`);
   }
-  console.log(`✅ Berhasil menyisipkan ${PROJECTS_DATA.length} portofolio proyek.`);
 
   // 4. Seed Project Briefs (Peluang Kerja dari UMKM)
   console.log('\n💼 Menyinkronkan Lowongan Brief UMKM...');
-  await sql`DELETE FROM brief_applications`;
-  await sql`DELETE FROM project_briefs`;
   const briefMap = new Map(); // title -> briefId
+  const [{ count: currentBriefsCount }] = await sql`SELECT COUNT(*)::int as count FROM project_briefs`;
+  if (!forceSeed && currentBriefsCount > 0) {
+    console.log(`🛡️ Lowongan brief sudah ada (${currentBriefsCount} data). Melewati penghapusan/seeding briefs demi proteksi data.`);
+  } else {
+    await sql`DELETE FROM brief_applications`;
+    await sql`DELETE FROM project_briefs`;
 
-  for (const brf of BRIEFS_DATA) {
-    const businessId = userMap.get(brf.businessEmail.toLowerCase());
-    if (!businessId) continue;
+    for (const brf of BRIEFS_DATA) {
+      const businessId = userMap.get(brf.businessEmail.toLowerCase());
+      if (!businessId) continue;
 
-    const briefId = crypto.randomUUID();
-    await sql`
-      INSERT INTO project_briefs 
-        (id, business_id, title, category, description, expected_output, budget, deadline, status, created_at)
-      VALUES 
-        (${briefId}, ${businessId}, ${brf.title}, ${brf.category}, ${brf.description}, ${brf.expectedOutput}, ${brf.budget}, ${brf.deadline}, ${brf.status}, NOW())
-    `;
-    briefMap.set(brf.title, briefId);
-  }
-  console.log(`✅ Berhasil menyisipkan ${BRIEFS_DATA.length} brief lowongan UMKM.`);
-
-  // 4b. Seed Brief Applications (Lamaran Kreator)
-  console.log('\n📝 Menyinkronkan Lamaran Kreatif (Brief Applications)...');
-  const APPLICATIONS_DATA = [
-    {
-      briefTitle: 'Desain Ulang Kemasan Standing Pouch Kopi Specialty 250gr',
-      creatorEmail: 'qaesyaar.aqeel@creatorin.my.id',
-      pitch: 'Halo tim Kopi Lereng! Saya memiliki pengalaman 4 tahun mendesain kemasan F&B siap cetak dengan dieline standar pabrik rotogravure. Saya siap buatkan 3 opsi konsep modern bernuansa heritage.',
-      proposedPrice: 'Rp 850.000',
-      status: 'accepted'
-    },
-    {
-      briefTitle: 'Desain Ulang Kemasan Standing Pouch Kopi Specialty 250gr',
-      creatorEmail: 'rahmat.hidayat@creatorin.my.id',
-      pitch: 'Saya siswa SMK DKV peraih medali emas LKS Packaging Design. Portofolio saya fokus pada kemasan kopi dan produk lokal dengan ilustrasi vektor presisi.',
-      proposedPrice: 'Rp 500.000',
-      status: 'pending'
-    },
-    {
-      briefTitle: 'Pembuatan 3 Video Edukasi TikTok Peternakan Sapi Perah',
-      creatorEmail: 'creator@creatorin.my.id',
-      pitch: 'Siap memproduksi 3 video vertikal 4K berorientasi viral hook dengan motion infographic yang menjelaskan nutrisi susu murni segar.',
-      proposedPrice: 'Rp 1.500.000',
-      status: 'accepted'
-    },
-    {
-      briefTitle: 'Kampanye Konten Video UGC Reels Serum Wajah Alami',
-      creatorEmail: 'sarah.amelia@creatorin.my.id',
-      pitch: 'Spesialis video UGC beauty & skincare dengan engagement tinggi. Kamera Sony A7IV + lighting studio siap menghasilkan visual aesthetic.',
-      proposedPrice: 'Rp 900.000',
-      status: 'pending'
-    },
-    {
-      briefTitle: 'Sesi Foto Katalog Studio Varian Sambal Kemasan Jar',
-      creatorEmail: 'budi.pratama@creatorin.my.id',
-      pitch: 'Studio foto komersial lengkap di Surabaya. Menyediakan garnish cabe segar, kayu jati, dan piring gerabah untuk nuansa otentik.',
-      proposedPrice: 'Rp 650.000',
-      status: 'pending'
-    }
-  ];
-
-  for (const app of APPLICATIONS_DATA) {
-    const briefId = briefMap.get(app.briefTitle);
-    const creatorId = userMap.get(app.creatorEmail.toLowerCase());
-    if (briefId && creatorId) {
+      const briefId = crypto.randomUUID();
       await sql`
-        INSERT INTO brief_applications 
-          (id, brief_id, creator_id, pitch, proposed_price, status, created_at)
+        INSERT INTO project_briefs 
+          (id, business_id, title, category, description, expected_output, budget, deadline, status, created_at)
         VALUES 
-          (${crypto.randomUUID()}, ${briefId}, ${creatorId}, ${app.pitch}, ${app.proposedPrice}, ${app.status}, NOW())
+          (${briefId}, ${businessId}, ${brf.title}, ${brf.category}, ${brf.description}, ${brf.expectedOutput}, ${brf.budget}, ${brf.deadline}, ${brf.status}, NOW())
       `;
+      briefMap.set(brf.title, briefId);
     }
+    console.log(`✅ Berhasil menyisipkan ${BRIEFS_DATA.length} brief lowongan UMKM.`);
+
+    // 4b. Seed Brief Applications (Lamaran Kreator)
+    console.log('\n📝 Menyinkronkan Lamaran Kreatif (Brief Applications)...');
+    const APPLICATIONS_DATA = [
+      {
+        briefTitle: 'Desain Ulang Kemasan Standing Pouch Kopi Specialty 250gr',
+        creatorEmail: 'qaesyaar.aqeel@creatorin.my.id',
+        pitch: 'Halo tim Kopi Lereng! Saya memiliki pengalaman 4 tahun mendesain kemasan F&B siap cetak dengan dieline standar pabrik rotogravure. Saya siap buatkan 3 opsi konsep modern bernuansa heritage.',
+        proposedPrice: 'Rp 850.000',
+        status: 'accepted'
+      },
+      {
+        briefTitle: 'Desain Ulang Kemasan Standing Pouch Kopi Specialty 250gr',
+        creatorEmail: 'rahmat.hidayat@creatorin.my.id',
+        pitch: 'Saya siswa SMK DKV peraih medali emas LKS Packaging Design. Portofolio saya fokus pada kemasan kopi dan produk lokal dengan ilustrasi vektor presisi.',
+        proposedPrice: 'Rp 500.000',
+        status: 'pending'
+      },
+      {
+        briefTitle: 'Pembuatan 3 Video Edukasi TikTok Peternakan Sapi Perah',
+        creatorEmail: 'creator@creatorin.my.id',
+        pitch: 'Siap memproduksi 3 video vertikal 4K berorientasi viral hook dengan motion infographic yang menjelaskan nutrisi susu murni segar.',
+        proposedPrice: 'Rp 1.500.000',
+        status: 'accepted'
+      },
+      {
+        briefTitle: 'Kampanye Konten Video UGC Reels Serum Wajah Alami',
+        creatorEmail: 'sarah.amelia@creatorin.my.id',
+        pitch: 'Spesialis video UGC beauty & skincare dengan engagement tinggi. Kamera Sony A7IV + lighting studio siap menghasilkan visual aesthetic.',
+        proposedPrice: 'Rp 900.000',
+        status: 'pending'
+      },
+      {
+        briefTitle: 'Sesi Foto Katalog Studio Varian Sambal Kemasan Jar',
+        creatorEmail: 'budi.pratama@creatorin.my.id',
+        pitch: 'Studio foto komersial lengkap di Surabaya. Menyediakan garnish cabe segar, kayu jati, dan piring gerabah untuk nuansa otentik.',
+        proposedPrice: 'Rp 650.000',
+        status: 'pending'
+      }
+    ];
+
+    for (const app of APPLICATIONS_DATA) {
+      const briefId = briefMap.get(app.briefTitle);
+      const creatorId = userMap.get(app.creatorEmail.toLowerCase());
+      if (briefId && creatorId) {
+        await sql`
+          INSERT INTO brief_applications 
+            (id, brief_id, creator_id, pitch, proposed_price, status, created_at)
+          VALUES 
+            (${crypto.randomUUID()}, ${briefId}, ${creatorId}, ${app.pitch}, ${app.proposedPrice}, ${app.status}, NOW())
+        `;
+      }
+    }
+    console.log(`✅ Berhasil menyisipkan ${APPLICATIONS_DATA.length} lamaran brief aktif.`);
   }
-  console.log(`✅ Berhasil menyisipkan ${APPLICATIONS_DATA.length} lamaran brief aktif.`);
 
   // 5. Seed Reviews, Invoices, Collaboration Rooms, Submissions & Revisions
   console.log('\n⭐ Menyinkronkan Kolaborasi, Ruangan Kerja, Submisi & Ulasan (Reviews)...');
-  await sql`DELETE FROM revisions`;
-  await sql`DELETE FROM submissions`;
-  await sql`DELETE FROM reviews`;
-  await sql`DELETE FROM collaboration_rooms`;
-  await sql`DELETE FROM invoices`;
-  await sql`DELETE FROM wallet_transactions`;
+  const [{ count: currentInvoicesCount }] = await sql`SELECT COUNT(*)::int as count FROM invoices`;
+  if (!forceSeed && currentInvoicesCount > 0) {
+    console.log(`🛡️ Kolaborasi & invoice sudah ada (${currentInvoicesCount} data). Melewati penghapusan/seeding kolaborasi demi proteksi data.`);
+  } else {
+    await sql`DELETE FROM revisions`;
+    await sql`DELETE FROM submissions`;
+    await sql`DELETE FROM reviews`;
+    await sql`DELETE FROM collaboration_rooms`;
+    await sql`DELETE FROM invoices`;
+    await sql`DELETE FROM wallet_transactions`;
 
-  for (const rev of REVIEWS_DATA) {
-    const creatorId = creatorSlugMap.get(rev.creatorSlug);
-    const businessId = userMap.get(rev.businessEmail.toLowerCase());
-    if (!creatorId || !businessId) continue;
+    for (const rev of REVIEWS_DATA) {
+      const creatorId = creatorSlugMap.get(rev.creatorSlug);
+      const businessId = userMap.get(rev.businessEmail.toLowerCase());
+      if (!creatorId || !businessId) continue;
 
-    const invoiceId = crypto.randomUUID();
-    const roomId = crypto.randomUUID();
-    const reviewId = crypto.randomUUID();
-    const submissionId = crypto.randomUUID();
-    const invoiceNum = `INV-${Date.now().toString().slice(-6)}-${Math.floor(100 + Math.random() * 900)}`;
+      const invoiceId = crypto.randomUUID();
+      const roomId = crypto.randomUUID();
+      const reviewId = crypto.randomUUID();
+      const submissionId = crypto.randomUUID();
+      const invoiceNum = `INV-${Date.now().toString().slice(-6)}-${Math.floor(100 + Math.random() * 900)}`;
 
-    // 1. Invoice Lunas
-    await sql`
-      INSERT INTO invoices 
-        (id, invoice_number, creator_id, business_id, title, scope_description, total_amount, deadline_days, revision_rules, status, paid_at, created_at)
-      VALUES 
-        (${invoiceId}, ${invoiceNum}, ${creatorId}, ${businessId}, ${rev.projectTitle}, ${rev.comment}, ${rev.amount || 750000}, 3, 'Maksimal 2 kali revisi minor.', 'paid', NOW(), NOW())
-    `;
-
-    // 2. Collaboration Room Selesai (Completed)
-    await sql`
-      INSERT INTO collaboration_rooms 
-        (id, invoice_id, creator_id, business_id, title, brief_summary, status, approved_at, created_at)
-      VALUES 
-        (${roomId}, ${invoiceId}, ${creatorId}, ${businessId}, ${rev.projectTitle}, ${rev.comment}, 'completed', NOW(), NOW())
-    `;
-
-    // 3. Submisi Hasil Karya Selesai
-    await sql`
-      INSERT INTO submissions 
-        (id, room_id, version, notes, file_urls, status, submitted_at)
-      VALUES 
-        (${submissionId}, ${roomId}, 1, ${'Draf final siap rilis untuk: ' + rev.projectTitle}, ${['https://images.unsplash.com/photo-1541167760496-1628856ab772?w=1200&auto=format&fit=crop&q=80']}, 'approved', NOW())
-    `;
-
-    // 4. Review Riil
-    await sql`
-      INSERT INTO reviews 
-        (id, creator_id, reviewer_id, room_id, reviewer_name, reviewer_role, reviewer_avatar, project_title, rating, comment, completed_date, created_at)
-      VALUES 
-        (${reviewId}, ${creatorId}, ${businessId}, ${roomId}, ${rev.reviewerName}, ${rev.reviewerRole}, ${rev.reviewerAvatar}, ${rev.projectTitle}, ${rev.rating}, ${rev.comment}, ${rev.completedDate}, NOW())
-    `;
-
-    // 5. Transaksi Dompet (Kredit ke dompet kreator)
-    const [wal] = await sql`SELECT id FROM creator_wallets WHERE creator_id = ${creatorId} LIMIT 1`;
-    if (wal) {
+      // 1. Invoice Lunas
       await sql`
-        INSERT INTO wallet_transactions 
-          (id, wallet_id, type, amount, status, description, created_at)
+        INSERT INTO invoices 
+          (id, invoice_number, creator_id, business_id, title, scope_description, total_amount, deadline_days, revision_rules, status, paid_at, created_at)
         VALUES 
-          (${crypto.randomUUID()}, ${wal.id}, 'project_payment', ${rev.amount || 750000}, 'completed', ${'Pembayaran selesai proyek: ' + rev.projectTitle}, NOW())
+          (${invoiceId}, ${invoiceNum}, ${creatorId}, ${businessId}, ${rev.projectTitle}, ${rev.comment}, ${rev.amount || 750000}, 3, 'Maksimal 2 kali revisi minor.', 'paid', NOW(), NOW())
       `;
+
+      // 2. Collaboration Room Selesai (Completed)
+      await sql`
+        INSERT INTO collaboration_rooms 
+          (id, invoice_id, creator_id, business_id, title, brief_summary, status, approved_at, created_at)
+        VALUES 
+          (${roomId}, ${invoiceId}, ${creatorId}, ${businessId}, ${rev.projectTitle}, ${rev.comment}, 'completed', NOW(), NOW())
+      `;
+
+      // 3. Submisi Hasil Karya Selesai
+      await sql`
+        INSERT INTO submissions 
+          (id, room_id, version, notes, file_urls, status, submitted_at)
+        VALUES 
+          (${submissionId}, ${roomId}, 1, ${'Draf final siap rilis untuk: ' + rev.projectTitle}, ${['https://images.unsplash.com/photo-1541167760496-1628856ab772?w=1200&auto=format&fit=crop&q=80']}, 'approved', NOW())
+      `;
+
+      // 4. Review Riil
+      await sql`
+        INSERT INTO reviews 
+          (id, creator_id, reviewer_id, room_id, reviewer_name, reviewer_role, reviewer_avatar, project_title, rating, comment, completed_date, created_at)
+        VALUES 
+          (${reviewId}, ${creatorId}, ${businessId}, ${roomId}, ${rev.reviewerName}, ${rev.reviewerRole}, ${rev.reviewerAvatar}, ${rev.projectTitle}, ${rev.rating}, ${rev.comment}, ${rev.completedDate}, NOW())
+      `;
+
+      // 5. Transaksi Dompet (Kredit ke dompet kreator)
+      const [wal] = await sql`SELECT id FROM creator_wallets WHERE creator_id = ${creatorId} LIMIT 1`;
+      if (wal) {
+        await sql`
+          INSERT INTO wallet_transactions 
+            (id, wallet_id, type, amount, status, description, created_at)
+          VALUES 
+            (${crypto.randomUUID()}, ${wal.id}, 'project_payment', ${rev.amount || 750000}, 'completed', ${'Pembayaran selesai proyek: ' + rev.projectTitle}, NOW())
+        `;
+      }
     }
-  }
 
-  // 5b. Tambahkan 1 Ruangan Kolaborasi Aktif (In Progress dengan Revisi Aktif)
-  const creatorProId = userMap.get('creator@creatorin.my.id');
-  const umkmId = userMap.get('umkm@creatorin.my.id');
-  if (creatorProId && umkmId) {
-    const activeInvId = crypto.randomUUID();
-    const activeRoomId = crypto.randomUUID();
-    const activeSubId = crypto.randomUUID();
-    const activeInvNum = `INV-ACTV-${Date.now().toString().slice(-5)}`;
+    // 5b. Tambahkan 1 Ruangan Kolaborasi Aktif (In Progress dengan Revisi Aktif)
+    const creatorProId = userMap.get('creator@creatorin.my.id');
+    const umkmId = userMap.get('umkm@creatorin.my.id');
+    if (creatorProId && umkmId) {
+      const activeInvId = crypto.randomUUID();
+      const activeRoomId = crypto.randomUUID();
+      const activeSubId = crypto.randomUUID();
+      const activeInvNum = `INV-ACTV-${Date.now().toString().slice(-5)}`;
 
-    await sql`
-      INSERT INTO invoices 
-        (id, invoice_number, creator_id, business_id, title, scope_description, total_amount, deadline_days, revision_rules, status, paid_at, created_at)
-      VALUES 
-        (${activeInvId}, ${activeInvNum}, ${creatorProId}, ${umkmId}, 'Kampanye Video Reels Menu Spesial Musim Hujan', 'Produksi 2 konten video reels vertikal 9:16 untuk peluncuran menu varian kopi rempah.', 1500000, 5, 'Maksimal 2 kali revisi minor.', 'paid', NOW(), NOW())
-    `;
+      await sql`
+        INSERT INTO invoices 
+          (id, invoice_number, creator_id, business_id, title, scope_description, total_amount, deadline_days, revision_rules, status, paid_at, created_at)
+        VALUES 
+          (${activeInvId}, ${activeInvNum}, ${creatorProId}, ${umkmId}, 'Kampanye Video Reels Menu Spesial Musim Hujan', 'Produksi 2 konten video reels vertikal 9:16 untuk peluncuran menu varian kopi rempah.', 1500000, 5, 'Maksimal 2 kali revisi minor.', 'paid', NOW(), NOW())
+      `;
 
-    await sql`
-      INSERT INTO collaboration_rooms 
-        (id, invoice_id, creator_id, business_id, title, brief_summary, status, deadline, created_at)
-      VALUES 
-        (${activeRoomId}, ${activeInvId}, ${creatorProId}, ${umkmId}, 'Kampanye Video Reels Menu Spesial Musim Hujan', 'Produksi 2 konten video reels vertikal 9:16 untuk peluncuran menu varian kopi rempah.', 'revision_requested', NOW() + INTERVAL '3 days', NOW())
-    `;
+      await sql`
+        INSERT INTO collaboration_rooms 
+          (id, invoice_id, creator_id, business_id, title, brief_summary, status, deadline, created_at)
+        VALUES 
+          (${activeRoomId}, ${activeInvId}, ${creatorProId}, ${umkmId}, 'Kampanye Video Reels Menu Spesial Musim Hujan', 'Produksi 2 konten video reels vertikal 9:16 untuk peluncuran menu varian kopi rempah.', 'revision_requested', NOW() + INTERVAL '3 days', NOW())
+      `;
 
-    await sql`
-      INSERT INTO submissions 
-        (id, room_id, version, notes, file_urls, status, submitted_at)
-      VALUES 
-        (${activeSubId}, ${activeRoomId}, 1, 'Mohon dicek draf video reels varian Kopi Jahe Gula Aren (Hook awal & transisi produk).', ${['https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?w=1200&auto=format&fit=crop&q=80']}, 'revision_requested', NOW() - INTERVAL '1 day')
-    `;
+      await sql`
+        INSERT INTO submissions 
+          (id, room_id, version, notes, file_urls, status, submitted_at)
+        VALUES 
+          (${activeSubId}, ${activeRoomId}, 1, 'Mohon dicek draf video reels varian Kopi Jahe Gula Aren (Hook awal & transisi produk).', ${['https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?w=1200&auto=format&fit=crop&q=80']}, 'revision_requested', NOW() - INTERVAL '1 day')
+      `;
 
-    await sql`
-      INSERT INTO revisions 
-        (id, room_id, submission_id, feedback, requested_at)
-      VALUES 
-        (${crypto.randomUUID()}, ${activeRoomId}, ${activeSubId}, 'Visual dan grading warnanya mantap mas! Hanya tolong perbesar teks promo diskon di 3 detik terakhir agar lebih eye-catching.', NOW())
-    `;
+      await sql`
+        INSERT INTO revisions 
+          (id, room_id, submission_id, feedback, requested_at)
+        VALUES 
+          (${crypto.randomUUID()}, ${activeRoomId}, ${activeSubId}, 'Visual dan grading warnanya mantap mas! Hanya tolong perbesar teks promo diskon di 3 detik terakhir agar lebih eye-catching.', NOW())
+      `;
 
-    console.log(`✅ Berhasil menyisipkan 1 ruangan kolaborasi aktif (Status: revision_requested) untuk pengujian CRUD.`);
+      console.log(`✅ Berhasil menyisipkan 1 ruangan kolaborasi aktif (Status: revision_requested) untuk pengujian CRUD.`);
+    }
+
+    console.log(`✅ Berhasil menyisipkan total ${REVIEWS_DATA.length} ulasan riil, invoice, submisi, dan ruangan kolaborasi.`);
   }
 
   // 5c. Seed Percakapan & Pesan Chat Riil
   console.log('\n💬 Menyinkronkan Percakapan & Pesan (Chat)...');
-  await sql`DELETE FROM messages`;
-  await sql`DELETE FROM conversations`;
-  if (creatorProId && umkmId) {
-    const convId = crypto.randomUUID();
-    await sql`
-      INSERT INTO conversations (id, participant_1_id, participant_2_id, last_message, last_message_time, updated_at)
-      VALUES (${convId}, ${umkmId}, ${creatorProId}, 'Siap mas, saya update revisi teks promo sore ini.', NOW(), NOW())
-    `;
-    const chatMsgs = [
-      { senderId: umkmId, content: 'Halo Creator Pro! Kami dari Kopi Lereng ingin buat konten video reels untuk varian menu kopi rempah terbaru.' },
-      { senderId: creatorProId, content: 'Halo Kopi Lereng Nusantara! Menarik sekali konsepnya. Untuk durasi target sekitar 30-45 detik dengan tempo energik atau warm-cinematic?' },
-      { senderId: umkmId, content: 'Lebih ke warm-cinematic mas, agar aroma dan suasana ngopi di lereng gunung terasa kental.' },
-      { senderId: creatorProId, content: 'Siap mas, saya update revisi teks promo sore ini.' },
-    ];
-    for (const msg of chatMsgs) {
+  const [{ count: currentMessagesCount }] = await sql`SELECT COUNT(*)::int as count FROM messages`;
+  const creatorProId = userMap.get('creator@creatorin.my.id');
+  const umkmId = userMap.get('umkm@creatorin.my.id');
+
+  if (!forceSeed && currentMessagesCount > 0) {
+    console.log(`🛡️ Pesan chat sudah ada (${currentMessagesCount} data). Melewati penghapusan/seeding chat demi proteksi data.`);
+  } else {
+    await sql`DELETE FROM messages`;
+    await sql`DELETE FROM conversations`;
+    if (creatorProId && umkmId) {
+      const convId = crypto.randomUUID();
       await sql`
-        INSERT INTO messages (id, conversation_id, sender_id, content, is_read, metadata, created_at)
-        VALUES (${crypto.randomUUID()}, ${convId}, ${msg.senderId}, ${msg.content}, true, '{}', NOW())
+        INSERT INTO conversations (id, participant_1_id, participant_2_id, last_message, last_message_time, updated_at)
+        VALUES (${convId}, ${umkmId}, ${creatorProId}, 'Siap mas, saya update revisi teks promo sore ini.', NOW(), NOW())
       `;
+      const chatMsgs = [
+        { senderId: umkmId, content: 'Halo Creator Pro! Kami dari Kopi Lereng ingin buat konten video reels untuk varian menu kopi rempah terbaru.' },
+        { senderId: creatorProId, content: 'Halo Kopi Lereng Nusantara! Menarik sekali konsepnya. Untuk durasi target sekitar 30-45 detik dengan tempo energik atau warm-cinematic?' },
+        { senderId: umkmId, content: 'Lebih ke warm-cinematic mas, agar aroma dan suasana ngopi di lereng gunung terasa kental.' },
+        { senderId: creatorProId, content: 'Siap mas, saya update revisi teks promo sore ini.' },
+      ];
+      for (const msg of chatMsgs) {
+        await sql`
+          INSERT INTO messages (id, conversation_id, sender_id, content, is_read, metadata, created_at)
+          VALUES (${crypto.randomUUID()}, ${convId}, ${msg.senderId}, ${msg.content}, true, '{}', NOW())
+        `;
+      }
+      console.log(`✅ Berhasil menyisipkan thread percakapan dengan ${chatMsgs.length} pesan riil.`);
     }
-    console.log(`✅ Berhasil menyisipkan thread percakapan dengan ${chatMsgs.length} pesan riil.`);
   }
 
   // 5d. Seed Notifikasi Riil
   console.log('\n🔔 Menyinkronkan Notifikasi Riil Pengguna...');
-  await sql`DELETE FROM notifications`;
-  if (creatorProId) {
-    await sql`
-      INSERT INTO notifications (id, user_id, type, title, body, link_url, is_read, created_at)
-      VALUES 
-        (${crypto.randomUUID()}, ${creatorProId}, 'invoice', 'Pembayaran Diterima', 'Kopi Lereng Nusantara telah membayar invoice senilai Rp 1.500.000.', '/contracts', false, NOW()),
-        (${crypto.randomUUID()}, ${creatorProId}, 'revision', 'Permintaan Revisi', 'Klien memberikan masukan revisi pada draf video reels varian kopi rempah.', '/contracts', false, NOW())
-    `;
+  const [{ count: currentNotifCount }] = await sql`SELECT COUNT(*)::int as count FROM notifications`;
+  if (!forceSeed && currentNotifCount > 0) {
+    console.log(`🛡️ Notifikasi sudah ada (${currentNotifCount} data). Melewati penghapusan/seeding notifikasi demi proteksi data.`);
+  } else {
+    await sql`DELETE FROM notifications`;
+    if (creatorProId) {
+      await sql`
+        INSERT INTO notifications (id, user_id, type, title, body, link_url, is_read, created_at)
+        VALUES 
+          (${crypto.randomUUID()}, ${creatorProId}, 'invoice', 'Pembayaran Diterima', 'Kopi Lereng Nusantara telah membayar invoice senilai Rp 1.500.000.', '/contracts', false, NOW()),
+          (${crypto.randomUUID()}, ${creatorProId}, 'revision', 'Permintaan Revisi', 'Klien memberikan masukan revisi pada draf video reels varian kopi rempah.', '/contracts', false, NOW())
+      `;
+    }
+    if (umkmId) {
+      await sql`
+        INSERT INTO notifications (id, user_id, type, title, body, link_url, is_read, created_at)
+        VALUES 
+          (${crypto.randomUUID()}, ${umkmId}, 'submission', 'Draf Baru Tersedia', 'Kreator telah mengunggah draf karya untuk Kampanye Video Reels.', '/dashboard', false, NOW()),
+          (${crypto.randomUUID()}, ${umkmId}, 'application', 'Pelamar Baru di Brief', 'Qaesyaar Aqeel mengajukan proposal untuk brief Desain Ulang Kemasan Kopi.', '/briefs', false, NOW())
+      `;
+    }
+    console.log('✅ Berhasil menyisipkan notifikasi riil untuk Creator Pro & UMKM.');
   }
-  if (umkmId) {
-    await sql`
-      INSERT INTO notifications (id, user_id, type, title, body, link_url, is_read, created_at)
-      VALUES 
-        (${crypto.randomUUID()}, ${umkmId}, 'submission', 'Draf Baru Tersedia', 'Kreator telah mengunggah draf karya untuk Kampanye Video Reels.', '/dashboard', false, NOW()),
-        (${crypto.randomUUID()}, ${umkmId}, 'application', 'Pelamar Baru di Brief', 'Qaesyaar Aqeel mengajukan proposal untuk brief Desain Ulang Kemasan Kopi.', '/briefs', false, NOW())
-    `;
-  }
-  console.log('✅ Berhasil menyisipkan notifikasi riil untuk Creator Pro & UMKM.');
 
   // 5e. Seed Komentar Portofolio Proyek (Project Comments)
   console.log('\n💬 Menyinkronkan Komentar Portofolio (Project Comments)...');
-  await sql`DELETE FROM project_comments`;
-  const [firstProject] = await sql`SELECT id FROM projects LIMIT 1`;
-  if (firstProject && umkmId && creatorProId) {
-    await sql`
-      INSERT INTO project_comments (id, project_id, user_id, content, created_at)
-      VALUES 
-        (${crypto.randomUUID()}, ${firstProject.id}, ${umkmId}, 'Karya visual yang sangat inspiratif dan komposisi warnanya berani!', NOW() - INTERVAL '2 hours'),
-        (${crypto.randomUUID()}, ${firstProject.id}, ${creatorProId}, 'Terima kasih banyak atas apresiasi dan dukungannya!', NOW() - INTERVAL '1 hour')
-    `;
-    console.log('✅ Berhasil menyisipkan komentar portofolio.');
+  const [{ count: currentCommentsCount }] = await sql`SELECT COUNT(*)::int as count FROM project_comments`;
+  if (!forceSeed && currentCommentsCount > 0) {
+    console.log(`🛡️ Komentar portofolio sudah ada (${currentCommentsCount} data). Melewati penghapusan/seeding komentar demi proteksi data.`);
+  } else {
+    await sql`DELETE FROM project_comments`;
+    const [firstProject] = await sql`SELECT id FROM projects LIMIT 1`;
+    if (firstProject && umkmId && creatorProId) {
+      await sql`
+        INSERT INTO project_comments (id, project_id, user_id, content, created_at)
+        VALUES 
+          (${crypto.randomUUID()}, ${firstProject.id}, ${umkmId}, 'Karya visual yang sangat inspiratif dan komposisi warnanya berani!', NOW() - INTERVAL '2 hours'),
+          (${crypto.randomUUID()}, ${firstProject.id}, ${creatorProId}, 'Terima kasih banyak atas apresiasi dan dukungannya!', NOW() - INTERVAL '1 hour')
+      `;
+      console.log('✅ Berhasil menyisipkan komentar portofolio.');
+    }
   }
 
   console.log(`✅ Berhasil menyisipkan total ${REVIEWS_DATA.length} ulasan riil, invoice, submisi, dan ruangan kolaborasi.`);

@@ -21,7 +21,7 @@ export async function GET(req: NextRequest) {
   let details: any = null;
 
   if (db) {
-    if (user.role === "creator") {
+    if (user.role === "creator" || user.role === "admin") {
       const [c] = await db.select().from(creatorProfiles).where(eq(creatorProfiles.profileId, user.id)).limit(1);
       details = c;
     } else if (user.role === "business") {

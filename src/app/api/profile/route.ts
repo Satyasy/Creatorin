@@ -94,7 +94,7 @@ export async function PUT(req: NextRequest) {
         .where(eq(profiles.id, user.id));
     }
 
-    if (user.role === "creator" && (headline !== undefined || bio !== undefined || skills !== undefined || startingPrice !== undefined)) {
+    if ((user.role === "creator" || user.role === "admin") && (headline !== undefined || bio !== undefined || skills !== undefined || startingPrice !== undefined)) {
       await db
         .insert(creatorProfiles)
         .values({
