@@ -4,36 +4,10 @@ import { getDb } from "@/lib/db";
 import { creatorWallets, walletTransactions, notifications } from "@/lib/db/schema";
 import { eq, sql } from "drizzle-orm";
 
-const ALLOWED_DEMO_EMAILS = [
-  'umkm@creatorin.my.id',
-  'creator@creatorin.my.id',
-  'school@creatorin.my.id',
-  'glowlab@creatorin.id',
-  'munir@creatorin.id',
-  'admin@creatorin.my.id',
-];
-
 export async function POST(req: NextRequest) {
   const user = await getAuthenticatedUser(req);
   if (!user) {
     return NextResponse.json({ error: "Sesi Anda telah berakhir. Silakan masuk kembali." }, { status: 401 });
-  }
-
-  const isDemoEnv = 
-    process.env.ENABLE_DEMO_TOPUP === 'true' || 
-    process.env.ALLOW_DEMO_TOPUP === 'true' || 
-    process.env.NODE_ENV !== 'production';
-
-  const isDemoAccount = user.email && ALLOWED_DEMO_EMAILS.includes(user.email.toLowerCase());
-
-  if (!isDemoEnv && !isDemoAccount) {
-    return NextResponse.json(
-      {
-        error: "Top-up koin demo hanya diizinkan untuk akun demonstrasi evaluasi atau saat mode demo aktif.",
-        code: "ERR_DEMO_TOPUP_DISABLED",
-      },
-      { status: 403 }
-    );
   }
 
   const db = getDb();
@@ -54,7 +28,7 @@ export async function POST(req: NextRequest) {
 
     if (rawAmount > 50_000_000) {
       return NextResponse.json(
-        { error: "Maksimal top-up koin demo per transaksi adalah 50.000.000 koin." },
+        { error: "Maksimal top-up koin per transaksi adalah 50.000.000 koin." },
         { status: 400 }
       );
     }
@@ -96,7 +70,7 @@ export async function POST(req: NextRequest) {
           walletId: wallet.id,
           type: "topup",
           amount: rawAmount,
-          description: `Top-up Koin Demo untuk simulasi evaluasi kolaborasi (+${rawAmount.toLocaleString('id-ID')} Koin)`,
+          description: `Top-up Saldo Koin (+🪙 ${rawAmount.toLocaleString('id-ID')})`,
           status: "completed",
         })
         .returning();
@@ -128,7 +102,7 @@ export async function POST(req: NextRequest) {
       transaction: result.transaction,
     });
   } catch (err: any) {
-    console.error("[Demo Top-Up Error]", err);
+    console.error("[Top-Up Error]", err);
     return NextResponse.json(
       { error: err.message || "Gagal memproses top-up koin." },
       { status: 500 }
