@@ -88,16 +88,11 @@ export function DemoTopUpModal({ isOpen, onClose, onSuccess }: Props) {
             <Coins className="w-6 h-6 stroke-[2]" />
           </div>
           <div>
-            <div className="flex items-center gap-1.5">
-              <h2 className="font-['DM_Sans',sans-serif] text-lg font-bold text-[#0D0C22] tracking-tight">
-                Top Up Koin Demo
-              </h2>
-              <span className="text-[10px] font-bold text-[#155DFC] bg-blue-50 px-2 py-0.5 rounded-full border border-blue-100">
-                Simulasi Evaluasi
-              </span>
-            </div>
+            <h2 className="font-['DM_Sans',sans-serif] text-lg font-bold text-[#0D0C22] tracking-tight">
+              Top Up Koin
+            </h2>
             <p className="text-xs text-[#55576A] mt-0.5">
-              Tambah saldo koin untuk simulasi pembayaran escrow kolaborasi.
+              Tambah saldo koin untuk pembayaran transaksi kolaborasi.
             </p>
           </div>
         </div>
@@ -105,7 +100,7 @@ export function DemoTopUpModal({ isOpen, onClose, onSuccess }: Props) {
         {/* Preset Buttons */}
         <div className="mt-4">
           <label className="block text-xs font-semibold text-[#262626] mb-2">
-            Pilih Nominal Koin Demo:
+            Pilih Nominal Koin:
           </label>
           <div className="grid grid-cols-2 gap-2">
             {PRESET_AMOUNTS.map((amt) => {

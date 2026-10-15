@@ -101,10 +101,10 @@ export const TopUpCoinModal: React.FC<TopUpCoinModalProps> = ({
             </div>
             <div>
               <h3 className="text-base sm:text-lg font-bold text-neutral-900 tracking-tight">
-                Top Up Koin UMKM
+                Top Up Koin
               </h3>
               <p className="text-xs text-neutral-500">
-                Isi saldo koin untuk transaksi & bayar jasa kreator
+                Isi saldo koin untuk transaksi dan kolaborasi jasa kreator
               </p>
             </div>
           </div>
@@ -164,14 +164,6 @@ export const TopUpCoinModal: React.FC<TopUpCoinModalProps> = ({
               </button>
             ))}
           </div>
-        </div>
-
-        {/* Dummy Notice Card */}
-        <div className="rounded-xl bg-blue-50/70 border border-blue-100 p-3 mb-6 flex items-start gap-2.5 text-xs text-blue-900 leading-relaxed">
-          <span className="shrink-0 text-sm">⚡</span>
-          <p>
-            <strong>Simulasi Dummy:</strong> Saldo koin akan langsung masuk ke dompet Anda seketika tanpa gateway pembayaran nyata.
-          </p>
         </div>
 
         {/* Action Buttons */}
