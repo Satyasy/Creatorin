@@ -7,18 +7,12 @@ import { eq, desc } from "drizzle-orm";
 export async function GET(req: NextRequest) {
   const user = await getAuthenticatedUser(req);
   if (!user) {
-    return NextResponse.json({
-      wallet: { balance: 1850000, points: 340, updatedAt: new Date().toISOString() },
-      transactions: [],
-    });
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
   const db = getDb();
   if (!db) {
-    return NextResponse.json({
-      wallet: { balance: 1850000, points: 340, updatedAt: new Date().toISOString() },
-      transactions: [],
-    });
+    return NextResponse.json({ error: "Database not connected" }, { status: 503 });
   }
 
   try {

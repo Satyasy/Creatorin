@@ -1,9 +1,12 @@
 import { chromium } from 'playwright';
 
-const browser = await chromium.launch({
-  headless: true,
-  executablePath: 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe',
-});
+const launchOptions = { headless: true };
+if (process.env.CHROME_PATH) {
+  launchOptions.executablePath = process.env.CHROME_PATH;
+} else if (process.platform === 'win32') {
+  launchOptions.executablePath = 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe';
+}
+const browser = await chromium.launch(launchOptions);
 
 try {
   for (const viewport of [{ width: 1440, height: 900 }, { width: 390, height: 844 }]) {
@@ -23,7 +26,7 @@ try {
 
     await page.locator('aside[aria-label="Sidebar kreator"]').waitFor();
     await page.getByRole('navigation', { name: 'Navigasi kreator' }).waitFor();
-    await page.getByRole('link', { name: 'Jelajah' }).waitFor();
+    await page.getByRole('link', { name: 'Layanan' }).waitFor();
     if (await page.getByRole('navigation', { name: 'Navigasi utama' }).count()) {
       throw new Error(`Navbar UMKM tampil pada ${viewport.width}px`);
     }
