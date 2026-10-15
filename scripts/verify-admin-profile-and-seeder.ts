@@ -1,10 +1,43 @@
 import postgres from 'postgres';
+import fs from 'fs';
+import path from 'path';
 
 async function main() {
   console.log('🧪 Starting Verification: Admin Profile Banner & Avatar + Seeder Safety Guard');
 
   const connectionString = process.env.DATABASE_URL || 'postgresql://creatorin_user:Cr3at0rIn_Secure_2026_Db@127.0.0.1:5432/creatorin_db';
   const sql = postgres(connectionString, { ssl: false });
+
+  // Record initial state to guarantee complete restoration
+  const [initialAdmin] = await sql`SELECT id, avatar_url, cover_url, headline FROM profiles WHERE LOWER(email) = 'admin@creatorin.my.id'`;
+  const initialAvatar = initialAdmin?.avatar_url || '/creatorin/avatar.png';
+  const initialCover = initialAdmin?.cover_url || 'linear-gradient(135deg, #0B1F3A 0%, #155DFC 100%)';
+  const initialHeadline = initialAdmin?.headline || '';
+
+  // Setup actual physical files on disk so Nginx never returns 404
+  const uploadsDir = '/var/www/creatorin/shared/uploads/avatars';
+  if (!fs.existsSync(uploadsDir)) {
+    fs.mkdirSync(uploadsDir, { recursive: true });
+  }
+  const timestamp = Date.now();
+  const avatarFilename = `admin-test-avatar-${timestamp}.png`;
+  const bannerFilename = `admin-test-banner-${timestamp}.png`;
+  const avatarFilePath = path.join(uploadsDir, avatarFilename);
+  const bannerFilePath = path.join(uploadsDir, bannerFilename);
+
+  const sampleImage = '/var/www/creatorin/repo/public/creatorin/avatar.png';
+  if (fs.existsSync(sampleImage)) {
+    fs.copyFileSync(sampleImage, avatarFilePath);
+    fs.copyFileSync(sampleImage, bannerFilePath);
+  } else {
+    const dummyPng = Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=', 'base64');
+    fs.writeFileSync(avatarFilePath, dummyPng);
+    fs.writeFileSync(bannerFilePath, dummyPng);
+  }
+
+  const testAvatarUrl = `/uploads/avatars/${avatarFilename}`;
+  const testCoverUrl = `/uploads/avatars/${bannerFilename}`;
+  const testHeadline = 'Administrator Platform & Community Lead (Verified)';
 
   try {
     // 1. Authenticate as admin
@@ -23,9 +56,6 @@ async function main() {
 
     // 2. Update admin avatar and coverUrl via PUT /api/profile
     console.log('\n--- STEP 2: Update admin avatar & coverUrl ---');
-    const testAvatarUrl = `/uploads/avatars/admin-test-avatar-${Date.now()}.png`;
-    const testCoverUrl = `/uploads/avatars/admin-test-banner-${Date.now()}.png`;
-    const testHeadline = 'Administrator Platform & Community Lead (Verified)';
 
     const updateRes = await fetch('http://127.0.0.1:3000/api/profile', {
       method: 'PUT',
@@ -107,6 +137,28 @@ async function main() {
     console.log('🎉 ALL VERIFICATION CHECKS PASSED 100%!');
     console.log('=======================================================');
   } finally {
+    console.log('\n--- CLEANUP: Restoring admin profile and removing temporary test files ---');
+    try {
+      await sql`
+        UPDATE profiles 
+        SET avatar_url = ${initialAvatar}, 
+            cover_url = ${initialCover}, 
+            headline = ${initialHeadline} 
+        WHERE LOWER(email) = 'admin@creatorin.my.id'
+      `;
+      console.log('✅ PostgreSQL profiles table restored to authentic admin profile values.');
+    } catch (restoreErr) {
+      console.error('⚠️ Failed to restore admin profile in DB:', restoreErr);
+    }
+
+    try {
+      if (fs.existsSync(avatarFilePath)) fs.unlinkSync(avatarFilePath);
+      if (fs.existsSync(bannerFilePath)) fs.unlinkSync(bannerFilePath);
+      console.log('✅ Temporary test image files safely removed from disk.');
+    } catch (unlinkErr) {
+      console.warn('⚠️ Could not remove temporary test image files:', unlinkErr);
+    }
+
     await sql.end();
   }
 }

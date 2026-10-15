@@ -235,6 +235,9 @@ export function CreatorSidebar() {
             <img
               src={user?.avatar || '/creatorin/avatar.png'}
               alt={user?.name || 'Avatar'}
+              onError={(e) => {
+                (e.currentTarget as HTMLImageElement).src = '/creatorin/avatar.png';
+              }}
               className="h-9 w-9 rounded-full border border-[#E1E3EA] object-cover"
             />
           </Link>

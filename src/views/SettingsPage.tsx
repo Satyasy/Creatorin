@@ -344,6 +344,9 @@ export const SettingsPage: React.FC = () => {
                     <img
                       src={user.coverUrl}
                       alt="Background Sampul"
+                      onError={(e) => {
+                        (e.currentTarget as HTMLImageElement).src = 'https://images.unsplash.com/photo-1579546929518-9e396f3cc809?w=1200';
+                      }}
                       className="w-full h-full object-cover transition duration-300 group-hover:scale-102"
                     />
                   ) : (
@@ -399,6 +402,9 @@ export const SettingsPage: React.FC = () => {
                   <img
                     src={user?.avatar || '/creatorin/avatar.png'}
                     alt={fullName}
+                    onError={(e) => {
+                      (e.currentTarget as HTMLImageElement).src = '/creatorin/avatar.png';
+                    }}
                     className="w-20 h-20 rounded-full object-cover ring-4 ring-neutral-100 group-hover:ring-blue-400 transition"
                   />
                   <div className="absolute inset-0 rounded-full bg-black/40 opacity-0 group-hover:opacity-100 transition flex flex-col items-center justify-center text-white text-[10px] font-semibold cursor-pointer">

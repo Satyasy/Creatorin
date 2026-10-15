@@ -725,6 +725,9 @@ export const CreatorProfilePage: React.FC<CreatorProfilePageProps> = ({
             <img
               src={creatorBannerColor}
               alt="Profile Cover Banner"
+              onError={() => {
+                setCreatorBannerColor('linear-gradient(135deg, #0B1F3A 0%, #155DFC 100%)');
+              }}
               className="absolute inset-0 w-full h-full object-cover"
             />
           )}
@@ -794,8 +797,11 @@ export const CreatorProfilePage: React.FC<CreatorProfilePageProps> = ({
           <div className="relative inline-block self-start group">
             <div className="size-[144px] rounded-full bg-white p-1.5 shadow-[0_20px_25px_-5px_rgba(0,0,0,0.08),0_8px_10px_-6px_rgba(0,0,0,0.08)] ring-1 ring-neutral-900/5">
               <img
-                src={creatorAvatar}
+                src={creatorAvatar || '/creatorin/avatar.png'}
                 alt={creatorName}
+                onError={(e) => {
+                  (e.currentTarget as HTMLImageElement).src = '/creatorin/avatar.png';
+                }}
                 className="w-full h-full rounded-full object-cover"
               />
             </div>

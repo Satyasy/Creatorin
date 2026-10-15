@@ -717,6 +717,9 @@ export const UmkmProfilePage: React.FC<UmkmProfilePageProps> = ({
             data-testid="umkm-banner-image"
             src={profile.coverBanner || currentUser?.coverUrl || 'https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=1200'}
             alt={profile.brandName}
+            onError={(e) => {
+              (e.currentTarget as HTMLImageElement).src = 'https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=1200';
+            }}
             className="w-full h-full object-cover"
           />
           {isUmkmOwner && isEditModeActive && (
@@ -740,6 +743,9 @@ export const UmkmProfilePage: React.FC<UmkmProfilePageProps> = ({
               <img
                 src={profile.logo || currentUser?.avatar || 'https://images.unsplash.com/photo-1559496417-e7f25cb247f3?w=150'}
                 alt={profile.brandName}
+                onError={(e) => {
+                  (e.currentTarget as HTMLImageElement).src = 'https://images.unsplash.com/photo-1559496417-e7f25cb247f3?w=150';
+                }}
                 className="w-full h-full rounded-full object-cover"
               />
               {isUmkmOwner && isEditModeActive && (

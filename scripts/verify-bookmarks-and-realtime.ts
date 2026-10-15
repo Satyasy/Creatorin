@@ -3,6 +3,8 @@
  * Automated persistence verification for Bookmarks, Chat Read Receipts, and Banner Persistence.
  */
 import postgres from "postgres";
+import fs from "fs";
+import path from "path";
 import { signJwtToken } from "../src/lib/auth-local.js";
 
 const DATABASE_URL = process.env.DATABASE_URL || "postgres://creatorin_user:creatorin_secure_2026@localhost:5432/creatorin_db";
@@ -42,6 +44,25 @@ async function main() {
   console.log("=============================================================\n");
 
   const sql = postgres(DATABASE_URL);
+
+  // Record initial creator cover
+  const [initialCreator] = await sql`SELECT cover_url FROM profiles WHERE id = ${CREATOR_ID}`;
+  const initialCreatorCover = initialCreator?.cover_url || "linear-gradient(135deg, #0B1F3A 0%, #155DFC 100%)";
+
+  // Create physical banner file so Nginx never returns 404
+  const uploadsDir = "/var/www/creatorin/shared/uploads/avatars";
+  if (!fs.existsSync(uploadsDir)) {
+    fs.mkdirSync(uploadsDir, { recursive: true });
+  }
+  const bannerFilename = "test-banner-persistent-2026.png";
+  const bannerFilePath = path.join(uploadsDir, bannerFilename);
+  const sampleImage = "/var/www/creatorin/repo/public/creatorin/avatar.png";
+  if (fs.existsSync(sampleImage)) {
+    fs.copyFileSync(sampleImage, bannerFilePath);
+  } else {
+    const dummyPng = Buffer.from("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=", "base64");
+    fs.writeFileSync(bannerFilePath, dummyPng);
+  }
 
   const creatorToken = await signJwtToken({
     id: CREATOR_ID,
@@ -190,6 +211,21 @@ async function main() {
       process.exit(1);
     }
   } finally {
+    console.log("\n--- CLEANUP: Restoring creator coverUrl and cleaning up temporary test files ---");
+    try {
+      await sql`UPDATE profiles SET cover_url = ${initialCreatorCover} WHERE id = ${CREATOR_ID}`;
+      console.log("✅ Creator coverUrl restored in PostgreSQL.");
+    } catch (e) {
+      console.error("⚠️ Failed to restore creator coverUrl:", e);
+    }
+
+    try {
+      if (fs.existsSync(bannerFilePath)) fs.unlinkSync(bannerFilePath);
+      console.log("✅ Temporary test banner unlinked from disk.");
+    } catch (e) {
+      console.warn("⚠️ Could not unlink temporary test banner:", e);
+    }
+
     await sql.end();
   }
 }

@@ -418,6 +418,9 @@ export const Navbar: React.FC<NavbarProps> = ({
                     <img
                       src={currentUser.avatar || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100&auto=format&fit=crop&q=80'}
                       alt={currentUser.name}
+                      onError={(e) => {
+                        (e.currentTarget as HTMLImageElement).src = '/creatorin/avatar.png';
+                      }}
                       className="w-8 h-8 sm:w-9 sm:h-9 rounded-full object-cover ring-1 ring-black/10 group-hover:ring-2 group-hover:ring-[#155DFC] transition-all"
                     />
                   </div>
@@ -637,6 +640,9 @@ export const Navbar: React.FC<NavbarProps> = ({
                   <img
                     src={currentUser.avatar || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100&auto=format&fit=crop&q=80'}
                     alt={currentUser.name}
+                    onError={(e) => {
+                      (e.currentTarget as HTMLImageElement).src = '/creatorin/avatar.png';
+                    }}
                     className="w-10 h-10 rounded-full object-cover ring-1 ring-black/10 shrink-0"
                   />
                   <div className="min-w-0">
