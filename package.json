@@ -18,6 +18,7 @@
     "test:admin-profile": "DOTENV_CONFIG_PATH=.env.local tsx -r dotenv/config scripts/verify-admin-profile-and-seeder.ts",
     "test:demo-wallet": "DOTENV_CONFIG_PATH=.env.local tsx -r dotenv/config scripts/test-demo-and-wallet.ts",
     "test:bookmarks-realtime": "DOTENV_CONFIG_PATH=.env.local tsx -r dotenv/config scripts/verify-bookmarks-and-realtime.ts",
+    "test:chat-realtime-ai": "DOTENV_CONFIG_PATH=.env.local tsx -r dotenv/config scripts/verify-chat-realtime-and-ai-summary.ts",
     "test:creator-dashboard": "node scripts/verify-creator-dashboard.mjs",
     "test:explore": "node scripts/verify-explore.mjs",
     "db:seed": "node scripts/seed-database.mjs",

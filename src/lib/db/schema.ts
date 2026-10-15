@@ -215,6 +215,8 @@ export const conversations = pgTable("conversations", {
   participant2Id: uuid("participant_2_id").references(() => profiles.id, { onDelete: "cascade" }).notNull(),
   lastMessage: text("last_message"),
   lastMessageTime: timestamp("last_message_time").defaultNow(),
+  aiSummary: jsonb("ai_summary").$type<Record<string, any>>(),
+  aiSummaryUpdatedAt: timestamp("ai_summary_updated_at"),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
 
@@ -255,6 +257,8 @@ export const collaborationRooms = pgTable("collaboration_rooms", {
   businessId: uuid("business_id").references(() => profiles.id, { onDelete: "cascade" }).notNull(),
   title: text("title").notNull(),
   briefSummary: text("brief_summary").notNull(),
+  aiSummary: jsonb("ai_summary").$type<Record<string, any>>(),
+  aiSummaryUpdatedAt: timestamp("ai_summary_updated_at"),
   deadline: timestamp("deadline"),
   status: roomStatusEnum("status").default("in_progress").notNull(),
   approvedAt: timestamp("approved_at"),

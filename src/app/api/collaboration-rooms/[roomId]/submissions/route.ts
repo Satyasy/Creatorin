@@ -70,6 +70,27 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ roo
       linkUrl: `/chat`,
     });
 
+    // Broadcast Real-time event via Redis
+    try {
+      const { invoices } = await import("@/lib/db/schema");
+      const { publishChatEvent } = await import("@/lib/redis");
+      const [inv] = await db
+        .select({ conversationId: invoices.conversationId })
+        .from(invoices)
+        .where(eq(invoices.id, room.invoiceId))
+        .limit(1);
+      if (inv?.conversationId) {
+        await publishChatEvent(`chat:${inv.conversationId}`, {
+          type: "NEW_SUBMISSION",
+          roomId,
+          conversationId: inv.conversationId,
+          submission: newSubmission,
+        });
+      }
+    } catch (pubErr) {
+      console.warn("[Redis] Submission publish notice:", pubErr);
+    }
+
     return NextResponse.json({ success: true, submission: newSubmission });
   } catch (err: any) {
     return NextResponse.json({ error: err.message }, { status: 500 });

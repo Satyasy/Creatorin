@@ -15,13 +15,15 @@ import {
   Coins, 
   RefreshCw, 
   FileText,
-  Star
+  Star,
+  ListChecks
 } from 'lucide-react';
 import { AuthState, ChatConversation, ChatInvoice } from '@/types';
 import { formatCoin } from '@/lib/coin';
 import { useToast } from '@/providers/ToastProvider';
 import { useConfirmModal } from '@/providers/ConfirmModalProvider';
 import { useSuccessModal } from '@/providers/SuccessModalProvider';
+import { aiSummarizeService } from '@/services/aiSummarizeService';
 
 interface DeliverableItem {
   id: string;
@@ -103,48 +105,56 @@ export const CollaborationRoomView: React.FC<CollaborationRoomViewProps> = ({
     setTimeout(() => setToastMessage(null), 3500);
   };
 
+  // AI Summary State in Collaboration Room
+  const [collabSummary, setCollabSummary] = useState<any>(roomData?.aiSummary || conversation?.aiSummary || null);
+  const [isSummarizingCollab, setIsSummarizingCollab] = useState(false);
+
   // Fetch live collaboration room data from backend
   const fetchRoomData = async () => {
-    if (!invoice?.id) return;
     setLoading(true);
     try {
-      const res = await fetch(`/api/collaboration-rooms/by-invoice/${invoice.id}`);
+      const endpoint = invoice?.id
+        ? `/api/collaboration-rooms/by-invoice/${invoice.id}`
+        : conversation?.id
+          ? `/api/collaboration-rooms/by-conversation/${conversation.id}`
+          : null;
+
+      if (!endpoint) return;
+
+      const res = await fetch(endpoint);
       if (res.ok) {
         const data = await res.json();
-        setRoomData(data.room);
-        
-        const mappedSubs: DeliverableItem[] = (data.submissions || []).map((s: any) => ({
-          id: s.id,
-          version: s.version,
-          title: `Hasil Karya Versi ${s.version}`,
-          url: s.fileUrls && s.fileUrls[0] ? s.fileUrls[0] : undefined,
-          notes: s.notes || undefined,
-          submittedAt: new Date(s.submittedAt).toLocaleDateString('id-ID', { hour: '2-digit', minute: '2-digit' }),
-          status: s.status,
-          revisionNote: data.revisions?.find((r: any) => r.submissionId === s.id)?.feedback,
-        }));
-        
-        setSubmissionsList(mappedSubs);
-        setCurrentStep(computeStep(data.room.status, mappedSubs));
-        
-        const revCount = data.revisions?.length || 0;
-        setRemainingRevisions(Math.max(0, 2 - revCount));
-      } else {
-        // Fallback default sample if not yet created in DB
-        setSubmissionsList([
-          {
-            id: 'del-1',
-            version: 1,
-            title: 'Draft Awal Pengerjaan Konten',
-            url: 'https://creatorin.my.id/preview/draft-v1',
-            notes: 'Draft versi 1 mencakup hook pembuka dan visual storytelling sesuai arahan brief.',
-            submittedAt: 'Baru saja',
-            status: 'pending'
+        if (data.room) {
+          setRoomData(data.room);
+          if (data.room.aiSummary) {
+            setCollabSummary(data.room.aiSummary);
+          } else if (conversation?.aiSummary) {
+            setCollabSummary(conversation.aiSummary);
           }
-        ]);
+          
+          const mappedSubs: DeliverableItem[] = (data.submissions || []).map((s: any) => ({
+            id: s.id,
+            version: s.version,
+            title: s.notes?.split(':')[0] || `Hasil Karya Versi ${s.version}`,
+            url: s.fileUrls && s.fileUrls[0] ? s.fileUrls[0] : undefined,
+            notes: s.notes || undefined,
+            submittedAt: new Date(s.submittedAt).toLocaleDateString('id-ID', { hour: '2-digit', minute: '2-digit' }),
+            status: s.status,
+            revisionNote: data.revisions?.find((r: any) => r.submissionId === s.id)?.feedback,
+          }));
+          
+          setSubmissionsList(mappedSubs);
+          setCurrentStep(computeStep(data.room.status, mappedSubs));
+          
+          const revCount = data.revisions?.length || 0;
+          setRemainingRevisions(Math.max(0, 2 - revCount));
+        } else {
+          setRoomData(null);
+          setSubmissionsList([]);
+        }
       }
-    } catch {
-      // Fallback
+    } catch (e) {
+      console.warn('Gagal memuat ruang kolaborasi:', e);
     } finally {
       setLoading(false);
     }
@@ -152,53 +162,117 @@ export const CollaborationRoomView: React.FC<CollaborationRoomViewProps> = ({
 
   useEffect(() => {
     fetchRoomData();
-  }, [invoice?.id]);
+  }, [invoice?.id, conversation?.id]);
+
+  // Perbarui Ringkasan AI dari ruang kolaborasi
+  const handleRefreshCollabSummary = async () => {
+    setIsSummarizingCollab(true);
+    try {
+      const messages = (conversation?.messages || []).map(m => ({
+        sender: m.isSelf ? (isCreator ? conversation.name : 'Anda (UMKM)') : (isCreator ? 'UMKM' : conversation.name),
+        text: m.text,
+        time: m.timestamp,
+      }));
+
+      const data = await aiSummarizeService.summarizeConversation({
+        roomId: roomData?.id,
+        conversationId: conversation?.id,
+        projectTitle: projectTitle,
+        creatorName: isCreator ? (currentUser?.name || 'Kreator') : conversation.name,
+        businessBrand: isCreator ? conversation.name : (currentUser?.name || 'UMKM Brand'),
+        messages,
+      });
+
+      if (data) {
+        setCollabSummary(data);
+        showGlobalToast({
+          type: 'success',
+          title: 'Ringkasan Diperbarui',
+          message: 'Ringkasan AI & Poin Kesepakatan berhasil disinkronkan ke database server.',
+        });
+      }
+    } catch {
+      showGlobalToast({
+        type: 'error',
+        title: 'Gagal Memperbarui',
+        message: 'Gagal memperbarui ringkasan AI dari obrolan.',
+      });
+    } finally {
+      setIsSummarizingCollab(false);
+    }
+  };
 
   // Kreator mengunggah hasil karya
   const handleSubmitDeliverable = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newDeliverableTitle.trim()) return;
 
+    // Pastikan roomData sudah teridentifikasi di database
+    let targetRoomId = roomData?.id;
+    if (!targetRoomId && conversation?.id) {
+      try {
+        const checkRes = await fetch(`/api/collaboration-rooms/by-conversation/${conversation.id}`);
+        if (checkRes.ok) {
+          const checkData = await checkRes.json();
+          if (checkData.room?.id) {
+            targetRoomId = checkData.room.id;
+            setRoomData(checkData.room);
+          }
+        }
+      } catch {}
+    }
+
+    if (!targetRoomId) {
+      showGlobalToast({
+        type: 'error',
+        title: 'Ruang Kolaborasi Belum Aktif',
+        message: 'Tidak dapat menyimpan hasil karya karena ruang kolaborasi belum terdaftar di database server. Pastikan invoice telah dibayar.',
+      });
+      return;
+    }
+
     setIsSubmittingWork(true);
     try {
-      if (roomData?.id) {
-        const res = await fetch(`/api/collaboration-rooms/${roomData.id}/submissions`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            title: newDeliverableTitle,
-            notes: newDeliverableNotes,
-            fileUrls: newDeliverableUrl ? [newDeliverableUrl] : [],
-          }),
-        });
-        const data = await res.json();
-        if (!res.ok) throw new Error(data.error || 'Gagal mengunggah hasil karya');
+      const res = await fetch(`/api/collaboration-rooms/${targetRoomId}/submissions`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          title: newDeliverableTitle,
+          notes: newDeliverableNotes,
+          fileUrls: newDeliverableUrl ? [newDeliverableUrl] : [],
+        }),
+      });
+
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error || 'Gagal mengunggah hasil karya ke server');
       }
 
-      const nextVer = submissionsList.length + 1;
+      const serverSub = data.submission;
+      const nextVer = serverSub?.version || (submissionsList.length + 1);
       const newItem: DeliverableItem = {
-        id: `del-${Date.now()}`,
+        id: serverSub?.id || `del-${Date.now()}`,
         version: nextVer,
         title: newDeliverableTitle,
         url: newDeliverableUrl || undefined,
         notes: newDeliverableNotes || undefined,
-        submittedAt: 'Baru saja',
+        submittedAt: new Date().toLocaleDateString('id-ID', { hour: '2-digit', minute: '2-digit' }),
         status: 'pending'
       };
 
-      setSubmissionsList(prev => [newItem, ...prev]);
+      setSubmissionsList(prev => [newItem, ...prev.filter(s => s.id !== newItem.id)]);
       setCurrentStep(3); // Masuk ke tahap tinjauan
       setNewDeliverableTitle('');
       setNewDeliverableUrl('');
       setNewDeliverableNotes('');
       showSuccessModal({
         title: 'Hasil Karya Berhasil Dikirim!',
-        message: `Hasil karya versi ${nextVer} berhasil dikirim ke UMKM untuk ditinjau.`,
+        message: `Hasil karya versi ${nextVer} berhasil tersimpan di server dan dikirim ke UMKM untuk ditinjau.`,
         duration: 3000,
       });
 
       if (onSendChatMessage) {
-        onSendChatMessage(`[Collaboration Room] Kreator telah mengunggah hasil karya versi ${nextVer}: "${newItem.title}". Silakan tinjau di Collaboration Room.`);
+        onSendChatMessage(`[Collaboration Room] Kreator telah mengunggah hasil karya versi ${nextVer}: "${newItem.title}". Silakan periksa di Ruang Kolaborasi.`);
       }
     } catch (err: any) {
       showGlobalToast({
@@ -637,6 +711,119 @@ export const CollaborationRoomView: React.FC<CollaborationRoomViewProps> = ({
             )}
           </div>
         )}
+
+        {/* KARTU RINGKASAN AI & POIN KESEPAKATAN PROYEK */}
+        <div className="bg-white rounded-2xl border border-neutral-200/80 p-5 shadow-2xs space-y-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2.5">
+              <div className="w-8 h-8 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center shrink-0 border border-blue-100">
+                <Sparkles className="w-4 h-4 text-blue-600" />
+              </div>
+              <div>
+                <h2 className="text-sm font-bold text-neutral-900">
+                  Ringkasan AI & Poin Kesepakatan Proyek
+                </h2>
+                <p className="text-[11px] text-neutral-500">
+                  Analisis otomatis dari percakapan obrolan nyata • Tersimpan di Server
+                </p>
+              </div>
+            </div>
+
+            <button
+              type="button"
+              onClick={handleRefreshCollabSummary}
+              disabled={isSummarizingCollab}
+              className="text-xs font-semibold px-3 py-1.5 rounded-lg border border-neutral-200 hover:bg-neutral-50 text-neutral-700 flex items-center gap-1.5 transition cursor-pointer disabled:opacity-50"
+              title="Perbarui ringkasan dari obrolan terkini"
+            >
+              <RefreshCw className={`w-3.5 h-3.5 ${isSummarizingCollab ? 'animate-spin text-blue-600' : ''}`} />
+              <span>{isSummarizingCollab ? 'Menganalisis...' : 'Sinkronkan AI'}</span>
+            </button>
+          </div>
+
+          {collabSummary ? (
+            <div className="space-y-3.5 pt-1">
+              {/* Executive Summary */}
+              <div className="p-3.5 rounded-xl bg-neutral-50/90 border border-neutral-200/70 text-neutral-800 text-xs leading-relaxed">
+                <span className="font-bold text-[10px] text-neutral-500 uppercase tracking-wider block mb-1">
+                  Status Kesepakatan
+                </span>
+                {collabSummary.executiveSummary}
+              </div>
+
+              {/* Grid 2 Kolom: Poin Kesepakatan & Tindak Lanjut */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                {/* Poin Kesepakatan */}
+                <div className="p-3.5 rounded-xl border border-neutral-100 bg-neutral-50/50 space-y-2">
+                  <span className="text-xs font-bold text-neutral-800 flex items-center gap-1.5">
+                    <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                    Poin yang Disepakati
+                  </span>
+                  <ul className="space-y-1.5 pl-0.5">
+                    {collabSummary.agreements && collabSummary.agreements.length > 0 ? (
+                      collabSummary.agreements.map((agr: string, idx: number) => (
+                        <li key={idx} className="text-xs text-neutral-600 flex items-start gap-1.5 leading-snug">
+                          <span className="text-blue-500 font-bold">•</span>
+                          <span>{agr}</span>
+                        </li>
+                      ))
+                    ) : (
+                      <li className="text-xs text-neutral-400">Belum ada kesepakatan tercatat.</li>
+                    )}
+                  </ul>
+                </div>
+
+                {/* Tindak Lanjut */}
+                <div className="p-3.5 rounded-xl border border-neutral-100 bg-neutral-50/50 space-y-2">
+                  <span className="text-xs font-bold text-neutral-800 flex items-center gap-1.5">
+                    <ListChecks className="w-4 h-4 text-blue-600 shrink-0" />
+                    Tindak Lanjut Terdekat
+                  </span>
+                  <div className="space-y-1.5">
+                    {collabSummary.actionItems && collabSummary.actionItems.length > 0 ? (
+                      collabSummary.actionItems.map((item: any, idx: number) => (
+                        <div key={idx} className="text-xs bg-white p-2 rounded-lg border border-neutral-200/60 flex items-center justify-between gap-2">
+                          <span className="text-neutral-800 font-medium truncate">{item.task}</span>
+                          <span className="text-[10px] px-2 py-0.5 rounded-md bg-blue-50 text-blue-700 font-semibold shrink-0">
+                            {item.assignee}
+                          </span>
+                        </div>
+                      ))
+                    ) : (
+                      <p className="text-xs text-neutral-400">Belum ada langkah tindak lanjut.</p>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              {/* Catatan Revisi Aktif jika ada */}
+              {collabSummary.lastRevisionNotes && (
+                <div className="p-3 rounded-xl bg-amber-50 border border-amber-200/70 text-xs text-amber-900 flex items-start gap-2">
+                  <AlertCircle className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
+                  <div>
+                    <strong className="block text-[11px] font-bold">Catatan Penyesuaian Terakhir:</strong>
+                    <span>{collabSummary.lastRevisionNotes}</span>
+                  </div>
+                </div>
+              )}
+            </div>
+          ) : (
+            <div className="p-4 rounded-xl bg-neutral-50 border border-neutral-100 text-center py-6">
+              <p className="text-xs text-neutral-500 mb-2">
+                Ringkasan AI belum dibuat untuk proyek ini. Klik tombol di bawah untuk menganalisis obrolan.
+              </p>
+              <button
+                type="button"
+                onClick={handleRefreshCollabSummary}
+                disabled={isSummarizingCollab}
+                className="px-3.5 py-1.5 rounded-lg bg-[#0B1F3A] text-white text-xs font-semibold hover:bg-[#123B8C] transition inline-flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
+              >
+                <Sparkles className="w-3.5 h-3.5 text-amber-300" />
+                <span>{isSummarizingCollab ? 'Menganalisis...' : 'Analisis Obrolan Sekarang'}</span>
+              </button>
+            </div>
+          )}
+        </div>
 
         {/* Daftar Hasil Karya / Deliverables History */}
         <div className="bg-white rounded-2xl border border-neutral-200/80 p-5 shadow-2xs space-y-4">

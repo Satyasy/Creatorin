@@ -123,6 +123,8 @@ export const chatService = {
           lastMessageTime: new Date(c.lastMessageTime || c.updatedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
           unreadCount: 0,
           messages: [],
+          aiSummary: c.aiSummary || undefined,
+          aiSummaryUpdatedAt: c.aiSummaryUpdatedAt || undefined,
         };
       });
 
@@ -463,9 +465,42 @@ export const chatService = {
     }
   },
 
+  async getCollaborationRoomByConversation(conversationId: string): Promise<{
+    room?: any;
+    invoice?: any;
+    submissions?: any[];
+    revisions?: any[];
+    creator?: any;
+    business?: any;
+    myRole?: 'creator' | 'umkm';
+    error?: string;
+  }> {
+    if (!conversationId || conversationId.startsWith('conv-')) {
+      return {};
+    }
+    try {
+      const res = await fetch(`/api/collaboration-rooms/by-conversation/${encodeURIComponent(conversationId)}`, {
+        cache: 'no-store',
+      });
+      if (!res.ok) return {};
+      return await res.json();
+    } catch {
+      return {};
+    }
+  },
+
   subscribeToMessages(
     conversationId: string,
-    onEvent: (event: { type: 'NEW_MESSAGE' | 'MESSAGES_READ' | 'POLL_SYNC'; message?: any; readBy?: string; messageIds?: string[]; messages?: any[] }) => void
+    onEvent: (event: {
+      type: 'NEW_MESSAGE' | 'MESSAGES_READ' | 'POLL_SYNC' | 'AI_SUMMARY_UPDATED' | 'NEW_SUBMISSION';
+      message?: any;
+      readBy?: string;
+      messageIds?: string[];
+      messages?: any[];
+      summary?: any;
+      submission?: any;
+      roomId?: string;
+    }) => void
   ): () => void {
     if (!conversationId || conversationId.startsWith('conv-')) {
       return () => {};

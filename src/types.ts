@@ -414,6 +414,15 @@ export interface ChatConversation {
   messages: ChatMessage[];
   category?: string;
   rate?: string;
+  aiSummary?: {
+    executiveSummary: string;
+    agreements: string[];
+    actionItems: { task: string; assignee: string; status: 'pending' | 'in_progress' | 'completed' }[];
+    lastRevisionNotes?: string;
+    modelUsed: string;
+    generatedAt: string;
+  };
+  aiSummaryUpdatedAt?: string;
 }
 
 // ==========================================

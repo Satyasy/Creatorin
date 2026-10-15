@@ -2,7 +2,8 @@ import { SummarizeResponseData } from '@/app/api/ai/summarize/route';
 import { apiUrl } from '@/lib/api-config';
 
 export interface SummarizeParams {
-  roomId: string;
+  roomId?: string;
+  conversationId?: string;
   projectTitle: string;
   creatorName: string;
   businessBrand: string;
@@ -10,13 +11,40 @@ export interface SummarizeParams {
 }
 
 export const aiSummarizeService = {
+  async getStoredSummary(conversationId?: string, roomId?: string): Promise<SummarizeResponseData | null> {
+    try {
+      const query = new URLSearchParams();
+      if (conversationId) query.set('conversationId', conversationId);
+      if (roomId) query.set('roomId', roomId);
+
+      const res = await fetch(apiUrl(`/api/ai/summarize?${query.toString()}`), {
+        credentials: 'include',
+        cache: 'no-store',
+      });
+      if (res.ok) {
+        const json = await res.json();
+        if (json.success && json.data) {
+          return json.data;
+        }
+      }
+      return null;
+    } catch {
+      return null;
+    }
+  },
+
   async summarizeConversation(params: SummarizeParams): Promise<SummarizeResponseData> {
     try {
+      const payload = {
+        ...params,
+        conversationId: params.conversationId || params.roomId,
+      };
+
       const res = await fetch(apiUrl('/api/ai/summarize'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
-        body: JSON.stringify(params),
+        body: JSON.stringify(payload),
       });
 
       if (res.ok) {

@@ -1,4 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { getDb } from '@/lib/db';
+import { conversations, collaborationRooms, invoices } from '@/lib/db/schema';
+import { eq, or } from 'drizzle-orm';
+import { publishChatEvent } from '@/lib/redis';
+import { getAuthenticatedUser } from '@/lib/api-auth';
 
 export interface SummarizeResponseData {
   executiveSummary: string;
@@ -160,16 +165,80 @@ function extractDynamicSummary(
   };
 }
 
+export async function GET(request: NextRequest) {
+  try {
+    const user = await getAuthenticatedUser(request);
+    if (!user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    const { searchParams } = new URL(request.url);
+    const conversationId = searchParams.get('conversationId');
+    const roomId = searchParams.get('roomId');
+
+    const db = getDb();
+    if (!db) {
+      return NextResponse.json({ error: 'Database not connected' }, { status: 503 });
+    }
+
+    if (conversationId && conversationId.match(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i)) {
+      const [conv] = await db
+        .select({
+          aiSummary: conversations.aiSummary,
+          aiSummaryUpdatedAt: conversations.aiSummaryUpdatedAt,
+        })
+        .from(conversations)
+        .where(eq(conversations.id, conversationId))
+        .limit(1);
+
+      if (conv?.aiSummary) {
+        return NextResponse.json({
+          success: true,
+          data: conv.aiSummary,
+          updatedAt: conv.aiSummaryUpdatedAt,
+        });
+      }
+    }
+
+    if (roomId && roomId.match(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i)) {
+      const [room] = await db
+        .select({
+          aiSummary: collaborationRooms.aiSummary,
+          aiSummaryUpdatedAt: collaborationRooms.aiSummaryUpdatedAt,
+          briefSummary: collaborationRooms.briefSummary,
+        })
+        .from(collaborationRooms)
+        .where(eq(collaborationRooms.id, roomId))
+        .limit(1);
+
+      if (room?.aiSummary) {
+        return NextResponse.json({
+          success: true,
+          data: room.aiSummary,
+          updatedAt: room.aiSummaryUpdatedAt,
+          briefSummary: room.briefSummary,
+        });
+      }
+    }
+
+    return NextResponse.json({ success: false, error: 'Belum ada ringkasan yang tersimpan' }, { status: 404 });
+  } catch (error: any) {
+    return NextResponse.json({ error: error.message }, { status: 500 });
+  }
+}
+
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
     const { 
+      conversationId,
       roomId, 
       projectTitle = 'Diskusi Kolaborasi Proyek', 
       creatorName = 'Kreator', 
       businessBrand = 'UMKM Brand',
       messages = [] 
     } = body as {
+      conversationId?: string;
       roomId?: string;
       projectTitle?: string;
       creatorName?: string;
@@ -177,6 +246,7 @@ export async function POST(request: NextRequest) {
       messages?: Array<{ sender: string; text: string; time?: string; role?: string }>;
     };
 
+    let finalSummary: SummarizeResponseData | null = null;
     const geminiKey = process.env.GEMINI_API_KEY;
 
     // Jika GEMINI_API_KEY tersedia dan ada pesan, gunakan Gemini LLM untuk penalaran ekstra mendalam
@@ -211,14 +281,11 @@ ${transcript}`;
           const textResponse = aiData.candidates?.[0]?.content?.parts?.[0]?.text;
           if (textResponse) {
             const parsed = JSON.parse(textResponse);
-            return NextResponse.json({
-              success: true,
-              data: {
-                ...parsed,
-                modelUsed: 'Google Gemini AI (Real-time Context)',
-                generatedAt: new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) + ' WIB'
-              }
-            });
+            finalSummary = {
+              ...parsed,
+              modelUsed: 'Google Gemini AI (Real-time Context)',
+              generatedAt: new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) + ' WIB'
+            };
           }
         }
       } catch (geminiError) {
@@ -226,12 +293,69 @@ ${transcript}`;
       }
     }
 
-    // Default: Dynamic Extractive NLP yang 100% membaca chat nyata dan bebas halusinasi
-    const dynamicResult = extractDynamicSummary(messages, projectTitle, creatorName, businessBrand);
+    if (!finalSummary) {
+      // Default: Dynamic Extractive NLP yang 100% membaca chat nyata dan bebas halusinasi
+      finalSummary = extractDynamicSummary(messages, projectTitle, creatorName, businessBrand);
+    }
+
+    // SIMPAN PERSISTEN KE DATABASE POSTGRESQL (Conversations & CollaborationRooms)
+    const targetConvId = conversationId || (roomId && roomId.match(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i) ? roomId : undefined);
+    
+    const db = getDb();
+    if (db && targetConvId) {
+      try {
+        // 1. Simpan ke tabel conversations
+        const [updatedConv] = await db
+          .update(conversations)
+          .set({
+            aiSummary: finalSummary,
+            aiSummaryUpdatedAt: new Date(),
+            updatedAt: new Date(),
+          })
+          .where(eq(conversations.id, targetConvId))
+          .returning();
+
+        // 2. Simpan juga ke linked collaboration_rooms jika ada
+        const [linkedRoom] = await db
+          .select({ id: collaborationRooms.id })
+          .from(collaborationRooms)
+          .innerJoin(invoices, eq(collaborationRooms.invoiceId, invoices.id))
+          .where(eq(invoices.conversationId, targetConvId))
+          .limit(1);
+
+        if (linkedRoom) {
+          await db
+            .update(collaborationRooms)
+            .set({
+              aiSummary: finalSummary,
+              aiSummaryUpdatedAt: new Date(),
+            })
+            .where(eq(collaborationRooms.id, linkedRoom.id));
+        } else if (roomId && roomId.match(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i)) {
+          await db
+            .update(collaborationRooms)
+            .set({
+              aiSummary: finalSummary,
+              aiSummaryUpdatedAt: new Date(),
+            })
+            .where(eq(collaborationRooms.id, roomId))
+            .catch(() => {});
+        }
+
+        // 3. Broadcast update real-time via Redis Pub/Sub ke subscriber chat aktif
+        await publishChatEvent(`chat:${targetConvId}`, {
+          type: "AI_SUMMARY_UPDATED",
+          conversationId: targetConvId,
+          summary: finalSummary,
+        });
+      } catch (dbErr) {
+        console.warn('[AI Summarize] Database persistence notice:', dbErr);
+      }
+    }
 
     return NextResponse.json({
       success: true,
-      data: dynamicResult
+      data: finalSummary
     });
   } catch (error: any) {
     console.error('Error in ai summarize route:', error);

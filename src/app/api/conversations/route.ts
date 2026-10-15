@@ -19,6 +19,8 @@ export async function GET(req: NextRequest) {
         participant2Id: conversations.participant2Id,
         lastMessage: conversations.lastMessage,
         lastMessageTime: conversations.lastMessageTime,
+        aiSummary: conversations.aiSummary,
+        aiSummaryUpdatedAt: conversations.aiSummaryUpdatedAt,
         updatedAt: conversations.updatedAt,
       })
       .from(conversations)

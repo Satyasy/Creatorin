@@ -159,12 +159,15 @@ export const ChatPage: React.FC<ChatPageProps> = ({
 
       const data = await aiSummarizeService.summarizeConversation({
         roomId: activeConversation.id,
+        conversationId: activeConversation.id,
         projectTitle: activeConversation.category || 'Diskusi Kolaborasi',
         creatorName: activeConversation.name,
-        businessBrand: 'Anda (UMKM)',
+        businessBrand: isCreatorInRoom ? activeConversation.name : 'Anda (UMKM)',
         messages,
       });
       setChatSummaryData(data);
+      // Sinkronkan ke daftar percakapan aktif di memory
+      setConversations(prev => prev.map(c => c.id === activeConversation.id ? { ...c, aiSummary: data } : c));
     } catch {
       // Fallback
     } finally {
@@ -174,7 +177,20 @@ export const ChatPage: React.FC<ChatPageProps> = ({
 
   useEffect(() => {
     if (activeConversation) {
-      handleGenerateChatSummary();
+      if (activeConversation.aiSummary) {
+        setChatSummaryData(activeConversation.aiSummary);
+      } else {
+        handleGenerateChatSummary();
+      }
+
+      // Auto-fetch active collaboration room & invoice if exists for this conversation
+      if (activeConversation.id && !activeConversation.id.startsWith('conv-')) {
+        chatService.getCollaborationRoomByConversation(activeConversation.id).then(res => {
+          if (res?.invoice) {
+            setActivePaidInvoice(res.invoice);
+          }
+        });
+      }
     }
   }, [activeChatId]);
 
@@ -340,6 +356,16 @@ export const ChatPage: React.FC<ChatPageProps> = ({
           metadata: m.metadata || {},
         }));
         setConversations(prev => prev.map(c => c.id === activeChatId ? { ...c, messages: synced } : c));
+      } else if (event.type === 'AI_SUMMARY_UPDATED' && event.summary) {
+        setChatSummaryData(event.summary);
+        setConversations(prev => prev.map(c => c.id === activeChatId ? { ...c, aiSummary: event.summary } : c));
+      } else if (event.type === 'NEW_SUBMISSION' && event.submission) {
+        // Re-sync collaboration room status
+        chatService.getCollaborationRoomByConversation(activeChatId).then(res => {
+          if (res?.invoice) {
+            setActivePaidInvoice(res.invoice);
+          }
+        });
       }
     });
 
