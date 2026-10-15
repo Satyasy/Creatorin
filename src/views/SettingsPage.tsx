@@ -21,26 +21,35 @@ import {
   Loader2,
   LogOut 
 } from 'lucide-react';
+import { useConfirmModal } from '@/providers/ConfirmModalProvider';
 import { uploadImageWithRetry } from '@/lib/uploadHelper';
 
 export const SettingsPage: React.FC = () => {
   const router = useRouter();
   const { user, refreshUser, logout } = useAuth();
+  const { confirmModal } = useConfirmModal();
   const [isLoggingOut, setIsLoggingOut] = useState(false);
 
   const handleLogout = async () => {
-    if (window.confirm('Apakah Anda yakin ingin keluar dari akun ini?')) {
-      setIsLoggingOut(true);
-      try {
-        await logout();
-        showToast({
-          type: 'info',
-          message: 'Anda telah berhasil keluar dari akun.',
-        });
-        window.location.href = '/';
-      } finally {
-        setIsLoggingOut(false);
-      }
+    const confirmed = await confirmModal({
+      title: 'Konfirmasi Keluar Akun',
+      message: 'Apakah Anda yakin ingin keluar dari akun Creatorin ini?',
+      confirmText: 'Keluar',
+      cancelText: 'Batal',
+      variant: 'danger',
+    });
+    if (!confirmed) return;
+
+    setIsLoggingOut(true);
+    try {
+      await logout();
+      showToast({
+        type: 'info',
+        message: 'Anda telah berhasil keluar dari akun.',
+      });
+      window.location.href = '/';
+    } finally {
+      setIsLoggingOut(false);
     }
   };
 

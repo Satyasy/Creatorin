@@ -309,6 +309,13 @@ async function main() {
   });
 
   await runTest("POST /api/invoices/[id]/pay (Payment -> Auto Create Room)", async () => {
+    // Ensure test business has sufficient wallet balance for payment
+    await request("/api/wallet/topup", {
+      method: "POST",
+      headers: authBusiness,
+      body: JSON.stringify({ amount: 5000 }),
+    }).catch(() => {});
+
     const res = await request(`/api/invoices/${testInvoiceId}/pay`, {
       method: "POST",
       headers: authBusiness,

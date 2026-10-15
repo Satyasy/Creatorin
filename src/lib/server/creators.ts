@@ -13,6 +13,7 @@ export interface CreatorServerData {
     headline: string | null;
     bio: string | null;
     avatarUrl: string | null;
+    coverUrl: string | null;
     location: string | null;
     rating: string | number;
     reviewsCount: number;
@@ -34,6 +35,7 @@ export async function getCreatorServerData(idOrSlug: string): Promise<CreatorSer
         role: profiles.role,
         fullName: profiles.fullName,
         avatarUrl: profiles.avatarUrl,
+        coverUrl: profiles.coverUrl,
         phone: profiles.phone,
         location: profiles.location,
         slug: creatorProfiles.slug,
@@ -135,6 +137,7 @@ export async function getCreatorServerData(idOrSlug: string): Promise<CreatorSer
         headline: rawCreator.headline,
         bio: rawCreator.bio,
         avatarUrl: rawCreator.avatarUrl,
+        coverUrl: rawCreator.coverUrl,
         location: rawCreator.location,
         rating: rawCreator.rating,
         reviewsCount: rawCreator.reviewsCount,

@@ -842,7 +842,11 @@ const DEFAULT_SERVICES: ServiceWithCreator[] = [
       // Arahkan otomatis ke ruang chat
       navigateTo('chat', `/chat?conversationId=${targetConvId}&creatorId=${targetCreatorId}`);
     } catch (err: any) {
-      alert(err.message || 'Gagal mengirim pesan ke kreator.');
+      showToast({
+        type: 'error',
+        title: 'Gagal Mengirim Pesan',
+        message: err?.message || 'Gagal mengirim pesan ke kreator.',
+      });
     } finally {
       setIsSendingInquiry(false);
     }

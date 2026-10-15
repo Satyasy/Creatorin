@@ -7,6 +7,8 @@ import { useAuth } from '@/providers/AuthProvider';
 import { useAuthModal } from '@/providers/AuthModalProvider';
 import { useLanguage } from '@/providers/LanguageProvider';
 import { useToast } from '@/providers/ToastProvider';
+import { useSuccessModal } from '@/providers/SuccessModalProvider';
+import { bookmarkService } from '@/services/bookmarkService';
 import { 
   Search, 
   Play,
@@ -591,8 +593,21 @@ export const ExploreProjectsPage: React.FC<ExploreProjectsPageProps> = ({
   const { user: authUser } = useAuth();
   const { openAuthModal } = useAuthModal();
   const { showToast: showGlobalToast } = useToast();
+  const { showSuccessModal } = useSuccessModal();
   const { t, language } = useLanguage();
   const currentUser = propUser !== undefined ? propUser : authUser;
+
+  useEffect(() => {
+    if (currentUser) {
+      bookmarkService.getBookmarks('project').then(ids => {
+        const map: Record<string, boolean> = {};
+        ids.forEach(id => { map[id] = true; });
+        setSavedPosts(map);
+      }).catch(() => {});
+    } else {
+      setSavedPosts({});
+    }
+  }, [currentUser]);
 
   const getCategoryLabel = (cat: string) => {
     if (cat === 'Semua') return t('category.all', 'Semua');
@@ -773,7 +788,7 @@ export const ExploreProjectsPage: React.FC<ExploreProjectsPageProps> = ({
     }));
   };
 
-  const handleToggleSave = (projId: string, e?: React.MouseEvent) => {
+  const handleToggleSave = async (projId: string, e?: React.MouseEvent) => {
     if (e) e.stopPropagation();
     if (!currentUser) {
       showGlobalToast({
@@ -787,12 +802,40 @@ export const ExploreProjectsPage: React.FC<ExploreProjectsPageProps> = ({
       });
       return;
     }
-    const willSave = !savedPosts[projId];
+    const wasSaved = !!savedPosts[projId];
     setSavedPosts(prev => ({
       ...prev,
-      [projId]: willSave
+      [projId]: !wasSaved
     }));
-    showToast(willSave ? t('toast.savedFavorite', 'Disimpan ke Koleksi Favorit') : t('toast.removedFavorite', 'Dihapus dari Koleksi'));
+
+    try {
+      const res = await bookmarkService.toggleBookmark('project', projId);
+      setSavedPosts(prev => ({
+        ...prev,
+        [projId]: res.bookmarked
+      }));
+      if (res.bookmarked) {
+        showSuccessModal({
+          title: t('toast.savedFavorite', 'Tersimpan ke Favorit'),
+          message: 'Proyek berhasil disimpan ke koleksi favorit Anda.',
+        });
+      } else {
+        showGlobalToast({
+          type: 'info',
+          message: t('toast.removedFavorite', 'Proyek dihapus dari Koleksi Favorit.'),
+        });
+      }
+    } catch (err: any) {
+      setSavedPosts(prev => ({
+        ...prev,
+        [projId]: wasSaved
+      }));
+      showGlobalToast({
+        type: 'error',
+        title: 'Gagal Menyimpan',
+        message: err?.message || 'Gagal memperbarui status simpan proyek.',
+      });
+    }
   };
 
 

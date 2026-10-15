@@ -50,6 +50,8 @@ import { useAuth } from '@/providers/AuthProvider';
 import { creatorService } from '@/services/creatorService';
 import { chatService } from '@/services/chatService';
 import { uploadImageWithRetry } from '@/lib/uploadHelper';
+import { useToast } from '@/providers/ToastProvider';
+import { useSuccessModal } from '@/providers/SuccessModalProvider';
 import { AuthModal } from '@/components/modals/AuthModal';
 import { UMKMProfile, AuthState, ActivePage, ProjectListing, UMKMCompletedCollab, UMKMCreatorReview, Creator } from '@/types';
 import { BriefDetailPage } from '@/views/BriefDetailPage';
@@ -200,25 +202,39 @@ export const UmkmProfilePage: React.FC<UmkmProfilePageProps> = ({
   const coverFileInputRef = React.useRef<HTMLInputElement>(null);
   const logoFileInputRef = React.useRef<HTMLInputElement>(null);
 
+  const { showToast: showGlobalToast } = useToast();
+  const { showSuccessModal } = useSuccessModal();
+
   const handleCoverUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
       try {
         const previewUrl = URL.createObjectURL(file);
         setProfile(prev => ({ ...prev, coverBanner: previewUrl }));
-        showToast('Mengunggah foto sampul brand...');
         const uploadResult = await uploadImageWithRetry(file, 'avatars');
         setProfile(prev => ({ ...prev, coverBanner: uploadResult.url }));
-        await fetch('/api/profile', {
+        const res = await fetch('/api/profile', {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ coverUrl: uploadResult.url }),
         });
+        if (!res.ok) {
+          const errData = await res.json().catch(() => ({}));
+          throw new Error(errData.error || 'Gagal menyimpan foto sampul ke database.');
+        }
         updateUser({ coverUrl: uploadResult.url });
         await refreshUser();
-        showToast('Foto sampul brand berhasil diperbarui!');
+        showSuccessModal({
+          title: 'Foto Sampul Diperbarui',
+          message: 'Foto sampul brand berhasil disimpan ke database.',
+          duration: 2500,
+        });
       } catch (err: any) {
-        showToast(err.message || 'Gagal mengunggah foto sampul.');
+        showGlobalToast({
+          type: 'error',
+          title: 'Gagal Mengunggah Sampul',
+          message: err?.message || 'Gagal mengunggah foto sampul.',
+        });
       }
     }
   };
@@ -229,19 +245,30 @@ export const UmkmProfilePage: React.FC<UmkmProfilePageProps> = ({
       try {
         const previewUrl = URL.createObjectURL(file);
         setProfile(prev => ({ ...prev, logo: previewUrl }));
-        showToast('Mengunggah logo brand...');
         const uploadResult = await uploadImageWithRetry(file, 'avatars');
         setProfile(prev => ({ ...prev, logo: uploadResult.url }));
-        await fetch('/api/profile', {
+        const res = await fetch('/api/profile', {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ avatarUrl: uploadResult.url }),
         });
+        if (!res.ok) {
+          const errData = await res.json().catch(() => ({}));
+          throw new Error(errData.error || 'Gagal menyimpan logo ke database.');
+        }
         updateUser({ avatar: uploadResult.url });
         await refreshUser();
-        showToast('Logo brand berhasil diperbarui!');
+        showSuccessModal({
+          title: 'Logo Brand Diperbarui',
+          message: 'Logo brand berhasil disimpan ke database.',
+          duration: 2500,
+        });
       } catch (err: any) {
-        showToast(err.message || 'Gagal mengunggah logo.');
+        showGlobalToast({
+          type: 'error',
+          title: 'Gagal Mengunggah Logo',
+          message: err?.message || 'Gagal mengunggah logo.',
+        });
       }
     }
   };

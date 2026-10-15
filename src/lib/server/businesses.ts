@@ -11,6 +11,8 @@ export interface BusinessServerData {
     name: string;
     brandName: string;
     logo: string | null;
+    coverUrl: string | null;
+    coverBanner?: string | null;
     location: string | null;
     category: string;
     bio: string | null;
@@ -29,6 +31,8 @@ export async function getBusinessServerData(id: string): Promise<BusinessServerD
         id: profiles.id,
         name: profiles.fullName,
         logo: profiles.avatarUrl,
+        coverUrl: profiles.coverUrl,
+        coverBanner: profiles.coverUrl,
         location: profiles.location,
         brandName: businessProfiles.companyName,
         category: businessProfiles.businessCategory,

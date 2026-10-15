@@ -3,6 +3,7 @@ import { getAuthenticatedUser } from "@/lib/api-auth";
 import { getDb } from "@/lib/db";
 import { messages, conversations, profiles } from "@/lib/db/schema";
 import { eq, asc, and, or } from "drizzle-orm";
+import { publishChatEvent } from "@/lib/redis";
 
 async function canAccessConversation(db: NonNullable<ReturnType<typeof getDb>>, conversationId: string, userId: string) {
   const [room] = await db.select({ id: conversations.id }).from(conversations)
@@ -90,6 +91,13 @@ export async function POST(req: NextRequest) {
         updatedAt: new Date(),
       })
       .where(eq(conversations.id, conversationId));
+
+    // Broadcast via Redis
+    await publishChatEvent(`chat:${conversationId}`, {
+      type: "NEW_MESSAGE",
+      conversationId,
+      message: msg,
+    });
 
     return NextResponse.json({ success: true, message: msg }, { status: 201 });
   } catch (err: any) {

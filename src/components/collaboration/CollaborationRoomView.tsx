@@ -19,6 +19,9 @@ import {
 } from 'lucide-react';
 import { AuthState, ChatConversation, ChatInvoice } from '@/types';
 import { formatCoin } from '@/lib/coin';
+import { useToast } from '@/providers/ToastProvider';
+import { useConfirmModal } from '@/providers/ConfirmModalProvider';
+import { useSuccessModal } from '@/providers/SuccessModalProvider';
 
 interface DeliverableItem {
   id: string;
@@ -90,6 +93,10 @@ export const CollaborationRoomView: React.FC<CollaborationRoomViewProps> = ({
   const [reviewComment, setReviewComment] = useState('');
   const [isSubmittingReview, setIsSubmittingReview] = useState(false);
   const [hasSubmittedReview, setHasSubmittedReview] = useState(false);
+
+  const { showToast: showGlobalToast } = useToast();
+  const { confirmModal } = useConfirmModal();
+  const { showSuccessModal } = useSuccessModal();
 
   const showToast = (msg: string) => {
     setToastMessage(msg);
@@ -184,13 +191,21 @@ export const CollaborationRoomView: React.FC<CollaborationRoomViewProps> = ({
       setNewDeliverableTitle('');
       setNewDeliverableUrl('');
       setNewDeliverableNotes('');
-      showToast(`Hasil karya versi ${nextVer} berhasil dikirim ke UMKM!`);
+      showSuccessModal({
+        title: 'Hasil Karya Berhasil Dikirim!',
+        message: `Hasil karya versi ${nextVer} berhasil dikirim ke UMKM untuk ditinjau.`,
+        duration: 3000,
+      });
 
       if (onSendChatMessage) {
         onSendChatMessage(`[Collaboration Room] Kreator telah mengunggah hasil karya versi ${nextVer}: "${newItem.title}". Silakan tinjau di Collaboration Room.`);
       }
     } catch (err: any) {
-      alert(err.message || 'Gagal mengirim hasil karya');
+      showGlobalToast({
+        type: 'error',
+        title: 'Gagal Mengunggah Berkas',
+        message: err.message || 'Terjadi gangguan saat mengirim hasil karya ke server.',
+      });
     } finally {
       setIsSubmittingWork(false);
     }
@@ -202,7 +217,11 @@ export const CollaborationRoomView: React.FC<CollaborationRoomViewProps> = ({
     if (!revisionFeedback.trim()) return;
 
     if (remainingRevisions <= 0) {
-      alert('Kuota revisi gratis sudah habis. Silakan diskusikan tambahan revisi di ruang obrolan.');
+      showGlobalToast({
+        type: 'warning',
+        title: 'Kuota Revisi Habis',
+        message: 'Kuota revisi gratis sudah habis. Silakan diskusikan kebutuhan penyesuaian di ruang obrolan.',
+      });
       return;
     }
 
@@ -231,7 +250,11 @@ export const CollaborationRoomView: React.FC<CollaborationRoomViewProps> = ({
 
       setCurrentStep(2); // Kembali ke produksi
       setIsRevisionModalOpen(false);
-      showToast('Catatan revisi telah dikirimkan ke Kreator!');
+      showSuccessModal({
+        title: 'Permintaan Revisi Terkirim',
+        message: 'Catatan perbaikan telah diteruskan ke Kreator untuk ditindaklanjuti.',
+        duration: 2500,
+      });
 
       if (onSendChatMessage) {
         onSendChatMessage(`[Collaboration Room] UMKM meminta revisi: "${revisionFeedback}". Sisa kuota revisi: ${remainingRevisions - 1}x.`);
@@ -239,7 +262,11 @@ export const CollaborationRoomView: React.FC<CollaborationRoomViewProps> = ({
 
       setRevisionFeedback('');
     } catch (err: any) {
-      alert(err.message || 'Gagal mengirim revisi');
+      showGlobalToast({
+        type: 'error',
+        title: 'Gagal Mengirim Revisi',
+        message: err.message || 'Terjadi gangguan saat menyampaikan permintaan revisi.',
+      });
     }
   };
 
@@ -270,13 +297,21 @@ export const CollaborationRoomView: React.FC<CollaborationRoomViewProps> = ({
 
       setHasSubmittedReview(true);
       setIsReviewModalOpen(false);
-      showToast('Ulasan dan rating bintang berhasil dikirim!');
+      showSuccessModal({
+        title: 'Ulasan Berhasil Disimpan!',
+        message: 'Terima kasih telah memberikan ulasan dan rating performa untuk kreator.',
+        duration: 3000,
+      });
 
       if (onSendChatMessage) {
         onSendChatMessage(`[Collaboration Room] UMKM telah memberikan ulasan bintang ⭐ ${reviewRating}/5: "${reviewComment.trim()}"`);
       }
     } catch (err: any) {
-      alert(err.message || 'Gagal mengirim ulasan');
+      showGlobalToast({
+        type: 'error',
+        title: 'Gagal Menyimpan Ulasan',
+        message: err.message || 'Terjadi kesalahan saat memproses ulasan Anda.',
+      });
     } finally {
       setIsSubmittingReview(false);
     }
@@ -284,8 +319,14 @@ export const CollaborationRoomView: React.FC<CollaborationRoomViewProps> = ({
 
   // UMKM menyetujui hasil karya & mencairkan escrow
   const handleApproveProject = async () => {
-    const confirmApprove = window.confirm(`Apakah Anda yakin ingin menyetujui hasil karya ini? Setelah disetujui, dana Escrow sebesar 🪙 ${escrowDisplay} akan dicairkan ke saldo Kreator dan proyek dianggap selesai.`);
-    if (!confirmApprove) return;
+    const confirmed = await confirmModal({
+      title: 'Setujui Hasil Karya & Selesaikan Proyek',
+      message: `Apakah Anda yakin ingin menyetujui hasil karya ini? Setelah disetujui, dana Escrow sebesar 🪙 ${escrowDisplay} akan dicairkan ke saldo dompet Kreator dan proyek dianggap selesai.`,
+      confirmText: 'Ya, Setujui & Cairkan',
+      cancelText: 'Periksa Kembali',
+      variant: 'primary',
+    });
+    if (!confirmed) return;
 
     try {
       if (roomData?.id) {
@@ -298,7 +339,11 @@ export const CollaborationRoomView: React.FC<CollaborationRoomViewProps> = ({
 
       setCurrentStep(4);
       setSubmissionsList(prev => prev.map((item, idx) => idx === 0 ? { ...item, status: 'approved' } : item));
-      showToast('Proyek berhasil diselesaikan! Dana Escrow Koin telah dicairkan ke Kreator.');
+      showSuccessModal({
+        title: 'Proyek Selesai & Dana Dicairkan!',
+        message: `Selamat! Hasil karya telah disetujui. Dana Escrow 🪙 ${escrowDisplay} berhasil dicairkan ke saldo Kreator.`,
+        duration: 3500,
+      });
 
       if (onSendChatMessage) {
         onSendChatMessage(`[Collaboration Room] Selamat! UMKM telah MENYETUJUI hasil akhir pengerjaan. Dana Escrow 🪙 ${escrowDisplay} telah berhasil dicairkan.`);
@@ -309,7 +354,11 @@ export const CollaborationRoomView: React.FC<CollaborationRoomViewProps> = ({
         setTimeout(() => setIsReviewModalOpen(true), 600);
       }
     } catch (err: any) {
-      alert(err.message || 'Gagal menyetujui proyek');
+      showGlobalToast({
+        type: 'error',
+        title: 'Gagal Menyetujui Proyek',
+        message: err.message || 'Terjadi kendala saat memproses persetujuan proyek.',
+      });
     }
   };
 

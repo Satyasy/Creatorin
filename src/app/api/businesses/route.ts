@@ -10,6 +10,7 @@ export async function GET(request: NextRequest) {
   try {
     const businesses = await db.select({
       id: profiles.id, name: profiles.fullName, logo: profiles.avatarUrl,
+      coverUrl: profiles.coverUrl, coverBanner: profiles.coverUrl,
       location: profiles.location, brandName: businessProfiles.companyName,
       category: businessProfiles.businessCategory, bio: businessProfiles.description,
       website: businessProfiles.website, createdAt: businessProfiles.createdAt,

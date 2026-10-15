@@ -449,31 +449,72 @@ export const chatService = {
     }
   },
 
-  subscribeToMessages(conversationId: string, onNewMessage: (msg: any) => void) {
+  async markMessagesAsRead(conversationId: string): Promise<boolean> {
+    if (!conversationId || conversationId.startsWith('conv-')) return true;
     try {
-      const supabase = createClient();
-      const channel = supabase
-        .channel(`messages:${conversationId}`)
-        .on(
-          'postgres_changes',
-          {
-            event: 'INSERT',
-            schema: 'public',
-            table: 'messages',
-            filter: `conversation_id=eq.${conversationId}`,
-          },
-          (payload) => {
-            onNewMessage(payload.new);
-          }
-        )
-        .subscribe();
-
-      return () => {
-        supabase.removeChannel(channel);
-      };
+      const res = await fetch('/api/messages/read', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ conversationId }),
+      });
+      return res.ok;
     } catch {
+      return false;
+    }
+  },
+
+  subscribeToMessages(
+    conversationId: string,
+    onEvent: (event: { type: 'NEW_MESSAGE' | 'MESSAGES_READ' | 'POLL_SYNC'; message?: any; readBy?: string; messageIds?: string[]; messages?: any[] }) => void
+  ): () => void {
+    if (!conversationId || conversationId.startsWith('conv-')) {
       return () => {};
     }
+
+    let es: EventSource | null = null;
+    let pollInterval: ReturnType<typeof setInterval> | null = null;
+    let isCleanedUp = false;
+
+    if (typeof window !== 'undefined' && 'EventSource' in window) {
+      try {
+        es = new EventSource(`/api/messages/stream?conversationId=${encodeURIComponent(conversationId)}`);
+        
+        es.addEventListener('message', (e) => {
+          try {
+            const data = JSON.parse(e.data);
+            if (data && data.type) {
+              onEvent(data);
+            }
+          } catch {}
+        });
+
+        es.onerror = () => {
+          if (!pollInterval && !isCleanedUp) {
+            pollInterval = setInterval(async () => {
+              try {
+                const res = await fetch(`/api/messages?conversationId=${encodeURIComponent(conversationId)}`, { cache: 'no-store' });
+                if (res.ok) {
+                  const data = await res.json();
+                  onEvent({ type: 'POLL_SYNC', messages: data.messages });
+                }
+              } catch {}
+            }, 3500);
+          }
+        };
+      } catch (err) {
+        console.warn('[SSE] EventSource init failed:', err);
+      }
+    }
+
+    return () => {
+      isCleanedUp = true;
+      if (es) {
+        es.close();
+      }
+      if (pollInterval) {
+        clearInterval(pollInterval);
+      }
+    };
   },
 };
 

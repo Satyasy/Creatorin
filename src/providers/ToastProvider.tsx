@@ -16,7 +16,7 @@ export interface ToastOptions {
 }
 
 interface ToastContextType {
-  showToast: (options: ToastOptions) => void;
+  showToast: (options: ToastOptions | string) => void;
   hideToast: (id?: string) => void;
 }
 
@@ -49,7 +49,9 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const showToast = useCallback(
-    ({ id = String(Date.now()), type = 'info', title, message, duration = 4500, action }: ToastOptions) => {
+    (opts: ToastOptions | string) => {
+      const parsedOpts: ToastOptions = typeof opts === 'string' ? { message: opts } : opts;
+      const { id = String(Date.now()), type = 'info', title, message, duration = 4500, action } = parsedOpts;
       const toastItem: ToastOptions = { id, type, title, message, duration, action };
 
       setToasts((prev) => {

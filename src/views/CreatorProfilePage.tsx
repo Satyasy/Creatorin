@@ -70,6 +70,9 @@ import { creatorService } from '@/services/creatorService';
 import { useToast } from '@/providers/ToastProvider';
 import { useLanguage } from '@/providers/LanguageProvider';
 import { useAuthModal } from '@/providers/AuthModalProvider';
+import { useConfirmModal } from '@/providers/ConfirmModalProvider';
+import { useSuccessModal } from '@/providers/SuccessModalProvider';
+import { bookmarkService } from '@/services/bookmarkService';
 import { createClient } from '@/lib/supabase/client';
 import { ShaderFill } from '@/lib/custom-effect-runtime';
 import { setup as setupConcentric, render as renderConcentric, manifest as manifestConcentric } from '@/lib/custom-effects/CodeComponentId_c2b302fbdfce8a1ec92a5a80b10a5916ab506ed7_430';
@@ -148,6 +151,8 @@ export const CreatorProfilePage: React.FC<CreatorProfilePageProps> = ({
   const { user: authUser, updateUser, refreshUser } = useAuth();
   const { openAuthModal } = useAuthModal();
   const { showToast } = useToast();
+  const { confirmModal } = useConfirmModal();
+  const { showSuccessModal } = useSuccessModal();
   const { t } = useLanguage();
   const currentUser = propUser !== undefined ? propUser : authUser;
   const isEffectiveOwner = Boolean(isOwnProfile);
@@ -312,7 +317,11 @@ export const CreatorProfilePage: React.FC<CreatorProfilePageProps> = ({
       setIsConfirmFinishOpen(false);
       setIsSuccessFinishOpen(true);
     } catch (error) {
-      alert(error instanceof Error ? error.message : 'Gagal menyimpan profil.');
+      showToast({
+        type: 'error',
+        title: 'Gagal Menyimpan Profil',
+        message: error instanceof Error ? error.message : 'Gagal menyimpan pembaruan profil ke server.',
+      });
     } finally {
       setIsSavingProfile(false);
     }
@@ -346,6 +355,16 @@ export const CreatorProfilePage: React.FC<CreatorProfilePageProps> = ({
     }
   }, [creator.services]);
 
+  useEffect(() => {
+    if (currentUser) {
+      bookmarkService.getBookmarks('project').then(ids => setSavedProjectIds(new Set(ids))).catch(() => {});
+      bookmarkService.getBookmarks('service').then(ids => setSavedServiceIds(new Set(ids))).catch(() => {});
+    } else {
+      setSavedProjectIds(new Set());
+      setSavedServiceIds(new Set());
+    }
+  }, [currentUser]);
+
   const handleToggleServiceActive = async (serviceId: string) => {
     const target = liveServices.find((s) => s.id === serviceId);
     if (!target) return;
@@ -374,24 +393,45 @@ export const CreatorProfilePage: React.FC<CreatorProfilePageProps> = ({
   };
 
   const handleDeleteService = async (serviceId: string, serviceTitle: string) => {
-    if (!window.confirm(`Yakin ingin menghapus layanan "${serviceTitle}"?`)) return;
-
-    setLiveServices((prev) => prev.filter((s) => s.id !== serviceId));
+    const confirmed = await confirmModal({
+      title: 'Hapus Layanan',
+      message: `Apakah Anda yakin ingin menghapus layanan "${serviceTitle}" dari profil Anda?`,
+      confirmText: 'Hapus',
+      cancelText: 'Batal',
+      variant: 'danger',
+    });
+    if (!confirmed) return;
 
     if (!serviceId.startsWith('demo-') && !serviceId.startsWith('qa-') && !serviceId.startsWith('sm-')) {
       try {
-        await fetch(`/api/services/${serviceId}`, {
+        const res = await fetch(`/api/services/${serviceId}`, {
           method: 'DELETE',
         });
-      } catch (err) {
-        console.error('Failed to delete service:', err);
+        if (!res.ok) {
+          const errData = await res.json().catch(() => ({}));
+          showToast({
+            type: 'error',
+            title: 'Gagal Menghapus Layanan',
+            message: errData.error || 'Terjadi kesalahan saat menghapus layanan dari server.',
+          });
+          return;
+        }
+      } catch (err: any) {
+        showToast({
+          type: 'error',
+          title: 'Koneksi Terputus',
+          message: err?.message || 'Gagal menghubungi server.',
+        });
+        return;
       }
     }
 
-    showToast({
-      type: 'info',
+    setLiveServices((prev) => prev.filter((s) => s.id !== serviceId));
+
+    showSuccessModal({
       title: 'Layanan Dihapus',
-      message: `Layanan "${serviceTitle}" telah dihapus.`,
+      message: `Paket layanan "${serviceTitle}" telah dihapus.`,
+      duration: 2500,
     });
   };
 
@@ -423,7 +463,7 @@ export const CreatorProfilePage: React.FC<CreatorProfilePageProps> = ({
   };
 
   // Toggle bookmark on project
-  const toggleSaveProject = (id: string, e: React.MouseEvent) => {
+  const toggleSaveProject = async (id: string, e: React.MouseEvent) => {
     e.stopPropagation();
     if (!currentUser) {
       showToast({
@@ -437,19 +477,47 @@ export const CreatorProfilePage: React.FC<CreatorProfilePageProps> = ({
       });
       return;
     }
+    const wasSaved = savedProjectIds.has(id);
     setSavedProjectIds(prev => {
       const next = new Set(prev);
-      if (next.has(id)) {
-        next.delete(id);
-      } else {
-        next.add(id);
-      }
+      if (wasSaved) next.delete(id); else next.add(id);
       return next;
     });
+
+    try {
+      const res = await bookmarkService.toggleBookmark('project', id);
+      setSavedProjectIds(prev => {
+        const next = new Set(prev);
+        if (res.bookmarked) next.add(id); else next.delete(id);
+        return next;
+      });
+      if (res.bookmarked) {
+        showSuccessModal({
+          title: t('toast.savedFavorite', 'Tersimpan ke Favorit'),
+          message: 'Proyek berhasil disimpan ke koleksi favorit Anda.',
+        });
+      } else {
+        showToast({
+          type: 'info',
+          message: 'Proyek dihapus dari koleksi favorit.',
+        });
+      }
+    } catch (err: any) {
+      setSavedProjectIds(prev => {
+        const next = new Set(prev);
+        if (wasSaved) next.add(id); else next.delete(id);
+        return next;
+      });
+      showToast({
+        type: 'error',
+        title: 'Gagal Menyimpan',
+        message: err?.message || 'Gagal memperbarui status simpan proyek.',
+      });
+    }
   };
 
   // Toggle bookmark on service
-  const toggleSaveService = (id: string, e: React.MouseEvent) => {
+  const toggleSaveService = async (id: string, e: React.MouseEvent) => {
     e.stopPropagation();
     if (!currentUser) {
       showToast({
@@ -463,15 +531,43 @@ export const CreatorProfilePage: React.FC<CreatorProfilePageProps> = ({
       });
       return;
     }
+    const wasSaved = savedServiceIds.has(id);
     setSavedServiceIds(prev => {
       const next = new Set(prev);
-      if (next.has(id)) {
-        next.delete(id);
-      } else {
-        next.add(id);
-      }
+      if (wasSaved) next.delete(id); else next.add(id);
       return next;
     });
+
+    try {
+      const res = await bookmarkService.toggleBookmark('service', id);
+      setSavedServiceIds(prev => {
+        const next = new Set(prev);
+        if (res.bookmarked) next.add(id); else next.delete(id);
+        return next;
+      });
+      if (res.bookmarked) {
+        showSuccessModal({
+          title: t('toast.savedFavorite', 'Tersimpan ke Favorit'),
+          message: 'Layanan berhasil disimpan ke koleksi favorit Anda.',
+        });
+      } else {
+        showToast({
+          type: 'info',
+          message: 'Layanan dihapus dari koleksi favorit.',
+        });
+      }
+    } catch (err: any) {
+      setSavedServiceIds(prev => {
+        const next = new Set(prev);
+        if (wasSaved) next.add(id); else next.delete(id);
+        return next;
+      });
+      showToast({
+        type: 'error',
+        title: 'Gagal Menyimpan',
+        message: err?.message || 'Gagal memperbarui status simpan layanan.',
+      });
+    }
   };
 
   // Copy link
@@ -521,7 +617,11 @@ export const CreatorProfilePage: React.FC<CreatorProfilePageProps> = ({
         router.push(conversationId ? `/chat?conversationId=${conversationId}` : '/chat');
       }, 900);
     } catch (err: any) {
-      alert(err.message || 'Gagal mengirim pesan penawaran ke kreator.');
+      showToast({
+        type: 'error',
+        title: 'Gagal Mengirim Penawaran',
+        message: err?.message || 'Gagal mengirim pesan penawaran ke kreator.',
+      });
     } finally {
       setIsSendingInquiry(false);
     }
@@ -756,7 +856,11 @@ export const CreatorProfilePage: React.FC<CreatorProfilePageProps> = ({
                   <button
                     onClick={() => {
                       setIsMoreMenuOpen(false);
-                      alert(`Profil ${creatorName} telah diverifikasi oleh tim Creatorin.`);
+                      showSuccessModal({
+                        title: 'Kreator Terverifikasi',
+                        message: `Profil ${creatorName} telah lolos uji portofolio dan verifikasi identitas resmi tim Creatorin.`,
+                        duration: 3000,
+                      });
                     }}
                     className="w-full px-4 py-2.5 text-xs font-semibold text-neutral-700 hover:bg-neutral-50 flex items-center gap-2.5 cursor-pointer"
                   >
@@ -1854,14 +1958,22 @@ export const CreatorProfilePage: React.FC<CreatorProfilePageProps> = ({
                     title: 'Masuk untuk Melanjutkan Pembayaran',
                     description: 'Silakan masuk ke akun Creatorin Anda terlebih dahulu untuk menyelesaikan proses pembayaran aman.',
                     action: () => {
-                      alert(`Pemesanan layanan "${selectedServiceForOrder.title}" berhasil diproses! Silakan lengkapi instruksi brief.`);
+                      showSuccessModal({
+                        title: 'Pemesanan Diproses',
+                        message: `Pemesanan layanan "${selectedServiceForOrder.title}" berhasil diproses! Silakan lengkapi instruksi brief proyek Anda.`,
+                        duration: 3500,
+                      });
                       setSelectedServiceForOrder(null);
                     },
                   });
                   setIsAuthModalOpen(true);
                   return;
                 }
-                alert(`Pemesanan layanan "${selectedServiceForOrder.title}" berhasil diproses! Silakan lengkapi instruksi brief.`);
+                showSuccessModal({
+                  title: 'Pemesanan Diproses',
+                  message: `Pemesanan layanan "${selectedServiceForOrder.title}" berhasil diproses! Silakan lengkapi instruksi brief proyek Anda.`,
+                  duration: 3500,
+                });
                 setSelectedServiceForOrder(null);
               }}
               className="w-full py-3.5 rounded-full bg-[#0d0c22] hover:bg-blue-600 text-white font-bold text-sm shadow-md transition cursor-pointer"
@@ -2225,8 +2337,19 @@ export const CreatorProfilePage: React.FC<CreatorProfilePageProps> = ({
 
                     await refreshUser();
                     setEditingSection(null);
+                    showSuccessModal({
+                      title: 'Profil Berhasil Diperbarui',
+                      message: editingSection === 'banner'
+                        ? 'Warna / foto banner profil berhasil disimpan di server.'
+                        : 'Pembaruan data profil Anda berhasil disimpan.',
+                      duration: 2500,
+                    });
                   } catch (error) {
-                    alert(error instanceof Error ? error.message : 'Gagal menyimpan profil.');
+                    showToast({
+                      type: 'error',
+                      title: 'Gagal Menyimpan Profil',
+                      message: error instanceof Error ? error.message : 'Gagal menyimpan profil ke server.',
+                    });
                   } finally {
                     setIsSavingSection(false);
                   }

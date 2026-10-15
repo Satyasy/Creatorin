@@ -3,7 +3,7 @@ import type { UMKMProfile } from '@/types';
 export function toBusiness(business: any, briefs: any[] = [], liveStats?: { activeBriefs?: number; completedProjects?: number; totalPaid?: number }): UMKMProfile {
   return {
     id: business.id, name: business.name || '', brandName: business.brandName || business.name || '',
-    logo: business.logo || '', coverBanner: '', industry: business.category || '',
+    logo: business.logo || '', coverBanner: business.coverBanner || business.coverUrl || '', industry: business.category || '',
     category: business.category || '', tagline: '', bio: business.bio || '',
     location: business.location || '', website: business.website || '', verified: false,
     joinedDate: business.createdAt ? new Date(business.createdAt).getFullYear().toString() : '',
