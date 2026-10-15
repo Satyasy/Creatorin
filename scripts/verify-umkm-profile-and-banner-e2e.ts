@@ -237,7 +237,7 @@ async function main() {
       await page.reload({ waitUntil: 'networkidle' });
       await page.waitForTimeout(1500);
 
-      const bannerImg = page.locator('img[alt="Foto Sampul Brand"], img[alt*="Sampul"]').first();
+      const bannerImg = page.locator('#umkm-banner-image');
       const loadedSrc = await bannerImg.getAttribute('src');
       console.log('Banner src after page reload:', loadedSrc);
 
@@ -274,19 +274,16 @@ async function main() {
 
       const fileInput = page.locator('input[type="file"]').first();
       await fileInput.setInputFiles(testImagePath);
-      await page.waitForTimeout(1500);
+
+      // Verify error toast appears after retry attempts
+      const toastLocator = page.locator('div:has-text("Storage Disk Full"), div:has-text("Gagal Mengunggah")').first();
+      await toastLocator.waitFor({ state: 'visible', timeout: 10000 });
+      console.log('Error toast visible on failed upload? true');
 
       // Verify SuccessModal does NOT appear
       const modalVisible = await page.locator('div[role="dialog"]').isVisible();
       if (modalVisible) {
         throw new Error('SuccessModal appeared even when banner upload failed!');
-      }
-
-      // Verify error toast
-      const toastVisible = await page.locator('div:has-text("Storage Disk Full")').first().isVisible().catch(() => false);
-      console.log('Error toast visible on failed upload?', toastVisible);
-      if (!toastVisible) {
-        throw new Error('Expected error toast was not displayed on banner upload failure.');
       }
     } finally {
       if (fs.existsSync(testImagePath)) fs.unlinkSync(testImagePath);

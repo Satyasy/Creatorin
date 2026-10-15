@@ -713,6 +713,8 @@ export const UmkmProfilePage: React.FC<UmkmProfilePageProps> = ({
         {/* Rounded Top Banner Card */}
         <div className="relative w-full rounded-2xl sm:rounded-3xl lg:rounded-[32px] overflow-hidden bg-[#f3f3f4] h-44 sm:h-56 md:h-64 lg:h-72">
           <img
+            id="umkm-banner-image"
+            data-testid="umkm-banner-image"
             src={profile.coverBanner || currentUser?.coverUrl || 'https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=1200'}
             alt={profile.brandName}
             className="w-full h-full object-cover"
