@@ -230,6 +230,27 @@
   }
 }
 
+@keyframes creatorinCheckmarkDraw {
+  0% {
+    stroke-dashoffset: 24;
+    opacity: 0;
+  }
+  30% {
+    opacity: 1;
+  }
+  100% {
+    stroke-dashoffset: 0;
+    opacity: 1;
+  }
+}
+
+.animate-checkmark-draw {
+  stroke-dasharray: 24;
+  stroke-dashoffset: 24;
+  animation: creatorinCheckmarkDraw 0.45s cubic-bezier(0.65, 0, 0.45, 1) forwards;
+  animation-delay: 0.1s;
+}
+
 /* Compatibility layer for legacy screens while all views share DESIGN.md tokens. */
 [class~="bg-[#F8FAFC]"], [class~="bg-[#FDFDFD]"] { background-color: #F8F9FC !important; }
 [class~="bg-[#E2E8F0]"] { background-color: #E1E3EA !important; }

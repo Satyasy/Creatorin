@@ -60,9 +60,22 @@ export const SuccessModal: React.FC<SuccessModalProps> = ({
           <X className="w-4 h-4" />
         </button>
 
-        {/* Emerald Animated Checkmark Badge matching Creatorin Design System */}
-        <div className="w-16 h-16 sm:w-20 sm:h-20 bg-emerald-50 text-emerald-600 rounded-full flex items-center justify-center mx-auto ring-8 ring-emerald-50/60 shadow-inner">
-          <CheckCircle2 className="w-9 h-9 sm:w-10 sm:h-10 animate-in zoom-in-50 duration-300 stroke-[2.2]" />
+        {/* Creatorin Royal Blue Animated Checkmark Badge */}
+        <div className="w-16 h-16 sm:w-20 sm:h-20 bg-[#155DFC] text-white rounded-full flex items-center justify-center mx-auto ring-8 ring-blue-100/80 shadow-lg shadow-blue-500/20 animate-in zoom-in-75 duration-300">
+          <svg
+            className="w-8 h-8 sm:w-10 sm:h-10 text-white"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="3.2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <path
+              d="M20 6L9 17L4 12"
+              className="animate-checkmark-draw"
+            />
+          </svg>
         </div>
 
         {/* Title */}
@@ -80,7 +93,7 @@ export const SuccessModal: React.FC<SuccessModalProps> = ({
           <button
             type="button"
             onClick={handleClose}
-            className="w-full sm:w-auto min-w-[140px] px-7 py-2.5 rounded-xl bg-[#0B1F3A] hover:bg-[#123B8C] text-white text-xs sm:text-sm font-semibold transition cursor-pointer shadow-xs active:scale-98"
+            className="w-full sm:w-auto min-w-[140px] px-7 py-2.5 rounded-xl bg-[#155DFC] hover:bg-[#1248C4] text-white text-xs sm:text-sm font-semibold transition cursor-pointer shadow-xs active:scale-98"
           >
             {options.buttonText || 'Selesai'}
           </button>
