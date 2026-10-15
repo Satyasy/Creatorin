@@ -32,6 +32,7 @@ export const creatorProfiles = pgTable("creator_profiles", {
   completedProjectsCount: integer("completed_projects_count").default(0).notNull(),
   rating: decimal("rating", { precision: 3, scale: 1 }).default("0.0").notNull(),
   reviewsCount: integer("reviews_count").default(0).notNull(),
+  followersCount: text("followers_count").default("0").notNull(),
   schoolId: uuid("school_id"),
   schoolName: text("school_name"),
   schoolStatus: schoolStatusEnum("school_status").default("pending"),
