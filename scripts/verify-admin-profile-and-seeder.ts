@@ -9,10 +9,9 @@ async function main() {
   const sql = postgres(connectionString, { ssl: false });
 
   // Record initial state to guarantee complete restoration
-  const [initialAdmin] = await sql`SELECT id, avatar_url, cover_url, headline FROM profiles WHERE LOWER(email) = 'admin@creatorin.my.id'`;
+  const [initialAdmin] = await sql`SELECT id, avatar_url, cover_url FROM profiles WHERE LOWER(email) = 'admin@creatorin.my.id'`;
   const initialAvatar = initialAdmin?.avatar_url || '/creatorin/avatar.png';
   const initialCover = initialAdmin?.cover_url || 'linear-gradient(135deg, #0B1F3A 0%, #155DFC 100%)';
-  const initialHeadline = initialAdmin?.headline || '';
 
   // Setup actual physical files on disk so Nginx never returns 404
   const uploadsDir = '/var/www/creatorin/shared/uploads/avatars';
@@ -142,8 +141,7 @@ async function main() {
       await sql`
         UPDATE profiles 
         SET avatar_url = ${initialAvatar}, 
-            cover_url = ${initialCover}, 
-            headline = ${initialHeadline} 
+            cover_url = ${initialCover}
         WHERE LOWER(email) = 'admin@creatorin.my.id'
       `;
       console.log('✅ PostgreSQL profiles table restored to authentic admin profile values.');
