@@ -521,7 +521,7 @@ export const UploadProjectModal: React.FC<UploadProjectModalProps> = ({
                 <div className="rounded-xl border border-neutral-200 bg-neutral-50/50 p-3.5 flex flex-col justify-between gap-2.5 focus-within:bg-white focus-within:border-[#155DFC] focus-within:ring-2 focus-within:ring-[#155DFC]/10 transition-all">
                   <div className="flex items-center justify-between">
                     <span className="text-[11px] font-bold text-neutral-500 tracking-wider uppercase">
-                      Nilai Proyek (Rp)
+                      Nilai Proyek (Koin)
                     </span>
                     <div className="w-6 h-6 rounded-md bg-neutral-200/60 flex items-center justify-center text-neutral-600">
                       <CreditCard className="w-3.5 h-3.5" />
@@ -529,8 +529,8 @@ export const UploadProjectModal: React.FC<UploadProjectModalProps> = ({
                   </div>
 
                   <div className="h-10 px-3 rounded-lg border border-neutral-200 bg-white flex items-center gap-1.5 focus-within:border-[#155DFC] transition-all">
-                    <span className="text-xs font-bold text-neutral-400 select-none">
-                      Rp
+                    <span className="text-sm select-none">
+                      🪙
                     </span>
                     <input
                       type="text"

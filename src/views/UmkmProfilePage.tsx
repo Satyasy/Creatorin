@@ -65,11 +65,11 @@ type TabKey = 'briefs' | 'collabs' | 'reviews' | 'about';
 
 const formatDisplayBudget = (formatted?: string, budgetMin?: number) => {
   if (budgetMin) {
-    return `Rp${budgetMin.toLocaleString('id-ID')}`;
+    return `🪙 ${budgetMin.toLocaleString('id-ID')}`;
   }
-  if (!formatted) return 'Rp0';
-  const clean = formatted.split(/[-–—]|sampai/i)[0].trim();
-  return clean.startsWith('Rp') ? clean : `Rp${clean}`;
+  if (!formatted) return '🪙 0';
+  const clean = formatted.split(/[-–—]|sampai/i)[0].replace(/^Rp\s*/i, '').replace(/^[🪙\s]+/i, '').trim();
+  return `🪙 ${clean}`;
 };
 
 export const UmkmProfilePage: React.FC<UmkmProfilePageProps> = ({
@@ -334,7 +334,7 @@ export const UmkmProfilePage: React.FC<UmkmProfilePageProps> = ({
     const maxNum = parseInt(newBriefForm.budgetMax) || 0;
     if (!minNum || !newBriefForm.title.trim() || !newBriefForm.description.trim()) { showToast('Judul, deskripsi, dan budget wajib diisi.'); return; }
     
-    const formattedBudget = `Rp${minNum.toLocaleString('id-ID')}`;
+    const formattedBudget = `🪙 ${minNum.toLocaleString('id-ID')}`;
     const deliverablesList = newBriefForm.deliverables
       .split('\n')
       .map(d => d.trim())
@@ -425,7 +425,7 @@ export const UmkmProfilePage: React.FC<UmkmProfilePageProps> = ({
       .filter(Boolean);
 
     try {
-      const response = await fetch(`/api/briefs/${editingBrief.id}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ title: editBriefForm.title, category: editBriefForm.category, description: editBriefForm.description, expectedOutput: deliverablesList.join('\n'), budget: `Rp${minNum.toLocaleString('id-ID')}`, deadline: editBriefForm.deadline }) });
+      const response = await fetch(`/api/briefs/${editingBrief.id}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ title: editBriefForm.title, category: editBriefForm.category, description: editBriefForm.description, expectedOutput: deliverablesList.join('\n'), budget: `🪙 ${minNum.toLocaleString('id-ID')}`, deadline: editBriefForm.deadline }) });
       if (!response.ok) throw new Error((await response.json()).error || 'Gagal memperbarui brief.');
     } catch (error) { showToast(error instanceof Error ? error.message : 'Gagal memperbarui brief.'); return; }
 
@@ -439,7 +439,7 @@ export const UmkmProfilePage: React.FC<UmkmProfilePageProps> = ({
             category: editBriefForm.category,
             budgetMin: minNum,
             budgetMax: minNum,
-            formattedBudget: `Rp${minNum.toLocaleString('id-ID')}`,
+            formattedBudget: `🪙 ${minNum.toLocaleString('id-ID')}`,
             deadline: editBriefForm.deadline,
             description: editBriefForm.description,
             deliverables: deliverablesList.length > 0 ? deliverablesList : b.deliverables,
@@ -1650,7 +1650,7 @@ export const UmkmProfilePage: React.FC<UmkmProfilePageProps> = ({
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-semibold text-neutral-700 mb-1">Anggaran Min (Rp)</label>
+                  <label className="block text-xs font-semibold text-neutral-700 mb-1">Anggaran Min (Koin)</label>
                   <input
                     type="number"
                     value={newBriefForm.budgetMin}
@@ -1659,7 +1659,7 @@ export const UmkmProfilePage: React.FC<UmkmProfilePageProps> = ({
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-semibold text-neutral-700 mb-1">Anggaran Max (Rp)</label>
+                  <label className="block text-xs font-semibold text-neutral-700 mb-1">Anggaran Max (Koin)</label>
                   <input
                     type="number"
                     value={newBriefForm.budgetMax}
@@ -1791,7 +1791,7 @@ export const UmkmProfilePage: React.FC<UmkmProfilePageProps> = ({
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-neutral-700 mb-1">Estimasi Anggaran (Rp)</label>
+                <label className="block text-xs font-semibold text-neutral-700 mb-1">Estimasi Anggaran (Koin)</label>
                 <input
                   type="number"
                   value={editBriefForm.budgetMin}
@@ -1906,13 +1906,13 @@ export const UmkmProfilePage: React.FC<UmkmProfilePageProps> = ({
             <form onSubmit={handleSendProposal} className="space-y-3.5 text-xs sm:text-sm">
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-semibold text-neutral-700 mb-1">Penawaran Biaya (Rp)</label>
+                  <label className="block text-xs font-semibold text-neutral-700 mb-1">Penawaran Biaya (Koin)</label>
                   <input
                     type="text"
                     required
                     value={proposalBid}
                     onChange={(e) => setProposalBid(e.target.value)}
-                    placeholder="Misal: Rp2.000.000"
+                    placeholder="Misal: 🪙 2.000.000"
                     className="w-full px-3 py-2 rounded-xl border border-neutral-200 focus:border-neutral-900 focus:outline-hidden"
                   />
                 </div>

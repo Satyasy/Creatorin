@@ -17,7 +17,7 @@ const DEFAULT_CREATOR_SERVICES: CreatorService[] = [
     description: 'Template landing page SaaS conversion-ready dengan 30+ komponen auto-layout dan variabel token warna.',
     deliveryDays: '2 Hari Kerja',
     price: 1500000,
-    formattedPrice: 'Rp1.500.000',
+    formattedPrice: '🪙 1.500.000',
     coverImage: '/figma/service-figma.png',
     isActive: true,
   },
@@ -28,7 +28,7 @@ const DEFAULT_CREATOR_SERVICES: CreatorService[] = [
     description: 'Pengerjaan website interaktif dengan Framer Motion, animasi responsif mobile, dan integrasi CMS dinamis.',
     deliveryDays: '4 Hari Kerja',
     price: 3800000,
-    formattedPrice: 'Rp3.800.000',
+    formattedPrice: '🪙 3.800.000',
     coverImage: '/figma/service-framer.png',
     isActive: true,
   },
@@ -39,7 +39,7 @@ const DEFAULT_CREATOR_SERVICES: CreatorService[] = [
     description: '3 video vertical 9:16 dengan angle problem-solution, hook 3 detik pertama, B-roll estetik, dan subtitle dinamis.',
     deliveryDays: '3 Hari Kerja',
     price: 2200000,
-    formattedPrice: 'Rp2.200.000',
+    formattedPrice: '🪙 2.200.000',
     coverImage: '/figma/service-tiktok.png',
     isActive: true,
   },
@@ -50,7 +50,7 @@ const DEFAULT_CREATOR_SERVICES: CreatorService[] = [
     description: 'Panduan identitas logo primer/sekunder, palet warna, tipografi, dan mockup kemasan produk untuk UMKM.',
     deliveryDays: '5 Hari Kerja',
     price: 1800000,
-    formattedPrice: 'Rp1.800.000',
+    formattedPrice: '🪙 1.800.000',
     coverImage: '/figma/service-branding.png',
     isActive: false,
   },
@@ -111,7 +111,7 @@ export function CreatorServicesPage() {
       bio: 'Desainer antarmuka dan kreator digital fokus pada brand identity, landing page interaktif, dan video konten UGC.',
       location: user?.location || 'Jakarta, ID',
       startingRate: 1500000,
-      formattedRate: 'Rp1.500.000',
+      formattedRate: '🪙 1.500.000',
       careerScore: {
         overall: 98,
         deadlineAccuracy: 100,
@@ -381,8 +381,9 @@ export function CreatorServicesPage() {
                     HARGA
                   </span>
                   <span className="block truncate text-sm sm:text-base font-bold leading-tight text-[#0D0C22] mt-0.5">
-                    {srv.formattedPrice ||
-                      (srv.price ? `Rp${srv.price.toLocaleString('id-ID')}` : 'Rp1.500.000')}
+                    {srv.formattedPrice
+                      ? srv.formattedPrice.replace(/^Rp\s?/, '🪙 ')
+                      : (srv.price ? `🪙 ${srv.price.toLocaleString('id-ID')}` : '🪙 1.500.000')}
                   </span>
                 </div>
 

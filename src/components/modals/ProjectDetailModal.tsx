@@ -318,7 +318,7 @@ export const ProjectDetailModal: React.FC<ProjectDetailModalProps> = ({
         bio: `${item.creatorName || item.creatorHandle} di Creatorin`,
         location: 'Indonesia',
         startingRate: 250000,
-        formattedRate: 'Rp250.000',
+        formattedRate: '🪙 250.000',
         careerScore: {
           overall: 95,
           deadlineAccuracy: 98,

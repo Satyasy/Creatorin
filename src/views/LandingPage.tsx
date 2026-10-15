@@ -367,10 +367,10 @@ export const LandingPage: React.FC<LandingPageProps> = ({ currentUser: propUser,
                     {selectedBudget === 'Semua' 
                       ? t('filter.budget', 'Budget') 
                       : selectedBudget === 'under500' 
-                        ? (language === 'en' ? '< IDR 500k' : '< Rp500rb') 
+                        ? '< 🪙 500rb'
                         : selectedBudget === 'mid' 
-                          ? (language === 'en' ? 'IDR 500k - 1.5M' : 'Rp500rb - Rp1.5jt') 
-                          : (language === 'en' ? '> IDR 1.5M' : '> Rp1.5jt')}
+                          ? '🪙 500rb - 🪙 1.5jt'
+                          : '> 🪙 1.5jt'}
                   </span>
                   <ChevronDown className="w-3.5 h-3.5 text-neutral-400" />
                 </button>
@@ -379,9 +379,9 @@ export const LandingPage: React.FC<LandingPageProps> = ({ currentUser: propUser,
                   <div className="absolute left-0 mt-1.5 w-52 bg-white rounded-2xl border border-neutral-200 shadow-xl py-2 z-30 animate-in fade-in">
                     {[
                       { label: t('filter.allBudget', 'Semua Budget'), val: 'Semua' },
-                      { label: t('filter.under500k', 'Di bawah Rp500.000'), val: 'under500' },
-                      { label: t('filter.midBudget', 'Rp500.000 - Rp1.500.000'), val: 'mid' },
-                      { label: t('filter.highBudget', 'Di atas Rp1.500.000'), val: 'high' }
+                      { label: t('filter.under500k', 'Di bawah 🪙 500.000'), val: 'under500' },
+                      { label: t('filter.midBudget', '🪙 500.000 - 🪙 1.500.000'), val: 'mid' },
+                      { label: t('filter.highBudget', 'Di atas 🪙 1.500.000'), val: 'high' }
                     ].map((b) => (
                       <button
                         key={b.val}
@@ -568,7 +568,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ currentUser: propUser,
                         {/* Sub-info Row (Harga, Lokasi, Respon, Layanan) */}
                         <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-neutral-500 mt-2">
                           <span className="font-semibold text-neutral-800">
-                            {t('card.startingFrom', 'Mulai')} {language === 'en' ? creator.formattedRate.replace('Rp', 'IDR ') : creator.formattedRate}
+                            {t('card.startingFrom', 'Mulai')} {creator.formattedRate ? creator.formattedRate.replace(/^Rp\s?/, '🪙 ') : (creator.startingRate ? `🪙 ${creator.startingRate.toLocaleString('id-ID')}` : '🪙 200.000')}
                           </span>
                           <span>•</span>
                           <span className="flex items-center gap-1">
@@ -664,7 +664,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ currentUser: propUser,
 
                                   <div className="flex items-center justify-between pt-0.5">
                                     <span className="text-[13px] sm:text-[14px] font-black text-[#171717] tracking-tight">
-                                      {language === 'en' ? service.formattedPrice.replace('Rp', 'IDR ') : service.formattedPrice}
+                                      {service.formattedPrice ? service.formattedPrice.replace(/^Rp\s?/, '🪙 ') : (service.price ? `🪙 ${service.price.toLocaleString('id-ID')}` : '🪙 200.000')}
                                     </span>
                                     {service.deliveryDays && (
                                       <span className="text-[11px] font-medium text-neutral-400">

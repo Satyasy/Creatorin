@@ -46,9 +46,9 @@ const CATEGORY_OPTIONS = [
 
 const BUDGET_OPTIONS = [
   { id: 'all', label: 'Semua Budget' },
-  { id: 'under250', label: '< Rp250.000' },
-  { id: '250to500', label: 'Rp250.000 - Rp500.000' },
-  { id: 'above500', label: '> Rp500.000' },
+  { id: 'under250', label: '< 🪙 250.000' },
+  { id: '250to500', label: '🪙 250.000 - 🪙 500.000' },
+  { id: 'above500', label: '> 🪙 500.000' },
 ];
 
 const LOCATION_OPTIONS = [
@@ -85,9 +85,9 @@ export const JelajahKreatorPage: React.FC<JelajahKreatorPageProps> = ({
 
   const getBudgetLabel = (id: string) => {
     if (id === 'all') return t('filter.allBudget', 'Semua Budget');
-    if (id === 'under250') return t('budget.under250', '< Rp250.000');
-    if (id === '250to500') return t('budget.250to500', 'Rp250.000 - Rp500.000');
-    if (id === 'above500') return t('budget.above500', '> Rp500.000');
+    if (id === 'under250') return t('budget.under250', '< 🪙 250.000');
+    if (id === '250to500') return t('budget.250to500', '🪙 250.000 - 🪙 500.000');
+    if (id === 'above500') return t('budget.above500', '> 🪙 500.000');
     return id;
   };
 
@@ -106,10 +106,10 @@ export const JelajahKreatorPage: React.FC<JelajahKreatorPageProps> = ({
 
   const formatRate = (creator: Creator) => {
     const rateNum = creator.startingRate || 200000;
-    if (language === 'en') {
-      return `From IDR ${rateNum.toLocaleString('en-US')}`;
-    }
-    return `${t('card.startingFrom', 'Mulai')} ${creator.formattedRate || `Rp${rateNum.toLocaleString('id-ID')}`}`;
+    const formatted = creator.formattedRate
+      ? creator.formattedRate.replace(/^Rp\s?/, '🪙 ')
+      : `🪙 ${rateNum.toLocaleString('id-ID')}`;
+    return `${t('card.startingFrom', 'Mulai')} ${formatted}`;
   };
 
   const [creators, setCreators] = useState<Creator[]>(DEFAULT_CREATORS);
@@ -672,7 +672,7 @@ export const JelajahKreatorPage: React.FC<JelajahKreatorPageProps> = ({
                             id: `${creator.id}-showcase-1`,
                             tag: 'Brand Identity',
                             title: 'Desain Identitas Brand & Logo UMKM',
-                            formattedPrice: 'Rp100.000',
+                            formattedPrice: '🪙 100.000',
                             deliveryDays: '3 Hari Kerja',
                             coverImage: '/creatorin/service-pattern-1.png',
                           },
@@ -680,7 +680,7 @@ export const JelajahKreatorPage: React.FC<JelajahKreatorPageProps> = ({
                             id: `${creator.id}-showcase-2`,
                             tag: 'Feed Instagram',
                             title: 'Desain Feed Instagram Aesthetic (9 Grid)',
-                            formattedPrice: 'Rp50.000',
+                            formattedPrice: '🪙 50.000',
                             deliveryDays: '2 Hari Kerja',
                             coverImage: '/creatorin/service-pattern-2.png',
                           },
@@ -688,7 +688,7 @@ export const JelajahKreatorPage: React.FC<JelajahKreatorPageProps> = ({
                             id: `${creator.id}-showcase-3`,
                             tag: 'Kemasan',
                             title: 'Packaging & Label Design Siap Cetak',
-                            formattedPrice: 'Rp70.000',
+                            formattedPrice: '🪙 70.000',
                             deliveryDays: '3 Hari Kerja',
                             coverImage: '/creatorin/service-pattern-3.png',
                           },
@@ -696,7 +696,7 @@ export const JelajahKreatorPage: React.FC<JelajahKreatorPageProps> = ({
                             id: `${creator.id}-showcase-4`,
                             tag: 'Banner',
                             title: 'Banner Promo E-Commerce & Marketplace',
-                            formattedPrice: 'Rp120.000',
+                            formattedPrice: '🪙 120.000',
                             deliveryDays: '1 Hari Kerja',
                             coverImage: '/creatorin/service-pattern-4.png',
                           },
@@ -746,7 +746,7 @@ export const JelajahKreatorPage: React.FC<JelajahKreatorPageProps> = ({
 
                                   <div className="flex items-center justify-between pt-0.5">
                                     <span className="text-[13px] sm:text-[14px] font-black text-[#171717] tracking-tight">
-                                      {language === 'en' ? (service.formattedPrice || '').replace('Rp', 'IDR ') : service.formattedPrice}
+                                      {service.formattedPrice ? service.formattedPrice.replace(/^Rp\s?/, '🪙 ') : ('price' in service && service.price ? `🪙 ${service.price.toLocaleString('id-ID')}` : '🪙 100.000')}
                                     </span>
                                     {service.deliveryDays && (
                                       <span className="text-[11px] font-medium text-neutral-400">

@@ -57,7 +57,7 @@ const DEFAULT_SIMILAR_SERVICES: SimilarServiceItem[] = [
     title: 'Premium Figma SaaS Landing Page Template',
     description: 'Pengerjaan profesional dengan jaminan kepatuhan brief dan revisi cepat.',
     duration: '2 Hari Kerja',
-    price: 'Rp1.500.000',
+    price: '🪙 1.500.000',
     image: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=800&auto=format&fit=crop&q=80',
   },
   {
@@ -66,7 +66,7 @@ const DEFAULT_SIMILAR_SERVICES: SimilarServiceItem[] = [
     title: 'Premium Figma SaaS Landing Page Template',
     description: 'Pengerjaan profesional dengan jaminan kepatuhan brief dan revisi cepat.',
     duration: '2 Hari Kerja',
-    price: 'Rp1.500.000',
+    price: '🪙 1.500.000',
     image: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=800&auto=format&fit=crop&q=80',
   },
   {
@@ -75,7 +75,7 @@ const DEFAULT_SIMILAR_SERVICES: SimilarServiceItem[] = [
     title: 'Premium Figma SaaS Landing Page Template',
     description: 'Pengerjaan profesional dengan jaminan kepatuhan brief dan revisi cepat.',
     duration: '2 Hari Kerja',
-    price: 'Rp1.500.000',
+    price: '🪙 1.500.000',
     image: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=800&auto=format&fit=crop&q=80',
   },
   {
@@ -84,7 +84,7 @@ const DEFAULT_SIMILAR_SERVICES: SimilarServiceItem[] = [
     title: 'Premium Figma SaaS Landing Page Template',
     description: 'Pengerjaan profesional dengan jaminan kepatuhan brief dan revisi cepat.',
     duration: '2 Hari Kerja',
-    price: 'Rp1.500.000',
+    price: '🪙 1.500.000',
     image: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=800&auto=format&fit=crop&q=80',
   },
   {
@@ -93,7 +93,7 @@ const DEFAULT_SIMILAR_SERVICES: SimilarServiceItem[] = [
     title: 'Premium Figma SaaS Landing Page Template',
     description: 'Pengerjaan profesional dengan jaminan kepatuhan brief dan revisi cepat.',
     duration: '2 Hari Kerja',
-    price: 'Rp1.500.000',
+    price: '🪙 1.500.000',
     image: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=800&auto=format&fit=crop&q=80',
   },
   {
@@ -102,7 +102,7 @@ const DEFAULT_SIMILAR_SERVICES: SimilarServiceItem[] = [
     title: 'Premium Figma SaaS Landing Page Template',
     description: 'Pengerjaan profesional dengan jaminan kepatuhan brief dan revisi cepat.',
     duration: '2 Hari Kerja',
-    price: 'Rp1.500.000',
+    price: '🪙 1.500.000',
     image: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=800&auto=format&fit=crop&q=80',
   },
 ];
@@ -279,9 +279,11 @@ export const ServiceDetailModal: React.FC<ServiceDetailModalProps> = ({
   const emailDisplay = `inquiry@${creator?.username || 'sobakhulmunirsiroj'}.com`;
 
   // Highlight metrics
-  const formattedPrice =
-    currentService.formattedPrice ||
-    (currentService.price ? `Rp${currentService.price.toLocaleString('id-ID')}` : 'Rp3.800.000');
+  const formattedPrice = currentService.formattedPrice
+    ? currentService.formattedPrice.replace(/^Rp\s?/, '🪙 ')
+    : currentService.price
+    ? `🪙 ${currentService.price.toLocaleString('id-ID')}`
+    : '🪙 3.800.000';
 
   const formattedDelivery = currentService.deliveryDays
     ? currentService.deliveryDays.toLowerCase().includes('hari')

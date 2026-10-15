@@ -23,13 +23,13 @@ export async function GET(req: NextRequest) {
       .limit(1);
 
     if (!wallet) {
-      // Auto-create wallet with starting 5000 coins for UMKM / Creator
+      // Initial default balance is 0 Koin
       const [newWallet] = await db
         .insert(creatorWallets)
         .values({
           creatorId: user.id,
-          balance: 5000,
-          points: 100,
+          balance: 0,
+          points: 0,
         })
         .returning();
       wallet = newWallet;
@@ -39,7 +39,7 @@ export async function GET(req: NextRequest) {
       success: true,
       balance: wallet.balance,
       points: wallet.points,
-      coinFormatted: `${wallet.balance.toLocaleString('id-ID')} Koin`,
+      coinFormatted: `🪙 ${wallet.balance.toLocaleString('id-ID')}`,
     });
   } catch (err: any) {
     return NextResponse.json({ error: err.message }, { status: 500 });

@@ -31,11 +31,11 @@ export const CATEGORY_OPTIONS = [
   'Print'
 ];
 
-// Helper to format currency display (IDR formatted for Indonesian context while supporting inputs)
+// Helper to format currency display (Coins formatted for Creatorin platform)
 export const formatIDR = (val: number): string => {
-  if (val >= 10000000) return 'Rp 10.000.000+';
-  if (val <= 0) return 'Rp 0';
-  return `Rp ${val.toLocaleString('id-ID')}`;
+  if (val >= 10000000) return '🪙 10.000.000+';
+  if (val <= 0) return '🪙 0';
+  return `🪙 ${val.toLocaleString('id-ID')}`;
 };
 
 export const ServiceFilterModal: React.FC<ServiceFilterModalProps> = ({

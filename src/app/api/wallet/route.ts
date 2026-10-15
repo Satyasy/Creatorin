@@ -8,7 +8,7 @@ export async function GET(req: NextRequest) {
   const user = await getAuthenticatedUser(req);
   if (!user) {
     return NextResponse.json({
-      wallet: { balance: 1850000, points: 340, updatedAt: new Date().toISOString() },
+      wallet: { balance: 0, points: 0, updatedAt: new Date().toISOString() },
       transactions: [],
     });
   }
@@ -16,7 +16,7 @@ export async function GET(req: NextRequest) {
   const db = getDb();
   if (!db) {
     return NextResponse.json({
-      wallet: { balance: 1850000, points: 340, updatedAt: new Date().toISOString() },
+      wallet: { balance: 0, points: 0, updatedAt: new Date().toISOString() },
       transactions: [],
     });
   }

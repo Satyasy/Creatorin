@@ -69,7 +69,7 @@ const DEFAULT_APPLICANTS: Application[] = [
     rating: 4.9,
     reviewsCount: 42,
     completedProjects: 42,
-    proposedPrice: 'Rp1.500.000',
+    proposedPrice: '🪙 1.500.000',
     location: 'Jakarta Selatan',
     careerScore: 98,
     duration: '3 Hari Kerja',
@@ -85,7 +85,7 @@ const DEFAULT_APPLICANTS: Application[] = [
     rating: 4.85,
     reviewsCount: 29,
     completedProjects: 29,
-    proposedPrice: 'Rp1.450.000',
+    proposedPrice: '🪙 1.450.000',
     location: 'Bandung',
     careerScore: 96,
     duration: '4 Hari Kerja',
@@ -101,7 +101,7 @@ const DEFAULT_APPLICANTS: Application[] = [
     rating: 4.95,
     reviewsCount: 18,
     completedProjects: 18,
-    proposedPrice: 'Rp1.500.000',
+    proposedPrice: '🪙 1.500.000',
     location: 'Jakarta Barat',
     careerScore: 95,
     duration: '3 Hari Kerja',
@@ -117,7 +117,7 @@ const DEFAULT_APPLICANTS: Application[] = [
     rating: 4.95,
     reviewsCount: 144,
     completedProjects: 144,
-    proposedPrice: 'Rp1.600.000',
+    proposedPrice: '🪙 1.600.000',
     location: 'Jakarta Selatan',
     careerScore: 98,
     duration: '5 Hari Kerja',
@@ -135,7 +135,7 @@ const DEFAULT_OTHER_BRIEFS: OtherBriefItem[] = [
     title: 'Desain Identitas Visual, Logo Brand, & Packaging Box',
     description: 'Mencari graphic designer berpengalaman di bidang beauty & lifestyle untuk brand skincare lokal baru.',
     tags: ['Logo Design', 'Packaging', 'Brand Identity', 'Adobe Illustrator'],
-    budget: 'Rp3.000.000',
+    budget: '🪙 3.000.000',
   },
   {
     id: 'other-brief-2',
@@ -144,7 +144,7 @@ const DEFAULT_OTHER_BRIEFS: OtherBriefItem[] = [
     title: 'Foto Katalog Produk & Lifestyle Shoot 12 Artikel Baju',
     description: 'Dibutuhkan fotografer produk fashion untuk sesi photoshoot 12 artikel pakaian streetwear dengan model.',
     tags: ['Foto Produk', 'Fashion Photography', 'Adobe Lightroom', 'Color Grading'],
-    budget: 'Rp2.000.000',
+    budget: '🪙 2.000.000',
   },
   {
     id: 'other-brief-3',
@@ -153,7 +153,7 @@ const DEFAULT_OTHER_BRIEFS: OtherBriefItem[] = [
     title: 'Paket Desain 15 Feed Instagram Carousel & Story',
     description: 'Kami membutuhkan desainer grafis untuk membuat 15 konten visual interaktif dan layout grid feed bulanan.',
     tags: ['Feed Instagram', 'Figma', 'Social Media Design', 'Typography'],
-    budget: 'Rp1.800.000',
+    budget: '🪙 1.800.000',
   },
 ];
 
@@ -177,7 +177,11 @@ export function BriefDetailPage({
 
   // Apply Modal state
   const [isApplyModalOpen, setIsApplyModalOpen] = useState(false);
-  const [proposedPrice, setProposedPrice] = useState(brief.formattedBudget || 'Rp1.500.000');
+  const [proposedPrice, setProposedPrice] = useState(
+    brief.formattedBudget
+      ? brief.formattedBudget.replace(/^Rp\s?/, '🪙 ')
+      : (brief.budgetMin ? `🪙 ${brief.budgetMin.toLocaleString('id-ID')}` : '🪙 1.500.000')
+  );
   const [pitch, setPitch] = useState('');
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
@@ -445,7 +449,9 @@ export function BriefDetailPage({
                 </div>
                 <div className="mt-3">
                   <div className="font-display font-bold text-xl sm:text-2xl text-[#0D0C22]">
-                    {currentBrief.formattedBudget || 'Rp1.500.000'}
+                    {currentBrief.formattedBudget
+                      ? currentBrief.formattedBudget.replace(/^Rp\s?/, '🪙 ')
+                      : (currentBrief.budgetMin ? `🪙 ${currentBrief.budgetMin.toLocaleString('id-ID')}` : '🪙 1.500.000')}
                   </div>
                   <div className="text-xs text-[#55576A] mt-1 flex items-center gap-1">
                     <Clock className="w-3 h-3 text-[#6F7285]" />
@@ -551,7 +557,7 @@ export function BriefDetailPage({
                           </div>
 
                           <div className="flex flex-wrap items-center gap-x-2 gap-y-1 mt-1 text-xs text-[#55576A]">
-                            <span className="font-medium text-[#0D0C22]">Tawaran {app.proposedPrice}</span>
+                            <span className="font-medium text-[#0D0C22]">Tawaran {app.proposedPrice ? app.proposedPrice.replace(/^Rp\s?/, '🪙 ') : '🪙 1.500.000'}</span>
                             <span>&middot;</span>
                             <span className="inline-flex items-center gap-1">
                               <MapPin className="w-3 h-3 text-[#6F7285]" />
@@ -664,7 +670,7 @@ export function BriefDetailPage({
                           Estimasi Anggaran
                         </span>
                         <span className="text-sm sm:text-base font-bold text-[#0D0C22] mt-0.5 block leading-tight">
-                          {other.budget}
+                          {other.budget ? other.budget.replace(/^Rp\s?/, '🪙 ') : '🪙 1.500.000'}
                         </span>
                       </div>
 
@@ -720,16 +726,19 @@ export function BriefDetailPage({
             <form onSubmit={submitApplication} className="space-y-4 pt-1">
               <div>
                 <label className="block text-xs font-semibold text-[#0D0C22] mb-1.5">
-                  Tawaran Biaya (IDR)
+                  Tawaran Biaya (Koin)
                 </label>
-                <input
-                  type="text"
-                  required
-                  value={proposedPrice}
-                  onChange={(e) => setProposedPrice(e.target.value)}
-                  placeholder="Contoh: Rp1.500.000"
-                  className="w-full rounded-xl border border-[#E1E3EA] px-3.5 py-2.5 text-xs text-[#0D0C22] focus:outline-hidden focus:ring-2 focus:ring-[#155DFC]"
-                />
+                <div className="relative">
+                  <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-sm select-none">🪙</span>
+                  <input
+                    type="text"
+                    required
+                    value={proposedPrice}
+                    onChange={(e) => setProposedPrice(e.target.value)}
+                    placeholder="Contoh: 1.500.000"
+                    className="w-full rounded-xl border border-[#E1E3EA] pl-9 pr-3.5 py-2.5 text-xs text-[#0D0C22] focus:outline-hidden focus:ring-2 focus:ring-[#155DFC]"
+                  />
+                </div>
               </div>
 
               <div>

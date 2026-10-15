@@ -62,7 +62,7 @@ export const businessService = {
       stats: {
         activeBriefs: 2,
         completedProjects: 12,
-        totalPaidFormatted: 'Rp14.500.000',
+        totalPaidFormatted: '🪙 14.500.000',
         ratingFromCreators: 4.9,
         reviewCount: 12,
         paymentOnTimeRate: 100,
@@ -77,7 +77,7 @@ export const businessService = {
           category: 'Video Reels',
           budgetMin: 1500000,
           budgetMax: 2000000,
-          formattedBudget: 'Rp1.500.000 - Rp2.000.000',
+          formattedBudget: '🪙 1.500.000 - 🪙 2.000.000',
           deadline: '10 Hari',
           description: 'Mencari kreator video untuk shooting dan editing video minuman kopi susu terbaru dengan angle estetik dan sound viral.',
           deliverables: ['3 Video Reels (9:16)', 'Resolusi 1080p', 'Audio bebas copyright'],

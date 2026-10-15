@@ -106,7 +106,7 @@ export async function POST(req: NextRequest) {
         title,
         category,
         description: description || "",
-        price,
+        price: `🪙 ${numeric.toLocaleString('id-ID')}`,
         priceNumeric: numeric,
         estimatedDays,
         shapeIdx: 0,

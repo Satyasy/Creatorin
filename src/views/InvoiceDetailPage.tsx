@@ -10,10 +10,12 @@ import {
   CheckCircle2, 
   AlertCircle, 
   Wallet,
-  Sparkles
+  PlusCircle,
+  Lock
 } from 'lucide-react';
 import type { ActivePage, AuthState } from '@/types';
 import { formatCoin } from '@/lib/coin';
+import { TopUpCoinModal } from '@/components/modals/TopUpCoinModal';
 
 export interface InvoiceDetailProps {
   currentUser?: AuthState['user'];
@@ -60,6 +62,7 @@ export function InvoiceDetailPage({ invoiceData, onPaymentSuccess, onClose }: In
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(true);
   const [paying, setPaying] = useState(false);
+  const [isTopUpOpen, setIsTopUpOpen] = useState(false);
 
   // 1. Fetch user's coin wallet balance
   useEffect(() => {
@@ -249,21 +252,30 @@ export function InvoiceDetailPage({ invoiceData, onPaymentSuccess, onClose }: In
           </div>
 
           {/* Rincian Saldo Koin & Biaya */}
-          <div className="border-t border-neutral-100 pt-5 space-y-2.5">
+          <div className="border-t border-neutral-100 pt-5 space-y-3">
             <div className="flex items-center justify-between text-xs text-neutral-600">
               <span className="flex items-center gap-1.5">
                 <Wallet className="w-3.5 h-3.5 text-neutral-400" />
                 <span>Saldo Koin Anda Saat Ini:</span>
               </span>
-              <strong className="text-neutral-900 font-bold">
-                {walletBalance !== null ? `${walletBalance.toLocaleString('id-ID')} Koin` : 'Memuat...'}
-              </strong>
+              <div className="flex items-center gap-2">
+                <strong className="text-neutral-900 font-bold">
+                  {walletBalance !== null ? `🪙 ${walletBalance.toLocaleString('id-ID')}` : 'Memuat...'}
+                </strong>
+                <button
+                  type="button"
+                  onClick={() => setIsTopUpOpen(true)}
+                  className="px-2 py-0.5 rounded-md bg-blue-50 text-blue-600 hover:bg-blue-100 text-[11px] font-bold cursor-pointer transition"
+                >
+                  + Top Up
+                </button>
+              </div>
             </div>
 
             <div className="flex items-center justify-between text-xs text-neutral-600">
               <span>Biaya Invoice (Escrow):</span>
               <strong className="text-amber-800 font-bold">
-                {totalCoinRequired.toLocaleString('id-ID')} Koin
+                🪙 {totalCoinRequired.toLocaleString('id-ID')}
               </strong>
             </div>
 
@@ -271,7 +283,7 @@ export function InvoiceDetailPage({ invoiceData, onPaymentSuccess, onClose }: In
               <div className="flex items-center justify-between text-xs pt-2 border-t border-dashed border-neutral-200">
                 <span className="text-neutral-500">Estimasi Sisa Saldo Koin:</span>
                 <span className={`font-semibold ${isBalanceSufficient ? 'text-emerald-600' : 'text-red-600'}`}>
-                  {isBalanceSufficient ? `${balanceAfterPayment.toLocaleString('id-ID')} Koin` : 'Saldo Koin Tidak Cukup'}
+                  {isBalanceSufficient ? `🪙 ${balanceAfterPayment.toLocaleString('id-ID')}` : 'Saldo Koin Tidak Cukup'}
                 </span>
               </div>
             )}
@@ -279,12 +291,9 @@ export function InvoiceDetailPage({ invoiceData, onPaymentSuccess, onClose }: In
             <div className="flex items-center justify-between pt-4 border-t border-neutral-200">
               <span className="font-bold text-sm text-neutral-900">Total Pembayaran:</span>
               <div className="text-right">
-                <span className="text-xl font-extrabold text-[#0B1F3A] flex items-center gap-1 justify-end">
+                <span className="text-2xl font-black text-[#0B1F3A] flex items-center gap-1.5 justify-end">
                   <span>🪙</span>
-                  <span>{totalCoinRequired.toLocaleString('id-ID')} Koin</span>
-                </span>
-                <span className="text-[10px] text-neutral-400 block">
-                  (Setara Rp{(totalCoinRequired * 1000).toLocaleString('id-ID')})
+                  <span>{totalCoinRequired.toLocaleString('id-ID')}</span>
                 </span>
               </div>
             </div>
@@ -292,22 +301,32 @@ export function InvoiceDetailPage({ invoiceData, onPaymentSuccess, onClose }: In
 
           {/* Tombol Aksi Pembayaran */}
           {invoice.status === 'unpaid' && (
-            <div className="pt-2 space-y-2">
+            <div className="pt-2 space-y-2.5">
+              {!isBalanceSufficient && (
+                <div className="p-3 rounded-xl bg-amber-50 border border-amber-200/80 space-y-2">
+                  <p className="text-xs text-amber-900 font-medium text-center">
+                    Saldo koin Anda kurang <strong>🪙 {(totalCoinRequired - (walletBalance || 0)).toLocaleString('id-ID')}</strong> untuk membayar invoice ini.
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() => setIsTopUpOpen(true)}
+                    className="w-full py-2.5 px-4 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs flex items-center justify-center gap-1.5 transition shadow-xs cursor-pointer"
+                  >
+                    <PlusCircle className="w-4 h-4" />
+                    <span>Top Up Koin Sekarang</span>
+                  </button>
+                </div>
+              )}
+
               <button
                 type="button"
                 onClick={pay}
                 disabled={paying || !isBalanceSufficient}
                 className="w-full rounded-xl bg-[#0B1F3A] hover:bg-[#123B8C] py-3 text-xs font-bold text-white transition-colors cursor-pointer flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed shadow-md"
               >
-                <Sparkles className="w-4 h-4 text-amber-300" />
+                <Lock className="w-4 h-4 text-neutral-300" />
                 <span>{paying ? 'Memproses Escrow Koin...' : 'Konfirmasi Bayar dengan Saldo Koin'}</span>
               </button>
-
-              {!isBalanceSufficient && (
-                <p className="text-[11px] text-red-600 text-center font-medium">
-                  Saldo koin Anda tidak mencukupi untuk melakukan pembayaran ini.
-                </p>
-              )}
 
               <p className="text-[10px] text-neutral-400 text-center">
                 Dana koin akan ditahan di rekening penampung (Escrow) CreatorIn hingga hasil akhir disetujui.
@@ -322,12 +341,22 @@ export function InvoiceDetailPage({ invoiceData, onPaymentSuccess, onClose }: In
                 <span>Pembayaran Berhasil Diverifikasi!</span>
               </div>
               <p className="text-[11px] text-emerald-700">
-                Dana sebesar 🪙 {totalCoinRequired.toLocaleString('id-ID')} Koin telah diamankan di Escrow. Collaboration Room telah aktif dan pengerjaan proyek dapat dipantau bersama Kreator.
+                Dana sebesar 🪙 {totalCoinRequired.toLocaleString('id-ID')} telah diamankan di Escrow. Collaboration Room telah aktif dan pengerjaan proyek dapat dipantau bersama Kreator.
               </p>
             </div>
           )}
         </div>
       )}
+
+      {/* Modal Top Up Cepat */}
+      <TopUpCoinModal
+        isOpen={isTopUpOpen}
+        onClose={() => setIsTopUpOpen(false)}
+        currentBalance={walletBalance || 0}
+        onSuccess={(newBal) => {
+          setWalletBalance(newBal);
+        }}
+      />
     </main>
   );
 }
