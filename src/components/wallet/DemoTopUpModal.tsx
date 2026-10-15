@@ -66,7 +66,7 @@ export function DemoTopUpModal({ isOpen, onClose, onSuccess }: Props) {
     <div
       role="dialog"
       aria-modal="true"
-      className="fixed inset-0 z-80 flex items-center justify-center p-4 bg-black/50 backdrop-blur-xs animate-in fade-in duration-150"
+      className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/50 backdrop-blur-xs animate-in fade-in duration-150"
       onClick={(e) => {
         if (e.target === e.currentTarget) onClose();
       }}

@@ -60,7 +60,7 @@ export function ErrorModal({ isOpen, onClose, error, onRetry }: ErrorModalProps)
       aria-modal="true"
       aria-labelledby="error-modal-title"
       aria-describedby="error-modal-description"
-      className="fixed inset-0 z-80 flex items-center justify-center p-4 bg-black/50 backdrop-blur-xs animate-in fade-in duration-150"
+      className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/50 backdrop-blur-xs animate-in fade-in duration-150"
       onClick={(e) => {
         if (e.target === e.currentTarget) onClose();
       }}

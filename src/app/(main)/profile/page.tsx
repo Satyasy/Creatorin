@@ -33,8 +33,8 @@ export default function MyProfilePage() {
         if (data) {
           setBusiness({
             ...data,
-            coverBanner: data.coverBanner || (data as any).coverUrl || user?.coverUrl || '',
-            logo: data.logo || user?.avatar || '',
+            coverBanner: user?.coverUrl || data.coverBanner || (data as any).coverUrl || '',
+            logo: user?.avatar || data.logo || '',
           });
         }
       })
@@ -52,8 +52,8 @@ export default function MyProfilePage() {
     return {
       id: user.id || '', name: user.name,
       brandName: business?.brandName || businessData.details?.companyName || user.name,
-      logo: business?.logo || user.avatar || '',
-      coverBanner: business?.coverBanner || user.coverUrl || '',
+      logo: user.avatar || business?.logo || '',
+      coverBanner: user.coverUrl || business?.coverBanner || '',
       industry: business?.industry || businessData.details?.businessCategory || '',
       category: business?.category || businessData.details?.businessCategory || '',
       tagline: business?.tagline || '',

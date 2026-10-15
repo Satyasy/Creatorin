@@ -43,7 +43,7 @@ export const SuccessModal: React.FC<SuccessModalProps> = ({
       role="dialog"
       aria-modal="true"
       aria-labelledby="success-modal-title"
-      className="fixed inset-0 z-80 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-in fade-in duration-200"
+      className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-in fade-in duration-200"
       onClick={handleClose}
     >
       <div

@@ -34,15 +34,15 @@ export async function getBusinessServerData(id: string): Promise<BusinessServerD
         coverUrl: profiles.coverUrl,
         coverBanner: profiles.coverUrl,
         location: profiles.location,
-        brandName: businessProfiles.companyName,
-        category: businessProfiles.businessCategory,
-        bio: businessProfiles.description,
+        brandName: sql<string>`coalesce(${businessProfiles.companyName}, ${profiles.fullName})`,
+        category: sql<string>`coalesce(${businessProfiles.businessCategory}, 'Retail / Brand')`,
+        bio: sql<string>`coalesce(${businessProfiles.description}, '')`,
         website: businessProfiles.website,
-        createdAt: businessProfiles.createdAt,
+        createdAt: sql<Date>`coalesce(${businessProfiles.createdAt}, ${profiles.createdAt})`,
       })
-      .from(businessProfiles)
-      .innerJoin(profiles, eq(businessProfiles.profileId, profiles.id))
-      .where(eq(profiles.id, id))
+      .from(profiles)
+      .leftJoin(businessProfiles, eq(profiles.id, businessProfiles.profileId))
+      .where(and(eq(profiles.id, id), eq(profiles.role, 'business')))
       .limit(1);
 
     if (!businesses.length) {

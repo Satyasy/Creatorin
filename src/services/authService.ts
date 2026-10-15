@@ -102,6 +102,7 @@ export const authService = {
         role: mapRoleToFrontend(data.user.role),
         dbRole: data.user.role,
         avatar: data.user.avatarUrl || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=240&auto=format&fit=crop&q=80',
+        coverUrl: data.user.coverUrl || '',
         location: data.user.location,
         phone: data.user.phone,
       };
@@ -138,6 +139,7 @@ export const authService = {
         role: mapRoleToFrontend(data.user.role),
         dbRole: data.user.role,
         avatar: data.user.avatarUrl || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=240&auto=format&fit=crop&q=80',
+        coverUrl: data.user.coverUrl || '',
         location: data.user.location,
         phone: data.user.phone,
       };
