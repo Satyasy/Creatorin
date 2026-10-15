@@ -55,7 +55,7 @@ export async function POST(req: NextRequest) {
     const uniqueFileName = `${Date.now()}-${crypto.randomBytes(6).toString("hex")}.${sanitizedExt}`;
 
     // Target directory: persistent shared/uploads or public/uploads/<folderType>/
-    const sanitizedFolder = ["avatars", "projects", "chat"].includes(folderType) ? folderType : "chat";
+    const sanitizedFolder = ["avatars", "projects", "services", "chat"].includes(folderType) ? folderType : "chat";
     const sharedUploadsDir = "/var/www/creatorin/shared/uploads";
     const uploadBaseDir = fs.existsSync(sharedUploadsDir)
       ? sharedUploadsDir

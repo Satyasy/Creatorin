@@ -22,10 +22,12 @@ import { AuthModal } from '@/components/modals/AuthModal';
 import { startRouteProgress } from '@/components/common/RouteProgressBar';
 import { creatorService } from '@/services/creatorService';
 import { DEFAULT_CREATORS } from '@/data/defaultCreators';
-import type { Creator, CreatorService, ActivePage, AuthState } from '@/types';
 import { useAuth } from '@/providers/AuthProvider';
 import { useLanguage } from '@/providers/LanguageProvider';
 import { useToast } from '@/providers/ToastProvider';
+import { useSuccessModal } from '@/providers/SuccessModalProvider';
+import { bookmarkService } from '@/services/bookmarkService';
+import type { AuthState, ActivePage, Creator, CreatorService } from '@/types';
 
 interface JelajahKreatorPageProps {
   currentUser?: AuthState['user'];
@@ -69,6 +71,7 @@ export const JelajahKreatorPage: React.FC<JelajahKreatorPageProps> = ({
   const router = useRouter();
   const { user: authUser } = useAuth();
   const { showToast } = useToast();
+  const { showSuccessModal } = useSuccessModal();
   const { t, language } = useLanguage();
   const currentUser = propUser !== undefined ? propUser : authUser;
 
@@ -154,10 +157,52 @@ export const JelajahKreatorPage: React.FC<JelajahKreatorPageProps> = ({
       });
   }, []);
 
-  const toggleBookmark = (id: string) => {
+  // Fetch persisted bookmarks from database
+  useEffect(() => {
+    if (currentUser?.id) {
+      bookmarkService.getBookmarks('creator').then((ids) => {
+        setBookmarkedIds(ids);
+      });
+    } else {
+      setBookmarkedIds([]);
+    }
+  }, [currentUser?.id]);
+
+  const toggleBookmark = async (id: string) => {
+    const wasBookmarked = bookmarkedIds.includes(id);
+    // Optimistic UI
     setBookmarkedIds((prev) => 
-      prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]
+      wasBookmarked ? prev.filter((item) => item !== id) : [...prev, id]
     );
+
+    const res = await bookmarkService.toggleBookmark('creator', id);
+    if (!res.success) {
+      // Rollback on failure
+      setBookmarkedIds((prev) => 
+        wasBookmarked ? [...prev, id] : prev.filter((item) => item !== id)
+      );
+      showToast({
+        type: 'error',
+        title: 'Gagal Menyimpan Bookmark',
+        message: res.error || 'Terjadi gangguan saat menyimpan ke database.',
+      });
+      return;
+    }
+
+    if (res.bookmarked) {
+      showSuccessModal({
+        title: 'Kreator Disimpan ke Favorit',
+        message: 'Profil kreator berhasil disimpan ke koleksi bookmark akun Anda.',
+        duration: 2500,
+      });
+    } else {
+      showToast({
+        type: 'info',
+        title: 'Bookmark Dihapus',
+        message: 'Profil kreator telah dihapus dari koleksi favorit.',
+        duration: 2000,
+      });
+    }
   };
 
   const handleCreatorClick = (creator: Creator) => {

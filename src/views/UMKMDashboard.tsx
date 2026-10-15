@@ -22,6 +22,8 @@ import { creatorService } from '@/services/creatorService';
 import { useAuth } from '@/providers/AuthProvider';
 import { useLanguage } from '@/providers/LanguageProvider';
 import { useToast } from '@/providers/ToastProvider';
+import { useSuccessModal } from '@/providers/SuccessModalProvider';
+import { bookmarkService } from '@/services/bookmarkService';
 import { FeedProject, CreatorService, Creator, AuthState } from '@/types';
 import { HomeHeroSection } from '@/components/home/HomeHeroSection';
 import { ProjectCard } from '@/components/common/ProjectCard';
@@ -660,6 +662,7 @@ export const UMKMDashboard = () => {
   const router = useRouter();
   const { user } = useAuth();
   const { showToast } = useToast();
+  const { showSuccessModal } = useSuccessModal();
   const { t, language } = useLanguage();
   const [activeTab, setActiveTab] = useState<'creator' | 'layanan' | 'proyek'>('creator');
   const [searchQuery, setSearchQuery] = useState('');
@@ -788,7 +791,34 @@ export const UMKMDashboard = () => {
       .catch(() => {});
   }, []);
 
-  const toggleBookmark = (creatorId: string) => {
+  // Fetch persisted bookmarks from database
+  useEffect(() => {
+    if (!user?.id) {
+      setSavedCreators({});
+      setSavedServices({});
+      setSavedProjects({});
+      return;
+    }
+    Promise.all([
+      bookmarkService.getBookmarks('creator'),
+      bookmarkService.getBookmarks('service'),
+      bookmarkService.getBookmarks('project'),
+    ]).then(([cIds, sIds, pIds]) => {
+      const cMap: Record<string, boolean> = {};
+      cIds.forEach((id) => { cMap[id] = true; });
+      setSavedCreators(cMap);
+
+      const sMap: Record<string, boolean> = {};
+      sIds.forEach((id) => { sMap[id] = true; });
+      setSavedServices(sMap);
+
+      const pMap: Record<string, boolean> = {};
+      pIds.forEach((id) => { pMap[id] = true; });
+      setSavedProjects(pMap);
+    }).catch(() => {});
+  }, [user?.id]);
+
+  const toggleBookmark = async (creatorId: string) => {
     if (!user) {
       showToast({
         type: 'warning',
@@ -801,13 +831,44 @@ export const UMKMDashboard = () => {
       });
       return;
     }
+
+    const wasSaved = Boolean(savedCreators[creatorId]);
     setSavedCreators((prev) => ({
       ...prev,
-      [creatorId]: !prev[creatorId],
+      [creatorId]: !wasSaved,
     }));
+
+    const res = await bookmarkService.toggleBookmark('creator', creatorId);
+    if (!res.success) {
+      setSavedCreators((prev) => ({
+        ...prev,
+        [creatorId]: wasSaved,
+      }));
+      showToast({
+        type: 'error',
+        title: 'Gagal Menyimpan Bookmark',
+        message: res.error || 'Terjadi kesalahan saat menyimpan bookmark kreator.',
+      });
+      return;
+    }
+
+    if (res.bookmarked) {
+      showSuccessModal({
+        title: 'Kreator Disimpan ke Favorit',
+        message: 'Profil kreator berhasil ditambahkan ke daftar bookmark akun Anda.',
+        duration: 2500,
+      });
+    } else {
+      showToast({
+        type: 'info',
+        title: 'Bookmark Dihapus',
+        message: 'Kreator telah dihapus dari koleksi favorit.',
+        duration: 2000,
+      });
+    }
   };
 
-  const toggleBookmarkService = (serviceId: string) => {
+  const toggleBookmarkService = async (serviceId: string) => {
     if (!user) {
       showToast({
         type: 'warning',
@@ -820,13 +881,44 @@ export const UMKMDashboard = () => {
       });
       return;
     }
+
+    const wasSaved = Boolean(savedServices[serviceId]);
     setSavedServices((prev) => ({
       ...prev,
-      [serviceId]: !prev[serviceId],
+      [serviceId]: !wasSaved,
     }));
+
+    const res = await bookmarkService.toggleBookmark('service', serviceId);
+    if (!res.success) {
+      setSavedServices((prev) => ({
+        ...prev,
+        [serviceId]: wasSaved,
+      }));
+      showToast({
+        type: 'error',
+        title: 'Gagal Menyimpan Layanan',
+        message: res.error || 'Terjadi kesalahan saat menyimpan bookmark layanan.',
+      });
+      return;
+    }
+
+    if (res.bookmarked) {
+      showSuccessModal({
+        title: 'Layanan Disimpan ke Favorit',
+        message: 'Paket layanan berhasil ditambahkan ke daftar favorit akun Anda.',
+        duration: 2500,
+      });
+    } else {
+      showToast({
+        type: 'info',
+        title: 'Bookmark Dihapus',
+        message: 'Layanan telah dihapus dari koleksi favorit.',
+        duration: 2000,
+      });
+    }
   };
 
-  const toggleBookmarkProject = (projectId: string, e?: React.MouseEvent) => {
+  const toggleBookmarkProject = async (projectId: string, e?: React.MouseEvent) => {
     if (e) e.stopPropagation();
     if (!user) {
       showToast({
@@ -840,10 +932,41 @@ export const UMKMDashboard = () => {
       });
       return;
     }
+
+    const wasSaved = Boolean(savedProjects[projectId]);
     setSavedProjects((prev) => ({
       ...prev,
-      [projectId]: !prev[projectId],
+      [projectId]: !wasSaved,
     }));
+
+    const res = await bookmarkService.toggleBookmark('project', projectId);
+    if (!res.success) {
+      setSavedProjects((prev) => ({
+        ...prev,
+        [projectId]: wasSaved,
+      }));
+      showToast({
+        type: 'error',
+        title: 'Gagal Menyimpan Proyek',
+        message: res.error || 'Terjadi gangguan saat menyimpan bookmark proyek.',
+      });
+      return;
+    }
+
+    if (res.bookmarked) {
+      showSuccessModal({
+        title: 'Karya Proyek Disimpan',
+        message: 'Karya portofolio berhasil ditambahkan ke inspirasi tersimpan akun Anda.',
+        duration: 2500,
+      });
+    } else {
+      showToast({
+        type: 'info',
+        title: 'Bookmark Dihapus',
+        message: 'Karya proyek telah dihapus dari daftar tersimpan.',
+        duration: 2000,
+      });
+    }
   };
 
   const handleTabChange = (tab: 'creator' | 'layanan' | 'proyek') => {

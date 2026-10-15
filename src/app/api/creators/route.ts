@@ -19,6 +19,7 @@ export async function GET(req: NextRequest) {
         id: profiles.id,
         fullName: profiles.fullName,
         avatarUrl: profiles.avatarUrl,
+        coverUrl: profiles.coverUrl,
         location: profiles.location,
         phone: profiles.phone,
         slug: creatorProfiles.slug,

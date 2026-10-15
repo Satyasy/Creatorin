@@ -5,6 +5,9 @@ import { AuthProvider } from "@/providers/AuthProvider";
 import { LanguageProvider } from "@/providers/LanguageProvider";
 import { AuthModalProvider } from "@/providers/AuthModalProvider";
 import { ToastProvider } from "@/providers/ToastProvider";
+import { ErrorModalProvider } from "@/providers/ErrorModalProvider";
+import { SuccessModalProvider } from "@/providers/SuccessModalProvider";
+import { ConfirmModalProvider } from "@/providers/ConfirmModalProvider";
 import { RouteProgressBar } from "@/components/common/RouteProgressBar";
 import { GA_TRACKING_ID, CLARITY_PROJECT_ID } from "@/lib/analytics";
 
@@ -165,10 +168,16 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
           <LanguageProvider>
             <AuthModalProvider>
               <ToastProvider>
-                <Suspense fallback={null}>
-                  <RouteProgressBar />
-                </Suspense>
-                {children}
+                <ErrorModalProvider>
+                  <SuccessModalProvider>
+                    <ConfirmModalProvider>
+                      <Suspense fallback={null}>
+                        <RouteProgressBar />
+                      </Suspense>
+                      {children}
+                    </ConfirmModalProvider>
+                  </SuccessModalProvider>
+                </ErrorModalProvider>
               </ToastProvider>
             </AuthModalProvider>
           </LanguageProvider>

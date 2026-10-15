@@ -252,8 +252,21 @@ export const ProjectBriefModal: React.FC<ProjectBriefModalProps> = ({
         <div className="px-6 sm:px-8 py-6 sm:py-8 overflow-y-auto flex-1">
           {isSubmitted ? (
             <div className="text-center py-12 space-y-4">
-              <div className="w-16 h-16 bg-emerald-50 text-emerald-600 rounded-full flex items-center justify-center mx-auto ring-8 ring-emerald-50/50">
-                <CheckCircle2 className="w-8 h-8" />
+              <div className="w-16 h-16 bg-[#155DFC] text-white rounded-full flex items-center justify-center mx-auto ring-8 ring-blue-100/80 shadow-lg shadow-blue-500/20 animate-in zoom-in-75 duration-300">
+                <svg
+                  className="w-8 h-8 text-white"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="3.2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <path
+                    d="M20 6L9 17L4 12"
+                    className="animate-checkmark-draw"
+                  />
+                </svg>
               </div>
               <h3 className="text-xl font-bold text-[#0D0C22]">{t('briefModal.successTitle', 'Brief Berhasil Diterbitkan!')}</h3>
               <p className="text-xs sm:text-sm text-neutral-600 max-w-md mx-auto leading-relaxed">
@@ -265,7 +278,7 @@ export const ProjectBriefModal: React.FC<ProjectBriefModalProps> = ({
                 <button
                   type="button"
                   onClick={handleResetAndClose}
-                  className="px-7 py-2.5 rounded-xl bg-[#0B1F3A] hover:bg-[#123B8C] text-white text-xs sm:text-sm font-semibold transition cursor-pointer shadow-xs"
+                  className="px-7 py-2.5 rounded-xl bg-[#155DFC] hover:bg-[#1248C4] text-white text-xs sm:text-sm font-semibold transition cursor-pointer shadow-xs active:scale-98"
                 >
                   {t('briefModal.doneBtn', 'Selesai')}
                 </button>

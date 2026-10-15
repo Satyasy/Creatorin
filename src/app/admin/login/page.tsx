@@ -46,6 +46,7 @@ export default function AdminLoginPage() {
       }
 
       if (data.session?.accessToken) {
+        localStorage.setItem('creatorin_token', data.session.accessToken);
         localStorage.setItem('creatorin_access_token', data.session.accessToken);
         localStorage.setItem('creatorin_role', data.user.role);
       }

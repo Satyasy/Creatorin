@@ -5,6 +5,7 @@ export function toCreator(c: any): Creator {
   const rating = Number(c.rating || 0);
   return {
     id: c.id, name: c.fullName || '', username: c.slug || '', avatar: c.avatarUrl || '',
+    coverUrl: c.coverUrl || '',
     category: c.skills?.some((skill: string) => /video|tiktok|reels/i.test(skill)) ? 'Video' : 'Image',
     roleTitle: c.headline || '', bio: c.bio || '', location: c.location || '',
     startingRate: Number(String(c.startingPrice || '').replace(/\D/g, '')) || 0,

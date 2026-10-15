@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { AlertCircle, Check, Eye, EyeOff, Loader2, Lock, Mail } from 'lucide-react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { AuthBanner } from '@/components/auth/AuthBanner';
+import { DemoAccessSection } from '@/components/auth/DemoAccessSection';
 import { useAuth } from '@/providers/AuthProvider';
 import { authService } from '@/services/authService';
 import { ActivePage, AuthState } from '@/types';
@@ -196,11 +197,14 @@ export const SignInPage: React.FC<Props> = ({ onNavigate, onLoginSuccess }) => {
                 const safe = sanitizeRedirect(redirectParam);
                 router.push(safe ? `/sign-up?redirect=${encodeURIComponent(safe)}` : '/sign-up');
               }}
-              className="font-semibold text-[#155DFC] hover:underline"
+              className="font-semibold text-[#155DFC] hover:underline cursor-pointer"
             >
               Daftar sekarang
             </button>
           </p>
+
+          {/* Quick Demo Personas */}
+          <DemoAccessSection onSuccess={(user) => onLoginSuccess?.(user)} />
 
           {/* Supported By Section */}
           <div className="mt-5 sm:mt-6 pt-4 border-t border-[#F5F5F5] flex flex-col items-center gap-2">

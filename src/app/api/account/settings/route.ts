@@ -4,6 +4,7 @@ import { hashPassword } from "@/lib/auth-local";
 import { getDb } from "@/lib/db";
 import { profiles, userSettings } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
+import { deleteCache } from "@/lib/redis";
 
 export async function GET(req: NextRequest) {
   const user = await getAuthenticatedUser(req);
@@ -80,6 +81,13 @@ export async function PUT(req: NextRequest) {
         },
       });
     }
+
+    // Invalidate user session details and public profile caches
+    await Promise.all([
+      deleteCache(`user:me:${user.id}`),
+      deleteCache("profile:slug:*"),
+      deleteCache("creators:*"),
+    ]);
 
     return NextResponse.json({
       success: true,

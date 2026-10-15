@@ -17,12 +17,42 @@ import {
   ShieldCheck, 
   Save, 
   Camera, 
-  ArrowLeft 
+  ArrowLeft,
+  Loader2,
+  LogOut 
 } from 'lucide-react';
+import { useConfirmModal } from '@/providers/ConfirmModalProvider';
+import { useSuccessModal } from '@/providers/SuccessModalProvider';
+import { uploadImageWithRetry } from '@/lib/uploadHelper';
 
 export const SettingsPage: React.FC = () => {
   const router = useRouter();
-  const { user, refreshUser } = useAuth();
+  const { user, refreshUser, logout } = useAuth();
+  const { confirmModal } = useConfirmModal();
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
+
+  const handleLogout = async () => {
+    const confirmed = await confirmModal({
+      title: 'Konfirmasi Keluar Akun',
+      message: 'Apakah Anda yakin ingin keluar dari akun Creatorin ini?',
+      confirmText: 'Keluar',
+      cancelText: 'Batal',
+      variant: 'danger',
+    });
+    if (!confirmed) return;
+
+    setIsLoggingOut(true);
+    try {
+      await logout();
+      showToast({
+        type: 'info',
+        message: 'Anda telah berhasil keluar dari akun.',
+      });
+      window.location.href = '/';
+    } finally {
+      setIsLoggingOut(false);
+    }
+  };
 
   const [activeTab, setActiveTab] = useState<'profile' | 'preferences' | 'security'>('profile');
 
@@ -46,6 +76,7 @@ export const SettingsPage: React.FC = () => {
   // Global hooks
   const { language, setLanguage, t } = useLanguage();
   const { showToast } = useToast();
+  const { showSuccessModal } = useSuccessModal();
 
   // Notification states
   const [notifyPush, setNotifyPush] = useState(true);
@@ -59,6 +90,76 @@ export const SettingsPage: React.FC = () => {
   const [isSavedToast, setIsSavedToast] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [saveError, setSaveError] = useState('');
+  const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
+  const avatarInputRef = React.useRef<HTMLInputElement>(null);
+  const [isUploadingBanner, setIsUploadingBanner] = useState(false);
+  const bannerInputRef = React.useRef<HTMLInputElement>(null);
+
+  const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setIsUploadingAvatar(true);
+    setSaveError('');
+    try {
+      const uploadResult = await uploadImageWithRetry(file, 'avatars');
+      const res = await fetch('/api/profile', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ avatarUrl: uploadResult.url }),
+      });
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        throw new Error(data.error || 'Gagal menyimpan foto profil.');
+      }
+      await refreshUser();
+      showSuccessModal({
+        title: 'Foto Profil Diperbarui',
+        message: 'Foto profil Anda berhasil disimpan ke database.',
+        duration: 2500,
+      });
+      showToast({
+        type: 'success',
+        message: 'Foto profil berhasil diperbarui!',
+      });
+    } catch (err: any) {
+      setSaveError(err.message || 'Gagal mengunggah foto profil.');
+    } finally {
+      setIsUploadingAvatar(false);
+    }
+  };
+
+  const handleBannerUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setIsUploadingBanner(true);
+    setSaveError('');
+    try {
+      const uploadResult = await uploadImageWithRetry(file, 'avatars');
+      const res = await fetch('/api/profile', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ coverUrl: uploadResult.url }),
+      });
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        throw new Error(data.error || 'Gagal menyimpan background sampul.');
+      }
+      await refreshUser();
+      showSuccessModal({
+        title: 'Foto Sampul Diperbarui',
+        message: 'Background banner profil Anda berhasil disimpan ke database.',
+        duration: 2500,
+      });
+      showToast({
+        type: 'success',
+        message: 'Background banner berhasil diperbarui!',
+      });
+    } catch (err: any) {
+      setSaveError(err.message || 'Gagal mengunggah foto sampul.');
+    } finally {
+      setIsUploadingBanner(false);
+    }
+  };
 
   useEffect(() => {
     if (!user) return;
@@ -78,6 +179,17 @@ export const SettingsPage: React.FC = () => {
     e.preventDefault();
     setIsSaving(true);
     setSaveError('');
+
+    if (newPassword && newPassword !== confirmPassword) {
+      setSaveError('Konfirmasi kata sandi tidak cocok.');
+      setIsSaving(false);
+      return;
+    }
+    if (newPassword && newPassword.length < 8) {
+      setSaveError('Kata sandi baru minimal 8 karakter.');
+      setIsSaving(false);
+      return;
+    }
 
     try {
       // Call account settings API
@@ -111,6 +223,11 @@ export const SettingsPage: React.FC = () => {
 
       await refreshUser();
       setIsSavedToast(true);
+      showSuccessModal({
+        title: 'Pengaturan Berhasil Disimpan',
+        message: 'Perubahan profil dan preferensi akun Anda telah berhasil diperbarui di server.',
+        duration: 2500,
+      });
       showToast({
         type: 'success',
         message: t('settings.saveSuccess', 'Pengaturan berhasil disimpan!'),
@@ -128,7 +245,7 @@ export const SettingsPage: React.FC = () => {
       <div className="max-w-4xl mx-auto px-6">
         
         {/* Top Back / Header */}
-        <div className="flex items-center justify-between mb-8">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
           <div className="flex items-center gap-3">
             <button
               onClick={() => router.back()}
@@ -146,6 +263,17 @@ export const SettingsPage: React.FC = () => {
               </p>
             </div>
           </div>
+
+          <button
+            type="button"
+            id="btn-settings-header-logout"
+            onClick={handleLogout}
+            disabled={isLoggingOut}
+            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl border border-red-200 bg-red-50 hover:bg-red-100 text-red-600 text-xs sm:text-sm font-semibold transition-colors cursor-pointer w-fit disabled:opacity-50"
+          >
+            {isLoggingOut ? <Loader2 className="w-4 h-4 animate-spin" /> : <LogOut className="w-4 h-4" />}
+            <span>{isLoggingOut ? 'Mengeluarkan...' : t('nav.signOut', 'Keluar Akun')}</span>
+          </button>
         </div>
 
         {/* Tab Navigation */}
@@ -192,24 +320,126 @@ export const SettingsPage: React.FC = () => {
           {activeTab === 'profile' && (
             <div className="bg-white rounded-2xl border border-[#E2E8F0] p-6 sm:p-8 space-y-6 shadow-2xs">
               
+              {/* Foto Sampul / Background Banner Section */}
+              <div className="pb-6 border-b border-[#E2E8F0]">
+                <div className="flex items-center justify-between mb-2">
+                  <label className="block text-xs font-bold text-neutral-700">
+                    Background Sampul / Banner Profil
+                  </label>
+                  <span className="text-[11px] text-neutral-400">Rekomendasi 1200 x 400px</span>
+                </div>
+                <input
+                  ref={bannerInputRef}
+                  type="file"
+                  accept="image/jpeg,image/png,image/webp"
+                  className="hidden"
+                  onChange={handleBannerUpload}
+                />
+                <div 
+                  onClick={() => !isUploadingBanner && bannerInputRef.current?.click()}
+                  className="relative group cursor-pointer h-32 sm:h-40 w-full rounded-2xl overflow-hidden border border-neutral-200 shadow-2xs transition-all hover:border-blue-400"
+                  title="Klik untuk mengganti background sampul profil"
+                >
+                  {user?.coverUrl && !user.coverUrl.startsWith('#') && !user.coverUrl.startsWith('linear-gradient') ? (
+                    <img
+                      src={user.coverUrl}
+                      alt="Background Sampul"
+                      className="w-full h-full object-cover transition duration-300 group-hover:scale-102"
+                    />
+                  ) : (
+                    <div 
+                      className="w-full h-full flex items-center justify-center transition duration-300"
+                      style={{
+                        background: user?.coverUrl || 'linear-gradient(135deg, #155DFC 0%, #03ACFD 100%)',
+                      }}
+                    >
+                      <span className="text-white/80 text-xs font-semibold tracking-wide">
+                        Klik untuk memasang foto background sampul
+                      </span>
+                    </div>
+                  )}
+
+                  {/* Hover Overlay */}
+                  <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center text-white text-xs font-semibold">
+                    <Camera className="w-5 h-5 mb-1 text-white" />
+                    <span>Ganti Background Sampul</span>
+                  </div>
+
+                  {/* Badge Button Top Right */}
+                  <div className="absolute top-3 right-3 px-3 py-1.5 rounded-full bg-white/95 backdrop-blur-xs text-[#0D0C22] text-xs font-bold shadow-md flex items-center gap-1.5 group-hover:bg-white transition">
+                    {isUploadingBanner ? (
+                      <>
+                        <Loader2 className="w-3.5 h-3.5 animate-spin text-blue-600" />
+                        <span>Mengunggah...</span>
+                      </>
+                    ) : (
+                      <>
+                        <Camera className="w-3.5 h-3.5 text-blue-600" />
+                        <span>Ganti Sampul</span>
+                      </>
+                    )}
+                  </div>
+                </div>
+              </div>
+
               {/* Avatar Section */}
               <div className="flex items-center gap-5 pb-6 border-b border-[#E2E8F0]">
-                <div className="relative">
+                <input
+                  ref={avatarInputRef}
+                  type="file"
+                  accept="image/jpeg,image/png,image/webp"
+                  className="hidden"
+                  onChange={handleAvatarUpload}
+                />
+                <div 
+                  onClick={() => !isUploadingAvatar && avatarInputRef.current?.click()}
+                  className="relative group cursor-pointer"
+                  title="Klik untuk mengganti foto profil"
+                >
                   <img
                     src={user?.avatar || '/creatorin/avatar.png'}
                     alt={fullName}
-                    className="w-20 h-20 rounded-full object-cover ring-4 ring-neutral-100"
+                    className="w-20 h-20 rounded-full object-cover ring-4 ring-neutral-100 group-hover:ring-blue-400 transition"
                   />
-                  <div className="absolute bottom-0 right-0 p-1.5 rounded-full bg-[#0B1F3A] text-white shadow-xs">
-                    <Camera className="w-3.5 h-3.5" />
+                  <div className="absolute inset-0 rounded-full bg-black/40 opacity-0 group-hover:opacity-100 transition flex flex-col items-center justify-center text-white text-[10px] font-semibold cursor-pointer">
+                    <Camera className="w-5 h-5 mb-0.5" />
+                    <span>Ubah</span>
+                  </div>
+                  <div className="absolute bottom-0 right-0 p-1.5 rounded-full bg-[#0B1F3A] text-white shadow-xs group-hover:scale-110 transition">
+                    {isUploadingAvatar ? (
+                      <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                    ) : (
+                      <Camera className="w-3.5 h-3.5" />
+                    )}
                   </div>
                 </div>
                 <div>
                   <h3 className="text-sm font-bold text-[#171717]">{fullName}</h3>
-                  <p className="text-xs text-neutral-500 mt-0.5">{user?.role === 'creator' ? 'Kreator Terverifikasi' : 'Brand / UMKM'}</p>
-                  <span className="inline-block mt-2 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-[#F3F3F4] text-neutral-700">
-                    Format JPG, PNG maks 2MB
-                  </span>
+                  <p className="text-xs text-neutral-500 mt-0.5">
+                    {user?.role === 'admin'
+                      ? 'Administrator Platform'
+                      : user?.role === 'creator'
+                      ? 'Kreator Terverifikasi'
+                      : 'Brand / UMKM'}
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() => avatarInputRef.current?.click()}
+                    disabled={isUploadingAvatar}
+                    className="inline-flex items-center gap-1.5 mt-2 px-3 py-1 rounded-full text-xs font-bold bg-[#F3F3F4] hover:bg-neutral-200 text-neutral-700 cursor-pointer transition"
+                  >
+                    {isUploadingAvatar ? (
+                      <>
+                        <Loader2 className="w-3 h-3 animate-spin" />
+                        <span>Mengunggah...</span>
+                      </>
+                    ) : (
+                      <>
+                        <Camera className="w-3 h-3" />
+                        <span>Pilih Foto Baru</span>
+                      </>
+                    )}
+                  </button>
                 </div>
               </div>
 
@@ -425,6 +655,31 @@ export const SettingsPage: React.FC = () => {
           </div>
 
         </form>
+
+        {/* Sesi Akun & Logout Card */}
+        <div className="mt-8 bg-white rounded-2xl border border-red-100 p-6 sm:p-7 shadow-2xs">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div>
+              <h3 className="text-sm font-bold text-red-950 flex items-center gap-2">
+                <LogOut className="w-4 h-4 text-red-600" />
+                <span>Sesi Akun & Keluar</span>
+              </h3>
+              <p className="text-xs text-neutral-500 mt-1 leading-relaxed">
+                Keluar dari sesi saat ini pada perangkat ini ({user?.email || 'akun terdaftar'}). Anda dapat masuk kembali kapan saja.
+              </p>
+            </div>
+            <button
+              type="button"
+              id="btn-settings-footer-logout"
+              onClick={handleLogout}
+              disabled={isLoggingOut}
+              className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl border border-red-200 bg-red-50 hover:bg-red-100 text-red-600 text-xs sm:text-sm font-semibold transition-colors cursor-pointer w-full sm:w-auto shrink-0 disabled:opacity-50"
+            >
+              {isLoggingOut ? <Loader2 className="w-4 h-4 animate-spin" /> : <LogOut className="w-4 h-4" />}
+              <span>{isLoggingOut ? 'Mengeluarkan...' : 'Keluar dari Akun Ini'}</span>
+            </button>
+          </div>
+        </div>
 
       </div>
     </div>

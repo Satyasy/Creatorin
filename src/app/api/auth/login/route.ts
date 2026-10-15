@@ -66,18 +66,21 @@ export async function POST(req: NextRequest) {
         role: userProfile.role,
         fullName: userProfile.fullName,
         avatarUrl: userProfile.avatarUrl,
+        coverUrl: userProfile.coverUrl || '',
         location: userProfile.location,
         phone: userProfile.phone,
       },
     });
 
     // Set HTTP-Only Cookie untuk persistensi browser cross-subdomain (creatorin.my.id <-> api.creatorin.my.id)
-    const isProd = process.env.NODE_ENV === "production";
-    const cookieDomain = isProd ? ".creatorin.my.id" : undefined;
+    const host = req.headers.get("host") || "";
+    const isCustomDomain = host.includes("creatorin.my.id");
+    const cookieDomain = isCustomDomain ? ".creatorin.my.id" : undefined;
+    const isSecure = isCustomDomain;
     response.cookies.set("creatorin_token", token, {
       httpOnly: true,
-      secure: isProd,
-      sameSite: isProd ? "none" : "lax",
+      secure: isSecure,
+      sameSite: isCustomDomain ? "none" : "lax",
       path: "/",
       domain: cookieDomain,
       maxAge: 7 * 24 * 60 * 60,

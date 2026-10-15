@@ -2,8 +2,10 @@ import { NextRequest, NextResponse } from "next/server";
 import { getAuthenticatedUser } from "@/lib/api-auth";
 import { getDb } from "@/lib/db";
 import { services, profiles, creatorProfiles } from "@/lib/db/schema";
-import { eq, desc, ilike, and } from "drizzle-orm";
-import { createClient } from "@/lib/supabase/server";
+import { eq, desc } from "drizzle-orm";
+import fs from "fs";
+import path from "path";
+import crypto from "crypto";
 
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
@@ -15,7 +17,7 @@ export async function GET(req: NextRequest) {
   if (!db) return NextResponse.json({ error: "Database not connected" }, { status: 503 });
 
   try {
-    let query = db
+    const query = db
       .select({
         id: services.id,
         title: services.title,
@@ -34,7 +36,7 @@ export async function GET(req: NextRequest) {
         creatorSlug: creatorProfiles.slug,
       })
       .from(services)
-      .innerJoin(profiles, eq(services.creatorId, profiles.id))
+      .leftJoin(profiles, eq(services.creatorId, profiles.id))
       .leftJoin(creatorProfiles, eq(profiles.id, creatorProfiles.profileId))
       .where(eq(services.isActive, true))
       .orderBy(desc(services.createdAt));
@@ -62,65 +64,113 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
   const user = await getAuthenticatedUser(req);
   if (!user) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    return NextResponse.json({ error: "Unauthorized. Silakan login terlebih dahulu." }, { status: 401 });
   }
-  if (user.role !== "creator") return NextResponse.json({ error: "Hanya kreator dapat membuat layanan." }, { status: 403 });
+  if (user.role !== "creator" && user.role !== "admin") {
+    return NextResponse.json({ error: "Hanya kreator dapat membuat layanan." }, { status: 403 });
+  }
 
   const db = getDb();
   if (!db) {
     return NextResponse.json({ error: "Database not connected" }, { status: 503 });
   }
 
-  const form = await req.formData();
-  const title = String(form.get("title") || "").trim();
-  const category = String(form.get("category") || "").trim();
-  const description = String(form.get("description") || "").trim();
-  const price = String(form.get("price") || "").trim();
-  const estimatedDays = String(form.get("estimatedDays") || "").trim();
-  const file = form.get("file");
-
-  if (!title || !category || !price) {
-    return NextResponse.json({ error: "Judul, kategori, dan harga wajib diisi." }, { status: 400 });
-  }
-
   try {
-    let imageUrl: string | undefined;
-    let uploadedPath: string | undefined;
-    const supabase = await createClient();
-    if (file instanceof File && file.size > 0) {
-      if (file.size > 20 * 1024 * 1024 || !["image/jpeg", "image/png", "image/webp"].includes(file.type)) {
-        return NextResponse.json({ error: "Gunakan JPG, PNG, atau WebP maksimal 20 MB." }, { status: 400 });
+    let title = "";
+    let category = "";
+    let description = "";
+    let price = "";
+    let estimatedDays = "3 Hari Kerja";
+    let imageUrl: string | undefined = undefined;
+    let savedFilePath: string | null = null;
+
+    const contentType = req.headers.get("content-type") || "";
+
+    if (contentType.includes("multipart/form-data")) {
+      const form = await req.formData();
+      title = String(form.get("title") || "").trim();
+      category = String(form.get("category") || "").trim();
+      description = String(form.get("description") || "").trim();
+      price = String(form.get("price") || "").trim();
+      const passedDays = String(form.get("estimatedDays") || "").trim();
+      if (passedDays) estimatedDays = passedDays;
+      const passedImageUrl = String(form.get("imageUrl") || "").trim();
+      if (passedImageUrl) imageUrl = passedImageUrl;
+
+      const file = form.get("file");
+      if (file instanceof File && file.size > 0) {
+        if (file.size > 25 * 1024 * 1024) {
+          return NextResponse.json({ error: "Ukuran gambar cover maksimal 25 MB." }, { status: 400 });
+        }
+        const allowedTypes = ["image/jpeg", "image/png", "image/webp", "image/gif"];
+        if (!allowedTypes.includes(file.type)) {
+          return NextResponse.json({ error: "Format gambar tidak didukung. Gunakan JPG, PNG, WebP, atau GIF." }, { status: 400 });
+        }
+
+        const sharedUploadsDir = "/var/www/creatorin/shared/uploads";
+        const uploadBaseDir = fs.existsSync(sharedUploadsDir)
+          ? sharedUploadsDir
+          : path.join(process.cwd(), "public", "uploads");
+        const uploadDir = path.join(uploadBaseDir, "services");
+        if (!fs.existsSync(uploadDir)) {
+          fs.mkdirSync(uploadDir, { recursive: true });
+        }
+
+        const rawExt = path.extname(file.name || "").replace(".", "") || file.type.split("/")[1] || "png";
+        const ext = rawExt.toLowerCase() === "jpeg" ? "jpg" : rawExt.toLowerCase();
+        const uniqueFileName = `${Date.now()}-${crypto.randomBytes(6).toString("hex")}.${ext}`;
+        const filePath = path.join(uploadDir, uniqueFileName);
+        const buffer = Buffer.from(await file.arrayBuffer());
+        await fs.promises.writeFile(filePath, buffer);
+
+        savedFilePath = filePath;
+        imageUrl = `/uploads/services/${uniqueFileName}`;
       }
-      uploadedPath = `${user.id}/${crypto.randomUUID()}.${file.type === "image/jpeg" ? "jpg" : file.type.split("/")[1]}`;
-      const { error } = await supabase.storage.from("project-media").upload(uploadedPath, file, { contentType: file.type });
-      if (error) return NextResponse.json({ error: error.message }, { status: 500 });
-      imageUrl = supabase.storage.from("project-media").getPublicUrl(uploadedPath).data.publicUrl;
-    }
-    const numeric = parseInt(price.replace(/[^0-9]/g, ""), 10) || 0;
-    let newService;
-    try {
-      [newService] = await db
-      .insert(services)
-      .values({
-        creatorId: user.id,
-        title,
-        category,
-        description: description || "",
-        price: `🪙 ${numeric.toLocaleString('id-ID')}`,
-        priceNumeric: numeric,
-        estimatedDays,
-        shapeIdx: 0,
-        imageUrl,
-        isActive: true,
-      })
-      .returning();
-    } catch (error) {
-      if (uploadedPath) await supabase.storage.from("project-media").remove([uploadedPath]);
-      throw error;
+    } else {
+      const body = await req.json();
+      title = String(body.title || "").trim();
+      category = String(body.category || "").trim();
+      description = String(body.description || "").trim();
+      price = String(body.price || "").trim();
+      if (body.estimatedDays) estimatedDays = String(body.estimatedDays).trim();
+      if (body.imageUrl) imageUrl = String(body.imageUrl).trim();
     }
 
-    return NextResponse.json({ success: true, service: newService }, { status: 201 });
+    if (!title || !category || !price) {
+      return NextResponse.json({ error: "Judul, kategori, dan harga wajib diisi." }, { status: 400 });
+    }
+
+    const numeric = parseInt(price.replace(/[^0-9]/g, ""), 10) || 0;
+    const formattedPrice = price.startsWith("🪙") ? price : `🪙 ${numeric.toLocaleString("id-ID")}`;
+
+    try {
+      const [newService] = await db
+        .insert(services)
+        .values({
+          creatorId: user.id,
+          title,
+          category,
+          description: description || "",
+          price: formattedPrice,
+          priceNumeric: numeric,
+          estimatedDays,
+          shapeIdx: 0,
+          imageUrl: imageUrl || null,
+          isActive: true,
+        })
+        .returning();
+
+      return NextResponse.json({ success: true, service: newService }, { status: 201 });
+    } catch (insertError) {
+      if (savedFilePath) {
+        try {
+          await fs.promises.unlink(savedFilePath);
+        } catch {}
+      }
+      throw insertError;
+    }
   } catch (err: any) {
-    return NextResponse.json({ error: err.message }, { status: 500 });
+    console.error("POST /api/services error:", err);
+    return NextResponse.json({ error: err.message || "Gagal membuat layanan." }, { status: 500 });
   }
 }

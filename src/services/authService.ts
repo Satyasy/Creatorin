@@ -8,6 +8,7 @@ export interface UserSession {
   role: UserRole;
   dbRole: 'creator' | 'business' | 'school';
   avatar?: string;
+  coverUrl?: string;
   location?: string;
   phone?: string;
   bio?: string;
@@ -20,6 +21,7 @@ export interface UserSession {
 export function mapRoleToFrontend(dbRole: string): UserRole {
   if (dbRole === 'business') return 'umkm';
   if (dbRole === 'school') return 'school';
+  if (dbRole === 'admin') return 'admin';
   return 'creator';
 }
 
@@ -62,6 +64,7 @@ export const authService = {
         role: mapRoleToFrontend(data.user.role),
         dbRole: data.user.role,
         avatar: data.user.avatarUrl || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=240&auto=format&fit=crop&q=80',
+        coverUrl: data.user.coverUrl || '',
         location: data.user.location,
         phone: data.user.phone,
         bio: details.bio || details.description || data.user.bio || '',
@@ -100,6 +103,7 @@ export const authService = {
         role: mapRoleToFrontend(data.user.role),
         dbRole: data.user.role,
         avatar: data.user.avatarUrl || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=240&auto=format&fit=crop&q=80',
+        coverUrl: data.user.coverUrl || '',
         location: data.user.location,
         phone: data.user.phone,
       };
@@ -107,6 +111,43 @@ export const authService = {
       return { success: true, user };
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : 'Terjadi kendala saat menghubungkan ke server.';
+      return { success: false, error: msg };
+    }
+  },
+
+  async signInDemo(role: 'creator' | 'business' | 'school'): Promise<{ success: boolean; user?: UserSession; error?: string }> {
+    try {
+      const res = await fetch(apiUrl('/api/auth/demo'), {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ role }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        return { success: false, error: data.error || 'Gagal masuk sebagai pengguna demo.' };
+      }
+
+      if (data.session?.accessToken && typeof window !== 'undefined') {
+        localStorage.setItem('creatorin_token', data.session.accessToken);
+      }
+
+      const fallbackName = data.user.fullName || data.user.email?.split('@')[0] || 'User';
+      const user: UserSession = {
+        id: data.user.id,
+        name: fallbackName,
+        email: data.user.email,
+        role: mapRoleToFrontend(data.user.role),
+        dbRole: data.user.role,
+        avatar: data.user.avatarUrl || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=240&auto=format&fit=crop&q=80',
+        coverUrl: data.user.coverUrl || '',
+        location: data.user.location,
+        phone: data.user.phone,
+      };
+
+      return { success: true, user };
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Terjadi kendala saat menghubungkan ke server demo.';
       return { success: false, error: msg };
     }
   },

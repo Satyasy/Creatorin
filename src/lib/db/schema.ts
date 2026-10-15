@@ -15,6 +15,7 @@ export const profiles = pgTable("profiles", {
   email: text("email"),
   passwordHash: text("password_hash"),
   avatarUrl: text("avatar_url"),
+  coverUrl: text("cover_url"),
   phone: text("phone"),
   location: text("location"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
@@ -31,6 +32,7 @@ export const creatorProfiles = pgTable("creator_profiles", {
   completedProjectsCount: integer("completed_projects_count").default(0).notNull(),
   rating: decimal("rating", { precision: 3, scale: 1 }).default("0.0").notNull(),
   reviewsCount: integer("reviews_count").default(0).notNull(),
+  followersCount: text("followers_count").default("0").notNull(),
   schoolId: uuid("school_id"),
   schoolName: text("school_name"),
   schoolStatus: schoolStatusEnum("school_status").default("pending"),
@@ -331,6 +333,15 @@ export const walletTransactions = pgTable("wallet_transactions", {
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
+// 15. User Bookmarks / Saved Items
+export const bookmarks = pgTable("bookmarks", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  userId: uuid("user_id").references(() => profiles.id, { onDelete: "cascade" }).notNull(),
+  targetType: text("target_type").notNull(), // 'creator' | 'project' | 'service' | 'brief'
+  targetId: text("target_id").notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
 // Relations
 export const profilesRelations = relations(profiles, ({ one, many }) => ({
   creatorProfile: one(creatorProfiles, {
@@ -349,6 +360,7 @@ export const profilesRelations = relations(profiles, ({ one, many }) => ({
   projects: many(projects),
   reviews: many(reviews),
   notifications: many(notifications),
+  bookmarks: many(bookmarks),
 }));
 
 export const servicesRelations = relations(services, ({ one }) => ({
@@ -416,5 +428,12 @@ export const schoolAchievementsRelations = relations(schoolAchievements, ({ one 
   school: one(schools, {
     fields: [schoolAchievements.schoolId],
     references: [schools.id],
+  }),
+}));
+
+export const bookmarksRelations = relations(bookmarks, ({ one }) => ({
+  user: one(profiles, {
+    fields: [bookmarks.userId],
+    references: [profiles.id],
   }),
 }));

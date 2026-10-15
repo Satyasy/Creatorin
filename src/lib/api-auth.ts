@@ -10,6 +10,7 @@ export type AuthUser = {
   role: "admin" | "creator" | "business" | "school";
   fullName: string;
   avatarUrl?: string | null;
+  coverUrl?: string | null;
   location?: string | null;
   phone?: string | null;
 };
@@ -45,6 +46,7 @@ export async function getAuthenticatedUser(req: NextRequest): Promise<AuthUser |
             role: profile.role,
             fullName: profile.fullName,
             avatarUrl: profile.avatarUrl,
+            coverUrl: profile.coverUrl,
             location: profile.location,
             phone: profile.phone,
           };
@@ -79,6 +81,7 @@ export async function getAuthenticatedUser(req: NextRequest): Promise<AuthUser |
               role: profile.role,
               fullName: profile.fullName,
               avatarUrl: profile.avatarUrl,
+              coverUrl: profile.coverUrl,
               location: profile.location,
               phone: profile.phone,
             };

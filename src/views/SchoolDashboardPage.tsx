@@ -16,6 +16,9 @@ import {
 } from '@/types';
 import { schoolService, DEFAULT_RUBRIC, calculateFinalScore } from '@/services/schoolService';
 import { useAuth } from '@/providers/AuthProvider';
+import { useToast } from '@/providers/ToastProvider';
+import { useConfirmModal } from '@/providers/ConfirmModalProvider';
+import { useSuccessModal } from '@/providers/SuccessModalProvider';
 import {
   LayoutDashboard,
   UserCheck,
@@ -136,6 +139,9 @@ function PageHeader({
 
 export function SchoolDashboardPage() {
   const { user, signOut } = useAuth();
+  const { showToast } = useToast();
+  const { confirmModal } = useConfirmModal();
+  const { showSuccessModal } = useSuccessModal();
   const isDev = process.env.NODE_ENV === 'development';
   const effectiveUser =
     user?.role === 'school'
@@ -277,7 +283,11 @@ export function SchoolDashboardPage() {
       }
     } catch (err) {
       console.error('Failed to update approval:', err);
-      alert('Gagal memproses permohonan siswa');
+      showToast({
+        type: 'error',
+        title: 'Gagal Memproses Permohonan',
+        message: 'Terjadi kesalahan saat memproses permohonan siswa.',
+      });
     }
   };
 
@@ -345,9 +355,20 @@ export function SchoolDashboardPage() {
           },
         });
       }
+      showSuccessModal({
+        title: targetStatus === 'completed' ? 'Penilaian Diterbitkan!' : 'Draf Disimpan',
+        message: targetStatus === 'completed'
+          ? `Penilaian siswa berhasil diterbitkan dengan nilai akhir ${result.finalScore} / 100.`
+          : 'Draf rubrik penilaian berhasil disimpan.',
+        duration: 3000,
+      });
     } catch (err) {
       console.error('Save assessment error:', err);
-      alert('Gagal menyimpan hasil penilaian');
+      showToast({
+        type: 'error',
+        title: 'Gagal Menyimpan Penilaian',
+        message: 'Hasil penilaian siswa gagal disimpan ke server.',
+      });
     } finally {
       setIsSavingAssessment(false);
     }
@@ -360,9 +381,18 @@ export function SchoolDashboardPage() {
       await schoolService.updateSchoolProfile(schoolProfile.id, schoolProfile);
       setProfileFeedback('Informasi profil sekolah berhasil diperbarui.');
       setTimeout(() => setProfileFeedback(null), 3000);
+      showSuccessModal({
+        title: 'Profil Sekolah Diperbarui',
+        message: 'Informasi profil dan pengaturan sekolah berhasil disimpan.',
+        duration: 2500,
+      });
     } catch (err) {
       console.error('Update profile error:', err);
-      alert('Gagal memperbarui profil sekolah');
+      showToast({
+        type: 'error',
+        title: 'Gagal Memperbarui Profil',
+        message: 'Pembaruan profil sekolah gagal disimpan ke server.',
+      });
     }
   };
 
@@ -374,7 +404,11 @@ export function SchoolDashboardPage() {
       );
     } catch (err) {
       console.error('Toggle featured student error:', err);
-      alert('Gagal mengubah status featured siswa');
+      showToast({
+        type: 'error',
+        title: 'Gagal Mengubah Status',
+        message: 'Status featured siswa gagal diperbarui.',
+      });
     }
   };
 
@@ -386,7 +420,11 @@ export function SchoolDashboardPage() {
       );
     } catch (err) {
       console.error('Toggle featured project error:', err);
-      alert('Gagal mengubah status featured project');
+      showToast({
+        type: 'error',
+        title: 'Gagal Mengubah Status',
+        message: 'Status featured project gagal diperbarui.',
+      });
     }
   };
 
@@ -406,20 +444,46 @@ export function SchoolDashboardPage() {
       });
       setProfileFeedback('Prestasi baru berhasil ditambahkan.');
       setTimeout(() => setProfileFeedback(null), 3000);
+      showSuccessModal({
+        title: 'Prestasi Berhasil Ditambahkan',
+        message: `Prestasi "${added.title}" telah tersimpan di profil sekolah.`,
+        duration: 3000,
+      });
     } catch (err) {
       console.error('Add achievement error:', err);
-      alert('Gagal menambah prestasi');
+      showToast({
+        type: 'error',
+        title: 'Gagal Menambah Prestasi',
+        message: 'Prestasi sekolah gagal ditambahkan ke server.',
+      });
     }
   };
 
   const handleDeleteAchievement = async (id: string) => {
-    if (!confirm('Apakah Anda yakin ingin menghapus prestasi ini?')) return;
+    const confirmed = await confirmModal({
+      title: 'Hapus Prestasi Sekolah',
+      message: 'Apakah Anda yakin ingin menghapus data prestasi sekolah ini?',
+      confirmText: 'Hapus Prestasi',
+      cancelText: 'Batal',
+      variant: 'danger',
+    });
+    if (!confirmed) return;
+
     try {
       await schoolService.deleteAchievement(id);
       setAchievements((prev) => prev.filter((a) => a.id !== id));
+      showSuccessModal({
+        title: 'Prestasi Dihapus',
+        message: 'Data prestasi sekolah berhasil dihapus dari profil.',
+        duration: 2500,
+      });
     } catch (err) {
       console.error('Delete achievement error:', err);
-      alert('Gagal menghapus prestasi');
+      showToast({
+        type: 'error',
+        title: 'Gagal Menghapus Prestasi',
+        message: 'Prestasi gagal dihapus dari server.',
+      });
     }
   };
 
@@ -437,9 +501,18 @@ export function SchoolDashboardPage() {
       await schoolService.updateSectionOrder(sectionOrderList);
       setProfileFeedback('Urutan section profil publik berhasil disimpan.');
       setTimeout(() => setProfileFeedback(null), 3000);
+      showSuccessModal({
+        title: 'Urutan Section Disimpan',
+        message: 'Susunan section profil sekolah Anda telah diperbarui.',
+        duration: 2500,
+      });
     } catch (err) {
       console.error('Save section order error:', err);
-      alert('Gagal menyimpan urutan section');
+      showToast({
+        type: 'error',
+        title: 'Gagal Menyimpan Urutan',
+        message: 'Urutan section profil publik gagal disimpan ke server.',
+      });
     }
   };
 

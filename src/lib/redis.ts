@@ -175,3 +175,43 @@ export async function getCachedSession<T>(token: string): Promise<T | null> {
 export async function invalidateSession(token: string): Promise<void> {
   await deleteCache(`session:${token}`);
 }
+
+/**
+ * Realtime Chat Pub/Sub Event Publishing
+ */
+export async function publishChatEvent(channel: string, event: any): Promise<void> {
+  const client = getRedisClient();
+  if (!client) return;
+  try {
+    if (client.status !== 'ready') {
+      await client.connect().catch(() => {});
+    }
+    await client.publish(channel, JSON.stringify(event));
+  } catch (err) {
+    console.warn(`[Redis] publishChatEvent error on ${channel}:`, err);
+  }
+}
+
+/**
+ * Realtime Chat Dedicated Redis Subscriber
+ */
+export function createRedisSubscriber(): Redis | null {
+  if (process.env.ENABLE_REDIS === "false") return null;
+  try {
+    const subscriber = new Redis(REDIS_URL, {
+      maxRetriesPerRequest: 1,
+      connectTimeout: 2000,
+      lazyConnect: true,
+      retryStrategy(times) {
+        if (times > 3) return null;
+        return Math.min(times * 100, 1000);
+      },
+    });
+    subscriber.on("error", (err) => {
+      console.warn("[Redis Subscriber] notice:", err.message);
+    });
+    return subscriber;
+  } catch {
+    return null;
+  }
+}

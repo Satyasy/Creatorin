@@ -47,6 +47,7 @@ export interface Creator {
   slug?: string;
   email?: string;
   avatar: string;
+  coverUrl?: string;
   category: CreatorCategory;
   roleTitle: string;
   bio: string;
@@ -179,6 +180,7 @@ export interface AuthState {
     role: UserRole;
     creatorCategory?: CreatorCategory;
     avatar?: string;
+    coverUrl?: string;
     /** Extended profile fields : populated on save from SettingsPage */
     location?: string;
     bio?: string;

@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { Play } from 'lucide-react';
+import { Play, Plus, Eye, Sparkles } from 'lucide-react';
 import { useAuth } from '@/providers/AuthProvider';
 import { FeedProject } from '@/types';
 import { UploadProjectModal } from '@/components/modals/UploadProjectModal';
@@ -258,22 +258,84 @@ export function CreatorProjectsPage() {
   const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
   const [selectedProject, setSelectedProject] = useState<FeedProject | null>(null);
 
-  // Load custom uploaded projects from localStorage if available
+  // Load projects from database API with fallback to stored and initial
   useEffect(() => {
-    try {
-      const stored = localStorage.getItem('creatorin_custom_projects');
-      if (stored) {
-        const parsed = JSON.parse(stored);
-        if (Array.isArray(parsed) && parsed.length > 0) {
-          setProjects([...parsed, ...INITIAL_PROJECTS]);
+    async function fetchApiProjects() {
+      try {
+        const res = await fetch('/api/projects');
+        if (res.ok) {
+          const data = await res.json();
+          if (Array.isArray(data.projects) && data.projects.length > 0) {
+            const apiProjects: FeedProject[] = data.projects.map((p: any) => ({
+              id: p.id,
+              title: p.title,
+              description: p.description || '',
+              coverImage: p.mediaUrl || '/creatorin/service-pattern-4.png',
+              mediaUrl: p.mediaUrl || '/creatorin/service-pattern-4.png',
+              mediaType: p.mediaType || 'image',
+              creatorId: p.creatorId,
+              category: p.category || 'Karya Kreatif',
+              platform: 'direct',
+              socialHandle: p.creatorHandle || (p.creatorName ? `@${p.creatorName.toLowerCase().replace(/\s+/g, '')}` : '@kreator'),
+              viewsCount: p.viewsCount || '0',
+              likesCount: 0,
+              commentsCount: 0,
+              sharesCount: 0,
+              creator: {
+                id: p.creatorId,
+                name: p.creatorName || 'Kreator',
+                username: (p.creatorName || 'kreator').toLowerCase().replace(/\s+/g, ''),
+                handle: p.creatorHandle || `@${(p.creatorName || 'kreator').toLowerCase().replace(/\s+/g, '')}`,
+                avatar: p.creatorAvatar || '/creatorin/avatar.png',
+                category: 'Image',
+                roleTitle: 'Kreator Konten & Desainer',
+                bio: 'Kreator terverifikasi di Creatorin.',
+                location: 'Indonesia',
+                startingRate: 350000,
+                formattedRate: 'Rp350.000',
+                careerScore: {
+                  overall: 95,
+                  deadlineAccuracy: 98,
+                  revisionRate: 1.0,
+                  completionRate: 100,
+                  clientRating: 4.9,
+                  completedProjects: 12,
+                  tier: 'Top Tier',
+                },
+                skills: ['Kreatif', 'Digital Content'],
+                joinedDate: '2024',
+              },
+            }));
+
+            // Combine with INITIAL_PROJECTS
+            const existingIds = new Set(apiProjects.map((p) => p.id));
+            const remainder = INITIAL_PROJECTS.filter((p) => !existingIds.has(p.id));
+            setProjects([...apiProjects, ...remainder]);
+            return;
+          }
         }
+      } catch (err) {
+        console.warn('Failed to load projects from API:', err);
       }
-    } catch {}
+
+      // Fallback to local storage if API call didn't yield results
+      try {
+        const stored = localStorage.getItem('creatorin_custom_projects');
+        if (stored) {
+          const parsed = JSON.parse(stored);
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            setProjects([...parsed, ...INITIAL_PROJECTS]);
+          }
+        }
+      } catch {}
+    }
+
+    fetchApiProjects();
   }, []);
 
   const handleUploadSuccess = (newProjectData: any) => {
     const newProject: FeedProject = {
-      id: `custom-proj-${Date.now()}`,
+      id: newProjectData.id || `custom-proj-${Date.now()}`,
       title: newProjectData.title || 'Proyek Baru Kreator',
       description: newProjectData.description || 'Portofolio karya kreatif terbaru.',
       coverImage: newProjectData.mediaUrl || '/creatorin/service-pattern-4.png',
@@ -282,8 +344,8 @@ export function CreatorProjectsPage() {
       creatorId: user?.id || 'creator-self',
       category: newProjectData.category || 'Desain Grafis',
       platform: 'direct',
-      socialHandle: user?.name ? `@${user.name.toLowerCase().replace(/\s+/g, '')}` : '@munirsr.design',
-      viewsCount: '1.2K',
+      socialHandle: user?.name ? `@${user.name.toLowerCase().replace(/\s+/g, '')}` : '@kreator',
+      viewsCount: '1',
       likesCount: 1,
       commentsCount: 0,
       sharesCount: 0,
@@ -313,8 +375,7 @@ export function CreatorProjectsPage() {
       },
     };
 
-    const updated = [newProject, ...projects];
-    setProjects(updated);
+    setProjects((prev) => [newProject, ...prev]);
     try {
       localStorage.setItem('creatorin_custom_projects', JSON.stringify([newProject]));
     } catch {}
@@ -325,17 +386,36 @@ export function CreatorProjectsPage() {
     <div className="min-h-screen bg-white">
       <div className="mx-auto max-w-[1440px] px-4 py-8 sm:px-6 sm:py-10 lg:px-10 lg:py-12">
         {/* Header Section (Matching Figma node 5414:15736) */}
-        <header className="mb-8 sm:mb-10">
-          <h1 className="text-2xl font-bold tracking-tight text-[#0D0B0B] sm:text-3xl lg:text-[32px]">
-            Manajemen Portofolio Proyek Kreator
-          </h1>
-          <p className="mt-2 max-w-3xl text-sm leading-relaxed text-[#55576A] sm:text-base">
-            Pamerkan karya terbaik Anda untuk membuktikan keahlian, memikat calon klien UMKM, dan meningkatkan peluang diterimanya proposal.
-          </p>
+        <header className="mb-10 sm:mb-12">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+            <div>
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 mb-2.5 rounded-full bg-[#155DFC]/10 text-[#155DFC] text-xs font-semibold">
+                <Sparkles className="w-3.5 h-3.5" />
+                <span>Portofolio & Showcases</span>
+              </div>
+              <h1 className="text-2xl font-bold tracking-tight text-[#0D0B0B] sm:text-3xl lg:text-[34px]">
+                Manajemen Portofolio Proyek Kreator
+              </h1>
+              <p className="mt-2.5 max-w-3xl text-sm leading-relaxed text-[#55576A] sm:text-base">
+                Pamerkan karya terbaik Anda untuk membuktikan keahlian, memikat calon klien UMKM, dan meningkatkan peluang diterimanya proposal.
+              </p>
+            </div>
+            <div className="shrink-0">
+              <button
+                type="button"
+                onClick={() => setIsUploadModalOpen(true)}
+                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#155DFC] text-white text-sm font-semibold hover:bg-[#1249c4] transition-all duration-200 shadow-sm hover:shadow-md cursor-pointer"
+              >
+                <Plus className="w-4 h-4" />
+                <span>Upload Proyek Baru</span>
+              </button>
+            </div>
+          </div>
         </header>
 
         {/* Grid Section: Upload Card + Project Portfolio Cards */}
-        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+        {/* Generous spacing and margin between cards (gap-8 sm:gap-8 lg:gap-10) */}
+        <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 sm:gap-8 lg:gap-10">
           {/* Card 1: Upload Proyek (Dashed Dotted Card) */}
           <button
             type="button"
@@ -343,16 +423,16 @@ export function CreatorProjectsPage() {
             data-testid="btn-upload-project-card"
             onClick={() => setIsUploadModalOpen(true)}
             aria-label="Upload Proyek Baru"
-            className="group flex aspect-[326/430] min-h-[420px] flex-col items-center justify-center rounded-2xl border-2 border-dashed border-[#D0D5DD] bg-white p-6 text-center transition-all duration-200 hover:border-[#155DFC] hover:bg-[#F9FAFB] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#155DFC] cursor-pointer"
+            className="group flex aspect-[326/430] min-h-[420px] flex-col items-center justify-center rounded-2xl sm:rounded-3xl border-2 border-dashed border-[#D0D5DD] bg-neutral-50/70 p-6 sm:p-8 text-center transition-all duration-300 hover:border-[#155DFC] hover:bg-[#F0F5FF] hover:-translate-y-1.5 hover:shadow-xl focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#155DFC] cursor-pointer"
           >
-            <span className="text-5xl font-light leading-none text-[#98A2B3] transition-colors group-hover:text-[#155DFC] sm:text-6xl">
-              +
-            </span>
-            <span className="mt-5 text-xl font-bold text-[#0D0B0B] transition-colors group-hover:text-[#155DFC] sm:text-2xl">
+            <div className="flex h-16 w-16 sm:h-20 sm:w-20 items-center justify-center rounded-2xl sm:rounded-3xl bg-white shadow-sm border border-neutral-200/80 transition-all duration-300 group-hover:border-[#155DFC]/40 group-hover:bg-[#155DFC] group-hover:shadow-md group-hover:scale-105">
+              <Plus className="h-8 w-8 sm:h-10 sm:w-10 text-neutral-400 group-hover:text-white transition-colors" />
+            </div>
+            <span className="mt-6 text-xl sm:text-2xl font-bold text-[#0D0B0B] transition-colors group-hover:text-[#155DFC]">
               Upload Proyek
             </span>
-            <span className="mt-2.5 max-w-[240px] text-xs leading-relaxed text-[#667085] sm:text-sm">
-              Show off your best work. Get feedback, likes and be a part of a growing community.
+            <span className="mt-3 max-w-[260px] text-xs sm:text-sm leading-relaxed text-[#667085]">
+              Tampilkan karya terbaik Anda. Dapatkan feedback, apresiasi, dan bangun reputasi profesional bersama UMKM.
             </span>
           </button>
 
@@ -370,34 +450,51 @@ export function CreatorProjectsPage() {
               tabIndex={0}
               role="button"
               aria-label={`Buka detail portofolio: ${project.title}`}
-              className="group relative flex aspect-[326/430] min-h-[420px] flex-col overflow-hidden rounded-2xl bg-black text-left shadow-xs transition-all duration-200 hover:shadow-lg focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#155DFC] cursor-pointer"
+              className="group relative flex aspect-[326/430] min-h-[420px] flex-col overflow-hidden rounded-2xl sm:rounded-3xl border border-neutral-200/80 bg-[#0D0B0B] text-left shadow-sm transition-all duration-300 hover:-translate-y-1.5 hover:shadow-2xl hover:border-neutral-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#155DFC] cursor-pointer"
             >
               {/* Media Image Area */}
               <div className="relative flex-1 overflow-hidden bg-neutral-900">
                 <img
                   src={project.coverImage || project.mediaUrl}
                   alt={project.title}
-                  className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+                  className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
                   loading="lazy"
                 />
 
+                {/* Top Overlay Badge: Category */}
+                {project.category && (
+                  <div className="absolute top-4 left-4 z-10">
+                    <span className="inline-flex items-center rounded-full bg-black/60 px-3 py-1 text-[11px] font-semibold text-white backdrop-blur-md border border-white/10 shadow-xs">
+                      {project.category}
+                    </span>
+                  </div>
+                )}
+
                 {/* Top-Right Play Indicator Badge */}
                 <div
-                  className="absolute top-4 right-4 flex h-8 w-8 items-center justify-center rounded-full bg-black/60 text-white shadow-xs backdrop-blur-xs transition-transform group-hover:scale-110"
+                  className="absolute top-4 right-4 z-10 flex h-8 w-8 items-center justify-center rounded-full bg-black/60 text-white shadow-xs backdrop-blur-md border border-white/10 transition-transform duration-300 group-hover:scale-110"
                   aria-hidden="true"
                 >
                   <Play className="ml-0.5 h-3.5 w-3.5 fill-white text-white" />
                 </div>
+
+                {/* Bottom subtle gradient overlay */}
+                <div className="absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-black/80 to-transparent pointer-events-none" />
               </div>
 
               {/* Bottom Metadata Bar */}
-              <div className="flex flex-col gap-1.5 bg-[#0D0B0B] p-4 text-white">
-                <h2 className="line-clamp-2 text-sm font-semibold leading-snug text-white transition-colors group-hover:text-[#03ACFD]">
+              <div className="flex flex-col gap-2.5 bg-[#0D0B0B] p-5 text-white border-t border-white/5">
+                <h2 className="line-clamp-2 text-sm sm:text-base font-semibold leading-snug text-white transition-colors group-hover:text-[#03ACFD]">
                   {project.title}
                 </h2>
-                <div className="flex items-center justify-between text-xs text-[#98A2B3]">
-                  <span>{project.socialHandle || '@munirsr.design'}</span>
-                  <span>{project.viewsCount || '185.4K'}</span>
+                <div className="flex items-center justify-between text-xs text-[#98A2B3] pt-1 border-t border-white/10">
+                  <span className="font-medium truncate max-w-[150px]">
+                    {project.socialHandle || (project.creator?.handle ?? '@kreator')}
+                  </span>
+                  <div className="flex items-center gap-1 shrink-0 text-neutral-400">
+                    <Eye className="w-3.5 h-3.5" />
+                    <span>{project.viewsCount || '0'}</span>
+                  </div>
                 </div>
               </div>
             </article>

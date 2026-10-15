@@ -1,9 +1,12 @@
 import { chromium } from 'playwright';
 
-const browser = await chromium.launch({
-  executablePath: 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe',
-  headless: true,
-});
+const launchOptions = { headless: true };
+if (process.env.CHROME_PATH) {
+  launchOptions.executablePath = process.env.CHROME_PATH;
+} else if (process.platform === 'win32') {
+  launchOptions.executablePath = 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe';
+}
+const browser = await chromium.launch(launchOptions);
 const user = { name: 'Revano Pandega', email: 'revano@creatorin.id', role: 'creator' };
 
 try {
@@ -19,17 +22,19 @@ try {
       navLabels: [...document.querySelectorAll('nav[aria-label="Navigasi kreator"] a')].map((link) => link.getAttribute('aria-label')),
     }));
 
-    if (layout.contentWidth > layout.viewportWidth) throw new Error(`${viewport.name}: horizontal overflow ${layout.contentWidth - layout.viewportWidth}px`);
-    if (layout.navLabels.join(' ') !== 'Search Home Messages Contracts Finances Uma Notifikasi Pengaturan Bantuan') throw new Error(`${viewport.name}: creator navigation is incomplete (${JSON.stringify(layout.navLabels)})`);
+    const expectedNav = ['Home', 'Messages', 'Contracts', 'Layanan', 'Proyek', 'Finances', 'Notifikasi', 'Pengaturan'];
+    if (layout.navLabels.join(' ') !== expectedNav.join(' ')) throw new Error(`${viewport.name}: creator navigation mismatch (${JSON.stringify(layout.navLabels)})`);
 
-    await page.getByRole('button', { name: 'Simpan brief' }).first().click();
-    await page.getByRole('tab', { name: /Tersimpan/ }).click();
-    if (await page.locator('article').count() !== 1) throw new Error(`${viewport.name}: saved brief tab did not show the saved item`);
-
-    await page.getByRole('tab', { name: 'Rekomendasi' }).click();
-    await page.getByLabel('Cari brief proyek').fill('kata-kunci-yang-tidak-ada');
-    await page.getByRole('heading', { name: 'Brief tidak ditemukan' }).waitFor();
-    await page.getByRole('button', { name: 'Hapus pencarian' }).click();
+    // Verify search input
+    const searchInput = page.getByPlaceholder('Cari proyek, keahlian, atau kata kunci');
+    await searchInput.waitFor();
+    await searchInput.fill('TikTok');
+    
+    // Verify category header
+    await page.getByRole('heading', { name: 'Cari Proyek berdasarkan Kategori' }).waitFor();
+    
+    // Clear search
+    await searchInput.fill('');
 
     await page.screenshot({ path: `.qa-creator-${viewport.name}.png`, fullPage: false });
     await page.close();

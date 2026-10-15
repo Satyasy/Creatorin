@@ -2,7 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { getAuthenticatedUser } from "@/lib/api-auth";
 import { getDb } from "@/lib/db";
 import { collaborationRooms, submissions, invoices, creatorWallets, walletTransactions, notifications } from "@/lib/db/schema";
-import { eq, desc, sql } from "drizzle-orm";
+import { eq, desc, sql, and, ne } from "drizzle-orm";
+import { deleteCache } from "@/lib/redis";
 
 export async function POST(req: NextRequest, { params }: { params: Promise<{ roomId: string }> }) {
   const { roomId } = await params;
@@ -42,11 +43,16 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ roo
 
     // Run transaction: update room, update submissions, credit creator wallet
     await db.transaction(async (tx) => {
-      // 1. Update room status
-      await tx
+      // 1. Update room status atomically only if not already completed
+      const [approvedRoom] = await tx
         .update(collaborationRooms)
         .set({ status: "completed", approvedAt: new Date() })
-        .where(eq(collaborationRooms.id, roomId));
+        .where(and(eq(collaborationRooms.id, roomId), ne(collaborationRooms.status, "completed")))
+        .returning();
+
+      if (!approvedRoom) {
+        throw new Error("Proyek ini sudah disetujui sebelumnya.");
+      }
 
       // 2. Update latest submission
       const [latestSub] = await tx
@@ -109,6 +115,13 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ roo
         linkUrl: `/contracts`,
       });
     });
+
+    // Invalidate feeds and creator directory caches
+    await Promise.all([
+      deleteCache(`feed:${room.creatorId}:*`),
+      deleteCache(`feed:${room.businessId}:*`),
+      deleteCache("creators:*"),
+    ]);
 
     return NextResponse.json({
       success: true,

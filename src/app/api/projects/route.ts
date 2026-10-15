@@ -3,7 +3,9 @@ import { getAuthenticatedUser } from "@/lib/api-auth";
 import { getDb } from "@/lib/db";
 import { projects, profiles } from "@/lib/db/schema";
 import { eq, desc } from "drizzle-orm";
-import { createClient } from "@/lib/supabase/server";
+import fs from "fs";
+import path from "path";
+import crypto from "crypto";
 
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
@@ -13,7 +15,7 @@ export async function GET(req: NextRequest) {
   if (!db) return NextResponse.json({ error: "Database not connected" }, { status: 503 });
 
   try {
-    let q = db
+    const q = db
       .select({
         id: projects.id,
         title: projects.title,
@@ -30,7 +32,7 @@ export async function GET(req: NextRequest) {
         creatorAvatar: profiles.avatarUrl,
       })
       .from(projects)
-      .innerJoin(profiles, eq(projects.creatorId, profiles.id))
+      .leftJoin(profiles, eq(projects.creatorId, profiles.id))
       .orderBy(desc(projects.createdAt));
 
     const rows = await q;
@@ -44,53 +46,123 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   const user = await getAuthenticatedUser(req);
-  if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  if (!user) return NextResponse.json({ error: "Unauthorized. Silakan login terlebih dahulu." }, { status: 401 });
 
   const db = getDb();
   if (!db) return NextResponse.json({ error: "Database not connected" }, { status: 503 });
 
-  if (user.role !== "creator") return NextResponse.json({ error: "Hanya kreator dapat mengunggah karya." }, { status: 403 });
+  if (user.role !== "creator" && user.role !== "admin") {
+    return NextResponse.json({ error: "Hanya kreator dapat mengunggah karya." }, { status: 403 });
+  }
 
   try {
-    const form = await req.formData();
-    const title = String(form.get("title") || "").trim();
-    const description = String(form.get("description") || "").trim();
-    const category = String(form.get("category") || "Karya Kreatif").trim();
-    const file = form.get("file");
-    if (!title || !(file instanceof File) || file.size === 0) {
-      return NextResponse.json({ error: "Judul dan file karya wajib diisi." }, { status: 400 });
-    }
-    if (file.size > 20 * 1024 * 1024 || !["image/jpeg", "image/png", "image/webp", "video/mp4", "video/webm"].includes(file.type)) {
-      return NextResponse.json({ error: "Gunakan JPG, PNG, WebP, MP4, atau WebM maksimal 20 MB." }, { status: 400 });
-    }
-    const supabase = await createClient();
-    const extension = file.type.split("/")[1] === "jpeg" ? "jpg" : file.type.split("/")[1];
-    const path = `${user.id}/${crypto.randomUUID()}.${extension}`;
-    const { error: uploadError } = await supabase.storage.from("project-media").upload(path, file, { contentType: file.type });
-    if (uploadError) return NextResponse.json({ error: uploadError.message }, { status: 500 });
-    const { data: publicFile } = supabase.storage.from("project-media").getPublicUrl(path);
-    const handle = `@${user.fullName.toLowerCase().replace(/\s+/g, "")}`;
-    let newProject;
-    try {
-      [newProject] = await db
-      .insert(projects)
-      .values({
-        creatorId: user.id,
-        title,
-        description,
-        category,
-        creatorHandle: handle,
-        mediaUrl: publicFile.publicUrl,
-        mediaType: file.type.startsWith("video/") ? "video" : "image",
-      })
-      .returning();
-    } catch (error) {
-      await supabase.storage.from("project-media").remove([path]);
-      throw error;
+    let title = "";
+    let description = "";
+    let category = "Karya Kreatif";
+    let externalLink = "";
+    let mediaUrl = "";
+    let mediaType = "image";
+    let savedFilePath: string | null = null;
+
+    const contentType = req.headers.get("content-type") || "";
+
+    if (contentType.includes("multipart/form-data")) {
+      const form = await req.formData();
+      title = String(form.get("title") || "").trim();
+      description = String(form.get("description") || "").trim();
+      category = String(form.get("category") || "Karya Kreatif").trim();
+      externalLink = String(form.get("externalLink") || "").trim();
+      mediaUrl = String(form.get("mediaUrl") || "").trim();
+      const rawMediaType = String(form.get("mediaType") || "").trim();
+      if (rawMediaType) mediaType = rawMediaType;
+
+      const file = form.get("file");
+      if (file instanceof File && file.size > 0) {
+        if (file.size > 25 * 1024 * 1024) {
+          return NextResponse.json({ error: "Ukuran file karya maksimal 25 MB." }, { status: 400 });
+        }
+        const allowedTypes = [
+          "image/jpeg",
+          "image/png",
+          "image/webp",
+          "image/gif",
+          "video/mp4",
+          "video/webm",
+          "video/quicktime",
+        ];
+        if (!allowedTypes.includes(file.type)) {
+          return NextResponse.json(
+            { error: "Format file tidak didukung. Gunakan JPG, PNG, WebP, GIF, MP4, atau WebM." },
+            { status: 400 }
+          );
+        }
+
+        const sharedUploadsDir = "/var/www/creatorin/shared/uploads";
+        const uploadBaseDir = fs.existsSync(sharedUploadsDir)
+          ? sharedUploadsDir
+          : path.join(process.cwd(), "public", "uploads");
+        const uploadDir = path.join(uploadBaseDir, "projects");
+        if (!fs.existsSync(uploadDir)) {
+          fs.mkdirSync(uploadDir, { recursive: true });
+        }
+
+        const rawExt = path.extname(file.name || "").replace(".", "") || file.type.split("/")[1] || "png";
+        const ext = rawExt.toLowerCase() === "jpeg" ? "jpg" : rawExt.toLowerCase();
+        const uniqueFileName = `${Date.now()}-${crypto.randomBytes(6).toString("hex")}.${ext}`;
+        const filePath = path.join(uploadDir, uniqueFileName);
+        const buffer = Buffer.from(await file.arrayBuffer());
+        await fs.promises.writeFile(filePath, buffer);
+
+        savedFilePath = filePath;
+        mediaUrl = `/uploads/projects/${uniqueFileName}`;
+        mediaType = file.type.startsWith("video/") ? "video" : "image";
+      }
+    } else {
+      const body = await req.json();
+      title = String(body.title || "").trim();
+      description = String(body.description || "").trim();
+      category = String(body.category || "Karya Kreatif").trim();
+      externalLink = String(body.externalLink || "").trim();
+      mediaUrl = String(body.mediaUrl || "").trim();
+      if (body.mediaType) mediaType = body.mediaType;
     }
 
-    return NextResponse.json({ success: true, project: newProject }, { status: 201 });
+    if (!title) {
+      return NextResponse.json({ error: "Judul karya wajib diisi." }, { status: 400 });
+    }
+
+    if (!mediaUrl) {
+      return NextResponse.json({ error: "File atau URL media karya wajib disertakan." }, { status: 400 });
+    }
+
+    const handle = `@${(user.fullName || "kreator").toLowerCase().replace(/\s+/g, "")}`;
+
+    try {
+      const [newProject] = await db
+        .insert(projects)
+        .values({
+          creatorId: user.id,
+          title,
+          description: description || null,
+          category,
+          creatorHandle: handle,
+          mediaUrl,
+          mediaType,
+          externalLink: externalLink || null,
+        })
+        .returning();
+
+      return NextResponse.json({ success: true, project: newProject }, { status: 201 });
+    } catch (insertError) {
+      if (savedFilePath) {
+        try {
+          await fs.promises.unlink(savedFilePath);
+        } catch {}
+      }
+      throw insertError;
+    }
   } catch (err: any) {
-    return NextResponse.json({ error: err.message }, { status: 500 });
+    console.error("POST /api/projects error:", err);
+    return NextResponse.json({ error: err.message || "Gagal mengunggah karya." }, { status: 500 });
   }
 }

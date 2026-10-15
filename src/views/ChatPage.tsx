@@ -3,6 +3,8 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '@/providers/AuthProvider';
+import { useToast } from '@/providers/ToastProvider';
+import { useSuccessModal } from '@/providers/SuccessModalProvider';
 import { 
   Search, 
   ArrowLeft, 
@@ -62,6 +64,8 @@ export const ChatPage: React.FC<ChatPageProps> = ({
   const targetCreatorId = searchParams.get('creatorId');
   const { user: authUser } = useAuth();
   const currentUser = propUser !== undefined ? propUser : authUser;
+  const { showToast } = useToast();
+  const { showSuccessModal } = useSuccessModal();
 
   const navigateTo = (page: ActivePage, path: string) => {
     if (onNavigate) onNavigate(page);
@@ -269,36 +273,74 @@ export const ChatPage: React.FC<ChatPageProps> = ({
       if (msgs && msgs.length > 0) {
         setConversations(prev => prev.map(c => c.id === activeChatId ? { ...c, messages: msgs } : c));
       }
+      // Mark messages as read upon opening chat
+      chatService.markMessagesAsRead(activeChatId);
     });
 
     const isDbConversation = activeChatId.length > 20 && !activeChatId.startsWith('conv-');
     if (!isDbConversation) return;
 
-    const unsubscribe = chatService.subscribeToMessages(activeChatId, (newMsg) => {
-      const meta = newMsg.metadata || {};
-      const incoming: ChatMessage = {
-        id: newMsg.id,
-        senderId: newMsg.sender_id,
-        text: newMsg.content,
-        timestamp: new Date(newMsg.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-        isSelf: newMsg.sender_id === (currentUser as any)?.id,
-        status: 'delivered',
-        attachment: meta.attachment || (newMsg.attachment_url ? { type: 'file', url: newMsg.attachment_url, name: 'Lampiran' } : undefined),
-        invoice: meta.invoice || undefined,
-        serviceInquiry: meta.serviceInquiry || undefined,
-        metadata: meta,
-      };
-      setConversations(prev => prev.map(c => {
-        if (c.id === activeChatId) {
-          return {
-            ...c,
-            lastMessage: incoming.text,
-            lastMessageTime: incoming.timestamp,
-            messages: [...c.messages.filter(m => m.id !== incoming.id), incoming],
-          };
+    const unsubscribe = chatService.subscribeToMessages(activeChatId, (event) => {
+      if (event.type === 'NEW_MESSAGE' && event.message) {
+        const raw = event.message;
+        const meta = raw.metadata || {};
+        const isSelf = raw.sender_id === (currentUser as any)?.id || raw.senderId === (currentUser as any)?.id;
+        const incoming: ChatMessage = {
+          id: raw.id,
+          senderId: raw.sender_id || raw.senderId,
+          text: raw.content,
+          timestamp: new Date(raw.created_at || raw.createdAt || Date.now()).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+          isSelf,
+          status: raw.is_read || raw.isRead ? 'read' : 'delivered',
+          attachment: meta.attachment || (raw.attachment_url ? { type: 'file', url: raw.attachment_url, name: 'Lampiran' } : undefined),
+          invoice: meta.invoice || undefined,
+          serviceInquiry: meta.serviceInquiry || undefined,
+          metadata: meta,
+        };
+
+        setConversations(prev => prev.map(c => {
+          if (c.id === activeChatId) {
+            return {
+              ...c,
+              lastMessage: incoming.text,
+              lastMessageTime: incoming.timestamp,
+              messages: [...c.messages.filter(m => m.id !== incoming.id), incoming],
+            };
+          }
+          return c;
+        }));
+
+        // If message is from partner, mark it as read immediately
+        if (!isSelf) {
+          chatService.markMessagesAsRead(activeChatId);
         }
-        return c;
-      }));
+      } else if (event.type === 'MESSAGES_READ') {
+        // Partner read our messages: update ticks to blue
+        const readBy = event.readBy;
+        if (readBy && readBy !== (currentUser as any)?.id) {
+          setConversations(prev => prev.map(c => {
+            if (c.id === activeChatId) {
+              return {
+                ...c,
+                messages: c.messages.map(m => m.isSelf ? { ...m, status: 'read' } : m),
+              };
+            }
+            return c;
+          }));
+        }
+      } else if (event.type === 'POLL_SYNC' && event.messages) {
+        const synced: ChatMessage[] = event.messages.map((m: any) => ({
+          id: m.id,
+          senderId: m.senderId,
+          text: m.content,
+          timestamp: new Date(m.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+          isSelf: m.senderId === (currentUser as any)?.id,
+          status: m.isRead ? 'read' : 'delivered',
+          attachment: m.attachmentUrl ? { type: 'file', url: m.attachmentUrl, name: 'Lampiran' } : undefined,
+          metadata: m.metadata || {},
+        }));
+        setConversations(prev => prev.map(c => c.id === activeChatId ? { ...c, messages: synced } : c));
+      }
     });
 
     return () => {
@@ -317,7 +359,14 @@ export const ChatPage: React.FC<ChatPageProps> = ({
     const messageContent = (textToSend !== undefined ? textToSend : inputText).trim();
     if (!messageContent || !activeChatId) return;
     const result = await chatService.sendMessage(activeChatId, messageContent);
-    if (!result.success) { alert(result.error || 'Gagal mengirim pesan.'); return; }
+    if (!result.success) {
+      showToast({
+        type: 'error',
+        title: 'Gagal Mengirim Pesan',
+        message: result.error || 'Terjadi gangguan koneksi saat mengirim pesan.',
+      });
+      return;
+    }
 
     const newMessage: ChatMessage = {
       id: result.message?.id || `msg-${Date.now()}`,
@@ -325,7 +374,7 @@ export const ChatPage: React.FC<ChatPageProps> = ({
       text: messageContent,
       timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
       isSelf: true,
-      status: 'sent'
+      status: 'delivered'
     };
 
     setConversations(prev => prev.map(conv => {
@@ -365,7 +414,11 @@ export const ChatPage: React.FC<ChatPageProps> = ({
 
       const data = await res.json();
       if (!res.ok) {
-        alert(data.error || 'Gagal mengunggah file.');
+        showToast({
+          type: 'error',
+          title: 'Gagal Mengunggah Berkas',
+          message: data.error || 'Berkas tidak dapat disimpan di server.',
+        });
         return;
       }
 
@@ -412,7 +465,11 @@ export const ChatPage: React.FC<ChatPageProps> = ({
         return conv;
       }));
     } catch (err: any) {
-      alert(err.message || 'Gagal mengunggah file.');
+      showToast({
+        type: 'error',
+        title: 'Gagal Mengunggah Berkas',
+        message: err.message || 'Terjadi kendala saat mengunggah berkas.',
+      });
     } finally {
       setIsUploadingFile(false);
     }
@@ -481,7 +538,7 @@ export const ChatPage: React.FC<ChatPageProps> = ({
         text: msgText,
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
         isSelf: true,
-        status: 'sent',
+        status: 'delivered',
         invoice: newInvoice,
         metadata: { type: 'invoice', invoice: newInvoice },
       };
@@ -499,8 +556,17 @@ export const ChatPage: React.FC<ChatPageProps> = ({
       }));
 
       setIsCreateInvoiceModalOpen(false);
+      showSuccessModal({
+        title: 'Pengajuan Invoice Terkirim!',
+        message: `Invoice DP ${invoiceFormDpPercent}% sebesar 🪙 ${dpCoin.toLocaleString('id-ID')} Koin untuk "${invoiceFormTitle}" telah dikirimkan ke ruang obrolan.`,
+        duration: 3500,
+      });
     } catch (err: any) {
-      alert(err.message || 'Gagal mengajukan invoice.');
+      showToast({
+        type: 'error',
+        title: 'Gagal Mengajukan Invoice',
+        message: err.message || 'Terjadi gangguan saat mengajukan invoice kesepakatan.',
+      });
     } finally {
       setIsSendingInvoice(false);
     }
@@ -1148,7 +1214,13 @@ export const ChatPage: React.FC<ChatPageProps> = ({
                   <div className="flex items-center gap-1 mt-1 text-[10px] text-neutral-400 px-1">
                     <span>{msg.timestamp}</span>
                     {msg.isSelf && (
-                      <CheckCheck className="w-3.5 h-3.5 text-blue-600" />
+                      <span title={msg.status === 'read' ? 'Dibaca' : 'Terkirim'}>
+                        <CheckCheck
+                          className={`w-3.5 h-3.5 transition-colors ${
+                            msg.status === 'read' ? 'text-blue-600' : 'text-neutral-400'
+                          }`}
+                        />
+                      </span>
                     )}
                   </div>
                 </div>

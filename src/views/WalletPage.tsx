@@ -37,7 +37,13 @@ export function WalletPage() {
       }
       setData(body as WalletData);
     } catch (caught) {
-      setError(caught instanceof Error ? caught.message : (language === 'en' ? 'Failed to load wallet' : 'Gagal memuat dompet'));
+      setError(
+        caught instanceof Error
+          ? caught.message
+          : language === 'en'
+          ? 'Failed to load wallet'
+          : 'Gagal memuat dompet'
+      );
     }
   }, [user, language]);
 

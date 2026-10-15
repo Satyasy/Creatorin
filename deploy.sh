@@ -71,10 +71,16 @@ npx drizzle-kit push || {
     echo "⚠️ Drizzle push warning/notice (skipping if no changes)."
 }
 
-echo "🌱 Seeding initial & master data..."
-npm run seed || {
-    echo "⚠️ Database seeder warning/notice (skipping if failed)."
-}
+# Seeder safety guard: DO NOT run seeder on standard production deployments.
+# Seeder will only run if explicitly requested via SEED_ON_DEPLOY=true environment variable.
+if [ "${SEED_ON_DEPLOY:-false}" = "true" ]; then
+    echo "🌱 SEED_ON_DEPLOY=true detected. Seeding initial & master data..."
+    npm run db:seed || {
+        echo "⚠️ Database seeder warning/notice (skipping if failed)."
+    }
+else
+    echo "🛡️ Deployment safety: Skipping database seeder to prevent overwriting existing user profiles, banners, avatars, and transaction data."
+fi
 
 # 5. Build Next.js Application
 echo "🔨 5/6. Building Next.js standalone application..."

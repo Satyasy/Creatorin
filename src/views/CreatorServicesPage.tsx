@@ -3,6 +3,8 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useAuth } from '@/providers/AuthProvider';
 import { useToast } from '@/providers/ToastProvider';
+import { useConfirmModal } from '@/providers/ConfirmModalProvider';
+import { useSuccessModal } from '@/providers/SuccessModalProvider';
 import { creatorService } from '@/services/creatorService';
 import { Creator, CreatorService } from '@/types';
 import { UploadServiceModal } from '@/components/modals/UploadServiceModal';
@@ -59,6 +61,8 @@ const DEFAULT_CREATOR_SERVICES: CreatorService[] = [
 export function CreatorServicesPage() {
   const { user } = useAuth();
   const { showToast } = useToast();
+  const { confirmModal } = useConfirmModal();
+  const { showSuccessModal } = useSuccessModal();
 
   const [services, setServices] = useState<CreatorService[]>(DEFAULT_CREATOR_SERVICES);
   const [creatorProfile, setCreatorProfile] = useState<Creator | null>(null);
@@ -161,34 +165,56 @@ export function CreatorServicesPage() {
   };
 
   const handleDeleteService = async (serviceId: string, serviceTitle: string) => {
-    if (!window.confirm(`Yakin ingin menghapus layanan "${serviceTitle}"?`)) return;
-
-    setServices((prev) => prev.filter((s) => s.id !== serviceId));
+    const confirmed = await confirmModal({
+      title: 'Hapus Layanan',
+      message: `Apakah Anda yakin ingin menghapus paket layanan "${serviceTitle}" dari etalase Anda?`,
+      confirmText: 'Hapus Layanan',
+      cancelText: 'Batal',
+      variant: 'danger',
+    });
+    if (!confirmed) return;
 
     if (!serviceId.startsWith('demo-') && !serviceId.startsWith('qa-') && !serviceId.startsWith('sm-')) {
       try {
-        await fetch(`/api/services/${serviceId}`, {
+        const res = await fetch(`/api/services/${serviceId}`, {
           method: 'DELETE',
         });
-      } catch (err) {
-        console.error('Failed to delete service:', err);
+        if (!res.ok) {
+          const errData = await res.json().catch(() => ({}));
+          showToast({
+            type: 'error',
+            title: 'Gagal Menghapus Layanan',
+            message: errData.error || 'Terjadi kesalahan saat menghapus layanan dari server.',
+          });
+          return;
+        }
+      } catch (err: any) {
+        showToast({
+          type: 'error',
+          title: 'Koneksi Terputus',
+          message: err?.message || 'Gagal menghubungi server untuk menghapus layanan.',
+        });
+        return;
       }
     }
 
-    showToast({
-      type: 'info',
+    setServices((prev) => prev.filter((s) => s.id !== serviceId));
+
+    showSuccessModal({
       title: 'Layanan Dihapus',
-      message: `Layanan "${serviceTitle}" telah berhasil dihapus.`,
+      message: `Paket layanan "${serviceTitle}" telah berhasil dihapus dari etalase Anda.`,
+      duration: 2500,
     });
   };
 
   const handleUploadSuccess = (newService: CreatorService) => {
     setServices((prev) => [newService, ...prev]);
     setIsUploadModalOpen(false);
-    showToast({
-      type: 'success',
-      title: 'Layanan Ditambahkan',
-      message: `Paket layanan "${newService.title}" berhasil ditambahkan ke etalase Anda!`,
+    showSuccessModal({
+      title: 'Layanan Berhasil Ditambahkan!',
+      message: `Paket layanan "${newService.title}" berhasil dipublikasikan dan aktif di etalase Anda.`,
+      buttonText: 'Selesai',
+      duration: 3500,
     });
   };
 
