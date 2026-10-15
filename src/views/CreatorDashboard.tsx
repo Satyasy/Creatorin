@@ -44,7 +44,7 @@ const FIGMA_SAMPLE_BRIEFS: BriefItem[] = [
     title: 'Produksi 3x Video Reels Instagram & TikTok untuk Launching Kopi Susu Botolan',
     description: 'Kami membutuhkan kreator video UGC yang aktif dan ekspresif untuk membuat 3 video reels/TikTok promosi menu baru Cold Brew Caramel. Konsep video: First impression review, aesthetic pouring B-roll, dan ASMR unboxing. Produk akan kami kirimkan ke alamat kreator.',
     skills: ['TikTok UGC', 'Reels Instagram', 'Food Videography', 'Voiceover', 'CapCut Pro'],
-    budget: 'Rp1.500.000',
+    budget: '🪙 1.500.000',
     budgetMin: 1500000,
     budgetMax: 1500000,
   },
@@ -55,7 +55,7 @@ const FIGMA_SAMPLE_BRIEFS: BriefItem[] = [
     title: 'Desain Identitas Visual, Logo Brand, & Packaging Box Skincare Organik',
     description: 'Mencari graphic designer berpengalaman di bidang beauty & skincare untuk merancang logo minimalis premium, panduan warna/tipografi, serta mockup box kemasan serum dan facial wash.',
     skills: ['Logo Design', 'Packaging', 'Brand Identity', 'Adobe Illustrator', 'Visual Branding'],
-    budget: 'Rp3.000.000',
+    budget: '🪙 3.000.000',
     budgetMin: 3000000,
     budgetMax: 3000000,
   },
@@ -66,7 +66,7 @@ const FIGMA_SAMPLE_BRIEFS: BriefItem[] = [
     title: 'Foto Katalog Produk & Lifestyle Shoot 12 Artikel Baju Muslim Lebaran',
     description: 'Dibutuhkan fotografer produk fashion untuk sesi photoshoot 12 artikel gamis & hijab. Kami akan kirimkan sampel produk fisik ke studio Anda. Butuh foto white background (clean e-commerce) dan outdoor natural mood.',
     skills: ['Foto Produk', 'Fashion Photography', 'Adobe Lightroom', 'Color Grading'],
-    budget: 'Rp2.000.000',
+    budget: '🪙 2.000.000',
     budgetMin: 2000000,
     budgetMax: 2000000,
   },
@@ -77,7 +77,7 @@ const FIGMA_SAMPLE_BRIEFS: BriefItem[] = [
     title: 'Paket Desain 15 Feed Instagram Carousel & Story Edukatif Fintech Syariah',
     description: 'Kami membutuhkan desainer grafis untuk membuat 15 konten visual social media bulanan (carousel edukasi investasi halal & tips keuangan) dengan tone modern, clean, dan profesional.',
     skills: ['Feed Instagram', 'Social Media Design', 'Figma', 'Infographic Design', 'Typography'],
-    budget: 'Rp1.800.000',
+    budget: '🪙 1.800.000',
     budgetMin: 1800000,
     budgetMax: 1800000,
   },
@@ -88,7 +88,7 @@ const FIGMA_SAMPLE_BRIEFS: BriefItem[] = [
     title: 'Video Review & Unboxing Jujur Headset Gaming Wireless (TikTok & YouTube Shorts)',
     description: 'Mencari tech enthusiast / gamer creator untuk membuat video unboxing + review latensi mic, sound staging, dan build quality produk headset gaming terbaru kami.',
     skills: ['Video Tiktok', 'Tech Review', 'Sound Testing', 'Video Editing'],
-    budget: 'Rp1.200.000',
+    budget: '🪙 1.200.000',
     budgetMin: 1200000,
     budgetMax: 1200000,
   },
@@ -99,7 +99,7 @@ const FIGMA_SAMPLE_BRIEFS: BriefItem[] = [
     title: 'Desain Banner Promosi Shopee Big Sale & Roll Up Banner Stand Booth Event',
     description: 'Dibutuhkan desainer cepat untuk membuat set banner e-commerce marketplace (Shopee/Tokopedia campaign) dan 2 desain standing banner untuk pameran kuliner.',
     skills: ['Banner', 'Poster', 'E-Commerce Graphic', 'Print Design', 'Photoshop'],
-    budget: 'Rp800.000',
+    budget: '🪙 800.000',
     budgetMin: 800000,
     budgetMax: 800000,
   },
@@ -110,7 +110,7 @@ const FIGMA_SAMPLE_BRIEFS: BriefItem[] = [
     title: 'Redesign Landing Page Website Brand Sepatu Lokal Ramah Lingkungan',
     description: 'Kami ingin meremajakan tampilan website katalog e-commerce kami dengan sentuhan clean, editorial, dan menonjolkan nilai sustainability sepatu daur ulang kami. Butuh file rapi di Figma siap serah terima ke developer.',
     skills: ['UI/UX Design', 'Figma', 'E-Commerce UX', 'Design Systems', 'Responsive Web'],
-    budget: 'Rp3.500.000',
+    budget: '🪙 3.500.000',
     budgetMin: 3500000,
     budgetMax: 3500000,
   },
@@ -121,7 +121,7 @@ const FIGMA_SAMPLE_BRIEFS: BriefItem[] = [
     title: 'Pembuatan 2 Video Recipe Hacks Menggunakan Keju Oles Serbaguna (TikTok Foodie)',
     description: 'Mencari kreator food blogger / home cook TikTok untuk membuat resep cemilan viral yang mudah ditiru ibu muda dan anak kos menggunakan keju oles kami. Wajib ada close-up tekstur leleh yang menggugah selera.',
     skills: ['Video Tiktok', 'Food Styling', 'Recipe Creation', 'Short Video Editing'],
-    budget: 'Rp1.800.000',
+    budget: '🪙 1.800.000',
     budgetMin: 1800000,
     budgetMax: 1800000,
   },
@@ -140,9 +140,9 @@ const CATEGORY_FILTERS = [
 
 const BUDGET_FILTERS = [
   'Semua Anggaran',
-  '< Rp1.000.000',
-  'Rp1.000.000 - Rp2.000.000',
-  '> Rp2.000.000',
+  '< 🪙 1.000.000',
+  '🪙 1.000.000 - 🪙 2.000.000',
+  '> 🪙 2.000.000',
 ];
 
 const DEADLINE_FILTERS = [
@@ -213,7 +213,9 @@ export const CreatorDashboard = () => {
             title: b.title,
             description: b.description || 'Brief kolaborasi proyek terbuka untuk kreator terverifikasi.',
             skills: b.requiredSkills?.length ? b.requiredSkills : [b.category || 'Kreatif'],
-            budget: b.formattedBudget || (b.budgetMin ? `Rp${b.budgetMin.toLocaleString('id-ID')}` : 'Rp1.500.000'),
+            budget: b.formattedBudget
+              ? b.formattedBudget.replace(/^Rp\s?/, '🪙 ')
+              : (b.budgetMin ? `🪙 ${b.budgetMin.toLocaleString('id-ID')}` : '🪙 1.500.000'),
             budgetMin: b.budgetMin || 0,
             budgetMax: b.budgetMax || 0,
           });
@@ -246,14 +248,14 @@ export const CreatorDashboard = () => {
       }
 
       // Budget filter
-      if (selectedBudget === '< Rp1.000.000' && item.budgetMin >= 1000000) return false;
+      if (selectedBudget === '< 🪙 1.000.000' && item.budgetMin >= 1000000) return false;
       if (
-        selectedBudget === 'Rp1.000.000 - Rp2.000.000' &&
+        selectedBudget === '🪙 1.000.000 - 🪙 2.000.000' &&
         (item.budgetMin < 1000000 || item.budgetMin > 2000000)
       ) {
         return false;
       }
-      if (selectedBudget === '> Rp2.000.000' && item.budgetMin <= 2000000) return false;
+      if (selectedBudget === '> 🪙 2.000.000' && item.budgetMin <= 2000000) return false;
 
       // Deadline filter
       if (selectedDeadline === 'Terbaru (< 24 Jam)') {
@@ -770,16 +772,19 @@ export const CreatorDashboard = () => {
             <form onSubmit={handleSendProposal} className="mt-4 space-y-4">
               <div>
                 <label className="block text-xs font-semibold text-[#0D0C22] mb-1">
-                  Penawaran Biaya (Rp)
+                  Penawaran Biaya (Koin)
                 </label>
-                <input
-                  type="text"
-                  value={proposedPrice}
-                  onChange={(e) => setProposedPrice(e.target.value)}
-                  className="w-full rounded-xl border border-neutral-200 px-3.5 py-2 text-sm text-[#0D0C22] outline-none focus:border-blue-600"
-                  placeholder="Contoh: Rp1.500.000"
-                  required
-                />
+                <div className="relative">
+                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm select-none">🪙</span>
+                  <input
+                    type="text"
+                    value={proposedPrice}
+                    onChange={(e) => setProposedPrice(e.target.value)}
+                    className="w-full rounded-xl border border-neutral-200 pl-8 pr-3.5 py-2 text-sm text-[#0D0C22] outline-none focus:border-blue-600"
+                    placeholder="Contoh: 1.500.000"
+                    required
+                  />
+                </div>
               </div>
 
               <div>

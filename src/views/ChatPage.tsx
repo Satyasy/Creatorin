@@ -96,10 +96,10 @@ export const ChatPage: React.FC<ChatPageProps> = ({
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isUploadingFile, setIsUploadingFile] = useState(false);
 
-  // Invoice DP Modal State (Default: 1.500 Koin = Rp1.500.000)
+  // Invoice DP Modal State (Default: 200.000 Koin)
   const [isCreateInvoiceModalOpen, setIsCreateInvoiceModalOpen] = useState(false);
   const [invoiceFormTitle, setInvoiceFormTitle] = useState('');
-  const [invoiceFormTotal, setInvoiceFormTotal] = useState('1500');
+  const [invoiceFormTotal, setInvoiceFormTotal] = useState('200000');
   const [invoiceFormDpPercent, setInvoiceFormDpPercent] = useState<number>(50);
   const [invoiceFormScope, setInvoiceFormScope] = useState('');
   const [invoiceFormDays, setInvoiceFormDays] = useState<number>(3);
@@ -493,9 +493,8 @@ export const ChatPage: React.FC<ChatPageProps> = ({
 
     setIsSendingInvoice(true);
     try {
-      const inputVal = parseInt(invoiceFormTotal.replace(/[^0-9]/g, ''), 10) || 1500;
-      // Convert to Coin (if user inputted e.g. 1500000, convert to 1500 coins; otherwise use coin value)
-      const cleanTotalCoin = inputVal > 50000 ? Math.round(inputVal / 1000) : inputVal;
+      const inputVal = parseInt(invoiceFormTotal.replace(/[^0-9]/g, ''), 10) || 200000;
+      const cleanTotalCoin = inputVal;
       const dpCoin = Math.round((cleanTotalCoin * invoiceFormDpPercent) / 100);
 
       // Partner ID is the business/UMKM recipient
@@ -507,7 +506,7 @@ export const ChatPage: React.FC<ChatPageProps> = ({
         businessId: partnerId,
         conversationId: activeChatId,
         title: invoiceFormTitle,
-        scopeDescription: `DP ${invoiceFormDpPercent}% (${dpCoin.toLocaleString('id-ID')} Koin) dari Total ${cleanTotalCoin.toLocaleString('id-ID')} Koin. ${invoiceFormScope}`,
+        scopeDescription: `DP ${invoiceFormDpPercent}% (🪙 ${dpCoin.toLocaleString('id-ID')}) dari Total 🪙 ${cleanTotalCoin.toLocaleString('id-ID')}. ${invoiceFormScope}`,
         totalAmount: dpCoin,
         deadlineDays: invoiceFormDays,
       });
@@ -519,13 +518,13 @@ export const ChatPage: React.FC<ChatPageProps> = ({
       const newInvoice: ChatInvoice = {
         id: dbInvoiceId,
         serviceTitle: invoiceFormTitle,
-        amount: `${dpCoin.toLocaleString('id-ID')} Koin`,
+        amount: `🪙 ${dpCoin.toLocaleString('id-ID')}`,
         status: 'unpaid',
         dueDate: `${invoiceFormDays} Hari Kerja`,
-        scopeSummary: `DP ${invoiceFormDpPercent}% (${dpCoin.toLocaleString('id-ID')} Koin). ${invoiceFormScope}`,
+        scopeSummary: `DP ${invoiceFormDpPercent}% (🪙 ${dpCoin.toLocaleString('id-ID')}). ${invoiceFormScope}`,
       };
 
-      const msgText = `Pengajuan Kesepakatan: Invoice DP ${invoiceFormDpPercent}% sebesar 🪙 ${dpCoin.toLocaleString('id-ID')} Koin untuk ${invoiceFormTitle}.`;
+      const msgText = `Pengajuan Kesepakatan: Invoice DP ${invoiceFormDpPercent}% sebesar 🪙 ${dpCoin.toLocaleString('id-ID')} untuk ${invoiceFormTitle}.`;
 
       // Send chat message with invoice metadata to database
       const result = await chatService.sendMessage(activeChatId, msgText, {
@@ -1688,20 +1687,20 @@ export const ChatPage: React.FC<ChatPageProps> = ({
                     <label className="text-xs font-semibold text-neutral-700">
                       Total Nilai Proyek (Koin)
                     </label>
-                    <span className="text-[10px] text-blue-600 font-medium bg-blue-50 px-1.5 py-0.5 rounded">
-                      1 Koin = Rp1.000
-                    </span>
                   </div>
-                  <input
-                    type="text"
-                    required
-                    placeholder="1500"
-                    value={invoiceFormTotal}
-                    onChange={(e) => setInvoiceFormTotal(e.target.value)}
-                    className="w-full text-xs sm:text-sm p-3 rounded-xl border border-neutral-200 focus:outline-hidden focus:border-[#0B1F3A]"
-                  />
+                  <div className="relative">
+                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm select-none">🪙</span>
+                    <input
+                      type="text"
+                      required
+                      placeholder="200000"
+                      value={invoiceFormTotal}
+                      onChange={(e) => setInvoiceFormTotal(e.target.value)}
+                      className="w-full text-xs sm:text-sm pl-9 pr-3 py-3 rounded-xl border border-neutral-200 focus:outline-hidden focus:border-[#0B1F3A]"
+                    />
+                  </div>
                   <p className="text-[10px] text-neutral-400 mt-1">
-                    Contoh: 1.500 Koin setara dengan Rp1.500.000
+                    Contoh: 200.000 untuk total biaya kesepakatan
                   </p>
                 </div>
 
@@ -1730,26 +1729,23 @@ export const ChatPage: React.FC<ChatPageProps> = ({
 
               {/* Rincian DP Terhitung dalam Koin */}
               {(() => {
-                const rawVal = parseInt(invoiceFormTotal.replace(/[^0-9]/g, ''), 10) || 1500;
-                const totalCoin = rawVal > 50000 ? Math.round(rawVal / 1000) : rawVal;
+                const rawVal = parseInt(invoiceFormTotal.replace(/[^0-9]/g, ''), 10) || 200000;
+                const totalCoin = rawVal;
                 const dpCoin = Math.round((totalCoin * invoiceFormDpPercent) / 100);
                 const remCoin = Math.max(0, totalCoin - dpCoin);
                 return (
                   <div className="p-3 bg-blue-50/70 border border-blue-100 rounded-xl flex items-center justify-between text-xs">
                     <div>
                       <span className="text-[11px] text-blue-700 block font-medium">Nominal DP Terhitung ({invoiceFormDpPercent}%)</span>
-                      <span className="font-bold text-sm text-[#0B1F3A] flex items-center gap-1 mt-0.5">
+                      <span className="font-bold text-sm text-[#0B1F3A] flex items-center gap-1.5 mt-0.5">
                         <span>🪙</span>
-                        <span>{dpCoin.toLocaleString('id-ID')} Koin</span>
-                      </span>
-                      <span className="text-[10px] text-neutral-400 block mt-0.5">
-                        Setara Rp{(dpCoin * 1000).toLocaleString('id-ID')}
+                        <span>{dpCoin.toLocaleString('id-ID')}</span>
                       </span>
                     </div>
                     <div className="text-right">
                       <span className="text-[10px] text-neutral-500 block">Sisa Pelunasan</span>
                       <span className="text-xs font-semibold text-neutral-700 block mt-0.5">
-                        🪙 {remCoin.toLocaleString('id-ID')} Koin
+                        🪙 {remCoin.toLocaleString('id-ID')}
                       </span>
                     </div>
                   </div>

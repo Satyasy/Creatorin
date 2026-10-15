@@ -141,7 +141,7 @@ export async function POST(req: NextRequest) {
     }
 
     const numeric = parseInt(price.replace(/[^0-9]/g, ""), 10) || 0;
-    const formattedPrice = price.startsWith("Rp") ? price : `Rp${numeric.toLocaleString("id-ID")}`;
+    const formattedPrice = price.startsWith("🪙") ? price : `🪙 ${numeric.toLocaleString("id-ID")}`;
 
     try {
       const [newService] = await db

@@ -78,9 +78,9 @@ export const ExploreServicesPage: React.FC<ExploreServicesPageProps> = ({
 
   const getBudgetLabel = (val: string) => {
     if (val === 'Semua') return t('filter.allBudget', 'Semua Budget');
-    if (val === 'under500') return t('budget.under500', '< Rp500rb');
-    if (val === 'mid') return t('budget.mid500to15', 'Rp500rb - Rp1.5jt');
-    if (val === 'high') return t('budget.above15', '> Rp1.5jt');
+    if (val === 'under500') return t('budget.under500', '< 🪙 500rb');
+    if (val === 'mid') return t('budget.mid500to15', '🪙 500rb - 🪙 1.5jt');
+    if (val === 'high') return t('budget.above15', '> 🪙 1.5jt');
     return val;
   };
 
@@ -228,7 +228,7 @@ const DEFAULT_SERVICES: ServiceWithCreator[] = [
     title: '1x Video TikTok UGC & Review Viral',
     description: 'Pengerjaan profesional dengan jaminan kepatuhan brief dan revisi cepat.',
     price: 1500000,
-    formattedPrice: 'Rp1.500.000',
+    formattedPrice: '🪙 1.500.000',
     deliveryDays: '2 Hari Kerja',
     tag: 'TIKTOK UGC',
     coverImage: 'https://images.unsplash.com/photo-1556228720-195a672e8a03?w=800&auto=format&fit=crop&q=80',
@@ -243,7 +243,7 @@ const DEFAULT_SERVICES: ServiceWithCreator[] = [
       bio: 'Konten kreator TikTok viral dengan pengalaman kolaborasi brand terpercaya.',
       location: 'Bandung',
       startingRate: 1500000,
-      formattedRate: 'Rp1.500.000',
+      formattedRate: '🪙 1.500.000',
       careerScore: { overall: 96, deadlineAccuracy: 98, revisionRate: 1.0, completionRate: 100, clientRating: 4.9, completedProjects: 42, tier: 'Top Tier' },
       skills: ['TikTok UGC', 'Video Viral', 'Short-form'],
       joinedDate: '2023',
@@ -254,7 +254,7 @@ const DEFAULT_SERVICES: ServiceWithCreator[] = [
     title: '3x Reels Instagram Hook Kuat & Edukasi Produk',
     description: 'Paket konten video reels vertikal dengan visual hook dalam 3 detik pertama.',
     price: 2500000,
-    formattedPrice: 'Rp2.500.000',
+    formattedPrice: '🪙 2.500.000',
     deliveryDays: '3 Hari Kerja',
     tag: 'REELS INSTAGRAM',
     coverImage: 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=800&auto=format&fit=crop&q=80',
@@ -269,7 +269,7 @@ const DEFAULT_SERVICES: ServiceWithCreator[] = [
       bio: 'Spesialis video TikTok & Reels berorientasi konversi untuk produk kecantikan.',
       location: 'Jakarta Selatan',
       startingRate: 250000,
-      formattedRate: 'Rp250.000',
+      formattedRate: '🪙 250.000',
       careerScore: { overall: 96, deadlineAccuracy: 98, revisionRate: 1.1, completionRate: 100, clientRating: 4.9, completedProjects: 38, tier: 'Top Tier' },
       skills: ['Video TikTok', 'Reels Instagram', 'UGC Content'],
       joinedDate: '2023',
@@ -280,7 +280,7 @@ const DEFAULT_SERVICES: ServiceWithCreator[] = [
     title: 'Desain Identitas Brand & Logo UMKM Siap Pakai',
     description: 'Paket logo profesional lengkap dengan color guide, font pairing, dan master file.',
     price: 850000,
-    formattedPrice: 'Rp850.000',
+    formattedPrice: '🪙 850.000',
     deliveryDays: '3 Hari Kerja',
     tag: 'LOGO & BRANDING',
     coverImage: 'https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?w=800&auto=format&fit=crop&q=80',
@@ -295,7 +295,7 @@ const DEFAULT_SERVICES: ServiceWithCreator[] = [
       bio: 'Membantu UMKM membangun identitas visual modern.',
       location: 'Bandung',
       startingRate: 400000,
-      formattedRate: 'Rp400.000',
+      formattedRate: '🪙 400.000',
       careerScore: { overall: 98, deadlineAccuracy: 100, revisionRate: 1.0, completionRate: 100, clientRating: 5.0, completedProjects: 45, tier: 'Top Tier' },
       skills: ['Motion Graphic', 'Branding', 'Vector'],
       joinedDate: '2022',
@@ -306,7 +306,7 @@ const DEFAULT_SERVICES: ServiceWithCreator[] = [
     title: '9-Grid Feed Instagram Estetik & Template Canva',
     description: 'Desain feed teratur yang memperkuat branding produk UMKM di media sosial.',
     price: 450000,
-    formattedPrice: 'Rp450.000',
+    formattedPrice: '🪙 450.000',
     deliveryDays: '2 Hari Kerja',
     tag: 'FEED INSTAGRAM',
     coverImage: 'https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?w=800&auto=format&fit=crop&q=80',
@@ -321,7 +321,7 @@ const DEFAULT_SERVICES: ServiceWithCreator[] = [
       bio: 'Desainer grafis berfokus pada feed Instagram estetik dan visual banner.',
       location: 'Yogyakarta',
       startingRate: 200000,
-      formattedRate: 'Rp200.000',
+      formattedRate: '🪙 200.000',
       careerScore: { overall: 94, deadlineAccuracy: 96, revisionRate: 1.2, completionRate: 100, clientRating: 4.9, completedProjects: 52, tier: 'Top Tier' },
       skills: ['Feed Instagram', 'Poster', 'Logo & Branding'],
       joinedDate: '2023',
@@ -332,7 +332,7 @@ const DEFAULT_SERVICES: ServiceWithCreator[] = [
     title: 'Foto Produk Komersial Studio 10 Foto Siap Katalog',
     description: 'Sesi foto produk dengan tata lampu studio dan retouching resolusi tinggi.',
     price: 650000,
-    formattedPrice: 'Rp650.000',
+    formattedPrice: '🪙 650.000',
     deliveryDays: '2 Hari Kerja',
     tag: 'FOTO PRODUK',
     coverImage: 'https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=800&auto=format&fit=crop&q=80',
@@ -347,7 +347,7 @@ const DEFAULT_SERVICES: ServiceWithCreator[] = [
       bio: 'Pencahayaan dan komposisi profesional untuk produk lokal.',
       location: 'Surabaya',
       startingRate: 350000,
-      formattedRate: 'Rp350.000',
+      formattedRate: '🪙 350.000',
       careerScore: { overall: 91, deadlineAccuracy: 95, revisionRate: 1.3, completionRate: 98, clientRating: 4.8, completedProjects: 29, tier: 'Rising Star' },
       skills: ['Foto Produk', 'Lighting Studio', 'Commercial'],
       joinedDate: '2023',
@@ -358,7 +358,7 @@ const DEFAULT_SERVICES: ServiceWithCreator[] = [
     title: 'Video Unboxing & Review Organik TikTok Shop',
     description: 'Video unboxing natural yang meningkatkan rasa percaya calon pembeli e-commerce.',
     price: 750000,
-    formattedPrice: 'Rp750.000',
+    formattedPrice: '🪙 750.000',
     deliveryDays: '2 Hari Kerja',
     tag: 'TIKTOK UGC',
     coverImage: 'https://images.unsplash.com/photo-1544816155-12df9643f363?w=800&auto=format&fit=crop&q=80',
@@ -373,7 +373,7 @@ const DEFAULT_SERVICES: ServiceWithCreator[] = [
       bio: 'UGC organik yang otentik dan relate dengan audiens muda.',
       location: 'Semarang',
       startingRate: 200000,
-      formattedRate: 'Rp200.000',
+      formattedRate: '🪙 200.000',
       careerScore: { overall: 95, deadlineAccuracy: 98, revisionRate: 1.0, completionRate: 100, clientRating: 4.9, completedProjects: 41, tier: 'Top Tier' },
       skills: ['UGC Review', 'Unboxing', 'Lifestyle'],
       joinedDate: '2023',
@@ -384,7 +384,7 @@ const DEFAULT_SERVICES: ServiceWithCreator[] = [
     title: 'Packaging & Kemasan Label Produk Box / Pouch Siap Cetak',
     description: 'Desain kemasan fungsional dengan pola dieline tepat ukuran siap dikirim ke percetakan.',
     price: 900000,
-    formattedPrice: 'Rp900.000',
+    formattedPrice: '🪙 900.000',
     deliveryDays: '4 Hari Kerja',
     tag: 'KEMASAN',
     coverImage: 'https://images.unsplash.com/photo-1559525839-8f8ec328b228?w=800&auto=format&fit=crop&q=80',
@@ -399,7 +399,7 @@ const DEFAULT_SERVICES: ServiceWithCreator[] = [
       bio: 'Membantu UMKM membangun identitas visual modern.',
       location: 'Bandung',
       startingRate: 400000,
-      formattedRate: 'Rp400.000',
+      formattedRate: '🪙 400.000',
       careerScore: { overall: 98, deadlineAccuracy: 100, revisionRate: 1.0, completionRate: 100, clientRating: 5.0, completedProjects: 45, tier: 'Top Tier' },
       skills: ['Packaging', 'Dieline', 'Print'],
       joinedDate: '2022',
@@ -410,7 +410,7 @@ const DEFAULT_SERVICES: ServiceWithCreator[] = [
     title: 'Banner Promosi Flash Sale Marketplace Shopee & Tokped',
     description: 'Header toko dan 5 banner campaign promo berdaya tarik visual tinggi.',
     price: 350000,
-    formattedPrice: 'Rp350.000',
+    formattedPrice: '🪙 350.000',
     deliveryDays: '1 Hari Kerja',
     tag: 'BANNER PROMO',
     coverImage: 'https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?w=800&auto=format&fit=crop&q=80',
@@ -425,7 +425,7 @@ const DEFAULT_SERVICES: ServiceWithCreator[] = [
       bio: 'Desainer grafis berfokus pada feed Instagram estetik dan visual banner.',
       location: 'Yogyakarta',
       startingRate: 200000,
-      formattedRate: 'Rp200.000',
+      formattedRate: '🪙 200.000',
       careerScore: { overall: 94, deadlineAccuracy: 96, revisionRate: 1.2, completionRate: 100, clientRating: 4.9, completedProjects: 52, tier: 'Top Tier' },
       skills: ['Feed Instagram', 'Poster', 'Banner Promo'],
       joinedDate: '2023',
@@ -436,7 +436,7 @@ const DEFAULT_SERVICES: ServiceWithCreator[] = [
     title: 'Video Sinematik B-Roll Menu Restoran & Kuliner',
     description: 'Tampilan menggugah selera dengan transisi mulus dan color grade hangat.',
     price: 1200000,
-    formattedPrice: 'Rp1.200.000',
+    formattedPrice: '🪙 1.200.000',
     deliveryDays: '3 Hari Kerja',
     tag: 'VIDEO KULINER',
     coverImage: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=800&auto=format&fit=crop&q=80',
@@ -451,7 +451,7 @@ const DEFAULT_SERVICES: ServiceWithCreator[] = [
       bio: 'Menghadirkan hook visual kuat dalam 3 detik pertama untuk promosi UMKM.',
       location: 'Bali',
       startingRate: 300000,
-      formattedRate: 'Rp300.000',
+      formattedRate: '🪙 300.000',
       careerScore: { overall: 93, deadlineAccuracy: 97, revisionRate: 1.1, completionRate: 100, clientRating: 4.9, completedProjects: 34, tier: 'Rising Star' },
       skills: ['Video Reels', 'TikTok Ads', 'Storytelling'],
       joinedDate: '2024',
@@ -462,7 +462,7 @@ const DEFAULT_SERVICES: ServiceWithCreator[] = [
     title: 'Redesain Kemasan Pouch Kopi Specialty Premium',
     description: 'Transformasi visual packaging kopi lokal menjadi produk bernilai jual ekspor.',
     price: 1100000,
-    formattedPrice: 'Rp1.100.000',
+    formattedPrice: '🪙 1.100.000',
     deliveryDays: '3 Hari Kerja',
     tag: 'PACKAGING',
     coverImage: 'https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?w=800&auto=format&fit=crop&q=80',
@@ -477,7 +477,7 @@ const DEFAULT_SERVICES: ServiceWithCreator[] = [
       bio: 'Membantu UMKM membangun identitas visual modern.',
       location: 'Bandung',
       startingRate: 400000,
-      formattedRate: 'Rp400.000',
+      formattedRate: '🪙 400.000',
       careerScore: { overall: 98, deadlineAccuracy: 100, revisionRate: 1.0, completionRate: 100, clientRating: 5.0, completedProjects: 45, tier: 'Top Tier' },
       skills: ['Packaging', 'Branding', 'Vector'],
       joinedDate: '2022',
@@ -488,7 +488,7 @@ const DEFAULT_SERVICES: ServiceWithCreator[] = [
     title: '1x Video TikTok Edukasi Masalah Kulit & Skincare',
     description: 'Konten soft-selling edukatif dengan pembawaan rileks dan relatable.',
     price: 800000,
-    formattedPrice: 'Rp800.000',
+    formattedPrice: '🪙 800.000',
     deliveryDays: '2 Hari Kerja',
     tag: 'TIKTOK UGC',
     coverImage: 'https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?w=800&auto=format&fit=crop&q=80',
@@ -503,7 +503,7 @@ const DEFAULT_SERVICES: ServiceWithCreator[] = [
       bio: 'UGC organik yang otentik dan relate dengan audiens muda.',
       location: 'Semarang',
       startingRate: 200000,
-      formattedRate: 'Rp200.000',
+      formattedRate: '🪙 200.000',
       careerScore: { overall: 95, deadlineAccuracy: 98, revisionRate: 1.0, completionRate: 100, clientRating: 4.9, completedProjects: 41, tier: 'Top Tier' },
       skills: ['UGC Review', 'Unboxing', 'Lifestyle'],
       joinedDate: '2023',
@@ -514,7 +514,7 @@ const DEFAULT_SERVICES: ServiceWithCreator[] = [
     title: 'Desain UI Landing Page Mobile UMKM Siap Coding',
     description: 'Mockup Figma responsif dengan komponen rapi dan prototipe interaktif.',
     price: 1800000,
-    formattedPrice: 'Rp1.800.000',
+    formattedPrice: '🪙 1.800.000',
     deliveryDays: '4 Hari Kerja',
     tag: 'UI/UX DESIGN',
     coverImage: 'https://images.unsplash.com/photo-1581291518857-4e27b48ff24e?w=800&auto=format&fit=crop&q=80',
@@ -529,7 +529,7 @@ const DEFAULT_SERVICES: ServiceWithCreator[] = [
       bio: 'Desainer grafis berfokus pada feed Instagram estetik dan visual banner.',
       location: 'Yogyakarta',
       startingRate: 200000,
-      formattedRate: 'Rp200.000',
+      formattedRate: '🪙 200.000',
       careerScore: { overall: 94, deadlineAccuracy: 96, revisionRate: 1.2, completionRate: 100, clientRating: 4.9, completedProjects: 52, tier: 'Top Tier' },
       skills: ['UI/UX', 'Figma', 'Web Design'],
       joinedDate: '2023',
@@ -540,7 +540,7 @@ const DEFAULT_SERVICES: ServiceWithCreator[] = [
     title: 'Foto Katalog Busana Muslim & Hijab On-Model',
     description: 'Foto lookbook studio profesional dengan model, makeup, dan arahan gaya.',
     price: 950000,
-    formattedPrice: 'Rp950.000',
+    formattedPrice: '🪙 950.000',
     deliveryDays: '3 Hari Kerja',
     tag: 'FOTO PRODUK',
     coverImage: 'https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=800&auto=format&fit=crop&q=80',
@@ -555,7 +555,7 @@ const DEFAULT_SERVICES: ServiceWithCreator[] = [
       bio: 'Pencahayaan dan komposisi profesional untuk produk lokal.',
       location: 'Surabaya',
       startingRate: 350000,
-      formattedRate: 'Rp350.000',
+      formattedRate: '🪙 350.000',
       careerScore: { overall: 91, deadlineAccuracy: 95, revisionRate: 1.3, completionRate: 98, clientRating: 4.8, completedProjects: 29, tier: 'Rising Star' },
       skills: ['Foto Produk', 'Lighting Studio', 'Commercial'],
       joinedDate: '2023',
@@ -566,7 +566,7 @@ const DEFAULT_SERVICES: ServiceWithCreator[] = [
     title: 'Animasi Logo 3D Bumper Video Intro Youtube',
     description: 'Animasi logo berdurasi 5 detik dengan sound effects memukau untuk video brand.',
     price: 600000,
-    formattedPrice: 'Rp600.000',
+    formattedPrice: '🪙 600.000',
     deliveryDays: '2 Hari Kerja',
     tag: 'ANIMASI & MOTION',
     coverImage: 'https://images.unsplash.com/photo-1620916566398-39f1143ab7be?w=800&auto=format&fit=crop&q=80',
@@ -581,7 +581,7 @@ const DEFAULT_SERVICES: ServiceWithCreator[] = [
       bio: 'Membantu UMKM membangun identitas visual modern.',
       location: 'Bandung',
       startingRate: 400000,
-      formattedRate: 'Rp400.000',
+      formattedRate: '🪙 400.000',
       careerScore: { overall: 98, deadlineAccuracy: 100, revisionRate: 1.0, completionRate: 100, clientRating: 5.0, completedProjects: 45, tier: 'Top Tier' },
       skills: ['Motion Graphic', 'Branding', 'Vector'],
       joinedDate: '2022',
@@ -592,7 +592,7 @@ const DEFAULT_SERVICES: ServiceWithCreator[] = [
     title: 'Paket Konten 30 Hari Feed + Story Kalender UMKM',
     description: 'Kalender editorial dan 30 aset grafis siap jadwalkan untuk media sosial bisnis.',
     price: 2200000,
-    formattedPrice: 'Rp2.200.000',
+    formattedPrice: '🪙 2.200.000',
     deliveryDays: '5 Hari Kerja',
     tag: 'FEED INSTAGRAM',
     coverImage: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&auto=format&fit=crop&q=80',
@@ -607,7 +607,7 @@ const DEFAULT_SERVICES: ServiceWithCreator[] = [
       bio: 'Desainer grafis berfokus pada feed Instagram estetik dan visual banner.',
       location: 'Yogyakarta',
       startingRate: 200000,
-      formattedRate: 'Rp200.000',
+      formattedRate: '🪙 200.000',
       careerScore: { overall: 94, deadlineAccuracy: 96, revisionRate: 1.2, completionRate: 100, clientRating: 4.9, completedProjects: 52, tier: 'Top Tier' },
       skills: ['Feed Instagram', 'Poster', 'Logo & Branding'],
       joinedDate: '2023',
@@ -618,7 +618,7 @@ const DEFAULT_SERVICES: ServiceWithCreator[] = [
     title: 'Video Testimoni & Review Penggunaan Produk Herbal',
     description: 'Ulasan personal dari sudut pandang konsumen asli dengan penyampaian terpercaya.',
     price: 500000,
-    formattedPrice: 'Rp500.000',
+    formattedPrice: '🪙 500.000',
     deliveryDays: '2 Hari Kerja',
     tag: 'TIKTOK UGC',
     coverImage: 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=800&auto=format&fit=crop&q=80',
@@ -633,7 +633,7 @@ const DEFAULT_SERVICES: ServiceWithCreator[] = [
       bio: 'Spesialis video TikTok & Reels berorientasi konversi untuk produk kecantikan.',
       location: 'Jakarta Selatan',
       startingRate: 250000,
-      formattedRate: 'Rp250.000',
+      formattedRate: '🪙 250.000',
       careerScore: { overall: 96, deadlineAccuracy: 98, revisionRate: 1.1, completionRate: 100, clientRating: 4.9, completedProjects: 38, tier: 'Top Tier' },
       skills: ['Video TikTok', 'Reels Instagram', 'UGC Content'],
       joinedDate: '2023',
@@ -654,7 +654,9 @@ const DEFAULT_SERVICES: ServiceWithCreator[] = [
               id: service.id,
               title: service.title,
               price: service.priceNumeric || 0,
-              formattedPrice: service.price || '',
+              formattedPrice: service.price
+                ? String(service.price).replace(/^Rp\s?/, '🪙 ')
+                : (service.priceNumeric ? `🪙 ${service.priceNumeric.toLocaleString('id-ID')}` : '🪙 200.000'),
               deliveryDays: service.estimatedDays || '',
               description: service.description || '',
               coverImage: service.imageUrl || '',
@@ -972,9 +974,9 @@ const DEFAULT_SERVICES: ServiceWithCreator[] = [
                   <div className="absolute left-0 mt-1.5 w-52 bg-white rounded-2xl border border-neutral-200 shadow-xl py-2 z-30 animate-in fade-in">
                     {[
                       { label: t('filter.allBudget', 'Semua Budget'), val: 'Semua' },
-                      { label: t('filter.under500k', 'Di bawah Rp500.000'), val: 'under500' },
-                      { label: t('filter.midBudget', 'Rp500.000 - Rp1.500.000'), val: 'mid' },
-                      { label: t('filter.highBudget', 'Di atas Rp1.500.000'), val: 'high' }
+                      { label: t('filter.under500k', 'Di bawah 🪙 500.000'), val: 'under500' },
+                      { label: t('filter.midBudget', '🪙 500.000 - 🪙 1.500.000'), val: 'mid' },
+                      { label: t('filter.highBudget', 'Di atas 🪙 1.500.000'), val: 'high' }
                     ].map((b) => (
                       <button
                         key={b.val}
@@ -1107,7 +1109,9 @@ const DEFAULT_SERVICES: ServiceWithCreator[] = [
               {filteredServices.map((item, sIdx) => {
                 const coverImage = item.coverImage || '';
                 const formattedDelivery = formatDelivery(item.deliveryDays);
-                const displayPrice = language === 'en' ? item.formattedPrice.replace('Rp', 'IDR ') : item.formattedPrice;
+                const displayPrice = item.formattedPrice
+                  ? item.formattedPrice.replace(/^Rp\s?/, '🪙 ')
+                  : (item.price ? `🪙 ${item.price.toLocaleString('id-ID')}` : '🪙 200.000');
 
                 return (
                   <ScrollReveal
@@ -1256,7 +1260,9 @@ const DEFAULT_SERVICES: ServiceWithCreator[] = [
                 <div>
                   <span className="text-xs text-neutral-400 font-bold uppercase">{t('service.totalCost', 'Total Biaya Layanan')}</span>
                   <p className="text-xl font-black text-[#0d0c22]">
-                    {language === 'en' ? orderModalService.formattedPrice.replace('Rp', 'IDR ') : orderModalService.formattedPrice}
+                    {orderModalService.formattedPrice
+                      ? orderModalService.formattedPrice.replace(/^Rp\s?/, '🪙 ')
+                      : (orderModalService.price ? `🪙 ${orderModalService.price.toLocaleString('id-ID')}` : '🪙 200.000')}
                   </p>
                 </div>
                 <div className="text-right">

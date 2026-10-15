@@ -40,11 +40,11 @@ import { briefService } from '@/services/briefService';
 // Format budget display to single clean number (e.g. Rp1.500.000)
 const formatDisplayBudget = (formatted?: string, budgetMin?: number) => {
   if (budgetMin) {
-    return `Rp${budgetMin.toLocaleString('id-ID')}`;
+    return `🪙 ${budgetMin.toLocaleString('id-ID')}`;
   }
-  if (!formatted) return 'Rp1.500.000';
-  const clean = formatted.split(/[-–—]|sampai/i)[0].trim();
-  return clean.startsWith('Rp') ? clean : `Rp${clean}`;
+  if (!formatted) return '🪙 1.500.000';
+  const clean = formatted.split(/[-–—]|sampai/i)[0].replace(/^Rp\s*/i, '').replace(/^[🪙\s]+/i, '').trim();
+  return `🪙 ${clean}`;
 };
 
 interface ProjectBriefsPageProps {
@@ -168,7 +168,7 @@ export const ProjectBriefsPage: React.FC<ProjectBriefsPageProps> = ({
       .filter(Boolean);
 
     try {
-      const response = await fetch(`/api/briefs/${editingBrief.id}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ title: editBriefForm.title, category: editBriefForm.category, description: editBriefForm.description, expectedOutput: deliverablesList.join('\n'), budget: `Rp${minNum.toLocaleString('id-ID')}`, deadline: editBriefForm.deadline }) });
+      const response = await fetch(`/api/briefs/${editingBrief.id}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ title: editBriefForm.title, category: editBriefForm.category, description: editBriefForm.description, expectedOutput: deliverablesList.join('\n'), budget: `🪙 ${minNum.toLocaleString('id-ID')}`, deadline: editBriefForm.deadline }) });
       if (!response.ok) throw new Error((await response.json()).error || 'Gagal memperbarui brief.');
     } catch (error) { showToast(error instanceof Error ? error.message : 'Gagal memperbarui brief.'); return; }
 
@@ -180,7 +180,7 @@ export const ProjectBriefsPage: React.FC<ProjectBriefsPageProps> = ({
           category: editBriefForm.category,
           budgetMin: minNum,
           budgetMax: minNum,
-          formattedBudget: `Rp${minNum.toLocaleString('id-ID')}`,
+          formattedBudget: `🪙 ${minNum.toLocaleString('id-ID')}`,
           deadline: editBriefForm.deadline,
           description: editBriefForm.description,
           deliverables: deliverablesList.length > 0 ? deliverablesList : p.deliverables,
@@ -220,7 +220,7 @@ export const ProjectBriefsPage: React.FC<ProjectBriefsPageProps> = ({
     setSelectedBriefForApply(brief);
     // pre-fill recommended rate midpoint
     const mid = Math.round((brief.budgetMin + brief.budgetMax) / 2);
-    setProposalRate(`Rp${mid.toLocaleString('id-ID')}`);
+    setProposalRate(`🪙 ${mid.toLocaleString('id-ID')}`);
     setProposalTimeline(brief.deadline);
     setProposalPitch('');
     setProposalPortfolioUrl('');
@@ -480,12 +480,12 @@ export const ProjectBriefsPage: React.FC<ProjectBriefsPageProps> = ({
                     {selectedBudget === 'Semua' 
                       ? 'Anggaran' 
                       : selectedBudget === '<1jt' 
-                      ? '< Rp1 Juta' 
+                      ? '< 🪙 1 Juta' 
                       : selectedBudget === '1-3jt' 
-                      ? 'Rp1jt - Rp3jt' 
+                      ? '🪙 1jt - 3jt' 
                       : selectedBudget === '3-5jt' 
-                      ? 'Rp3jt - Rp5jt' 
-                      : '> Rp5 Juta'}
+                      ? '🪙 3jt - 5jt' 
+                      : '> 🪙 5 Juta'}
                   </span>
                   <ChevronDown className="w-3.5 h-3.5 text-neutral-400" />
                 </button>
@@ -494,10 +494,10 @@ export const ProjectBriefsPage: React.FC<ProjectBriefsPageProps> = ({
                   <div className="absolute left-0 mt-1.5 w-52 bg-white rounded-2xl border border-neutral-200 shadow-xl py-2 z-40 animate-in fade-in">
                     {[
                       { id: 'Semua', label: 'Semua Anggaran' },
-                      { id: '<1jt', label: 'Di bawah Rp1 Juta' },
-                      { id: '1-3jt', label: 'Rp1.000.000 - Rp3.000.000' },
-                      { id: '3-5jt', label: 'Rp3.000.000 - Rp5.000.000' },
-                      { id: '>5jt', label: 'Di atas Rp5.000.000' },
+                      { id: '<1jt', label: 'Di bawah 🪙 1 Juta' },
+                      { id: '1-3jt', label: '🪙 1.000.000 - 🪙 3.000.000' },
+                      { id: '3-5jt', label: '🪙 3.000.000 - 🪙 5.000.000' },
+                      { id: '>5jt', label: 'Di atas 🪙 5.000.000' },
                     ].map((b) => (
                       <button
                         key={b.id}
@@ -868,14 +868,14 @@ export const ProjectBriefsPage: React.FC<ProjectBriefsPageProps> = ({
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div>
                       <label className="block text-xs font-bold text-neutral-700 mb-1">
-                        Nominal Penawaran Anda (Rp)
+                        Nominal Penawaran Anda (Koin)
                       </label>
                       <input
                         type="text"
                         required
                         value={proposalRate}
                         onChange={(e) => setProposalRate(e.target.value)}
-                        placeholder="Contoh: Rp1.800.000"
+                        placeholder="Contoh: 🪙 1.800.000"
                         className="w-full px-3.5 py-2.5 bg-neutral-50 border border-neutral-200 rounded-xl text-xs sm:text-sm focus:outline-hidden focus:border-neutral-900"
                       />
                     </div>
@@ -1034,14 +1034,14 @@ export const ProjectBriefsPage: React.FC<ProjectBriefsPageProps> = ({
                   <div className="rounded-2xl border border-[#E5E5E5] bg-white p-4 shadow-[0_1px_0_0_rgba(0,0,0,0.05)] flex flex-col justify-between gap-3">
                     <div className="flex items-center justify-between">
                       <span className="text-[11px] font-bold text-[#737373] tracking-[0.055em] uppercase">
-                        Harga (Rp)
+                        Harga (Koin)
                       </span>
                       <div className="w-8 h-8 rounded-xl bg-[#F5F5F5] flex items-center justify-center text-[#737373]">
                         <CreditCard className="w-4 h-4" />
                       </div>
                     </div>
                     <div className="h-[42px] px-3 rounded-xl border border-[#E5E5E5] bg-white flex items-center gap-1.5 focus-within:border-[#155DFC] focus-within:ring-2 focus-within:ring-[#155DFC]/10 transition-all">
-                      <span className="text-xs font-bold text-[#A1A1A1] select-none">Rp</span>
+                      <span className="text-sm select-none">🪙</span>
                       <input
                         type="number"
                         required

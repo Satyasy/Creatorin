@@ -579,7 +579,7 @@ export const UploadServiceModal: React.FC<UploadServiceModalProps> = ({
               <div className="rounded-2xl border border-[#E5E5E5] bg-white p-4 shadow-[0_1px_0_0_rgba(0,0,0,0.05)] flex flex-col justify-between gap-3">
                 <div className="flex items-center justify-between">
                   <span className="text-[11px] font-bold text-[#737373] tracking-[0.055em] uppercase">
-                    Harga (Rp)
+                    Harga (Koin)
                   </span>
                   <div className="w-8 h-8 rounded-xl bg-[#F5F5F5] flex items-center justify-center text-[#737373]">
                     <CreditCard className="w-4 h-4" />
@@ -587,8 +587,8 @@ export const UploadServiceModal: React.FC<UploadServiceModalProps> = ({
                 </div>
 
                 <div className="h-[42px] px-3 rounded-xl border border-[#E5E5E5] bg-white flex items-center gap-1.5 focus-within:border-[#155DFC] focus-within:ring-2 focus-within:ring-[#155DFC]/10 transition-all">
-                  <span className="text-xs font-bold text-[#A1A1A1] select-none">
-                    Rp
+                  <span className="text-sm select-none">
+                    🪙
                   </span>
                   <input
                     type="text"

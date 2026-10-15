@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getAuthenticatedUser } from "@/lib/api-auth";
 import { getDb } from "@/lib/db";
-import { creatorWallets, walletTransactions } from "@/lib/db/schema";
+import { creatorWallets, walletTransactions, notifications } from "@/lib/db/schema";
 import { eq, sql } from "drizzle-orm";
 
 const ALLOWED_DEMO_EMAILS = [
@@ -101,12 +101,25 @@ export async function POST(req: NextRequest) {
         })
         .returning();
 
+      // 4. Catat notifikasi in-app
+      try {
+        await tx.insert(notifications).values({
+          userId: user.id,
+          type: "wallet",
+          title: "Top-up koin berhasil!",
+          body: `Saldo koin Anda berhasil ditambahkan sebesar 🪙 ${rawAmount.toLocaleString('id-ID')}. Total saldo sekarang: 🪙 ${updatedWallet.balance.toLocaleString('id-ID')}.`,
+          linkUrl: "/wallet",
+        });
+      } catch {}
+
       return { updatedWallet, transaction };
     });
 
     return NextResponse.json({
       success: true,
       message: `Berhasil menambahkan 🪙 ${rawAmount.toLocaleString('id-ID')} Koin ke dompet Anda.`,
+      balance: result.updatedWallet.balance,
+      amount: rawAmount,
       wallet: {
         balance: result.updatedWallet.balance,
         points: result.updatedWallet.points,

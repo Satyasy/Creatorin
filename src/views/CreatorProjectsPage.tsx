@@ -36,7 +36,7 @@ const INITIAL_PROJECTS: FeedProject[] = [
       bio: 'Desainer grafis spesialis F&B branding dan katalog produk kreatif.',
       location: 'Bandung',
       startingRate: 450000,
-      formattedRate: 'Rp450.000',
+      formattedRate: '🪙 450.000',
       careerScore: {
         overall: 98,
         deadlineAccuracy: 99,
@@ -76,7 +76,7 @@ const INITIAL_PROJECTS: FeedProject[] = [
       bio: 'Desainer grafis spesialis F&B branding dan katalog produk kreatif.',
       location: 'Bandung',
       startingRate: 450000,
-      formattedRate: 'Rp450.000',
+      formattedRate: '🪙 450.000',
       careerScore: {
         overall: 98,
         deadlineAccuracy: 99,
@@ -116,7 +116,7 @@ const INITIAL_PROJECTS: FeedProject[] = [
       bio: 'Desainer grafis spesialis F&B branding dan katalog produk kreatif.',
       location: 'Bandung',
       startingRate: 450000,
-      formattedRate: 'Rp450.000',
+      formattedRate: '🪙 450.000',
       careerScore: {
         overall: 98,
         deadlineAccuracy: 99,
@@ -156,7 +156,7 @@ const INITIAL_PROJECTS: FeedProject[] = [
       bio: 'Desainer grafis spesialis F&B branding dan katalog produk kreatif.',
       location: 'Bandung',
       startingRate: 450000,
-      formattedRate: 'Rp450.000',
+      formattedRate: '🪙 450.000',
       careerScore: {
         overall: 98,
         deadlineAccuracy: 99,
@@ -196,7 +196,7 @@ const INITIAL_PROJECTS: FeedProject[] = [
       bio: 'Desainer grafis spesialis F&B branding dan katalog produk kreatif.',
       location: 'Bandung',
       startingRate: 450000,
-      formattedRate: 'Rp450.000',
+      formattedRate: '🪙 450.000',
       careerScore: {
         overall: 98,
         deadlineAccuracy: 99,
@@ -236,7 +236,7 @@ const INITIAL_PROJECTS: FeedProject[] = [
       bio: 'Desainer grafis spesialis F&B branding dan katalog produk kreatif.',
       location: 'Bandung',
       startingRate: 450000,
-      formattedRate: 'Rp450.000',
+      formattedRate: '🪙 450.000',
       careerScore: {
         overall: 98,
         deadlineAccuracy: 99,
@@ -360,7 +360,7 @@ export function CreatorProjectsPage() {
         bio: user?.bio || 'Kreator terverifikasi di Creatorin.',
         location: user?.location || 'Indonesia',
         startingRate: 350000,
-        formattedRate: 'Rp350.000',
+        formattedRate: '🪙 350.000',
         careerScore: {
           overall: 95,
           deadlineAccuracy: 98,
