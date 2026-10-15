@@ -22,6 +22,7 @@
 | **Phase 8** | End-to-End Regression Testing | ✅ COMPLETED | `verify-creator-dashboard.mjs` & `verify-explore.mjs` passed at 1440x900 & 390x844 |
 | **Phase 9** | Production Readiness Audit | ✅ COMPLETED | PM2 cluster reload & zero-downtime deployment verified (Release `20261015_075126`, HTTP 200) |
 | **Phase 10** | Final Report Compilation | ✅ COMPLETED | Final report compiled in `docs/audit/final-report.md` |
+| **Phase 11** | Demo Experience, Global Error UX & Safe Top-Up | ✅ COMPLETED | 1-click authentic demo personas (`/sign-in`, `/sign-up`), global ErrorModalProvider, atomic `POST /api/wallet/topup`, 14/14 tests passed (`docs/audit/demo-error-ux-results.md`) |
 
 ---
 

@@ -14,6 +14,7 @@
     "db:push": "drizzle-kit push",
     "db:studio": "drizzle-kit studio",
     "test:api": "DOTENV_CONFIG_PATH=.env.local tsx -r dotenv/config scripts/test-api.ts",
+    "test:demo-wallet": "DOTENV_CONFIG_PATH=.env.local tsx -r dotenv/config scripts/test-demo-and-wallet.ts",
     "test:creator-dashboard": "node scripts/verify-creator-dashboard.mjs",
     "test:explore": "node scripts/verify-explore.mjs",
     "db:seed": "node scripts/seed-database.mjs",

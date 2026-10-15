@@ -14,6 +14,7 @@ import {
 } from 'lucide-react';
 import type { ActivePage, AuthState } from '@/types';
 import { formatCoin } from '@/lib/coin';
+import { DemoTopUpModal } from '@/components/wallet/DemoTopUpModal';
 
 export interface InvoiceDetailProps {
   currentUser?: AuthState['user'];
@@ -60,6 +61,7 @@ export function InvoiceDetailPage({ invoiceData, onPaymentSuccess, onClose }: In
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(true);
   const [paying, setPaying] = useState(false);
+  const [isTopUpOpen, setIsTopUpOpen] = useState(false);
 
   // 1. Fetch user's coin wallet balance
   useEffect(() => {
@@ -304,9 +306,19 @@ export function InvoiceDetailPage({ invoiceData, onPaymentSuccess, onClose }: In
               </button>
 
               {!isBalanceSufficient && (
-                <p className="text-[11px] text-red-600 text-center font-medium">
-                  Saldo koin Anda tidak mencukupi untuk melakukan pembayaran ini.
-                </p>
+                <div className="space-y-2 pt-1">
+                  <p className="text-[11px] text-red-600 text-center font-medium">
+                    Saldo koin Anda tidak mencukupi untuk melakukan pembayaran ini.
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() => setIsTopUpOpen(true)}
+                    className="w-full rounded-xl bg-amber-500 hover:bg-amber-600 py-2.5 text-xs font-bold text-white transition-colors cursor-pointer flex items-center justify-center gap-2 shadow-xs"
+                  >
+                    <Coins className="w-4 h-4 text-white" />
+                    <span>Top Up Koin Demo Sekarang</span>
+                  </button>
+                </div>
               )}
 
               <p className="text-[10px] text-neutral-400 text-center">
@@ -328,6 +340,13 @@ export function InvoiceDetailPage({ invoiceData, onPaymentSuccess, onClose }: In
           )}
         </div>
       )}
+
+      {/* Demo Top Up Modal */}
+      <DemoTopUpModal
+        isOpen={isTopUpOpen}
+        onClose={() => setIsTopUpOpen(false)}
+        onSuccess={(newBal) => setWalletBalance(newBal)}
+      />
     </main>
   );
 }

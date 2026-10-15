@@ -6,6 +6,8 @@ import { authService } from '@/services/authService';
 import { DEMO_COOKIE, getDemoUser } from '@/lib/demo-users';
 import { apiUrl } from '@/lib/api-config';
 
+import { dispatchGlobalError } from './ErrorModalProvider';
+
 // Global Client-Side Fetch Interceptor:
 // Routes all relative /api/* calls directly to the VPS backend (https://api.creatorin.my.id/api/*)
 // and ensures credentials: 'include' + Authorization Bearer header for resilient authentication
@@ -25,7 +27,18 @@ if (typeof window !== 'undefined' && !(window as any).__creatorin_fetch_intercep
         ...init,
         headers,
       };
-      return originalFetch(targetUrl, updatedInit);
+      return originalFetch(targetUrl, updatedInit).catch((err) => {
+        const isSilent = input.includes('/api/auth/me') || input.includes('/api/notifications');
+        if (!isSilent) {
+          console.error('[Creatorin Fetch Error]', input, err);
+          dispatchGlobalError(err, {
+            onRetry: () => {
+              window.location.reload();
+            },
+          });
+        }
+        throw err;
+      });
     }
     return originalFetch(input, init);
   };
