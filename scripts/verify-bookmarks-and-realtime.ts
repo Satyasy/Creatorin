@@ -3,22 +3,13 @@
  * Automated persistence verification for Bookmarks, Chat Read Receipts, and Banner Persistence.
  */
 import postgres from "postgres";
-import { SignJWT } from "jose";
+import { signJwtToken } from "../src/lib/auth-local.js";
 
 const DATABASE_URL = process.env.DATABASE_URL || "postgres://creatorin_user:creatorin_secure_2026@localhost:5432/creatorin_db";
-const JWT_SECRET = new TextEncoder().encode(process.env.JWT_SECRET || "creatorin_dev_secret_key_change_in_production");
 const BASE_URL = process.env.TEST_BASE_URL || "http://localhost:3000";
 
-const CREATOR_ID = "147e4d43-cde1-4ec4-82f6-30dabd6c8025";
-const BUSINESS_ID = "258e4d43-cde1-4ec4-82f6-30dabd6c8026";
-
-async function createToken(userId: string, email: string, role: string) {
-  return await new SignJWT({ userId, email, role })
-    .setProtectedHeader({ alg: "HS256" })
-    .setIssuedAt()
-    .setExpirationTime("2h")
-    .sign(JWT_SECRET);
-}
+const CREATOR_ID = "33333333-3333-3333-3333-333333333333";
+const BUSINESS_ID = "44444444-4444-4444-4444-444444444444";
 
 async function request(path: string, options: RequestInit = {}) {
   const res = await fetch(`${BASE_URL}${path}`, options);
@@ -52,8 +43,18 @@ async function main() {
 
   const sql = postgres(DATABASE_URL);
 
-  const creatorToken = await createToken(CREATOR_ID, "creator.demo@creatorin.id", "creator");
-  const businessToken = await createToken(BUSINESS_ID, "umkm.demo@creatorin.id", "business");
+  const creatorToken = await signJwtToken({
+    id: CREATOR_ID,
+    email: "munir@creatorin.id",
+    role: "creator",
+    fullName: "Sobakhul Munir Siroj",
+  });
+  const businessToken = await signJwtToken({
+    id: BUSINESS_ID,
+    email: "glowlab@creatorin.my.id",
+    role: "business",
+    fullName: "GlowLab Skincare Indonesia",
+  });
 
   const authCreator = { Authorization: `Bearer ${creatorToken}`, "Content-Type": "application/json" };
   const authBusiness = { Authorization: `Bearer ${businessToken}`, "Content-Type": "application/json" };
@@ -85,7 +86,8 @@ async function main() {
       const res = await request("/api/bookmarks?targetType=project", {
         headers: authCreator,
       });
-      if (!Array.isArray(res.bookmarks) || !res.bookmarks.includes(testProjectId)) {
+      const exists = Array.isArray(res.bookmarks) && res.bookmarks.some((b: any) => b.targetId === testProjectId || b === testProjectId);
+      if (!exists) {
         throw new Error("Target project ID not present in bookmarks array");
       }
     });
