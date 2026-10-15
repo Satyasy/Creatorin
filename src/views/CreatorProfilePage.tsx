@@ -50,8 +50,10 @@ import {
   Linkedin,
   Pencil,
   Link as LinkIcon,
-  Loader2
+  Loader2,
+  UploadCloud
 } from 'lucide-react';
+import { uploadImageWithRetry } from '@/lib/uploadHelper';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '@/providers/AuthProvider';
 import { Creator, CreatorService, PortfolioItem, AuthState, ActivePage, FeedProject } from '@/types';
@@ -213,7 +215,7 @@ export const CreatorProfilePage: React.FC<CreatorProfilePageProps> = ({
   const [creatorRoleTitle, setCreatorRoleTitle] = useState(creator.roleTitle);
   const [creatorBio, setCreatorBio] = useState(creator.bio);
   const [creatorAvatar, setCreatorAvatar] = useState(creator.avatar);
-  const [creatorBannerColor, setCreatorBannerColor] = useState('#0063b4');
+  const [creatorBannerColor, setCreatorBannerColor] = useState(creator.coverUrl || '#0063b4');
 
   // Temp editing inputs
   const [tempName, setTempName] = useState(creator.name);
@@ -221,6 +223,10 @@ export const CreatorProfilePage: React.FC<CreatorProfilePageProps> = ({
   const [tempBio, setTempBio] = useState(creator.bio);
   const [tempAvatar, setTempAvatar] = useState(creator.avatar);
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
+  const [bannerFile, setBannerFile] = useState<File | null>(null);
+  const [tempBanner, setTempBanner] = useState<string>(creator.coverUrl || '#0063b4');
+  const [bannerTab, setBannerTab] = useState<'upload' | 'color'>('upload');
+  const [isSavingSection, setIsSavingSection] = useState(false);
 
   // Finish edit confirmation & animated success modal state
   const [isConfirmFinishOpen, setIsConfirmFinishOpen] = useState(false);
@@ -242,32 +248,30 @@ export const CreatorProfilePage: React.FC<CreatorProfilePageProps> = ({
     try {
       let avatarUrl = creatorAvatar;
       if (avatarFile) {
-        if (!['image/jpeg', 'image/png', 'image/webp'].includes(avatarFile.type) || avatarFile.size > 10 * 1024 * 1024) {
-          throw new Error('Gunakan JPG, PNG, atau WebP maksimal 10 MB.');
-        }
-        const formData = new FormData();
-        formData.append('file', avatarFile);
-        formData.append('folder', 'avatars');
-        const uploadRes = await fetch('/api/upload', {
-          method: 'POST',
-          body: formData,
-        });
-        const uploadData = await uploadRes.json();
-        if (!uploadRes.ok) {
-          throw new Error(uploadData.error || 'Gagal mengunggah foto profil.');
-        }
-        avatarUrl = uploadData.url;
+        const uploadResult = await uploadImageWithRetry(avatarFile, 'avatars');
+        avatarUrl = uploadResult.url;
         setCreatorAvatar(avatarUrl);
         setAvatarFile(null);
         creator.avatar = avatarUrl;
         updateUser({ avatar: avatarUrl });
       }
 
-      const payload: { fullName?: string; headline?: string; bio?: string; avatarUrl?: string } = {};
+      let coverUrl = creatorBannerColor;
+      if (bannerFile) {
+        const uploadResult = await uploadImageWithRetry(bannerFile, 'avatars');
+        coverUrl = uploadResult.url;
+        setCreatorBannerColor(coverUrl);
+        setBannerFile(null);
+        creator.coverUrl = coverUrl;
+        updateUser({ coverUrl });
+      }
+
+      const payload: { fullName?: string; headline?: string; bio?: string; avatarUrl?: string; coverUrl?: string } = {};
       if (tempName && tempName !== creator.name) payload.fullName = tempName;
       if (tempRoleTitle && tempRoleTitle !== creator.roleTitle) payload.headline = tempRoleTitle;
       if (tempBio && tempBio !== creator.bio) payload.bio = tempBio;
       if (avatarUrl && avatarUrl !== creator.avatar) payload.avatarUrl = avatarUrl;
+      if (coverUrl && coverUrl !== (creator.coverUrl || '#0063b4')) payload.coverUrl = coverUrl;
 
       if (Object.keys(payload).length > 0) {
         const response = await fetch('/api/profile', {
@@ -290,11 +294,16 @@ export const CreatorProfilePage: React.FC<CreatorProfilePageProps> = ({
           setCreatorBio(tempBio);
           creator.bio = tempBio;
         }
+        if (payload.coverUrl) {
+          setCreatorBannerColor(coverUrl);
+          creator.coverUrl = coverUrl;
+        }
         updateUser({
           ...(payload.fullName ? { name: tempName } : {}),
           ...(payload.headline ? { roleTitle: tempRoleTitle } : {}),
           ...(payload.bio ? { bio: tempBio } : {}),
           ...(payload.avatarUrl ? { avatar: avatarUrl } : {}),
+          ...(payload.coverUrl ? { coverUrl } : {}),
         });
         await refreshUser();
       }
@@ -589,46 +598,71 @@ export const CreatorProfilePage: React.FC<CreatorProfilePageProps> = ({
         {/* Rounded Top Banner Card (Large panel radius 24px according to design.md §7) */}
         <div 
           className="relative h-[220px] sm:h-[260px] lg:h-[288px] w-full overflow-hidden rounded-3xl"
-          style={{ backgroundColor: creatorBannerColor }}
+          style={
+            (creatorBannerColor.startsWith('#') || creatorBannerColor.startsWith('linear-gradient'))
+              ? { background: creatorBannerColor }
+              : undefined
+          }
         >
-          <ShaderFill
-            className="absolute inset-0 rounded-3xl"
-            shader={{
-              setup: setupConcentric,
-              render: renderConcentric,
-              params: {
-                falloff: 1,
-                inverseFalloff: false,
-                ringCount: 20,
-                offset: 0,
-                shape: 1,
-                transform: { x: 50, y: 50, radius: 50, angle: 0 },
-                color: { r: 1, g: 1, b: 1, a: 1 },
-              },
-              manifest: manifestConcentric,
-            }}
-          />
-          <ShaderFill
-            className="absolute inset-0 rounded-[32px]"
-            shader={{
-              setup: setupWater,
-              render: renderWater,
-              params: {
-                center: { x: 50, y: 50 },
-                scale: 1,
-                playhead: 0,
-                highlightColor: { r: 0.804, g: 0.961, b: 1, a: 1 },
-                waterColor: { r: 0, g: 0.388, b: 0.706, a: 1 },
-                intensity: 0.5,
-              },
-              manifest: manifestWater,
-            }}
-          />
+          {!(creatorBannerColor.startsWith('#') || creatorBannerColor.startsWith('linear-gradient')) && (
+            <img
+              src={creatorBannerColor}
+              alt="Profile Cover Banner"
+              className="absolute inset-0 w-full h-full object-cover"
+            />
+          )}
+
+          {(creatorBannerColor.startsWith('#') || creatorBannerColor.startsWith('linear-gradient')) && (
+            <>
+              <ShaderFill
+                className="absolute inset-0 rounded-3xl"
+                shader={{
+                  setup: setupConcentric,
+                  render: renderConcentric,
+                  params: {
+                    falloff: 1,
+                    inverseFalloff: false,
+                    ringCount: 20,
+                    offset: 0,
+                    shape: 1,
+                    transform: { x: 50, y: 50, radius: 50, angle: 0 },
+                    color: { r: 1, g: 1, b: 1, a: 1 },
+                  },
+                  manifest: manifestConcentric,
+                }}
+              />
+              <ShaderFill
+                className="absolute inset-0 rounded-[32px]"
+                shader={{
+                  setup: setupWater,
+                  render: renderWater,
+                  params: {
+                    center: { x: 50, y: 50 },
+                    scale: 1,
+                    playhead: 0,
+                    highlightColor: { r: 0.804, g: 0.961, b: 1, a: 1 },
+                    waterColor: { r: 0, g: 0.388, b: 0.706, a: 1 },
+                    intensity: 0.5,
+                  },
+                  manifest: manifestWater,
+                }}
+              />
+            </>
+          )}
           {isOwnProfile && isEditModeActive && (
             <button
-              onClick={() => setEditingSection('banner')}
-              className="absolute top-4 right-4 z-30 px-3 py-1.5 rounded-full bg-white/95 hover:bg-white text-black text-xs font-semibold shadow-md flex items-center gap-1.5 cursor-pointer backdrop-blur-xs transition"
-              title="Edit Banner"
+              onClick={() => {
+                setTempBanner(creatorBannerColor);
+                setBannerFile(null);
+                setBannerTab(
+                  creatorBannerColor.startsWith('#') || creatorBannerColor.startsWith('linear-gradient')
+                    ? 'color'
+                    : 'upload'
+                );
+                setEditingSection('banner');
+              }}
+              className="absolute top-4 right-4 z-30 px-3.5 py-1.5 rounded-full bg-white/95 hover:bg-white text-black text-xs font-semibold shadow-md flex items-center gap-1.5 cursor-pointer backdrop-blur-xs transition hover:scale-105"
+              title="Ganti Background Sampul"
             >
               <Pencil className="w-3.5 h-3.5 text-blue-600" />
               <span>Ganti Banner</span>
@@ -1928,41 +1962,180 @@ export const CreatorProfilePage: React.FC<CreatorProfilePageProps> = ({
             )}
 
             {editingSection === 'avatar' && (
-              <div className="space-y-3 text-xs">
-                <div className="flex items-center gap-3">
-                  <img src={tempAvatar} alt="Preview" className="w-14 h-14 rounded-full object-cover ring-2 ring-neutral-200" />
-                  <div className="flex-1">
-                    <label className="font-semibold text-neutral-700 block mb-1">Pilih File Baru</label>
-                    <input
-                      type="file"
-                      accept="image/*"
-                      onChange={(e) => {
-                        const file = e.target.files?.[0];
-                        if (file) { setAvatarFile(file); setTempAvatar(URL.createObjectURL(file)); }
-                      }}
-                      className="text-xs text-neutral-500"
+              <div className="space-y-4 text-xs">
+                <div className="flex flex-col sm:flex-row items-center gap-4 p-3 bg-neutral-50 rounded-2xl border border-neutral-200">
+                  <div className="relative group shrink-0">
+                    <img 
+                      src={tempAvatar} 
+                      alt="Preview Avatar" 
+                      className="w-16 h-16 rounded-full object-cover ring-3 ring-white shadow-md" 
                     />
                   </div>
+                  <div className="flex-1 text-center sm:text-left">
+                    <p className="font-bold text-neutral-800 text-sm">Pratinjau Foto Profil</p>
+                    <p className="text-neutral-500 text-[11px] mt-0.5">
+                      Gunakan format JPG, PNG, atau WebP. Maksimal ukuran 15 MB.
+                    </p>
+                    {avatarFile && (
+                      <p className="text-blue-600 font-semibold text-[11px] mt-1 flex items-center justify-center sm:justify-start gap-1">
+                        <Check className="w-3.5 h-3.5" />
+                        <span>File terpilih: {avatarFile.name} ({(avatarFile.size / 1024).toFixed(0)} KB)</span>
+                      </p>
+                    )}
+                  </div>
                 </div>
+
+                {/* Dropzone with explicit cursor pointer and hover effects */}
+                <label 
+                  htmlFor="avatar-file-upload-input"
+                  className="group relative flex flex-col items-center justify-center p-6 border-2 border-dashed border-neutral-300 hover:border-blue-500 rounded-2xl bg-white hover:bg-blue-50/40 transition-all duration-200 cursor-pointer text-center"
+                >
+                  <input
+                    id="avatar-file-upload-input"
+                    type="file"
+                    accept="image/jpeg,image/png,image/webp,image/gif"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (file) { 
+                        setAvatarFile(file); 
+                        setTempAvatar(URL.createObjectURL(file)); 
+                      }
+                    }}
+                    className="sr-only cursor-pointer"
+                  />
+                  <div className="w-12 h-12 rounded-full bg-neutral-100 group-hover:bg-blue-100 text-neutral-600 group-hover:text-blue-600 flex items-center justify-center transition mb-2 cursor-pointer shadow-xs">
+                    <UploadCloud className="w-6 h-6" />
+                  </div>
+                  <span className="font-bold text-neutral-800 group-hover:text-blue-600 text-xs transition cursor-pointer">
+                    Klik untuk memilih berkas foto atau seret ke sini
+                  </span>
+                  <span className="text-[11px] text-neutral-400 mt-1 cursor-pointer">
+                    Mendukung JPG, PNG, atau WebP (Orientasi 1:1 direkomendasikan)
+                  </span>
+                </label>
               </div>
             )}
 
             {editingSection === 'banner' && (
-              <div className="space-y-3 text-xs">
-                <label className="font-semibold text-neutral-700 block">Pilih Warna Aksen Banner</label>
-                <div className="flex gap-2">
-                  {['#0063b4', '#0d0c22', '#155DFC', '#0f766e', '#7c3aed', '#be185d'].map((c) => (
-                    <button
-                      key={c}
-                      type="button"
-                      onClick={() => setCreatorBannerColor(c)}
-                      className={`w-8 h-8 rounded-full border-2 transition cursor-pointer ${
-                        creatorBannerColor === c ? 'border-black scale-110' : 'border-transparent'
-                      }`}
-                      style={{ backgroundColor: c }}
-                    />
-                  ))}
+              <div className="space-y-4 text-xs">
+                {/* Tabs: Upload Foto vs Pilihan Warna */}
+                <div className="flex items-center gap-2 p-1 bg-neutral-100 rounded-xl">
+                  <button
+                    type="button"
+                    onClick={() => setBannerTab('upload')}
+                    className={`flex-1 py-1.5 px-3 rounded-lg font-bold text-xs transition cursor-pointer flex items-center justify-center gap-1.5 ${
+                      bannerTab === 'upload'
+                        ? 'bg-white text-neutral-900 shadow-xs'
+                        : 'text-neutral-500 hover:text-neutral-800'
+                    }`}
+                  >
+                    <UploadCloud className="w-3.5 h-3.5" />
+                    <span>Upload Foto Sampul</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setBannerTab('color')}
+                    className={`flex-1 py-1.5 px-3 rounded-lg font-bold text-xs transition cursor-pointer flex items-center justify-center gap-1.5 ${
+                      bannerTab === 'color'
+                        ? 'bg-white text-neutral-900 shadow-xs'
+                        : 'text-neutral-500 hover:text-neutral-800'
+                    }`}
+                  >
+                    <Sparkles className="w-3.5 h-3.5" />
+                    <span>Preset Warna & Gradien</span>
+                  </button>
                 </div>
+
+                {bannerTab === 'upload' && (
+                  <div className="space-y-3">
+                    {/* Live Preview Banner */}
+                    <div className="relative h-28 w-full rounded-2xl overflow-hidden border border-neutral-200 bg-neutral-100">
+                      {!(tempBanner.startsWith('#') || tempBanner.startsWith('linear-gradient')) ? (
+                        <img src={tempBanner} alt="Preview Banner" className="w-full h-full object-cover" />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center text-neutral-400 text-xs" style={{ background: tempBanner }}>
+                          <span>Belum ada foto yang dipilih</span>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Dropzone with cursor-pointer and hover */}
+                    <label 
+                      htmlFor="banner-file-upload-input"
+                      className="group relative flex flex-col items-center justify-center p-5 border-2 border-dashed border-neutral-300 hover:border-blue-500 rounded-2xl bg-white hover:bg-blue-50/40 transition-all duration-200 cursor-pointer text-center"
+                    >
+                      <input
+                        id="banner-file-upload-input"
+                        type="file"
+                        accept="image/jpeg,image/png,image/webp"
+                        onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          if (file) {
+                            setBannerFile(file);
+                            setTempBanner(URL.createObjectURL(file));
+                          }
+                        }}
+                        className="sr-only cursor-pointer"
+                      />
+                      <div className="w-10 h-10 rounded-full bg-neutral-100 group-hover:bg-blue-100 text-neutral-600 group-hover:text-blue-600 flex items-center justify-center transition mb-1.5 cursor-pointer shadow-xs">
+                        <UploadCloud className="w-5 h-5" />
+                      </div>
+                      <span className="font-bold text-neutral-800 group-hover:text-blue-600 text-xs transition cursor-pointer">
+                        Klik untuk memilih foto sampul kustom
+                      </span>
+                      <span className="text-[11px] text-neutral-400 mt-0.5 cursor-pointer">
+                        Format JPG, PNG, WebP maks 15 MB (Rekomendasi rasio 16:9 atau 1440x300px)
+                      </span>
+                      {bannerFile && (
+                        <span className="text-blue-600 font-semibold text-[11px] mt-2">
+                          File: {bannerFile.name} ({(bannerFile.size / 1024).toFixed(0)} KB)
+                        </span>
+                      )}
+                    </label>
+                  </div>
+                )}
+
+                {bannerTab === 'color' && (
+                  <div className="space-y-3">
+                    <div 
+                      className="h-20 w-full rounded-2xl border border-neutral-200 shadow-inner flex items-center justify-center text-white font-bold text-xs"
+                      style={{ background: tempBanner.startsWith('#') || tempBanner.startsWith('linear-gradient') ? tempBanner : '#0063b4' }}
+                    >
+                      Pratinjau Warna Aksen Banner
+                    </div>
+                    <div>
+                      <p className="font-semibold text-neutral-700 mb-2">Pilih Palet Tema:</p>
+                      <div className="flex flex-wrap gap-2.5">
+                        {[
+                          '#0063b4', 
+                          '#0d0c22', 
+                          '#155DFC', 
+                          '#0f766e', 
+                          '#7c3aed', 
+                          '#be185d', 
+                          '#ea580c',
+                          'linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%)',
+                          'linear-gradient(135deg, #064e3b 0%, #10b981 100%)',
+                          'linear-gradient(135deg, #4c1d95 0%, #8b5cf6 100%)'
+                        ].map((c) => (
+                          <button
+                            key={c}
+                            type="button"
+                            onClick={() => {
+                              setTempBanner(c);
+                              setBannerFile(null);
+                            }}
+                            className={`w-9 h-9 rounded-xl border-2 transition cursor-pointer shadow-xs hover:scale-110 ${
+                              tempBanner === c ? 'border-black ring-2 ring-blue-500 scale-105' : 'border-neutral-200'
+                            }`}
+                            style={{ background: c }}
+                            title={c}
+                          />
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
             )}
 
@@ -1976,31 +2149,46 @@ export const CreatorProfilePage: React.FC<CreatorProfilePageProps> = ({
               </button>
               <button
                 type="button"
+                disabled={isSavingSection}
                 onClick={async () => {
+                  setIsSavingSection(true);
                   try {
                     let avatarUrl = tempAvatar;
+                    let coverUrl = tempBanner;
+
                     if (editingSection === 'avatar' && avatarFile) {
-                      if (!['image/jpeg', 'image/png', 'image/webp'].includes(avatarFile.type) || avatarFile.size > 10 * 1024 * 1024) {
-                        throw new Error('Gunakan JPG, PNG, atau WebP maksimal 10 MB.');
-                      }
-                      const formData = new FormData();
-                      formData.append('file', avatarFile);
-                      formData.append('folder', 'avatars');
-                      const uploadRes = await fetch('/api/upload', {
-                        method: 'POST',
-                        body: formData,
-                      });
-                      const uploadData = await uploadRes.json();
-                      if (!uploadRes.ok) {
-                        throw new Error(uploadData.error || 'Gagal mengunggah foto profil.');
-                      }
-                      avatarUrl = uploadData.url;
+                      const uploadResult = await uploadImageWithRetry(avatarFile, 'avatars');
+                      avatarUrl = uploadResult.url;
                     }
-                    const payload = editingSection === 'name' ? { fullName: tempName, headline: tempRoleTitle } : editingSection === 'bio' ? { bio: tempBio } : editingSection === 'avatar' ? { avatarUrl } : {};
-                    if (editingSection !== 'banner') {
-                      const response = await fetch('/api/profile', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
-                      if (!response.ok) throw new Error((await response.json()).error || 'Gagal menyimpan profil.');
+
+                    if (editingSection === 'banner' && bannerFile) {
+                      const uploadResult = await uploadImageWithRetry(bannerFile, 'avatars');
+                      coverUrl = uploadResult.url;
                     }
+
+                    const payload: Record<string, any> = {};
+                    if (editingSection === 'name') {
+                      payload.fullName = tempName;
+                      payload.headline = tempRoleTitle;
+                    } else if (editingSection === 'bio') {
+                      payload.bio = tempBio;
+                    } else if (editingSection === 'avatar') {
+                      payload.avatarUrl = avatarUrl;
+                    } else if (editingSection === 'banner') {
+                      payload.coverUrl = coverUrl;
+                    }
+
+                    const response = await fetch('/api/profile', {
+                      method: 'PUT',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify(payload),
+                    });
+
+                    if (!response.ok) {
+                      const errData = await response.json().catch(() => ({}));
+                      throw new Error(errData.error || 'Gagal menyimpan profil.');
+                    }
+
                     if (editingSection === 'name') {
                       setCreatorName(tempName);
                       setCreatorRoleTitle(tempRoleTitle);
@@ -2016,14 +2204,31 @@ export const CreatorProfilePage: React.FC<CreatorProfilePageProps> = ({
                       setAvatarFile(null);
                       creator.avatar = avatarUrl;
                       updateUser({ avatar: avatarUrl });
+                    } else if (editingSection === 'banner') {
+                      setCreatorBannerColor(coverUrl);
+                      setBannerFile(null);
+                      creator.coverUrl = coverUrl;
+                      updateUser({ coverUrl });
                     }
+
                     await refreshUser();
                     setEditingSection(null);
-                  } catch (error) { alert(error instanceof Error ? error.message : 'Gagal menyimpan profil.'); }
+                  } catch (error) {
+                    alert(error instanceof Error ? error.message : 'Gagal menyimpan profil.');
+                  } finally {
+                    setIsSavingSection(false);
+                  }
                 }}
-                className="px-4 py-1.5 rounded-xl bg-[#0D0C22] hover:bg-neutral-800 text-white text-xs font-bold cursor-pointer transition shadow-xs"
+                className="px-4 py-1.5 rounded-xl bg-[#0D0C22] hover:bg-neutral-800 disabled:opacity-50 text-white text-xs font-bold cursor-pointer transition shadow-xs flex items-center gap-1.5"
               >
-                Simpan
+                {isSavingSection ? (
+                  <>
+                    <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                    <span>Menyimpan...</span>
+                  </>
+                ) : (
+                  <span>Simpan</span>
+                )}
               </button>
             </div>
           </div>

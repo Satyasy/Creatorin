@@ -15,6 +15,7 @@ export const profiles = pgTable("profiles", {
   email: text("email"),
   passwordHash: text("password_hash"),
   avatarUrl: text("avatar_url"),
+  coverUrl: text("cover_url"),
   phone: text("phone"),
   location: text("location"),
   createdAt: timestamp("created_at").defaultNow().notNull(),

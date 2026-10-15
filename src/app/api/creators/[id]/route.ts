@@ -24,6 +24,7 @@ export async function GET(
         role: profiles.role,
         fullName: profiles.fullName,
         avatarUrl: profiles.avatarUrl,
+        coverUrl: profiles.coverUrl,
         phone: profiles.phone,
         location: profiles.location,
         slug: creatorProfiles.slug,

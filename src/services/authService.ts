@@ -8,6 +8,7 @@ export interface UserSession {
   role: UserRole;
   dbRole: 'creator' | 'business' | 'school';
   avatar?: string;
+  coverUrl?: string;
   location?: string;
   phone?: string;
   bio?: string;

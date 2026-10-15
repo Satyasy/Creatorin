@@ -48,6 +48,7 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from '@/providers/AuthProvider';
 import { creatorService } from '@/services/creatorService';
 import { chatService } from '@/services/chatService';
+import { uploadImageWithRetry } from '@/lib/uploadHelper';
 import { AuthModal } from '@/components/modals/AuthModal';
 import { UMKMProfile, AuthState, ActivePage, ProjectListing, UMKMCompletedCollab, UMKMCreatorReview, Creator } from '@/types';
 import { BriefDetailPage } from '@/views/BriefDetailPage';
@@ -81,7 +82,7 @@ export const UmkmProfilePage: React.FC<UmkmProfilePageProps> = ({
   initialProfile
 }) => {
   const router = useRouter();
-  const { user: authUser } = useAuth();
+  const { user: authUser, refreshUser, updateUser } = useAuth();
   const currentUser = propUser !== undefined ? propUser : authUser;
   const isCreatorShell = currentUser?.role === 'creator';
 
@@ -198,21 +199,49 @@ export const UmkmProfilePage: React.FC<UmkmProfilePageProps> = ({
   const coverFileInputRef = React.useRef<HTMLInputElement>(null);
   const logoFileInputRef = React.useRef<HTMLInputElement>(null);
 
-  const handleCoverUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleCoverUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      const url = URL.createObjectURL(file);
-      setProfile(prev => ({ ...prev, coverBanner: url }));
-      showToast('Foto sampul brand berhasil diperbarui!');
+      try {
+        const previewUrl = URL.createObjectURL(file);
+        setProfile(prev => ({ ...prev, coverBanner: previewUrl }));
+        showToast('Mengunggah foto sampul brand...');
+        const uploadResult = await uploadImageWithRetry(file, 'avatars');
+        setProfile(prev => ({ ...prev, coverBanner: uploadResult.url }));
+        await fetch('/api/profile', {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ coverUrl: uploadResult.url }),
+        });
+        updateUser({ coverUrl: uploadResult.url });
+        await refreshUser();
+        showToast('Foto sampul brand berhasil diperbarui!');
+      } catch (err: any) {
+        showToast(err.message || 'Gagal mengunggah foto sampul.');
+      }
     }
   };
 
-  const handleLogoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      const url = URL.createObjectURL(file);
-      setProfile(prev => ({ ...prev, logo: url }));
-      showToast('Logo brand berhasil diperbarui!');
+      try {
+        const previewUrl = URL.createObjectURL(file);
+        setProfile(prev => ({ ...prev, logo: previewUrl }));
+        showToast('Mengunggah logo brand...');
+        const uploadResult = await uploadImageWithRetry(file, 'avatars');
+        setProfile(prev => ({ ...prev, logo: uploadResult.url }));
+        await fetch('/api/profile', {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ avatarUrl: uploadResult.url }),
+        });
+        updateUser({ avatar: uploadResult.url });
+        await refreshUser();
+        showToast('Logo brand berhasil diperbarui!');
+      } catch (err: any) {
+        showToast(err.message || 'Gagal mengunggah logo.');
+      }
     }
   };
 

@@ -17,8 +17,10 @@ import {
   ShieldCheck, 
   Save, 
   Camera, 
-  ArrowLeft 
+  ArrowLeft,
+  Loader2 
 } from 'lucide-react';
+import { uploadImageWithRetry } from '@/lib/uploadHelper';
 
 export const SettingsPage: React.FC = () => {
   const router = useRouter();
@@ -59,6 +61,36 @@ export const SettingsPage: React.FC = () => {
   const [isSavedToast, setIsSavedToast] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [saveError, setSaveError] = useState('');
+  const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
+  const avatarInputRef = React.useRef<HTMLInputElement>(null);
+
+  const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setIsUploadingAvatar(true);
+    setSaveError('');
+    try {
+      const uploadResult = await uploadImageWithRetry(file, 'avatars');
+      const res = await fetch('/api/profile', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ avatarUrl: uploadResult.url }),
+      });
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        throw new Error(data.error || 'Gagal menyimpan foto profil.');
+      }
+      await refreshUser();
+      showToast({
+        type: 'success',
+        message: 'Foto profil berhasil diperbarui!',
+      });
+    } catch (err: any) {
+      setSaveError(err.message || 'Gagal mengunggah foto profil.');
+    } finally {
+      setIsUploadingAvatar(false);
+    }
+  };
 
   useEffect(() => {
     if (!user) return;
@@ -194,22 +226,56 @@ export const SettingsPage: React.FC = () => {
               
               {/* Avatar Section */}
               <div className="flex items-center gap-5 pb-6 border-b border-[#E2E8F0]">
-                <div className="relative">
+                <input
+                  ref={avatarInputRef}
+                  type="file"
+                  accept="image/jpeg,image/png,image/webp"
+                  className="hidden"
+                  onChange={handleAvatarUpload}
+                />
+                <div 
+                  onClick={() => !isUploadingAvatar && avatarInputRef.current?.click()}
+                  className="relative group cursor-pointer"
+                  title="Klik untuk mengganti foto profil"
+                >
                   <img
                     src={user?.avatar || '/creatorin/avatar.png'}
                     alt={fullName}
-                    className="w-20 h-20 rounded-full object-cover ring-4 ring-neutral-100"
+                    className="w-20 h-20 rounded-full object-cover ring-4 ring-neutral-100 group-hover:ring-blue-400 transition"
                   />
-                  <div className="absolute bottom-0 right-0 p-1.5 rounded-full bg-[#0B1F3A] text-white shadow-xs">
-                    <Camera className="w-3.5 h-3.5" />
+                  <div className="absolute inset-0 rounded-full bg-black/40 opacity-0 group-hover:opacity-100 transition flex flex-col items-center justify-center text-white text-[10px] font-semibold cursor-pointer">
+                    <Camera className="w-5 h-5 mb-0.5" />
+                    <span>Ubah</span>
+                  </div>
+                  <div className="absolute bottom-0 right-0 p-1.5 rounded-full bg-[#0B1F3A] text-white shadow-xs group-hover:scale-110 transition">
+                    {isUploadingAvatar ? (
+                      <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                    ) : (
+                      <Camera className="w-3.5 h-3.5" />
+                    )}
                   </div>
                 </div>
                 <div>
                   <h3 className="text-sm font-bold text-[#171717]">{fullName}</h3>
                   <p className="text-xs text-neutral-500 mt-0.5">{user?.role === 'creator' ? 'Kreator Terverifikasi' : 'Brand / UMKM'}</p>
-                  <span className="inline-block mt-2 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-[#F3F3F4] text-neutral-700">
-                    Format JPG, PNG maks 2MB
-                  </span>
+                  <button
+                    type="button"
+                    onClick={() => avatarInputRef.current?.click()}
+                    disabled={isUploadingAvatar}
+                    className="inline-flex items-center gap-1.5 mt-2 px-3 py-1 rounded-full text-xs font-bold bg-[#F3F3F4] hover:bg-neutral-200 text-neutral-700 cursor-pointer transition"
+                  >
+                    {isUploadingAvatar ? (
+                      <>
+                        <Loader2 className="w-3 h-3 animate-spin" />
+                        <span>Mengunggah...</span>
+                      </>
+                    ) : (
+                      <>
+                        <Camera className="w-3 h-3" />
+                        <span>Pilih Foto Baru</span>
+                      </>
+                    )}
+                  </button>
                 </div>
               </div>
 

@@ -26,6 +26,7 @@ export async function GET(req: NextRequest) {
         id: profiles.id,
         fullName: profiles.fullName,
         avatarUrl: profiles.avatarUrl,
+        coverUrl: profiles.coverUrl,
         location: profiles.location,
         phone: profiles.phone,
         slug: creatorProfiles.slug,
@@ -76,10 +77,10 @@ export async function PUT(req: NextRequest) {
   }
 
   const body = await req.json();
-  const { fullName, phone, location, avatarUrl, headline, bio, skills, startingPrice } = body;
+  const { fullName, phone, location, avatarUrl, coverUrl, headline, bio, skills, startingPrice } = body;
 
   try {
-    if (fullName !== undefined || phone !== undefined || location !== undefined || avatarUrl !== undefined) {
+    if (fullName !== undefined || phone !== undefined || location !== undefined || avatarUrl !== undefined || coverUrl !== undefined) {
       await db
         .update(profiles)
         .set({
@@ -87,6 +88,7 @@ export async function PUT(req: NextRequest) {
           phone: phone !== undefined ? phone : undefined,
           location: location !== undefined ? location : undefined,
           avatarUrl: avatarUrl !== undefined ? avatarUrl : undefined,
+          coverUrl: coverUrl !== undefined ? coverUrl : undefined,
           updatedAt: new Date(),
         })
         .where(eq(profiles.id, user.id));
