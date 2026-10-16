@@ -16,7 +16,8 @@ import {
   RefreshCw, 
   FileText,
   Star,
-  ListChecks
+  ListChecks,
+  Calendar
 } from 'lucide-react';
 import { AuthState, ChatConversation, ChatInvoice } from '@/types';
 import { formatCoin } from '@/lib/coin';
@@ -795,6 +796,43 @@ export const CollaborationRoomView: React.FC<CollaborationRoomViewProps> = ({
                   </div>
                 </div>
               </div>
+
+              {/* Timeline & Target Deadline jika ada */}
+              {collabSummary.timeline && collabSummary.timeline.length > 0 && (
+                <div className="p-3.5 rounded-xl border border-neutral-100 bg-neutral-50/50 space-y-2">
+                  <span className="text-xs font-bold text-neutral-800 flex items-center gap-1.5">
+                    <Calendar className="w-4 h-4 text-blue-600 shrink-0" />
+                    Target Waktu & Timeline Faktual
+                  </span>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                    {collabSummary.timeline.map((item: any, idx: number) => (
+                      <div key={idx} className="p-2.5 rounded-lg bg-white border border-neutral-200/60 space-y-1">
+                        <div className="flex items-center justify-between text-[11px]">
+                          <strong className="text-neutral-900">{item.statedDeadline}</strong>
+                          <span className={`px-1.5 py-0.5 rounded text-[10px] font-semibold ${
+                            item.certainty === 'confirmed' ? 'bg-emerald-50 text-emerald-700' : 'bg-neutral-100 text-neutral-600'
+                          }`}>
+                            {item.certainty === 'confirmed' ? 'Disepakati' : 'Perlu Konfirmasi'}
+                          </span>
+                        </div>
+                        <p className="text-[11px] text-neutral-600 truncate">{item.task}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Usulan Belum Dikonfirmasi jika ada */}
+              {collabSummary.proposals && collabSummary.proposals.length > 0 && (
+                <div className="p-3 rounded-xl bg-amber-50/50 border border-amber-200/60 text-xs text-amber-900 space-y-1">
+                  <strong className="block text-[11px] font-bold text-amber-800">Usulan Belum Dikonfirmasi:</strong>
+                  <ul className="space-y-0.5 pl-1 text-[11px]">
+                    {collabSummary.proposals.map((prop: string, idx: number) => (
+                      <li key={idx}>› {prop}</li>
+                    ))}
+                  </ul>
+                </div>
+              )}
 
               {/* Catatan Revisi Aktif jika ada */}
               {collabSummary.lastRevisionNotes && (

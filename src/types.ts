@@ -421,6 +421,24 @@ export interface ChatConversation {
     lastRevisionNotes?: string;
     modelUsed: string;
     generatedAt: string;
+    scope?: string[];
+    confirmedAgreements?: string[];
+    proposals?: string[];
+    timeline?: Array<{
+      task: string;
+      statedDeadline: string;
+      assignee: string;
+      status: 'not_started' | 'in_progress' | 'completed' | 'unknown';
+      certainty: 'confirmed' | 'unconfirmed';
+      sourceQuote: string;
+    }>;
+    creatorResponsibilities?: string[];
+    umkmResponsibilities?: string[];
+    openQuestions?: string[];
+    risksAndConflicts?: string[];
+    missingInformation?: string[];
+    isOutdated?: boolean;
+    sourceMessageRange?: { count: number; firstAt?: string; lastAt?: string };
   };
   aiSummaryUpdatedAt?: string;
 }
